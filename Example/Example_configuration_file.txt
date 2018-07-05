@@ -1,0 +1,211 @@
+#######################
+## Define Model
+#######################
+@model
+start_year 1989
+final_year 2018
+min_age 0
+max_age 15
+age_plus true
+initialisation_phases Equilibrium_state
+time_steps Summer week1 week2 week3 week4 Autumn Winter Spring
+## In this example summer is a spawning event, and so we want to model egg transport and larve development for the first
+## 4 weeks after spawning before jumping back to the bigger items
+
+## Define some parameters for the partition
+@partition
+number_of_individuals 100000  ## can be super individuals aka agents
+## maybe some flags on what components we want in our models
+undeveloped true
+sub_developed true 
+developed true 
+
+
+## Define some initial state, either equilibrium or user defined
+@initialisation_phase Equilibrium_state
+type iterative
+number_of_years 200
+
+#######################
+## Define annual cycle
+#######################
+@time_step Summer 
+processes spawn_migrate M Recruitment growth
+
+@time_step week1 
+processes egg_transport_week1 egg_mortality
+
+@time_step week2
+processes egg_transport_week2 egg_mortality
+
+@time_step week3
+processes egg_transport_week3 egg_mortality
+
+@time_step week4
+processes egg_transport_week4 larvae_development larvae_mortality
+
+@time_step Autumn 
+processes F M egg_development
+
+@time_step Winter  
+processes winter_migrate M
+
+@time_step Spring 
+processes M larvae_development
+
+#######################
+## Define Processes in 
+## From the annual cycle
+#######################
+@process M
+type instantaneous_mortality
+time_step_proportions 0.25 0.25 0.25 0.25 # how much M to apply in each time step
+individuals sub_developed developed
+M 0.5 0.2 # the annual M, a one to one relationship with the above categories
+selectivities One One ## Can have length or age based M as well as time varying
+layers ## an optional command where users can specify a spatially varying M, could be based on predator abundance 
+
+## a seperate M process for eggs
+@process egg_mortality
+type instantaneous_mortality
+time_step_proportions 0.25 0.25 0.25 0.25 # how much M to apply in each time step
+individuals un_developed
+M 0.6 # the annual M, a one to one relationship with the above categories
+selectivities One ## Can have length or age based M as well as time varying
+layers ## an optional command where users can specify a spatially varying M, could be based on predator abundance 
+
+## a movement process for eggs purely based on currents
+@process egg_transport_week1
+type advection_diffusion_movement
+diffusion_coeffecient
+zonal_layer zonal_currents_1_week_after_spawn
+meridional_layer meridional_currents_2_week_after_spawn
+individuals un_developed
+
+@process egg_transport_week2
+type advection_diffusion_movement
+diffusion_coeffecient
+zonal_layer zonal_currents_2_week_after_spawn
+meridional_layer meridional_currents_2_week_after_spawn
+individuals un_developed
+
+@process egg_transport_week3
+type advection_diffusion_movement
+diffusion_coeffecient
+zonal_layer zonal_currents_3_week_after_spawn
+meridional_layer meridional_currents_3_week_after_spawn
+individuals un_developed
+
+@process egg_transport_week4
+type advection_diffusion_movement
+diffusion_coeffecient
+zonal_layer zonal_currents_4_week_after_spawn
+meridional_layer meridional_currents_4_week_after_spawn
+individuals un_developed
+
+@process egg_development
+type category_transition
+from un_developed
+to sub_developed
+layer nusery_areas ## A binary layer, if 0 the egg dies, if 1 egg turns into a larvae
+
+@process larvae_development
+type category_transition
+from sub_developed
+to developed
+## all larvae can become adults in this process
+
+@process F
+type instantaneous_mortality
+individuals developed
+
+@process spawn_migrate
+type ontogenetic_movement
+layer #move to spawning areas perhaps a layer with spawning hotspots that generate large velocity and small diffusion
+selectivity
+categories developed
+
+@process winter_migrate
+type ontogenetic_movement
+layer #some layer that disperese individuals outside homogenously or based on habitat
+selectivity
+categories developed
+
+#
+@process Recruitment
+type beverton_holt_recruitment
+ssb_layer ## this can be used to distribute the recruits
+h 0.8
+B0 200000 ## this is what scales individuals to super individuals
+
+
+################
+## Define reports
+################
+## age samples from fishery
+## age sample at a point in time
+## biomass sample
+## partition at each time step write to file on the fly so we don't have to cache this crap in memory, involves another thread though
+
+
+################
+## Define layers
+################
+## there are three important layers
+# - base
+# - latitude
+# - longitude
+
+@layer Base
+type base
+begin_table
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+end_table
+
+@layer latitude
+type latitude
+begin_table
+-46.5 -46.5 -46.5 -46.5
+-47.5 -47.5 -47.5 -47.5
+-48.5 -48.5 -48.5 -48.5
+-49.5 -49.5 -49.5 -49.5
+end_table
+
+@layer longitude
+type longitude
+begin_table
+172.5 173.5 174.5 175.5
+172.5 173.5 174.5 175.5
+172.5 173.5 174.5 175.5
+172.5 173.5 174.5 175.5
+end_table
+
+# there can be fundamental layers
+# - defined by the models
+# - defined by the user
+## examples follow
+
+# - defined by the models, generates ssb of the partition in Summer for all years, you can see this is then passed to Recruitment process
+@layer ssb_layer
+type biomass
+time_step Summer
+years # default all years
+
+# - user defined
+@layer nusery_areas
+type proportion
+years # default all years
+begin_table
+1 0.3 0 0
+1 0.3 0 0
+1 0.3 0 0
+1 0.3 0 0
+end_table
+
+
+
+
+

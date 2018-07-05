@@ -1,7 +1,8 @@
 # Individual Based Model (IBM)
 
-This repository is for a generalised IBM that I am trying to generate during my PhD. It is a mixture of 
-ideas that need to be acknowledged. Firstly to the Casal2 team found [here](https://github.com/NIWAFisheriesModelling/CASAL2),
+This repository is for a generalised IBM that I am trying to generate during my PhD. It will be a stochastic simulator used 
+for investigating different stock assessment methods under hypothetical scenerios. The current repository is a mixture of  ideas that need to be acknowledged. 
+Firstly to the Casal2 team found [here](https://github.com/NIWAFisheriesModelling/CASAL2),
 which formulated the basis of the core code for error handling, parameter structure, configuration syntax and more. I also learnt about IBM's 
 via the model found [here](https://github.com/trophia/sna1) where some idea's have been brought across.
 
@@ -14,3 +15,5 @@ habitat based movement, via currents and active gradient searches like in [this 
 Also make it a full life cycle model so that we can do (end to end model)[https://www-sciencedirect-com.ezproxy.auckland.ac.nz/science/article/pii/S0079661115000233]
 It would also need to simulate data that could easily be assess in a stock assessment model for management strategy evaluation.
 
+IBM's are notorious for being limited by CPU, so a big emphasis is to make it as modular and thread safe as possible. It is currently
+coded to be used on a desktop (as apposed to HPC) as I belief that is where most users will apply it.
