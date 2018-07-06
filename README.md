@@ -12,7 +12,7 @@ structure model design see this [document](https://github.com/Craig44/IBM/blob/m
 
 I am interested in adding features that are being used in recent applications of IBM's such as; [energetic functionality](https://www.sciencedirect.com/science/article/pii/S0304380018301327) 
 habitat based movement, via currents and active gradient searches like in [this paper](https://www.sciencedirect.com/science/article/pii/S0079661117302896)
-Also make it a full life cycle model so that we can do (end to end model)[https://www-sciencedirect-com.ezproxy.auckland.ac.nz/science/article/pii/S0079661115000233]
+Also make it a full life cycle model so that we can do [end to end model](https://www-sciencedirect-com.ezproxy.auckland.ac.nz/science/article/pii/S0079661115000233)
 It would also need to simulate data that could easily be assess in a stock assessment model for management strategy evaluation.
 
 IBM's are notorious for being limited by CPU, so a big emphasis is to make it as modular and thread safe as possible. It is currently

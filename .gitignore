@@ -1,0 +1,10 @@
+/ThirdParty/boost/boost_1_58_0
+/ThirdParty/boost/casal2_unzip.log
+/ThirdParty/boost/windows.pyc
+/ThirdParty/googletest_googlemock/windows.pyc
+/ThirdParty/googletest_googlemock/gmock-1.6.0
+/ThirdParty/googletest_googlemock/casal2_unzip.log
+/BuildSystem/buildtools/classes/*.pyc
+/BuildSystem/bin
+/BuildSystem/buildtools/windows/Python27
+/.settings/*.prefs
