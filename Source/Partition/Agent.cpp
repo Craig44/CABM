@@ -20,9 +20,9 @@
 
 // namespaces
 namespace niwa {
-namespace partition {
+namespace agents {
 
 
 
-} /* namespace partitions */
+} /* namespace agents */
 } /* namespace niwa */

@@ -50,7 +50,7 @@ public:
   // TODO add functions like Casal2 that checks to see if attributes are valid such as maturity, sex, area
 
   // Accessors
-  vector<partition::Agent>&   get_partition() {return partition_;}; // accessor for the vector of agents by reference, this is a const so only used for summarising partition e.g SSB, observations
+  vector<agents::Agent>&   get_partition() {return partition_;}; // accessor for the vector of agents by reference, this is a const so only used for summarising partition e.g SSB, observations
 
 protected:
   // Methods
@@ -58,7 +58,7 @@ protected:
 
   // Members
   Model*                       model_ = nullptr;
-  vector<partition::Agent>		 partition_;  // A vector of Agent instances....
+  vector<agents::Agent>		 partition_;  // A vector of Agent instances....
 
 };
 

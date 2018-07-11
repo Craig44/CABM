@@ -60,7 +60,7 @@ protected:
   vector<string>              selectivity_labels_;
   vector<Selectivity*>        selectivities_;
   vector<string>              category_labels_;
-  vector<partition::Agent>    partition_;
+  vector<agents::Agent>       partition_;
   string                      proportion_method_;
   Double                      time_step_proportion_;
   bool                        mean_proportion_method_;

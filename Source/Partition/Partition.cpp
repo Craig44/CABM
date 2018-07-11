@@ -18,7 +18,7 @@
 
 #include <cmath>
 
-#include "Agents/Agents.h"
+#include "Partition/Agent.h"
 #include "Model/Model.h"
 #include "Logging/Logging.h"
 
@@ -44,7 +44,7 @@ void Partition::Build() {
   //
   for(unsigned i = 0; i < model_->number_of_agents_to_seed(); ++i) {
     LOG_FINEST() << "Adding Agent to the partition";
-    partition::Agent* new_agent = new partition::Agent(model_);
+    agents::Agent* new_agent = new agents::Agent(model_);
     // Initialise Partition here.
 
     partition_.push_back(*new_agent);

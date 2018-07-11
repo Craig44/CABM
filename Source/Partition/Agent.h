@@ -1,5 +1,5 @@
 /**
- * @file Agents.h
+ * @file Agent.h
  * @author Scott Rasmussen (scott.rasmussen@zaita.com)
  * @github https://github.com/Zaita
  * @date 18/02/2015
@@ -26,16 +26,9 @@
 
 // namespaces
 namespace niwa {
-class AgeLength;
-class LengthWeight;
-class Model;
+namespace agents {
 
-namespace partition {
-using std::string;
-using std::map;
-using std::vector;
-using std::pair;
-using niwa::utilities::Double;
+class Model;
 
 /**
  * Class definition
@@ -56,9 +49,9 @@ public:
 private:
   // members
   Model*                      model_ = nullptr;
-};
 
-} /* namespace partitions */
+};
+} /* namespace agents */
 } /* namespace niwa */
 
 #endif /* PARTITION_AGENT_H_ */
