@@ -62,7 +62,7 @@ void Logistic::DoValidate() {
  * for each age in the model.
  */
 void Logistic::RebuildCache() {
-  if (model_->partition_type() == PartitionType::kAge) {
+  if (not length_based_) {
     Double threshold = 0.0;
 
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
@@ -75,7 +75,7 @@ void Logistic::RebuildCache() {
       else
         values_[age - min_index_] = alpha_ / (1.0 + pow(19.0, threshold));
     }
-  } else if (model_->partition_type() == PartitionType::kLength) {
+  } else {
     Double threshold = 0.0;
     vector<unsigned> length_bins = model_->length_bins();
 

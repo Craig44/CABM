@@ -81,15 +81,12 @@ public:
   virtual vector<unsigned>    years() const;
   unsigned                    year_spread() const;
   virtual unsigned            current_year() const { return current_year_; }
-  virtual string              base_weight_units() const { return base_weight_units_; }
   virtual unsigned            min_age() const { return min_age_; }
   virtual unsigned            max_age() const { return max_age_; }
   virtual unsigned            age_spread() const { return (max_age_ - min_age_) + 1; }
   virtual bool                age_plus() const { return age_plus_; }
   virtual const vector<string>& time_steps() const { return time_steps_; }
   const vector<string>&       initialisation_phases() const { return initialisation_phases_; }
-  void                        set_partition_type(PartitionType partition_type) { partition_type_ = partition_type; }
-  virtual PartitionType       partition_type() const { return partition_type_; }
   virtual const vector<unsigned>&     length_bins() const { return length_bins_; }
   virtual bool                length_plus() const { return length_plus_; }
   virtual unsigned            number_of_agents_to_seed() const {return number_agents_;}
@@ -130,7 +127,6 @@ protected:
   bool                        length_plus_ = true;
   bool                        addressable_values_file_ = false;
   unsigned                    adressable_values_count_ = 1;
-  PartitionType               partition_type_ = PartitionType::kInvalid;
   bool                        sexed_ = false;
   unsigned                    number_agents_;
   string                      base_layer_;

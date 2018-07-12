@@ -21,6 +21,8 @@ namespace niwa {
  *
  */
 void WorldCell::Validate() {
+  LOG_TRACE();
+
 }
 
 /**
@@ -31,6 +33,8 @@ void WorldCell::Validate() {
  * accessor objects.
  */
 void WorldCell::Build() {
+  LOG_TRACE();
+
   // Get a pointer to the environment from the model and give each Agent a pointer to that environment.
 
 }
@@ -39,6 +43,8 @@ void WorldCell::Build() {
  * Reset our partition so all data values are 0.0
  */
 void WorldCell::Reset() {
+  LOG_TRACE();
+
 
 }
 

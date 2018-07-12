@@ -66,7 +66,7 @@ void DoubleNormal::DoValidate() {
  * for each age in the model.
  */
 void DoubleNormal::RebuildCache() {
-  if (model_->partition_type() == PartitionType::kAge) {
+  if (not length_based_) {
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
       Double temp = (Double)age;
       if (temp < mu_)
@@ -74,7 +74,7 @@ void DoubleNormal::RebuildCache() {
       else
         values_[age - min_index_] = pow(2.0, -((temp - mu_) / sigma_r_ * (temp - mu_) / sigma_r_)) * alpha_;
     }
-  } else if (model_->partition_type() == PartitionType::kLength) {
+  } else {
     vector<unsigned> length_bins = model_->length_bins();
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index) {
       Double temp = (Double)length_bins[length_bin_index];

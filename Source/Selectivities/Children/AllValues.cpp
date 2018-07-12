@@ -28,7 +28,7 @@ namespace selectivities {
 AllValues::AllValues(Model* model)
 : Selectivity(model) {
 
-  parameters_.Bind<Double>(PARAM_V, &v_, "V", "")->set_partition_type(PartitionType::kAge | PartitionType::kLength);
+  parameters_.Bind<Double>(PARAM_V, &v_, "V", "");
 
   RegisterAsAddressable(PARAM_V, &v_);
 }
@@ -44,24 +44,16 @@ AllValues::AllValues(Model* model)
  * rules for the model.
  */
 void AllValues::DoValidate() {
-  switch(model_->partition_type()) {
-  case PartitionType::kAge:
+  if (not length_based_) {
     if (v_.size() != model_->age_spread()) {
       LOG_ERROR_P(PARAM_V) << ": Number of 'v' values supplied is not the same as the model age spread.\n"
           << "Expected: " << model_->age_spread() << " but got " << v_.size();
     }
-    break;
-
-  case PartitionType::kLength:
+  } else {
     if (v_.size() != model_->length_bins().size()) {
       LOG_ERROR_P(PARAM_V) << ": Number of 'v' values supplied is not the same as the model length bin count.\n"
           << "Expected: " << model_->length_bins().size() << " but got " << v_.size();
     }
-    break;
-
-  default:
-    LOG_CODE_ERROR() << "Unknown partition_type on the model at this point";
-    break;
   }
 }
 
@@ -73,14 +65,14 @@ void AllValues::DoValidate() {
  * for each age in the model.
  */
 void AllValues::RebuildCache() {
-  if (model_->partition_type() == PartitionType::kAge) {
+  if (not length_based_) {
     unsigned min_age = model_->min_age();
     for (unsigned i = 0; i < v_.size(); ++i) {
       if (v_[i] < 0.0)
         LOG_FATAL_P(PARAM_V) << "cannot have value < 0.0 in this class. Found value = " << v_[i] << " for age = " << min_age + i;
       values_[i] = v_[i];
     }
-  } else if (model_->partition_type() == PartitionType::kLength) {
+  } else {
     for (unsigned i = 0; i < v_.size(); ++i) {
       length_values_[i] = v_[i];
     }

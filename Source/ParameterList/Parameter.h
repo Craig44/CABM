@@ -24,7 +24,6 @@
 #include <initializer_list>
 #include <memory>
 
-#include "Utilities/PartitionType.h"
 #include "Utilities/RunMode.h"
 
 // Namespaces
@@ -63,8 +62,6 @@ public:
   string                      location() const;
   virtual string              stored_type() const = 0;
   string                      description() const { return description_; };
-  void                        set_partition_type(PartitionType partition_type);
-  PartitionType               partition_type() const { return partition_type_; }
 
 protected:
   // Methods
@@ -78,7 +75,6 @@ protected:
   string                      file_name_ = "";
   unsigned                    line_number_ = 0;
   bool                        is_optional_ = false;
-  PartitionType               partition_type_ = PartitionType::kModel;
 };
 
 } /* namespace parameterlist */

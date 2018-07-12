@@ -45,7 +45,7 @@ AllValuesBounded::AllValuesBounded(Model* model)
  * rules for the model.
  */
 void AllValuesBounded::DoValidate() {
-  if (model_->partition_type() == PartitionType::kAge) {
+  if (not length_based_) {
     unsigned min_age = model_->min_age();
     unsigned max_age = model_->max_age();
 
@@ -67,7 +67,7 @@ void AllValuesBounded::DoValidate() {
           << "Expected " << (high_ - low_) + 1 << " but got " << v_.size();
     }
 
-  } else if (model_->partition_type() == PartitionType::kLength) {
+  } else {
     vector<unsigned> length_bins = model_->length_bins();
     unsigned bins = 0;
     for (unsigned i = 0; i < length_bins.size(); ++i) {
@@ -103,7 +103,7 @@ void AllValuesBounded::RebuildCache() {
    * While Age > Low && Age < High :: Value = v_
    * While age > High :: Value = Last element if v_
    */
-  if (model_->partition_type() == PartitionType::kAge) {
+  if (not length_based_) {
     unsigned min_age = model_->min_age();
     unsigned max_age = model_->max_age();
     unsigned age = min_age;
@@ -117,7 +117,7 @@ void AllValuesBounded::RebuildCache() {
     for (; age <= max_age; ++age)
       values_[age - min_index_] = *v_.rbegin();
 
-  } else if (model_->partition_type() == PartitionType::kLength) {
+  } else {
     vector<unsigned> length_bins = model_->length_bins();
     unsigned v_index = 0;
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index)

@@ -68,7 +68,7 @@ protected:
   // members
   WorldCell                   **base_grid_;
   WorldCell                   **cached_grid_;
-  Layer*                      base_layer_ = nullptr;
+  Layer*                      base_layer_ = nullptr;  // TODO might do a dynamic cast if you want a special IntLayer and access to all its functionality that isn't in Parent
 
 
 private:

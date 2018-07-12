@@ -13,7 +13,6 @@
 
 #include "BaseClasses/Object.h"
 #include "Model/Model.h"
-#include "Utilities/PartitionType.h"
 #include "Utilities/Types.h"
 
 // Namespaces
@@ -42,15 +41,10 @@ protected:
   virtual void                DoValidate() = 0;
   // Members
   Model*                      model_ = nullptr;
-  unsigned                    n_quant_ = 5;
-  vector<Double>              quantiles_;
-  vector<Double>              quantiles_at_;
   bool                        length_based_ = false;
 //  map<unsigned, Double>       values_;
   vector<Double>              values_;
   vector<Double>              length_values_;
-  string                      partition_type_label_ = "";
-  PartitionType               partition_type_ = PartitionType::kInvalid;
   unsigned                    min_index_;
 };
 } /* namespace niwa */

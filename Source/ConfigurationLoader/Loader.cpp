@@ -190,13 +190,11 @@ void Loader::ParseBlock(vector<FileLine> &block) {
   block_label = line_parts.size() == 2 ? line_parts[1] : "";
 
   /**
-   * Look for the object type and partition_type
    * e.g
    * @block <label>
    * type <object_type>
    */
   string sub_type = "";
-  PartitionType partition_type = PartitionType::kModel;
 
   for(FileLine file_line : block) {
     string& line = file_line.line_;
@@ -216,23 +214,12 @@ void Loader::ParseBlock(vector<FileLine> &block) {
       continue;
 
 
-    } else if (line.length() >= 19 && line.substr(0, 19) == PARAM_PARTITION_TYPE) {
+    } else if (line.length() >= 19) {
       // Split the line into a vector
       boost::split(line_parts, file_line.line_, boost::is_any_of(" "));
       if (line_parts.size() == 0)
         LOG_FATAL() << "At line " << file_line.line_number_ << " in " << file_line.file_name_
             << ": Could not successfully split the line into an array. Line is incorrectly formatted";
-
-      if (line_parts.size() != 2)
-        LOG_FATAL() << "At line " << file_line.line_number_ << " in " << file_line.file_name_
-            << ": No valid value was specified as the partition_type";
-
-      string temp = utilities::ToLowercase(line_parts[1]);
-      if (!utilities::To<PartitionType>(temp, partition_type))
-        LOG_FATAL() << "Could not convert value " << temp << " to a valid partition_type (model, age, length, hybrid)";
-      if (partition_type == PartitionType::kModel)
-        partition_type = model_.partition_type();
-
       continue;
     }
   }
@@ -243,7 +230,7 @@ void Loader::ParseBlock(vector<FileLine> &block) {
   block_type  = utilities::ToLowercase(block_type);
   sub_type = utilities::ToLowercase(sub_type);
 
-  Object* object = model_.factory().CreateObject(block_type, sub_type, partition_type);
+  Object* object = model_.factory().CreateObject(block_type, sub_type);
   if (!object)
     LOG_FATAL() << "At line " << block[0].line_number_ << " in " << block[0].file_name_
         << ": Block object type or sub-type is invalid.\n"
@@ -258,15 +245,6 @@ void Loader::ParseBlock(vector<FileLine> &block) {
   object->set_block_type(block_type);
   object->set_defined_file_name(block[0].file_name_);
   object->set_defined_line_number(block[0].line_number_);
-
-  /**
-   * If this is the model, tell it what type of model it is
-   */
-  if (block_type == PARAM_MODEL && sub_type != "") {
-    if (!utilities::To<PartitionType>(sub_type, partition_type))
-      LOG_FATAL() << "Could not convert value " << sub_type << " to a valid type (age, length, hybrid) for the @model block";
-    model_.set_partition_type(partition_type);
-  }
 
   /**
    * Load the parameters into our new object

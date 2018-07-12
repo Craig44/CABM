@@ -14,7 +14,6 @@
 
 // namespaces
 #include "Layers/Layer.h"
-#include "Utilities/PartitionType.h"
 
 // namespaces
 namespace niwa {

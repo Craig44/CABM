@@ -13,7 +13,6 @@
 #include "Agent.h"
 
 #include "Model/Model.h"
-#include "Logging/Logging.h"
 #include "Utilities/String.h"
 #include "Utilities/To.h"
 

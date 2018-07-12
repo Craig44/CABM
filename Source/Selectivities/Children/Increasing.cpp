@@ -59,7 +59,7 @@ void Increasing::DoValidate() {
     }
   }
 
-  if (model_->partition_type() == PartitionType::kAge) {
+  if (not length_based_) {
     if (low_ < model_->min_age() || low_ > model_->max_age())
       LOG_ERROR_P(PARAM_L) << ": 'l' (" << low_ << ") must be between the model min_age (" << model_->min_age() << ") and max_age (" << model_->max_age() << ")";
 
@@ -67,7 +67,7 @@ void Increasing::DoValidate() {
       LOG_ERROR_P(PARAM_V) << " 'v' has incorrect amount of elements\n"
           << "Expected: " << (high_ - low_ + 1) << " but got " << v_.size();
     }
-  }   else if (model_->partition_type() == PartitionType::kLength) {
+  } else {
     vector<unsigned> length_bins = model_->length_bins();
     if (low_ < length_bins[0] || low_ > length_bins[length_bins.size()-1])
       LOG_ERROR_P(PARAM_L) << ": 'l' (" << low_ << ") must be between the model min length (" << length_bins[0] << ") and max length (" << length_bins[length_bins.size()-1] << ")";
@@ -95,7 +95,7 @@ void Increasing::DoValidate() {
  * for each age in the model.
  */
 void Increasing::RebuildCache() {
-  if (model_->partition_type() == PartitionType::kAge) {
+  if (not length_based_) {
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
 
       if (age < low_) {
@@ -115,7 +115,7 @@ void Increasing::RebuildCache() {
         values_[age - min_index_] = value;
       }
     }
-  } else if (model_->partition_type() == PartitionType::kLength) {
+  } else {
     vector<unsigned> length_bins = model_->length_bins();
     unsigned mark = 0;
     unsigned start_element = 0;

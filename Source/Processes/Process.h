@@ -56,14 +56,12 @@ public:
   virtual void                DoExecute() = 0;
 
   // accessors
-  PartitionType               partition_structure() const { return partition_structure_; }
   ProcessType                 process_type() const { return process_type_; }
 
 protected:
   // members
   Model*                      model_ = nullptr;
   ProcessType                 process_type_ = ProcessType::kUnknown;
-  PartitionType               partition_structure_ = PartitionType::kInvalid;
   map<unsigned, map<string, vector<Executor*>>> executors_;
 };
 } /* namespace niwa */

@@ -64,7 +64,53 @@ int main(int argc, char * argv[]) {
     case RunMode::kLicense:
 
     case RunMode::kBasic:
-		break;
+      if (!model.global_configuration().disable_standard_report()) {
+         standard_report.Prepare();
+         model.managers().report()->set_std_header(standard_report.header());
+       }
+
+       // load our configuration file
+       configuration::Loader config_loader(model);
+       if (!config_loader.LoadConfigFile()) {
+         Logging::Instance().FlushErrors();
+         return_code = -1;
+         break;
+       }
+
+       Logging& logging = Logging::Instance();
+        config_loader.ParseFileLines();
+        if (logging.errors().size() > 0) {
+          logging.FlushErrors();
+          return_code = -1;
+          break;
+        }
+
+       // override any config file values from our command line
+       model.global_configuration().ParseOptions(&model);
+       utilities::RandomNumberGenerator::Instance().Reset(model.global_configuration().random_seed());
+
+       // Thread off the reports
+       //reports::Manager* report_manager = model.managers().report();
+
+       // TODO address the threading of reports
+/*       std::thread report_thread([&report_manager]() { report_manager->FlushReports(); });
+
+       // Run the model
+       model_start_return_success = model.Start(run_mode);
+
+       // finish report thread
+       report_manager->StopThread();
+       report_thread.join();*/
+
+       if (logging.errors().size() > 0) {
+         logging.FlushErrors();
+         return_code = -1;
+       } else
+         logging.FlushWarnings();
+
+       if (!model.global_configuration().disable_standard_report())
+         standard_report.Finalise();
+       break;
     } // switch(run_mode)
 
   } catch (const string &exception) {

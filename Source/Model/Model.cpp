@@ -51,12 +51,15 @@ Model::Model() {
   parameters_.Bind<unsigned>(PARAM_MIN_AGE, &min_age_, "Minimum age of individuals in the population", R"($0 \le$ age\textlow{min} $\le$ age\textlow{max})", 0);
   parameters_.Bind<unsigned>(PARAM_MAX_AGE, &max_age_, "Maximum age of individuals in the population", R"($0 \le$ age\textlow{min} $\le$ age\textlow{max})", 0);
   parameters_.Bind<bool>(PARAM_AGE_PLUS, &age_plus_, "Define the oldest age or extra length midpoint (plus group size) as a plus group", "true, false", false);
-  parameters_.Bind<string>(PARAM_INITIALISATION_PHASES, &initialisation_phases_, "Define the labels of the phases of the initialisation", R"(A list of valid labels defined by \texttt{@initialisation_phase})", true);
+  parameters_.Bind<string>(PARAM_INITIALISATION_PHASE_LABELS, &initialisation_phases_, "Define the labels of the phases of the initialisation", R"(A list of valid labels defined by \texttt{@initialisation_phase})", true);
   parameters_.Bind<string>(PARAM_TIME_STEPS, &time_steps_, "Define the labels of the time steps, in the order that they are applied, to form the annual cycle", R"(A list of valid labels defined by \texttt{@time_step})");
   parameters_.Bind<unsigned>(PARAM_LENGTH_BINS, &length_bins_, "", "", true);
   parameters_.Bind<bool>(PARAM_LENGTH_PLUS, &length_plus_, "Is the last bin a plus group", "", false);
   parameters_.Bind<unsigned>(PARAM_NUMBER_OF_AGENTS, &number_agents_, "The number of agents to initially seed in the partition", "");
-  parameters_.Bind<string>(PARAM_BASE_LAYER, &base_layer_, "Label for the base layer", "");
+  parameters_.Bind<string>(PARAM_BASE_LAYER_LABEL, &base_layer_, "Label for the base layer", "");
+  parameters_.Bind<unsigned>(PARAM_NROWS, &world_height_, "number of rows in spatial domain", "");
+  parameters_.Bind<unsigned>(PARAM_NCOLS, &world_width_, "number of columns in spatial domain", "");
+
 
 
   global_configuration_ = new GlobalConfiguration();
@@ -198,48 +201,10 @@ void Model::PopulateParameters() {
   // Check that we've actually defined a @model block
   if (block_type_ == "")
     LOG_ERROR() << "The @model block is missing from configuration file. This block is required.";
-
   /**
    * Validate the parameters
    */
   parameters_.Populate(this);
-  if (type_ == PARAM_AGE)
-    partition_type_ = PartitionType::kAge;
-  else if (type_ == PARAM_LENGTH)
-    partition_type_ = PartitionType::kLength;
-//  else if (type_ == PARAM_HYBRID)
-//    partition_type_ = PartitionType::kHybrid;
-
-  if (partition_type_ == PartitionType::kAge) {
-    if (start_year_ < 1000)
-      LOG_ERROR_P(PARAM_START_YEAR) << " (" << start_year_ << ") cannot be less than 1000";
-    if (start_year_ > final_year_)
-      LOG_ERROR_P(PARAM_FINAL_YEAR) << " (" << final_year_ << ") cannot be less than start_year (" << start_year_ << ")";
-    if (min_age_ > max_age_)
-      LOG_ERROR_P(PARAM_MIN_AGE) << " (" << min_age_ << ") has been defined as greater than max_age (" << max_age_ << ")";
-
-
-  } else if (partition_type_ == PartitionType::kLength) {
-    if (!parameters_.Get(PARAM_LENGTH_BINS)->has_been_defined())
-      LOG_ERROR() << location() << "@model is missing required parameter " << PARAM_LENGTH_BINS;
-    if (parameters_.Get(PARAM_MIN_AGE)->has_been_defined())
-      LOG_ERROR_P(PARAM_MIN_AGE) << "cannot be defined in a length model";
-    if (parameters_.Get(PARAM_MAX_AGE)->has_been_defined())
-      LOG_ERROR_P(PARAM_MAX_AGE) << "cannot be defined in a length model";
-//    if (parameters_.Get(PARAM_PLUS_GROUP)->has_been_defined())
-//      LOG_ERROR_P(PARAM_PLUS_GROUP) << "cannot be defined in a length model"; // SAMIK - removed condition as plus_group applies for length
-
-  } else
-    LOG_ERROR() << "Partition structure " << (unsigned)partition_type_ << " not supported";
-
-//  if (base_weight_units_label_ == PARAM_TONNES)
-//    base_weight_units_ = Units::kTonnes;
-//  else if (base_weight_units_label_ == PARAM_KGS)
-//    base_weight_units_ = Units::kKilograms;
-//  else if (base_weight_units_label_ == PARAM_GRAMS)
-//    base_weight_units_ = Units::kGrams;
-//  else
-//    LOG_CODE_ERROR() << "Base weight units for model " << base_weight_units_label_ << " is invalid";
 }
 
 /**
@@ -275,13 +240,13 @@ void Model::Validate() {
 
   /**
    * Do some simple checks
-   * e.g Validate that the length_bins are strictly increasing
+   * e.g Validate that the length_bins are strictly increasing order
    */
-//  for(unsigned length = 0; length < (length_bins_.size() - 1); ++length) {
-//    if(length_bins_[length] < 0.0)
-//    if(length_bins_[length] > length_bins_[length + 1])
-//      LOG_ERROR_P(PARAM_LENGTH_BINS) << ": Length bins must be strictly increasing " << length_bins_[length] << " is greater than " << length_bins_[length +1];
-//  }
+  for(unsigned length = 0; length < (length_bins_.size() - 1); ++length) {
+    if(length_bins_[length] < 0.0)
+    if(length_bins_[length] > length_bins_[length + 1])
+      LOG_ERROR_P(PARAM_LENGTH_BINS) << ": Length bins must be strictly increasing " << length_bins_[length] << " is greater than " << length_bins_[length +1];
+  }
 }
 
 /**

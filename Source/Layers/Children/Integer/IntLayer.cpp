@@ -23,6 +23,7 @@ IntLayer::IntLayer(Model* model) : Layer(model) {
 
 // Deconstructor
 IntLayer::~IntLayer() {
+  LOG_TRACE();
   // Clean Our Grid
   if (grid_ != 0) {
     for (unsigned i = 0; i < height_; ++i) {

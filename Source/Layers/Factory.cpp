@@ -13,6 +13,8 @@
 #include "Model/Model.h"
 #include "Model/Managers.h"
 #include "Layers/Manager.h"
+#include "Layers/Children/Integer/IntLayer.h"
+
 
 // namespaces
 namespace niwa {
@@ -28,6 +30,12 @@ namespace layers {
  */
 Layer* Factory::Create(Model* model, const string& object_type, const string& sub_type) {
   Layer* result = nullptr;
+  if (object_type == PARAM_LAYER) {
+    if (sub_type == PARAM_INTEGER)
+      result = new IntLayer(model);
+    //else if ()
+  }
+
 
 
   if (result)

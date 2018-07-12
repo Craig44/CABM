@@ -129,8 +129,7 @@ void ParameterList::Populate(Model* model) {
    */
   string missing_parameters = "";
   for (auto iter = parameters_.begin(); iter != parameters_.end(); ++iter) {
-    if ((iter->second->values().size() == 0 && !iter->second->is_optional())  &&
-        (iter->second->partition_type() == PartitionType::kModel || iter->second->partition_type() == model->partition_type()))
+    if ((iter->second->values().size() == 0 && !iter->second->is_optional()))
       missing_parameters += iter->first + " ";
   }
   for (auto iter = tables_.begin(); iter != tables_.end(); ++iter) {
@@ -195,27 +194,6 @@ void ParameterList::Populate(Model* model) {
   }
   LOG_FINEST() << "Binding complete";
 
-  LOG_FINEST() << "Doing Partition Type Checks";
-  if (parameters_.find(PARAM_PARTITION_TYPE) != parameters_.end()) {
-    Parameter* param = parameters_[PARAM_PARTITION_TYPE];
-    if (param->values().size() != 0) {
-      string temp = parameters_.find(PARAM_PARTITION_TYPE)->second->values()[0];
-      PartitionType partition_type = PartitionType::kInvalid;
-      if (!utilities::To<PartitionType>(temp, partition_type))
-        LOG_FATAL() << "X";
-      bool using_model_partition_type = partition_type == PartitionType::kModel;
-
-      for(auto& iter : parameters_) {
-        if (iter.second->partition_type() != partition_type) {
-          if (using_model_partition_type) {
-            LOG_ERROR() << iter.second->location() << " cannot be defined with the current model partition type defined at " << model->location();
-          } else {
-            LOG_ERROR() << iter.second->location() << " cannot be defined with the current partition_type parameter";
-          }
-        }
-      }
-    }
-  }
 
   if (parameters_.find(PARAM_LABEL) != parameters_.end()) {
     Parameter* param = parameters_[PARAM_LABEL];

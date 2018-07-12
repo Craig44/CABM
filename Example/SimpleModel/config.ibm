@@ -1,0 +1,25 @@
+@model
+start_year 1990
+final_year 2018
+min_age 0
+max_age 30
+age_plus true # other acceptable inputs for bool are '1' and 'yes'
+initialisation_phase_labels Iterative #label to an @initialisation block
+time_steps Annual # just one time step for now
+length_bins 0 5 10 15 20 25 30 35 40 45 50 55 60 65 70 # assumed cm's
+length_plus true
+number_of_agents 100000 ## initial number of agents
+base_layer_label Base #
+## a single area model
+nrows 1
+ncols 1 
+
+
+# --------------
+# Include Layers
+# --------------
+!include "Layers/base_layer.ibm"
+
+
+
+

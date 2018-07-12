@@ -44,7 +44,7 @@ KnifeEdge::KnifeEdge(Model* model)
  * for each age in the model.
  */
 void KnifeEdge::RebuildCache() {
-  if (model_->partition_type() == PartitionType::kAge) {
+  if (not length_based_) {
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
       Double temp = age * 1.0;
       if (temp >= edge_)
@@ -52,7 +52,7 @@ void KnifeEdge::RebuildCache() {
       else
         values_[age - min_index_] = 0.0;
     }
-  } else if (model_->partition_type() == PartitionType::kLength) {
+  } else {
     vector<unsigned> length_bins = model_->length_bins();
 
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index) {

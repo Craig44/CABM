@@ -53,16 +53,16 @@ Factory::Factory(Model* model) : model_(model) { }
  * @param partition_type The specifically defined partition type for this object
  * @return A shared_ptr to the object we've created
  */
-base::Object* Factory::CreateObject(const string& object_type, const string& sub_type, PartitionType partition_type) {
+base::Object* Factory::CreateObject(const string& object_type, const string& sub_type) {
   string lwr_object_type    = utilities::ToLowercase(object_type);
   string lwr_sub_type       = utilities::ToLowercase(sub_type);
 
   if (lwr_object_type == PARAM_ASSERT)
     return asserts::Factory::Create(model_, lwr_object_type, lwr_sub_type);
-  //else if (lwr_object_type == PARAM_PARTITION) // TODO decide whether to add a factory on to Partition
-  //  return derivedquantities::Factory::Create(model_, lwr_object_type, lwr_sub_type, partition_type);
+  else if (lwr_object_type == PARAM_LAYER)
+    return layers::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_DERIVED_QUANTITY || lwr_object_type == PARAM_DERIVED_QUANTITIES)
-    return derivedquantities::Factory::Create(model_, lwr_object_type, lwr_sub_type, partition_type);
+    return derivedquantities::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_INITIALISATION_PHASE || lwr_object_type == PARAM_INITIALISATION_PHASES)
     return initialisationphases::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_LIKELIHOOD)
@@ -72,9 +72,9 @@ base::Object* Factory::CreateObject(const string& object_type, const string& sub
   else if (lwr_object_type == PARAM_OBSERVATION)
     return observations::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_PROCESS || lwr_object_type == PARAM_PROCESSES)
-    return processes::Factory::Create(model_, lwr_object_type, lwr_sub_type, partition_type);
+    return processes::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_STATE || lwr_object_type == PARAM_TAG || lwr_object_type == PARAM_TRANSITION) // @process specialisation
-    return processes::Factory::Create(model_, lwr_object_type, lwr_sub_type, partition_type);
+    return processes::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_REPORT)
     return reports::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_SELECTIVITY || lwr_object_type == PARAM_SELECTIVITIES)

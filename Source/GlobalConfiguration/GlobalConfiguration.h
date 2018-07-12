@@ -56,6 +56,7 @@ public:
   string                config_file() { return options_.config_file_; }
   bool                  skip_loading_config_file() const { return skip_loading_config_file_; }
   void                  flag_skip_config_file() { skip_loading_config_file_ = true; }
+  bool                  disable_standard_report() { return options_.no_std_report_; }
 
 private:
   // Members
