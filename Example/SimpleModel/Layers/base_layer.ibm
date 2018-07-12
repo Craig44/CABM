@@ -1,5 +1,5 @@
 @layer Base
-type integer
+type numeric
 table layer
-1
+1 
 end_table

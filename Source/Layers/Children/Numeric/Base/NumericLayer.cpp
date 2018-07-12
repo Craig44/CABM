@@ -1,5 +1,5 @@
 /**
- * @file IntLayer.cpp
+ * @file NumericLayer.cpp
  * @author  C.Marsh
  * @date 12/07/2018
  * @section LICENSE
@@ -8,21 +8,21 @@
  */
 
 // headers
-#include "IntLayer.h"
+#include "NumericLayer.h"
 
 namespace niwa {
 namespace layers {
 
 // Constructor
-IntLayer::IntLayer(Model* model) : Layer(model) {
-  int_table_ = new parameters::Table(PARAM_LAYER);
-  parameters_.BindTable(PARAM_LAYER, int_table_, "Table of layer attributes", "", false, false);
+NumericLayer::NumericLayer(Model* model) : Layer(model) {
+  data_table_ = new parameters::Table(PARAM_LAYER);
+  parameters_.BindTable(PARAM_LAYER, data_table_, "Table of layer attributes", "", false, true);
   // Default Variables
   grid_ = 0;
 }
 
 // Deconstructor
-IntLayer::~IntLayer() {
+NumericLayer::~NumericLayer() {
   LOG_TRACE();
   // Clean Our Grid
   if (grid_ != 0) {
@@ -33,26 +33,26 @@ IntLayer::~IntLayer() {
     delete [] grid_;
   }
   // remove input table
-  delete int_table_;
+  delete data_table_;
 
 }
 
-void IntLayer::DoValidate() {
+void NumericLayer::DoValidate() {
   LOG_TRACE();
   // Allocate Space for ourlayer on the heap
-  grid_ = new unsigned*[height_];
+  grid_ = new float*[height_];
   for (unsigned i = 0; i < height_; ++i)
-    grid_[i] = new unsigned[width_];
+    grid_[i] = new float[width_];
 }
 
 
 
-void IntLayer::DoBuild() {
+void NumericLayer::DoBuild() {
   LOG_TRACE();
   /**
    * Build our layer pointer
    */
-  vector<vector<string>>& input_data = int_table_->data();
+  vector<vector<string>>& input_data = data_table_->data();
 
   LOG_FINEST() << "rows = " << input_data.size() << " columns = " << input_data[0].size();
   unsigned row_iter = 0;
@@ -64,9 +64,9 @@ void IntLayer::DoBuild() {
     if ((row_iter + 1) > height_)
       LOG_FATAL_P(PARAM_LAYER) << "you supplied at least '"<< row_iter + 1 << "' rows in the layer but, nrows on the @model = '" << width_ << "' these must be the same";
 
-    unsigned value;
+    float value;
     for (unsigned i = 0; i < row.size(); ++i) {
-      value = utilities::ToInline<string, unsigned>(row[i]);
+      value = utilities::ToInline<string, float>(row[i]);
       if (value < 0)
         LOG_ERROR_P(PARAM_LAYER) << "at row '" << row_iter << "' and column '" << i + 1 << "' we found a value less than zero this is not allowed for this layer type, they must be >= 0, please sort out";
       grid_[row_iter][i] = value;
@@ -80,7 +80,7 @@ void IntLayer::DoBuild() {
 /*
  * setValue
 */
-void IntLayer::set_value(int RowIndex, int ColIndex, unsigned Value) {
+void NumericLayer::set_value(int RowIndex, int ColIndex, float Value) {
 #ifndef OPTIMIZE
 // TODO do some error catching for debugging purposes
 #endif

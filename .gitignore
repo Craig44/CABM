@@ -8,3 +8,4 @@
 /BuildSystem/bin
 /BuildSystem/buildtools/windows/Python27
 /.settings/*.prefs
+/Documentation/UserManual/*.aux

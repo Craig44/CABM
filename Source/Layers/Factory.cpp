@@ -14,6 +14,7 @@
 #include "Model/Managers.h"
 #include "Layers/Manager.h"
 #include "Layers/Children/Integer/IntLayer.h"
+#include "Layers/Children/Numeric/Base/NumericLayer.h"
 
 
 // namespaces
@@ -33,6 +34,8 @@ Layer* Factory::Create(Model* model, const string& object_type, const string& su
   if (object_type == PARAM_LAYER) {
     if (sub_type == PARAM_INTEGER)
       result = new IntLayer(model);
+    else if (sub_type == PARAM_NUMERIC)
+      result = new NumericLayer(model);
     //else if ()
   }
 

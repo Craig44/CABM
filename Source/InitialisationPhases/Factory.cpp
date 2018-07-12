@@ -16,6 +16,8 @@
 #include "Model/Managers.h"
 #include "InitialisationPhases/Manager.h"
 
+#include "Children/Iterative.h"
+
 // Namespaces
 namespace niwa {
 namespace initialisationphases {
@@ -31,6 +33,10 @@ namespace initialisationphases {
 InitialisationPhase* Factory::Create(Model* model, const string& object_type, const string& sub_type) {
   InitialisationPhase* result = nullptr;
 
+  if (object_type == PARAM_INITIALISATION_PHASE) {
+    if (sub_type == PARAM_ITERATIVE)
+      result = new Iterative(model);
+  }
 
 
   if (result)

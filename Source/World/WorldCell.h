@@ -5,8 +5,8 @@
  * @date 12/07/2018
  * @section LICENSE
  * Description :  This class represents 1 cell in our World-Grid. Each
- *                WorldSquare maintains a list of categories and ages; As well as
- *                The number of fish in each location
+ *                WorldSquare maintains a list of Agents
+ *                The number of 'entity' in each cell
  *
  *
  */
@@ -36,21 +36,24 @@ class Agent;
 class WorldCell {
 public:
   // Methods
-  WorldCell() = delete;
-  explicit WorldCell(Model* model) : model_(model) { };
-  virtual                     ~WorldCell() {};
+  WorldCell() = default;
+  virtual                     ~WorldCell() = default;
   void                        Validate();
   void                        Build();
   void                        Reset();
-
-
+  void                        set_enabled(bool enabled) {enabled_ = enabled; };
+  bool                        is_enabled() {return enabled_; };
+  void                        set_area(float area) {area_ = area;}
+  void                        seed_agents(unsigned number_agents_to_seed);
+  list<Agent>&                get_agents() {return agents_;};
 protected:
   // Methods
 
   // Members
   Model*                       model_ = nullptr;
   list<Agent>                  agents_;
-  list<Agent>                  cached_agents_;
+  bool                         enabled_;
+  float                        area_;
 
 };
 

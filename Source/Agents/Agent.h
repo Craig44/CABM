@@ -24,16 +24,13 @@ class Model;
 /**
  * Class Definition
  */
-class Agent : public niwa::base::Object {
+class Agent { // Don't make this inherit from BaseClasses/Object.h
 public:
   // Methods
   virtual                       ~Agent() = default;
-  Agent()                       = delete;
-  explicit                      Agent(Model* model);
-  void                          Validate();
-  void                          Build();
-  void                          Reset() { };
-
+  Agent() = default; // TODO will change this so we construct with parameters.
+  virtual void                  Reset() {};
+  void                          seed();
 
   // Accessors
 

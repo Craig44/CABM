@@ -93,11 +93,12 @@ int main(int argc, char * argv[]) {
        //reports::Manager* report_manager = model.managers().report();
 
        // TODO address the threading of reports
-/*       std::thread report_thread([&report_manager]() { report_manager->FlushReports(); });
+       //std::thread report_thread([&report_manager]() { report_manager->FlushReports(); });
 
        // Run the model
        model_start_return_success = model.Start(run_mode);
 
+       /*
        // finish report thread
        report_manager->StopThread();
        report_thread.join();*/

@@ -8,11 +8,10 @@
  *
  */
 
-// defines
-#define _USE_MATH_DEFINES
-
 // Headers
 #include "WorldCell.h"
+
+#include "Agents/Agent.h"
 
 // Namespaces
 namespace niwa {
@@ -44,8 +43,18 @@ void WorldCell::Build() {
  */
 void WorldCell::Reset() {
   LOG_TRACE();
+}
 
-
+/**
+ * This method is called in Initialisation where we seed agents over the spatial domain before we start iterating
+ * each agent that is created will be call seed() this will seed an agent with an equilibrium age structure
+ */
+void WorldCell::seed_agents(unsigned number_agents_to_seed) {
+  for (unsigned agent = 0; agent < number_agents_to_seed; ++agent) {
+    Agent new_agent; // seed it with lat long, K, L_inf
+    new_agent.seed();
+    agents_.push_back(new_agent);
+  }
 }
 
 } /* namespace niwa */

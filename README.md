@@ -1,6 +1,7 @@
 # Individual Based Model (IBM)
 
-This repository is for a generalised IBM that I am trying to generate during my PhD. It will be a stochastic simulator used 
+This repository is for a generalised IBM that I am trying to generate during my PhD. I abuse the Individual term a bit I actually mean agent or super individual, where one entity 'can' represent
+many entities that have identical attributes. The purpose of this is for scaling up results to population levels. It will be a stochastic simulator used 
 for investigating different stock assessment methods under hypothetical scenerios. The current repository is a mixture of  ideas that need to be acknowledged. 
 Firstly to the Casal2 team found [here](https://github.com/NIWAFisheriesModelling/CASAL2),
 which formulated the basis of the core code for error handling, parameter structure, configuration syntax and more. I also learnt about IBM's 
@@ -17,3 +18,8 @@ It would also need to simulate data that could easily be assess in a stock asses
 
 IBM's are notorious for being limited by CPU, so a big emphasis is to make it as modular and thread safe as possible. It is currently
 coded to be used on a desktop (as apposed to HPC) as I belief that is where most users will apply it.
+
+This IBM has a forced spatial structure, where users must define at least one spatial area. The reason I have gone down this road
+is mainly because I am interested in spatial characteristics and I believe they are fundamental to IBM's. This means for simple 
+spatial models (single area models) the model could be a bit lousy, But when you start having high spatial resolution and spatial
+processes such as fishing. The spatial memory management will benefit massively in efficiency's it also allows easier threading.

@@ -28,5 +28,25 @@ Layer* Manager::GetLayer(const string& label) {
   return nullptr;
 }
 
+IntLayer* Manager::GetIntLayer(const string& label) {
+  IntLayer* pPtr = nullptr;
+  for (auto layer : objects_) {
+    if (layer->label() == label && layer->type() == PARAM_INTEGER)
+      pPtr = dynamic_cast<IntLayer*>(layer);
+    return pPtr;
+  }
+  return nullptr;
+}
+
+NumericLayer* Manager::GetNumericLayer(const string& label) {
+  NumericLayer* pPtr = nullptr;
+  for (auto layer : objects_) {
+    if (layer->label() == label && layer->type() == PARAM_NUMERIC)
+      pPtr = dynamic_cast<NumericLayer*>(layer);
+    return pPtr;
+  }
+  return nullptr;
+}
+
 } /* namespace layers */
 } /* namespace niwa */

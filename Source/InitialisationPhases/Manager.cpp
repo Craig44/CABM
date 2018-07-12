@@ -37,6 +37,7 @@ void Manager::Build() {
  *
  */
 void Manager::Validate() {
+  LOG_TRACE();
   for (auto phase : objects_) {
     phase->Validate();
   }

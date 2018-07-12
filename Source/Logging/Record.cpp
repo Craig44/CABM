@@ -102,7 +102,7 @@ void Record::BuildMessage() {
 #else
     o << "\n";
     o << "********************************************************************************\n";
-    o << "********                CODE ERROR - CASAL2 is FORCE QUITTING           ********\n";
+    o << "********                CODE ERROR - IBM is FORCE QUITTING              ********\n";
     o << "********************************************************************************\n";
     o << "Source File: " << file_name_ << "(line: " << line_number_ << ")\n";
     o << "Source Method: " << function_ << "\n";
@@ -110,7 +110,7 @@ void Record::BuildMessage() {
     o << "Message:\n";
     o << stream_.str() << "\n";
     o << "NOTE: This error is a bug in the software and can be corrected by a developer\n";
-    o << "Please contact the application developers at casal2@niwa.co.nz to have this issue fixed\n\n";
+    o << "Please contact the application developers at craig.marsh10@gmail.com to have this issue fixed\n\n";
 #endif
     break;
   }

@@ -11,7 +11,7 @@
 #define INTLAYER_H_
 
 // Local Headers
-#include "../../Layer.h"
+#include "Layers/Layer.h"
 
 namespace niwa {
 namespace layers {
@@ -22,8 +22,8 @@ public:
   explicit IntLayer(Model* model);
   virtual                     ~IntLayer();
   int                         countValidSpaces();
-  void                        setValue(int RowIndex, int ColIndex, unsigned Value);
-  unsigned                    getValue(int RowIndex, int ColIndex);
+  void                        set_value(int RowIndex, int ColIndex, unsigned Value);
+  unsigned                    get_value(int RowIndex, int ColIndex);
 
 
 protected:

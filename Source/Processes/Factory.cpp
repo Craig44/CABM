@@ -18,6 +18,7 @@
 #include "Processes/Manager.h"
 
 #include "Children/Nop.h"
+#include "Children/RecruitmentBevertonHolt.h"
 
 // Namespaces
 namespace niwa {
@@ -52,6 +53,15 @@ Process* Factory::Create(Model* model, const string& object_type, const string& 
     object = PARAM_PROCESS;
 
     LOG_FINE() << "Finished modification of object_type (" << object << ") and sub_type (" << sub << ")";
+  }
+
+  if (object == PARAM_PROCESS || object == PARAM_PROCESSES) {
+    if (sub == PARAM_NOP)
+          result = new processes::Nop(model);
+    else if (sub == PARAM_RECRUITMENT_BEVERTON_HOLT)
+      result = new processes::RecruitmentBevertonHolt(model);
+
+
   }
 
   

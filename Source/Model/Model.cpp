@@ -55,7 +55,6 @@ Model::Model() {
   parameters_.Bind<string>(PARAM_TIME_STEPS, &time_steps_, "Define the labels of the time steps, in the order that they are applied, to form the annual cycle", R"(A list of valid labels defined by \texttt{@time_step})");
   parameters_.Bind<unsigned>(PARAM_LENGTH_BINS, &length_bins_, "", "", true);
   parameters_.Bind<bool>(PARAM_LENGTH_PLUS, &length_plus_, "Is the last bin a plus group", "", false);
-  parameters_.Bind<unsigned>(PARAM_NUMBER_OF_AGENTS, &number_agents_, "The number of agents to initially seed in the partition", "");
   parameters_.Bind<string>(PARAM_BASE_LAYER_LABEL, &base_layer_, "Label for the base layer", "");
   parameters_.Bind<unsigned>(PARAM_NROWS, &world_height_, "number of rows in spatial domain", "");
   parameters_.Bind<unsigned>(PARAM_NCOLS, &world_width_, "number of columns in spatial domain", "");
@@ -114,8 +113,8 @@ Factory& Model::factory() {
   return *factory_;
 }
 
-WorldView& Model::world_view() {
-  return *world_view_;
+WorldView* Model::world_view() {
+  return world_view_;
 }
 
 /**
@@ -229,7 +228,7 @@ void Model::Validate() {
   initialisationphases::Manager& init_phase_mngr = *managers_->initialisation_phase();
   for (const string& phase : initialisation_phases_) {
     if (!init_phase_mngr.IsPhaseDefined(phase))
-      LOG_ERROR_P(PARAM_INITIALISATION_PHASES) << "(" << phase << ") has not been defined. Please ensure you have defined it";
+      LOG_ERROR_P(PARAM_INITIALISATION_PHASE_LABELS) << "(" << phase << ") has not been defined. Please ensure you have defined it";
   }
 
   timesteps::Manager& time_step_mngr = *managers_->time_step();

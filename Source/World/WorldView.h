@@ -32,12 +32,13 @@
 #include <vector>
 #include <string>
 
+#include "Layers/Children/Numeric/Base/NumericLayer.h"
 // namespaces
 namespace niwa {
 
 class Model;
 class WorldCell;
-class Layer;
+class NumericLayer;
 
 using std::string;
 /**
@@ -47,9 +48,9 @@ class WorldView {
 
 public:
   // methods
-  WorldView(Model* model) : model_(model) { };
-  virtual                     ~WorldView() = default;
-  void                        Validate() {};
+  WorldView(Model* model);
+  virtual                     ~WorldView();
+  void                        Validate();
   void                        Build();
   void                        Reset() {};
 
@@ -60,17 +61,19 @@ public:
   //unsigned                    get_width() { return width_; }  // these can be called off the model
 
   //TODO
-  //WorldCell*                  get_base_square(int RowIndex, int ColIndex);
-  //WorldCell*                  get_cached_square(int RowIndex, int ColIndex);
-  void                        MergeCachedAgents() {};
+  WorldCell*                  get_base_square(int RowIndex, int ColIndex);
+  WorldCell*                  get_cached_square(int RowIndex, int ColIndex);
+  unsigned                    get_enabled_cells() {return enabled_cells_; };
+  void                        MergeCachedGrid() {};
 
 protected:
   // members
   WorldCell                   **base_grid_;
   WorldCell                   **cached_grid_;
-  Layer*                      base_layer_ = nullptr;  // TODO might do a dynamic cast if you want a special IntLayer and access to all its functionality that isn't in Parent
-
-
+  niwa::layers::NumericLayer*     base_layer_ = nullptr;  // TODO might do a dynamic cast if you want a special IntLayer and access to all its functionality that isn't in Parent
+  unsigned                    width_;
+  unsigned                    height_;
+  unsigned                    enabled_cells_;
 private:
   // members
   Model*                      model_ = nullptr;

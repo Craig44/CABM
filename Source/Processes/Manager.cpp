@@ -29,10 +29,10 @@ void Manager::Validate() {
 
 void Manager::Validate(Model* model) {
   LOG_TRACE();
-  Validate();
+  base::Manager<niwa::processes::Manager, niwa::Process>::Validate();
 
   if (objects_.size() == 0)
-    LOG_ERROR() << "The configuration file requires you specify at least one type of process. E.g @recruitment, @mortality, @ageing";
+    LOG_FATAL() << "The configuration file requires you specify at least one type of process. E.g @recruitment, @mortality, @ageing";
 
   for (auto process : objects_) {
     LOG_FINEST() << "processes managed" << process->label();

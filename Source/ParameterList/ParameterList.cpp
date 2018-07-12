@@ -204,7 +204,7 @@ void ParameterList::Populate(Model* model) {
     }
   }
 
-  LOG_FINEST() << "Populating Tables";
+  LOG_FINEST() << "Populating " << tables_.size() << " Tables";
   for (auto table : tables_)
     table.second->Populate(model);
 
@@ -327,6 +327,7 @@ string ParameterList::location(const string& label) {
  * @param values used for documentation, ignored
  */
 void ParameterList::BindTable(const string& label, parameters::Table* table, const string& description, const string& values, bool requires_columns, bool optional) {
+  LOG_TRACE();
   table->set_requires_columns(requires_columns);
   table->set_is_optional(optional);
   tables_[label] = table;

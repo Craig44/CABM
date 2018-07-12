@@ -71,7 +71,7 @@ void Managers::Validate() {
   LOG_TRACE();
   time_step_->Validate(model_);
   initialisation_phase_->Validate();
-  process_->Validate(model_); // Needs to go before estimate for the situation where there is an @estimate block
+  process_->Validate(model_);
   assert_->Validate();
   derived_quantity_->Validate();
   layer_->Validate();
@@ -86,7 +86,7 @@ void Managers::Build() {
   LOG_TRACE();
   time_step_->Build();
   initialisation_phase_->Build(model_);
-  process_->Build(); // To handle BH Recruitment having ssb_offset available
+  process_->Build();
   assert_->Build();
   derived_quantity_->Build();
   layer_->Build();

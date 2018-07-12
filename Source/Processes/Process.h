@@ -49,7 +49,6 @@ public:
   void                        Reset();
   void                        Execute(unsigned year, const string& time_step_label);
   void                        Subscribe(unsigned year, const string& time_step_label, Executor* executor);
-
   virtual void                DoValidate() = 0;
   virtual void                DoBuild() = 0;
   virtual void                DoReset() = 0;
@@ -57,11 +56,13 @@ public:
 
   // accessors
   ProcessType                 process_type() const { return process_type_; }
+  bool                        get_requires_difference_merge() {return merge_difference_grid_;};
 
 protected:
   // members
   Model*                      model_ = nullptr;
   ProcessType                 process_type_ = ProcessType::kUnknown;
+  bool                        merge_difference_grid_ = true;
   map<unsigned, map<string, vector<Executor*>>> executors_;
 };
 } /* namespace niwa */

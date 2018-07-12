@@ -78,37 +78,7 @@ string Table::location() const {
  *
  */
 void Table::Populate(Model* model) {
-  // get the index for PARAM_CATEGORY or PARAM_CATEGORIES if it exists
-  unsigned category_index = column_index(PARAM_CATEGORY);
-  category_index = category_index == columns_.size() ? column_index(PARAM_CATEGORIES) : category_index;
-  if (category_index == columns_.size())
-    return; // nothing to see here, move along
-
   // Make a copy of our data object so we can manipulate the container
-  vector<vector<string>> data_copy = data_;
-  data_.clear();
-
-  vector<string> category_labels;
-  string error = "";
-  for (auto row : data_copy) {
-/* TODO add this back in
-    string category_lookup = row[category_index];
-    category_labels = model->categories()->GetCategoryLabelsV(category_lookup, location());
-    if (!utilities::String::HandleOperators(category_labels, error))
-      LOG_FATAL() << location() << error;
-    LOG_FINE() << "category_labels: " << boost::join(category_labels, " ");
-*/
-
-    for (auto label : category_labels) {
-/*      if (!model->categories()->IsValid(label)) {
-        LOG_ERROR() << location() << " contains an invalid category " << label << ". Perhaps you mis-typed the short-hand?";
-      }*/
-
-      row[category_index] = label;
-      LOG_FINE() << "re-adding row to table: " << boost::join(row, " ");
-      data_.push_back(row);
-    }
-  }
 }
 
 } /* namespace parameters */

@@ -89,7 +89,6 @@ public:
   const vector<string>&       initialisation_phases() const { return initialisation_phases_; }
   virtual const vector<unsigned>&     length_bins() const { return length_bins_; }
   virtual bool                length_plus() const { return length_plus_; }
-  virtual unsigned            number_of_agents_to_seed() const {return number_agents_;}
   string&                     get_base_layer() {return base_layer_;};
   unsigned                    get_height() {return world_height_;};
   unsigned                    get_width() {return world_width_;};
@@ -99,7 +98,7 @@ public:
   virtual Objects&            objects();
   GlobalConfiguration&        global_configuration() { return *global_configuration_; }
   virtual Factory&            factory();
-  virtual WorldView&          world_view();
+  WorldView*                  world_view();
 
 protected:
   // Methods
@@ -128,7 +127,6 @@ protected:
   bool                        addressable_values_file_ = false;
   unsigned                    adressable_values_count_ = 1;
   bool                        sexed_ = false;
-  unsigned                    number_agents_;
   string                      base_layer_;
   unsigned                    world_height_;
   unsigned                    world_width_;

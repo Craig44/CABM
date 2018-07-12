@@ -8,12 +8,22 @@ initialisation_phase_labels Iterative #label to an @initialisation block
 time_steps Annual # just one time step for now
 length_bins 0 5 10 15 20 25 30 35 40 45 50 55 60 65 70 # assumed cm's
 length_plus true
-number_of_agents 100000 ## initial number of agents
 base_layer_label Base #
 ## a single area model
 nrows 1
 ncols 1 
 
+@initialisation_phase Iterative
+type iterative
+years 50
+number_of_agents 1000 ## initial number of agents
+layer_label Base
+
+@time_step Annual
+processes place_holder
+
+@process place_holder
+type nop
 
 # --------------
 # Include Layers

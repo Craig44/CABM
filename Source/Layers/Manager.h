@@ -14,7 +14,10 @@
 
 // headers
 #include "BaseClasses/Manager.h"
+
 #include "Layers/Layer.h"
+#include "Children/Integer/IntLayer.h"
+#include "Children/Numeric/Base/NumericLayer.h"
 
 
 #include "Model/Managers.h"
@@ -31,6 +34,9 @@ public:
   // methods
   virtual                     ~Manager() noexcept(true) { };
   Layer*                      GetLayer(const string& label);
+  IntLayer*                   GetIntLayer(const string& label);
+  NumericLayer*               GetNumericLayer(const string& label);
+
 };
 
 } /* namespace layers */
