@@ -1,0 +1,37 @@
+\section{Introduction\label{sec:Introduction}} 
+
+\IBM\ ia a project I embarked on during my PhD and I hope that it will be useful to some one out in the wide world. \IBM\ simulates a generalised individual based model that allows a great deal of choice in specifying the agent dynamics and model outputs. \IBM\ is designed for flexibility. The \IBM\ is a spatially explicit as I thought that would be a valuable model characteristic and was the area of interest for me.
+
+The time period and annual cycle of \IBM\ is completely defined by the user. It can simulate many different user defined IBM, for example removals-at-length or -age from an anthropogenic or exploitation event (e.g. fishery or other human impact), scientific survey and other biomass indices, and mark-recapture data.
+
+The real power of \IBM\ comes with management strategy evaluation and population assessment model investigation.
+
+
+\subsection{\I{Where to get \IBM }}
+\IBM\ source code is hosted on github, and can be found at \url{https://github.com/Craig44/IBM}\index{github}.
+
+Currently you have to compile the code, to get an executable but, the repository contains all the required thirdparty libraries and has been developed for ease of compilation.
+
+\subsection{\I{System requirements}}
+\IBM\ is available for most IBM compatible machines running 64-bit \I{Linux} and \I{Microsoft Windows} operating systems.
+
+Several of \IBM 's tasks are highly computer intensive and a fast processor is recommended. Depending on the model implemented, some of the \IBM\ tasks can take a considerable amount of processing time.
+
+The program itself requires a few gigs of hard-disk space but output files can consume large amounts of disk space\index{Disk space}. Depending on the number and type of user output requests, the output could range from a few hundred kilobytes to several hundred megabytes. When estimating model fits, several hundred megabytes of RAM may be required, depending on the spatial size of the model, number of categories, and complexity of processes and observations. For extremely large models, several gigabytes of RAM may occasionally be required. 
+
+\subsection{\I{Necessary files}}
+
+For both 64-bit Linux and Microsoft Windows, only the binary executable \texttt{ibm} or \texttt{ibm.exe} is required to run \IBM . No other software is required. We do not provide a version for 32-bit operating systems. 
+
+\IBM\ offers little in the way of post-processing of model output, and a package available that allows tabulation and graphing of model outputs is recommended. We suggest software such as \href{http://www.r-project.org}{\R}\ \citep{R} to assist in the post processing of \IBM\ output. We provide the \texttt{CASAL2} \R\ package for importing the \IBM\ output into \R\ (see Section \ref{sec:post-processing}).
+
+\subsection{Getting help\index{Getting help}\index{User assistance}\index{Notifying errors}}
+
+\IBM\ is distributed as unsupported software. The Development Team would appreciate being notified of any problems or errors in \IBM , please use the github page to post issues, see Section \ref{sec:reporting-errors} for the recommended template for reporting issues.
+
+\subsection{Technical details\index{Technical specifications}}\label{sec:tech}
+
+\IBM\ was compiled on Linux using \texttt{gcc} (\url{http://gcc.gnu.org}), the C/C++ compiler developed by the GNU Project (\url{http://gcc.gnu.org}). The 64-bit Linux \index{Linux} version was compiled using \texttt{gcc} version 5.2.1 20151010 Ubuntu Linux (\url{http://www.ubuntu.com/}). The Microsoft Windows (\url{http://www.microsoft.com})\index{Microsoft Windows} version was compiled using MingW (\url{http://www.mingw.org})\index{Mingw} \texttt{gcc} (tdm64-1) 5.1.0 (\url{http://gcc.gnu.org})\index{gcc}. The Microsoft Windows(\url{http://www.microsoft.com}) installer was built using the Inno Setup 5 (\url{http://www.jrsoftware.org/isdl.php}).
+
+The random number generator\index{Random number generator} used by \IBM\ uses an implementation of the Mersenne twister random number generator \citep{796}. This, the command line functionality, matrix operations, and a number of other functions use the \href{http://www.boost.org/}{BOOST} C++ library (Version 1.58.0)\index{BOOST C++ library}.
+
