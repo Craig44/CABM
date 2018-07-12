@@ -13,7 +13,6 @@
 
 #include <limits>
 
-#include "Agents/Agents.h"
 #include "Selectivities/Manager.h"
 #include "TimeSteps/Manager.h"
 

@@ -16,6 +16,7 @@
 #include "Asserts/Manager.h"
 #include "DerivedQuantities/Manager.h"
 #include "InitialisationPhases/Manager.h"
+#include "Layers/Manager.h"
 #include "Likelihoods/Manager.h"
 #include "Observations/Manager.h"
 #include "Processes/Manager.h"
@@ -38,6 +39,7 @@ Managers::Managers(Model* model) {
   assert_                 = new asserts::Manager();
   derived_quantity_       = new derivedquantities::Manager();
   initialisation_phase_   = new initialisationphases::Manager();
+  layer_                  = new layers::Manager();
   likelihood_             = new likelihoods::Manager();
   observation_            = new observations::Manager();
   process_                = new processes::Manager();
@@ -55,6 +57,7 @@ Managers::~Managers() {
   delete assert_;
   delete derived_quantity_;
   delete initialisation_phase_;
+  delete layer_;
   delete likelihood_;
   delete observation_;
   delete process_;
@@ -71,6 +74,7 @@ void Managers::Validate() {
   process_->Validate(model_); // Needs to go before estimate for the situation where there is an @estimate block
   assert_->Validate();
   derived_quantity_->Validate();
+  layer_->Validate();
   likelihood_->Validate();
   observation_->Validate();
   report_->Validate();
@@ -85,6 +89,7 @@ void Managers::Build() {
   process_->Build(); // To handle BH Recruitment having ssb_offset available
   assert_->Build();
   derived_quantity_->Build();
+  layer_->Build();
   likelihood_->Build();
   observation_->Build();
   selectivity_->Build();
@@ -97,6 +102,7 @@ void Managers::Reset() {
   assert_->Reset();
   derived_quantity_->Reset();
   initialisation_phase_->Reset();
+  layer_->Reset();
   likelihood_->Reset();
   observation_->Reset();
   process_->Reset();

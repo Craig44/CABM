@@ -15,7 +15,7 @@
 // Common Factories
 #include "BaseClasses/Object.h"
 #include "Asserts/Factory.h"
-#include "Agents/Agents.h"
+#include "Layers/Factory.h"
 #include "DerivedQuantities/Factory.h"
 #include "InitialisationPhases/Factory.h"
 #include "Likelihoods/Factory.h"

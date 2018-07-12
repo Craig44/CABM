@@ -26,7 +26,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 For more information see http://www.niwa.co.nz, or contact the development 
-team at casal2@niwa.co.nz
+team at Craig.Marsh@niwa.co.nz or craig.marsh10@gmail.com
 
 )";
 

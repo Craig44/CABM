@@ -1,0 +1,38 @@
+/**
+ * @file Manager.h
+ * @author  C.Marsh
+ * @date 12/07/2018
+ * @section LICENSE
+ *
+ *
+ * @section DESCRIPTION
+ *
+ * This class is the manager for the Layers
+ */
+#ifndef LAYERS_MANAGER_H_
+#define LAYERS_MANAGER_H_
+
+// headers
+#include "BaseClasses/Manager.h"
+#include "Layers/Layer.h"
+
+
+#include "Model/Managers.h"
+
+// namespaces
+namespace niwa {
+namespace layers {
+
+// classes
+class Manager : public niwa::base::Manager<layers::Manager, niwa::Layer> {
+  friend class niwa::base::Manager<layers::Manager, niwa::Layer>;
+  friend class niwa::Managers;
+public:
+  // methods
+  virtual                     ~Manager() noexcept(true) { };
+  Layer*                      GetLayer(const string& label);
+};
+
+} /* namespace layers */
+} /* namespace niwa */
+#endif /* LAYERS_MANAGER_H_ */

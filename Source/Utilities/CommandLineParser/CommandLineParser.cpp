@@ -48,7 +48,7 @@ void CommandLineParser::Parse(int argc, char* argv[], RunParameters& options) {
   options_description oDesc("Usage");
   oDesc.add_options()
     ("help,h", "Print help")
-    ("license,l", "Display CASAL2 license")
+    ("license,l", "Display IBM license")
     ("version,v", "Display version information")
     ("config,c", value<string>(), "Configuration file")
     ("run,r", "Basic model run mode")

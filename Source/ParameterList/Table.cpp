@@ -15,7 +15,6 @@
 
 #include <algorithm>
 
-#include "Agents/Agents.h"
 #include "Model/Model.h"
 #include "Utilities/String.h"
 #include "Utilities/To.h"

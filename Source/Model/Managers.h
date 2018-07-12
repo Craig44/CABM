@@ -23,6 +23,7 @@ namespace niwa {
 namespace asserts { class Manager; }
 namespace derivedquantities { class Manager; }
 namespace initialisationphases { class Manager; }
+namespace layers { class Manager; }
 namespace likelihoods { class Manager; }
 namespace observations { class Manager; }
 namespace processes { class Manager; }
@@ -43,6 +44,7 @@ public:
   virtual asserts::Manager*               assertx() { return assert_; }
   virtual derivedquantities::Manager*     derived_quantity() { return derived_quantity_; }
   virtual initialisationphases::Manager*  initialisation_phase() { return initialisation_phase_; }
+  virtual layers::Manager*                layer() { return layer_; }
   virtual likelihoods::Manager*           likelihood() { return likelihood_; }
   virtual observations::Manager*          observation() { return observation_; }
   virtual processes::Manager*             process() { return process_; }
@@ -64,6 +66,7 @@ protected:
   asserts::Manager*                   assert_;
   derivedquantities::Manager*         derived_quantity_;
   initialisationphases::Manager*      initialisation_phase_;
+  layers::Manager*                    layer_;
   likelihoods::Manager*               likelihood_;
   observations::Manager*              observation_;
   processes::Manager*                 process_;

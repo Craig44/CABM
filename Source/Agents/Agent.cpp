@@ -1,5 +1,5 @@
 /**
- * @file Agents.cpp
+ * @file Agent.cpp
  * @author  C.Marsh
  * @version 1.0
  * @date 11/06/2018
@@ -10,12 +10,7 @@
  */
 
 // Headers
-#include "Agents.h"
-
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/algorithm/string/trim_all.hpp>
-#include <boost/algorithm/string/split.hpp>
-
+#include "Agent.h"
 
 #include "Model/Model.h"
 #include "Logging/Logging.h"
@@ -35,7 +30,7 @@ namespace niwa {
  *
  * Note: The constructor is parsed to generate Latex for the documentation.
  */
-Agents::Agents(Model* model) : model_(model) {
+Agent::Agent(Model* model) : model_(model) {
 	// Perhaps think if Agent attributes would ever differ from Model attributes.
 }
 
@@ -45,7 +40,7 @@ Agents::Agents(Model* model) : model_(model) {
  *
  * Note: all parameters are populated from configuration files
  */
-void Agents::Validate() {
+void Agent::Validate() {
   // Check that we actually had a categories block
   parameters_.Populate(model_);
 
@@ -56,7 +51,7 @@ void Agents::Validate() {
  * Obtain smart_pointers to any objects that will be used by this object.
  */
 
-void Agents::Build() {
+void Agent::Build() {
 
 }
 

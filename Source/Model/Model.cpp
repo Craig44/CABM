@@ -7,7 +7,7 @@
  *
  * Copyright NIWA Science ©2012 - www.niwa.co.nz
  *
- * $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
+ * @modified 12/7/2018 by C.Marsh for IBM usage
  */
 
 // Headers
@@ -23,12 +23,12 @@
 #include "Factory.h"
 #include "Managers.h"
 #include "Objects.h"
-#include "Agents/Agents.h"
+#include "Agents/Agent.h"
 #include "GlobalConfiguration/GlobalConfiguration.h"
 #include "InitialisationPhases/Manager.h"
 #include "Logging/Logging.h"
 #include "Observations/Manager.h"
-#include "Partition/Partition.h"
+#include "World/WorldView.h"
 #include "Reports/Manager.h"
 #include "TimeSteps/Manager.h"
 #include "TimeVarying/Manager.h"
@@ -56,16 +56,14 @@ Model::Model() {
   parameters_.Bind<unsigned>(PARAM_LENGTH_BINS, &length_bins_, "", "", true);
   parameters_.Bind<bool>(PARAM_LENGTH_PLUS, &length_plus_, "Is the last bin a plus group", "", false);
   parameters_.Bind<unsigned>(PARAM_NUMBER_OF_AGENTS, &number_agents_, "The number of agents to initially seed in the partition", "");
-  parameters_.Bind<string>(PARAM_AREAS, &areas_, "Label the areas in the model", "");
-  parameters_.Bind<bool>(PARAM_SEXED, &sexed_, "Is sex an attribute in the partition", "true, false", false);
-  parameters_.Bind<bool>(PARAM_MATURE, &mature_, "Is maturity an attribute in the partition", "true, false", false);
+  parameters_.Bind<string>(PARAM_BASE_LAYER, &base_layer_, "Label for the base layer", "");
 
 
   global_configuration_ = new GlobalConfiguration();
   managers_ = new Managers(this);
   objects_ = new Objects(this);
   factory_ = new Factory(this);
-  partition_ = new Partition(this); // Constructor for the Partition.
+  world_view_ = new WorldView(this);
 }
 
 /**
@@ -76,7 +74,7 @@ Model::~Model() {
   delete managers_;
   delete objects_;
   delete factory_;
-  delete partition_;
+  delete world_view_;
 }
 
 /**
@@ -113,8 +111,8 @@ Factory& Model::factory() {
   return *factory_;
 }
 
-Partition& Model::partition() {
-  return *partition_;
+WorldView& Model::world_view() {
+  return *world_view_;
 }
 
 /**
@@ -256,7 +254,7 @@ void Model::Validate() {
     parameters_.Populate(this);
 
   // Call validation for the other objects required by the model
-  partition_->Validate();
+  world_view_->Validate();
 
   managers_->Validate();
 
@@ -291,7 +289,7 @@ void Model::Validate() {
  */
 void Model::Build() {
   LOG_TRACE();
-  partition_->Build();
+  world_view_->Build();
   managers_->Build();
 
 }
@@ -311,7 +309,7 @@ void Model::Verify() {
 void Model::Reset() {
   LOG_TRACE();
 
-  partition_->Reset();
+  world_view_->Reset();
   managers_->Reset();
 }
 

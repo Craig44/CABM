@@ -1,5 +1,5 @@
 /**
- * @file Agents.h
+ * @file Agent.h
  * @author  C.Marsh
  * @version 1.0
  * @date 11/06/2018
@@ -11,8 +11,8 @@
  * Other processes such as recruitment are defined at the partition level.
  *
  */
-#ifndef AGENTS_H_
-#define AGENTS_H_
+#ifndef AGENT_H_
+#define AGENT_H_
 
 // Headers
 #include "BaseClasses/Object.h"
@@ -24,11 +24,12 @@ class Model;
 /**
  * Class Definition
  */
-class Agents : public niwa::base::Object {
-  friend class Model;
+class Agent : public niwa::base::Object {
 public:
   // Methods
-  virtual                       ~Agents() = default;
+  virtual                       ~Agent() = default;
+  Agent()                       = delete;
+  explicit                      Agent(Model* model);
   void                          Validate();
   void                          Build();
   void                          Reset() { };
@@ -38,9 +39,6 @@ public:
 
 protected:
   // Methods
-  Agents() = delete;
-  explicit Agents(Model* model);
-
 
   // Members
   Model*                      model_ = nullptr;
@@ -48,4 +46,4 @@ protected:
 };
 } /* namespace niwa */
 
-#endif /* AGENTS_H_ */
+#endif /* AGENT_H_ */

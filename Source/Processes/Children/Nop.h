@@ -24,7 +24,7 @@ namespace processes {
 /**
  * Class definition
  */
-class Nop : public Process{
+class Nop : public Process {
 public:
   // methods
   explicit Nop(Model* model);

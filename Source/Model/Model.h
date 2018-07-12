@@ -21,7 +21,6 @@
 #include "BaseClasses/Object.h"
 #include "GlobalConfiguration/GlobalConfiguration.h"
 #include "Utilities/Math.h"
-#include "Utilities/PartitionType.h"
 #include "Utilities/RunMode.h"
 
 // Namespaces
@@ -33,7 +32,7 @@ class Agents;
 class Factory;
 class Partition;
 class ObjectiveFunction;
-class EquationParser;
+class WorldView;
 
 namespace State {
 enum Type {
@@ -77,12 +76,6 @@ public:
   virtual unsigned            start_year() const { return start_year_; }
   virtual unsigned            final_year() const { return final_year_; }
   unsigned                    projection_final_year() const { return projection_final_year_;}
-  Double                      b0(string derived_quantity_label) {return b0_[derived_quantity_label];}
-  void                        set_b0(string derived_quantity_label, Double new_b0) {b0_[derived_quantity_label] = new_b0;}
-  Double                      binitial(string derived_quantity_label) {return binitial_[derived_quantity_label];}
-  void                        set_binitial(string derived_quantity_label, Double new_binitial) {binitial_[derived_quantity_label] = new_binitial;}
-  bool                        b0_initialised(string derived_quantity_label) {return b0_initialised_[derived_quantity_label];}
-  void                        set_b0_initialised(string derived_quantity_label, bool new_b0_initialised) {b0_initialised_[derived_quantity_label] = new_b0_initialised;}
   bool                        projection_final_phase() {return projection_final_phase_;}
   void                        set_projection_final_phase(bool phase) {projection_final_phase_ = phase;}
   virtual vector<unsigned>    years() const;
@@ -100,13 +93,16 @@ public:
   virtual const vector<unsigned>&     length_bins() const { return length_bins_; }
   virtual bool                length_plus() const { return length_plus_; }
   virtual unsigned            number_of_agents_to_seed() const {return number_agents_;}
+  string&                     get_base_layer() {return base_layer_;};
+  unsigned                    get_height() {return world_height_;};
+  unsigned                    get_width() {return world_width_;};
 
   // manager accessors
   virtual Managers&           managers();
   virtual Objects&            objects();
   GlobalConfiguration&        global_configuration() { return *global_configuration_; }
   virtual Factory&            factory();
-  virtual Partition&          partition();
+  virtual WorldView&          world_view();
 
 protected:
   // Methods
@@ -127,9 +123,6 @@ protected:
   unsigned                    min_age_ = 0;
   unsigned                    max_age_ = 0;
   string                      base_weight_units_;
-  map<string, Double>         b0_;
-  map<string, Double>         binitial_;
-  map<string, bool>           b0_initialised_;
   bool                        age_plus_ = true;
   vector<string>              initialisation_phases_;
   vector<string>              time_steps_;
@@ -138,16 +131,18 @@ protected:
   bool                        addressable_values_file_ = false;
   unsigned                    adressable_values_count_ = 1;
   PartitionType               partition_type_ = PartitionType::kInvalid;
-  // Things I have hacked in
-  bool                        mature_ = false;
   bool                        sexed_ = false;
-  vector<string>              areas_;
   unsigned                    number_agents_;
+  string                      base_layer_;
+  unsigned                    world_height_;
+  unsigned                    world_width_;
+
+
   Managers*                   managers_ = nullptr;
   Objects*                    objects_ = nullptr;
   GlobalConfiguration*        global_configuration_ = nullptr;
   Factory*                    factory_ = nullptr;
-  Partition*                  partition_ = nullptr;
+  WorldView*                  world_view_ = nullptr;
   bool                        projection_final_phase_ = false; // this parameter is for the projection classes. most of the methods are in the reset but they don't need to be applied
   // if the model is in the first iteration and storeing values.
   map<State::Type, vector<Executor*>> executors_;
