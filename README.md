@@ -23,3 +23,40 @@ This IBM has a forced spatial structure, where users must define at least one sp
 is mainly because I am interested in spatial characteristics and I believe they are fundamental to IBM's. This means for simple 
 spatial models (single area models) the model could be a bit lousy, But when you start having high spatial resolution and spatial
 processes such as fishing. The spatial memory management will benefit massively in efficiency's it also allows easier threading.
+
+
+Currently there is no executable to download and use because it is still in development, but if you are interested in the code base
+and want to be a collaborator on the project I recommend you fork the repository and compile the code which is easy to do as shown in the
+following steps.
+
+Open a terminal in the BuildSystem folder, to check you have the right dependencies on your program run the following command
+
+```
+doBuild.bat check
+```
+
+if you have windows 10 you may have to put a ```.\``` in front of the command, and for linux
+
+```
+doBuild.sh check
+```
+
+This will look for g++, git, gfortran (I don't think this is neccesary though will check)
+
+If the check worked okay, run the command to build the within repository libraries Python and Boost
+
+```
+doBuild.bat thirdparty
+```
+
+Once that is done you should (in theory) be able to compile the code and build an executable using the following
+call in the command.
+
+```
+doBuild.bat release
+```
+
+This will put the executable in the following directory BuildSystem\bin\'system'\release, where 'system' can 
+be windows or linux depending on your OS.
+
+God speed
