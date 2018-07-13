@@ -29,6 +29,8 @@ Currently there is no executable to download and use because it is still in deve
 and want to be a collaborator on the project I recommend you fork the repository and compile the code which is easy to do as shown in the
 following steps.
 
+### Compiling the code
+
 Open a terminal in the BuildSystem folder, to check you have the right dependencies on your program run the following command
 
 ```
@@ -38,12 +40,12 @@ doBuild.bat check
 if you have windows 10 you may have to put a ```.\``` in front of the command, and for linux
 
 ```
-doBuild.sh check
+.\doBuild.sh check
 ```
 
-This will look for g++, git, gfortran (I don't think this is neccesary though will check)
+This will look for g++, git, and g++ version maybe some others.
 
-If the check worked okay, run the command to build the within repository libraries Python and Boost
+If the check worked okay, run the command to build the within repository libraries Python, cmake and Boost
 
 ```
 doBuild.bat thirdparty
@@ -56,7 +58,12 @@ call in the command.
 doBuild.bat release
 ```
 
-This will put the executable in the following directory BuildSystem\bin\'system'\release, where 'system' can 
-be windows or linux depending on your OS.
+This will put the executable in the following directory ```BuildSystem\bin\'system'\release```, where ```'system'``` can 
+be ```windows``` or ```linux``` depending on your OS. An alternative is to build it in a IDE such as eclipse.
 
+For more information on build parameters look at the python scripts or run the command
+
+```
+doBuild.bat help
+```
 God speed

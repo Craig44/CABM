@@ -48,11 +48,9 @@ def start_build_system():
   if Globals.operating_system_ == "windows":
     Globals.cmd_path_      = system_info.find_exe_path('cmd.exe')
     Globals.compiler_path_ = system_info.find_exe_path('g++.exe')
-    Globals.gfortran_path_ = system_info.find_exe_path('gfortran.exe')
     Globals.git_path_      = system_info.find_exe_path('git.exe')
   else:
     Globals.compiler_path_ = system_info.find_exe_path('g++')
-    Globals.gfortran_path_ = system_info.find_exe_path('gfortran')
     Globals.git_path_      = system_info.find_exe_path('git')    
     if system_info.find_exe_path('unzip') == '':
       return Globals.PrintError('unzip is not in the current path. Please ensure it has been installed')
@@ -62,8 +60,6 @@ def start_build_system():
 
   if Globals.compiler_path_ == "":
     return Globals.PrintError("g++ is not in the current path")
-  if Globals.gfortran_path_ == "":
-    return Globals.PrintError("gfortran for g++ is not installed. Please install the GCC Fortran compiler")
   if Globals.git_path_ == "":
     return Globals.PrintError("git is not in the current path. Please install a git command line client (e.g http://git-scm.com/downloads)")  
   if Globals.operating_system_ == 'windows' and os.path.exists(Globals.git_path_ + '\\sh.exe'):
