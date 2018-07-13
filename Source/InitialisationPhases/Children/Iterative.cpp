@@ -6,7 +6,6 @@
  *
  *
  */
-
 // headers
 #include "Iterative.h"
 
@@ -35,6 +34,8 @@ Iterative::Iterative(Model* model)
   parameters_.Bind<double>(PARAM_LAMBDA, &lambda_, "The maximum value of the absolute sum of differences (lambda) between the partition at year-1 and year that indicates successfull convergence", "", Double(0.0));
   parameters_.Bind<unsigned>(PARAM_NUMBER_OF_AGENTS, &number_agents_, "The number of agents to initially seed in the partition", "");
   parameters_.Bind<string>(PARAM_LAYER_LABEL, &intial_layer_label_, "The label of a layer that you want to seed a distribution by.", "")->is_optional();
+  parameters_.Bind<string>(PARAM_GROWTH_PROCESS_LABEL, &growth_process_label_, "Label for the growth process in the annual cycle", "");
+  parameters_.Bind<string>(PARAM_NATURAL_MORTALITY_PROCESS_LABEL, &natural_mortality_label_, "Label for the natural mortality process in the annual cycle", "");
 }
 
 /**

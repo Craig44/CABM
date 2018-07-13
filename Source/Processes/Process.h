@@ -31,6 +31,7 @@ enum class ProcessType {
   kMaturation,
   kMortality,
   kRecruitment,
+  kGrowth,
   kTransition,
   kNullProcess, // Special process type for the process child nop
 };

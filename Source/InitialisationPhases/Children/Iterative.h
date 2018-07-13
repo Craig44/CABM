@@ -27,7 +27,7 @@ class NumericLayer;
 class WorldView;
 
 namespace initialisationphases {
-
+using std::string;
 /**
  *
  */
@@ -50,10 +50,11 @@ protected:
   Double                      lambda_;
   vector<unsigned>            convergence_years_;
   unsigned                    number_agents_;
-  std::string                 intial_layer_label_ = "";
+  string                 intial_layer_label_ = "";
   niwa::layers::NumericLayer* initial_layer_ = nullptr;
   WorldView*                  world_ = nullptr;
-
+  string					  growth_process_label_;
+  string					  natural_mortality_label_;
 
 
 };
