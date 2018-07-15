@@ -5,11 +5,11 @@
 
 // Headers
 #include <iostream>
-#include <thread>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/trim_all.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <thread>
 
 #include "ConfigurationLoader/Loader.h"
 #include "GlobalConfiguration/GlobalConfiguration.h"
@@ -90,18 +90,18 @@ int main(int argc, char * argv[]) {
        utilities::RandomNumberGenerator::Instance().Reset(model.global_configuration().random_seed());
 
        // Thread off the reports
-       //reports::Manager* report_manager = model.managers().report();
+       reports::Manager* report_manager = model.managers().report();
 
        // TODO address the threading of reports
-       //std::thread report_thread([&report_manager]() { report_manager->FlushReports(); });
+       std::thread report_thread([&report_manager]() { report_manager->FlushReports(); });
 
        // Run the model
        model_start_return_success = model.Start(run_mode);
 
-       /*
+
        // finish report thread
        report_manager->StopThread();
-       report_thread.join();*/
+       report_thread.join();
 
        if (logging.errors().size() > 0) {
          logging.FlushErrors();

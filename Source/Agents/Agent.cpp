@@ -13,18 +13,25 @@
 #include "Agent.h"
 
 #include "Model/Model.h"
-#include "Utilities/String.h"
-#include "Utilities/To.h"
+#include "Utilities/RandomNumberGenerator.h"
 
 // Namespaces
 namespace niwa {
 
-/*
- * A method used in initialisation that draws an age from an equilibrium distribution and calculates the corresponding length based on that
- * age, a short cut to populate with a semi equilibrium distribution
-*/
-void  Agent::seed() {
+
+Agent::Agent(double first_growth_par, double second_growth_par, double M, unsigned age) : first_growth_par_(first_growth_par), second_growth_par_(second_growth_par), survival_(1 - exp(-M)), age_(age)
+{
 
 }
+
+/*
+ * Survival event
+*/
+void Agent::survival() {
+  utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+  if (not (rng.chance() > survival_))
+    alive_ = false;
+}
+
 
 } /* namespace niwa */

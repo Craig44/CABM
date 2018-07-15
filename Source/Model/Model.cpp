@@ -56,6 +56,9 @@ Model::Model() {
   parameters_.Bind<unsigned>(PARAM_LENGTH_BINS, &length_bins_, "", "", true);
   parameters_.Bind<bool>(PARAM_LENGTH_PLUS, &length_plus_, "Is the last bin a plus group", "", false);
   parameters_.Bind<string>(PARAM_BASE_LAYER_LABEL, &base_layer_, "Label for the base layer", "");
+  parameters_.Bind<string>(PARAM_LATITUDE_LAYER_LABEL, &lat_layer_label_, "Label for the latitude layer", "", "");
+  parameters_.Bind<string>(PARAM_LONGITUDE_LAYER_LABEL, &lon_layer_label_, "Label for the longitude layer", "", "");
+  parameters_.Bind<double>(PARAM_INITIALISATION_SEED_Z, &initialisation_seed_z_, "A instantaneous Z value used to speed up the equilibrium state in initialisation set to M to begin with, but see manual for information", "");
   parameters_.Bind<unsigned>(PARAM_NROWS, &world_height_, "number of rows in spatial domain", "");
   parameters_.Bind<unsigned>(PARAM_NCOLS, &world_width_, "number of columns in spatial domain", "");
 

@@ -62,6 +62,29 @@ double RandomNumberGenerator::uniform(double min, double max) {
 }
 
 /**
+ * Get a random uniform between 0-1
+ *
+ * @return random number
+ */
+double RandomNumberGenerator::chance() {
+ boost::variate_generator<boost::mt19937&, boost::uniform_01<> > generator(generator_, chance_);
+
+ return generator();
+}
+
+/**
+ * Get a random exponential numebr
+ *
+ * @param lambda The rate parameter of an exponential
+ * @return random number
+ */
+double RandomNumberGenerator::exponential(double lambda) {
+  boost::exponential_distribution<> exponential(lambda);
+  boost::variate_generator<boost::mt19937&, boost::exponential_distribution<> > generator(generator_, exponential);
+
+ return generator();
+}
+/**
  * Generate a normal distributed random number
  *
  * @param mean (default 0.0)

@@ -36,11 +36,12 @@ InitialisationPhase* Factory::Create(Model* model, const string& object_type, co
   if (object_type == PARAM_INITIALISATION_PHASE) {
     if (sub_type == PARAM_ITERATIVE)
       result = new Iterative(model);
+
+    if (result)
+      model->managers().initialisation_phase()->AddObject(result);
   }
 
 
-  if (result)
-    model->managers().initialisation_phase()->AddObject(result);
 
   return result;
 }

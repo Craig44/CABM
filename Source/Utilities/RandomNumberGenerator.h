@@ -41,7 +41,9 @@ public:
   double                        lognormal(double mean, double cv);
   double                        binomial(double p, double n);
   double                        chi_square(unsigned df);
+  double                        exponential(double lambda);
   double                        gamma(double shape);
+  double                        chance();
 
 private:
   // Methods
@@ -49,6 +51,8 @@ private:
 
   // Members
   boost::mt19937                generator_;
+  boost::uniform_01<>           chance_;
+
 };
 
 } /* namespace utilities */

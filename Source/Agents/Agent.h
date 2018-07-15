@@ -28,17 +28,26 @@ class Agent { // Don't make this inherit from BaseClasses/Object.h
 public:
   // Methods
   virtual                       ~Agent() = default;
-  Agent() = default; // TODO will change this so we construct with parameters.
+  Agent(double first_growth_par, double second_growth_par, double M, unsigned age);
   virtual void                  Reset() {};
-  void                          seed();
-
   // Accessors
+  unsigned                     age() const {return age_;};
+  bool                         is_alive() const {return alive_ ;};
 
+
+  //Dynamices
+  void                         survival();
 protected:
   // Methods
 
   // Members
-  Model*                      model_ = nullptr;
+  double                      first_growth_par_;  // L_inf for von bert
+  double                      second_growth_par_; // k for von bert
+  double                      survival_; // natural mortality
+  unsigned                    age_;
+  bool                        alive_ = true;
+  //
+
 
 };
 } /* namespace niwa */

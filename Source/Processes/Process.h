@@ -24,7 +24,7 @@
 #include "Model/Model.h"
 
 namespace niwa {
-
+class WorldView;
 enum class ProcessType {
   kUnknown,
   kAgeing,
@@ -62,6 +62,8 @@ public:
 protected:
   // members
   Model*                      model_ = nullptr;
+  WorldView*                  world_ = nullptr;
+
   ProcessType                 process_type_ = ProcessType::kUnknown;
   bool                        merge_difference_grid_ = true;
   map<unsigned, map<string, vector<Executor*>>> executors_;

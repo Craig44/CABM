@@ -14,7 +14,7 @@
 #define SOURCE_PROCESSES_CHILDREN_GROWTH_VON_BERTALANFFY_H_
 
 // headers
-#include "Processes/Process.h"
+#include "Processes/Children/Growth/Growth.h"
 
 #include "Layers/Children/Numeric/Base/NumericLayer.h"
 // namespaces
@@ -25,7 +25,7 @@ class NumericLayer;
 /**
  * Class definition
  */
-class GrowthVonBertalanffy : public Process {
+class GrowthVonBertalanffy : public Growth {
 public:
   // methods
   explicit GrowthVonBertalanffy(Model* model);
@@ -34,16 +34,15 @@ public:
   void                        DoBuild() override final;
   void                        DoReset() override final { };
   void                        DoExecute() override final { };
+
+  void                        draw_growth_param(unsigned row, unsigned col, unsigned number_of_draws, vector<vector<double>>& vec) override final;
+
 protected:
   std::string				  l_inf_layer_label_;
   std::string				  k_layer_label_;
-  niwa::layers::NumericLayer* L_inf_layer_;
-  niwa::layers::NumericLayer* k_layer_;  
-  vector<double>			  time_step_proportions_;
-  double					  cv_;
-  string					  distribution_;
+  niwa::layers::NumericLayer* L_inf_layer_ = nullptr;
+  niwa::layers::NumericLayer* k_layer_ = nullptr;
 
-  vector<double>			  get_growth_params_by_cell(unsigned row, unsigned col);
 };
 
 } /* namespace processes */

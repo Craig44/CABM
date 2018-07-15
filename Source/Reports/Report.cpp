@@ -14,8 +14,6 @@
 #include "Report.h"
 
 #include <string>
-#include <iostream>
-#include <fstream>
 
 #include "Model/Model.h"
 #include "Model/Managers.h"
@@ -32,6 +30,8 @@ using std::ifstream;
 using std::cout;
 using std::endl;
 using std::ios_base;
+
+std::mutex Report::lock_;
 
 
 inline bool DoesFileExist(const string& file_name) {
@@ -94,22 +94,28 @@ bool Report::HasYear(unsigned year) {
  */
 void Report::Prepare() {
   LOG_FINEST() << "preparing report: " << label_;
+  Report::lock_.lock();
   SetUpInternalStates();
   DoPrepare();
+  Report::lock_.unlock();
 };
 
 /**
  *
  */
 void Report::Execute() {
+  Report::lock_.lock();
   DoExecute();
+  Report::lock_.unlock();
 }
 
 /**
  *
  */
 void Report::Finalise() {
+  Report::lock_.lock();
   DoFinalise();
+  Report::lock_.unlock();
 };
 
 /**
@@ -144,6 +150,7 @@ void Report::SetUpInternalStates() {
  * Flush the contents of the cache to the file or stdout/stderr
  */
 void Report::FlushCache() {
+  Report::lock_.lock();
   /**
    * Are we writing to a file?
    */
@@ -192,6 +199,8 @@ void Report::FlushCache() {
   cache_.clear();
   cache_.str("");
   ready_for_writing_ = false;
+  Report::lock_.unlock();
+
 }
 
 } /* namespace niwa */

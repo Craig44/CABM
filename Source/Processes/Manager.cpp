@@ -10,6 +10,7 @@
 #include "Model/Model.h"
 #include "Logging/Logging.h"
 
+
 namespace niwa {
 namespace processes {
 
@@ -56,5 +57,46 @@ Process* Manager::GetProcess(const string& label) {
   return nullptr;
 }
 
+/**
+ * Return the growth process with the name passed in as a parameter.
+ * If no process is found then an empty pointer will
+ * be returned.
+ *
+ * @param label The name of the process to find
+ * @return A pointer to the process or empty pointer
+ */
+Growth* Manager::GetGrowthProcess(const string& label) {
+  LOG_TRACE();
+  Growth* growth_ptr = nullptr;
+  for (auto process : objects_) {
+    if ((process->label() == label) && (process->process_type() == ProcessType::kGrowth)) {
+      growth_ptr = dynamic_cast<Growth*>(process);
+      return growth_ptr;
+    }
+  }
+
+  return growth_ptr;
+}
+
+/**
+ * Return the growth process with the name passed in as a parameter.
+ * If no process is found then an empty pointer will
+ * be returned.
+ *
+ * @param label The name of the process to find
+ * @return A pointer to the process or empty pointer
+ */
+Mortality* Manager::GetMortalityProcess(const string& label) {
+  LOG_TRACE();
+  Mortality* mortality_ptr = nullptr;
+  for (auto process : objects_) {
+    if ((process->label() == label) && (process->process_type() == ProcessType::kMortality)) {
+      mortality_ptr = dynamic_cast<Mortality*>(process);
+      return mortality_ptr;
+    }
+  }
+
+  return mortality_ptr;
+}
 } /* namespace processes */
 } /* namespace niwa */

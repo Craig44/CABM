@@ -42,7 +42,8 @@ protected:
   // methods
   void                        DoValidate() override final;
   void                        DoBuild() override final;
-  bool                        CheckConvergence();
+  template<typename T>
+  bool                        CheckConvergence(vector<T> pre_quantity, vector<T> post_quantity);
 
   // members
   unsigned                    years_;
@@ -50,11 +51,11 @@ protected:
   Double                      lambda_;
   vector<unsigned>            convergence_years_;
   unsigned                    number_agents_;
-  string                 intial_layer_label_ = "";
+  string                      intial_layer_label_;
   niwa::layers::NumericLayer* initial_layer_ = nullptr;
   WorldView*                  world_ = nullptr;
-  string					  growth_process_label_;
-  string					  natural_mortality_label_;
+  string					            growth_process_label_;
+  string					            natural_mortality_label_;
 
 
 };

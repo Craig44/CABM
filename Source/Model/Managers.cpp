@@ -71,7 +71,6 @@ void Managers::Validate() {
   LOG_TRACE();
   time_step_->Validate(model_);
   initialisation_phase_->Validate();
-  process_->Validate(model_);
   assert_->Validate();
   derived_quantity_->Validate();
   layer_->Validate();
@@ -79,22 +78,23 @@ void Managers::Validate() {
   observation_->Validate();
   report_->Validate();
   selectivity_->Validate();
+  process_->Validate(model_);
   time_varying_->Validate();
 }
 
 void Managers::Build() {
   LOG_TRACE();
+  layer_->Build();
   time_step_->Build();
-  initialisation_phase_->Build(model_);
-  process_->Build();
   assert_->Build();
   derived_quantity_->Build();
-  layer_->Build();
   likelihood_->Build();
   observation_->Build();
   selectivity_->Build();
   time_varying_->Build();
+  process_->Build();
   report_->Build();
+  initialisation_phase_->Build(model_);  // This calls report and process() so needs to be built after them
 }
 
 void Managers::Reset() {

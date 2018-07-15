@@ -20,11 +20,13 @@
 #include "BaseClasses/Manager.h"
 #include "Processes/Process.h"
 
+#include "Processes/Children/Growth/Growth.h"
+#include "Processes/Children/Mortality/Mortality.h"
+
 // Namespaces
 namespace niwa {
 class Model;
 namespace processes {
-
 /**
  * Class Definition
  */
@@ -37,6 +39,8 @@ public:
   void                        Validate() override final;
   void                        Validate(Model* model);
   Process*                    GetProcess(const string& label);
+  Growth*                     GetGrowthProcess(const string& label);
+  Mortality*                  GetMortalityProcess(const string& label);
 
 protected:
   // methods

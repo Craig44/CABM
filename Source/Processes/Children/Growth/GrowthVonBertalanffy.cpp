@@ -8,27 +8,23 @@
  *
  * @section DESCRIPTION
  *
- * This file exists to keep documentation generator happy
  */
 
 // headers
 #include "GrowthVonBertalanffy.h"
 
 #include "Layers/Manager.h"
+#include "Utilities/RandomNumberGenerator.h"
 // namespaces
 namespace niwa {
 namespace processes {
 
 /**
- * Empty constructor
+ * constructor
  */
-GrowthVonBertalanffy::GrowthVonBertalanffy(Model* model) : Process(model) {
-  process_type_ = ProcessType::kGrowth;
+GrowthVonBertalanffy::GrowthVonBertalanffy(Model* model) : Growth(model) {
   parameters_.Bind<string>(PARAM_L_INF_LAYER_LABEL, &l_inf_layer_label_, "Label for the numeric layer that describes mean L_inf through space", "");
   parameters_.Bind<string>(PARAM_K_LAYER_LABEL, &k_layer_label_, "Label for the numeric layer that describes mean k through space", "");
-  parameters_.Bind<double>(PARAM_TIME_STEP_PROPORTION, &time_step_proportions_, "A vector of proportions that describe how much of the annual increment to add to the lenght of an agent in each time step this process is applied", "");
-  parameters_.Bind<string>(PARAM_DISTRIBUTION, &distribution_, "the distribution to allocate the parameters to the agents", "");
-  parameters_.Bind<double>(PARAM_CV, &cv_, "The cv of the distribution", "");
 }
 
 // Build relationships between classes
@@ -47,14 +43,24 @@ void GrowthVonBertalanffy::DoBuild() {
 
 	// Check that the layers are all positive
 
-
 }
 
-vector<double> GrowthVonBertalanffy::get_growth_params_by_cell(unsigned row, unsigned col) {
-	vector<double> result;
-	result.push_back(L_inf_layer_->get_value(row, col));
-	result.push_back(k_layer_->get_value(row, col));
-	return result;
+
+/*
+ * This method is called at when ever an agent is created/seeded or moves. Agents will get a new/updated growth parameters
+ * based on the spatial cells of the process. This is called in initialisation/Recruitment and movement processes if needed.
+*/
+void  GrowthVonBertalanffy::draw_growth_param(unsigned row, unsigned col, unsigned number_of_draws, vector<vector<double>>& vec) {
+  utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+	double mean_linf = L_inf_layer_->get_value(row, col);
+	double mean_k = k_layer_->get_value(row, col);
+	vec.clear();
+	vec.resize(number_of_draws);
+
+	for (unsigned i = 0; i < number_of_draws; ++i) {
+	  vec[i].push_back(rng.lognormal(mean_linf, cv_));
+	  vec[i].push_back(rng.lognormal(mean_k, cv_));
+	}
 }
 
 } /* namespace processes */

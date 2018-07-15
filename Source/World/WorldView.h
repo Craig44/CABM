@@ -65,12 +65,15 @@ public:
   WorldCell*                  get_cached_square(int RowIndex, int ColIndex);
   unsigned                    get_enabled_cells() {return enabled_cells_; };
   void                        MergeCachedGrid() {};
+  void                        get_world_age_frequency(vector<unsigned>& world_age_freq);
 
 protected:
   // members
   WorldCell                   **base_grid_;
   WorldCell                   **cached_grid_;
-  niwa::layers::NumericLayer*     base_layer_ = nullptr;  // TODO might do a dynamic cast if you want a special IntLayer and access to all its functionality that isn't in Parent
+  niwa::layers::NumericLayer*     base_layer_ = nullptr;
+  niwa::layers::NumericLayer*     lat_layer_ = nullptr;
+  niwa::layers::NumericLayer*     long_layer_ = nullptr;
   unsigned                    width_;
   unsigned                    height_;
   unsigned                    enabled_cells_;

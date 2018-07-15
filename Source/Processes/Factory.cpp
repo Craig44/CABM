@@ -19,6 +19,8 @@
 
 #include "Children/Nop.h"
 #include "Children/RecruitmentBevertonHolt.h"
+#include "Children/Growth/GrowthVonBertalanffy.h"
+#include "Children/Mortality/MortalityConstantRate.h"
 
 // Namespaces
 namespace niwa {
@@ -59,14 +61,17 @@ Process* Factory::Create(Model* model, const string& object_type, const string& 
     if (sub == PARAM_NOP)
           result = new processes::Nop(model);
     else if (sub == PARAM_RECRUITMENT_BEVERTON_HOLT)
-      result = new processes::RecruitmentBevertonHolt(model);
+      result = new RecruitmentBevertonHolt(model);
+    else if (sub == PARAM_GROWTH_VON_BERTALANFFY)
+      result = new GrowthVonBertalanffy(model);
+    else if (sub == PARAM_MORTALITY_CONSTANT_RATE)
+      result = new MortalityConstantRate(model);
 
-
+    if (result)
+      model->managers().process()->AddObject(result);
   }
 
-  
-  if (result)
-    model->managers().process()->AddObject(result);
+
 
   return result;
 }

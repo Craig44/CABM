@@ -28,24 +28,39 @@ Layer* Manager::GetLayer(const string& label) {
   return nullptr;
 }
 
+/**
+ * Return a int layer from our collection
+ *
+ * @param label The label of the layer
+ * @return pointer to quantity, or empty pointer if not found
+ */
 IntLayer* Manager::GetIntLayer(const string& label) {
   IntLayer* pPtr = nullptr;
   for (auto layer : objects_) {
-    if (layer->label() == label && layer->type() == PARAM_INTEGER)
+    if (layer->label() == label && layer->type() == PARAM_INTEGER) {
       pPtr = dynamic_cast<IntLayer*>(layer);
-    return pPtr;
+      return pPtr;
+    }
   }
   return nullptr;
 }
 
+/**
+ * Return a numeric layer from our collection
+ *
+ * @param label The label of the layer
+ * @return pointer to quantity, or empty pointer if not found
+ */
 NumericLayer* Manager::GetNumericLayer(const string& label) {
+  LOG_TRACE()
   NumericLayer* pPtr = nullptr;
   for (auto layer : objects_) {
-    if (layer->label() == label && layer->type() == PARAM_NUMERIC)
+    if ((layer->label() == label) && (layer->type() == PARAM_NUMERIC)) {
       pPtr = dynamic_cast<NumericLayer*>(layer);
-    return pPtr;
+      return pPtr;
+    }
   }
-  return nullptr;
+  return pPtr;
 }
 
 } /* namespace layers */

@@ -89,7 +89,10 @@ public:
   const vector<string>&       initialisation_phases() const { return initialisation_phases_; }
   virtual const vector<unsigned>&     length_bins() const { return length_bins_; }
   virtual bool                length_plus() const { return length_plus_; }
-  string&                     get_base_layer() {return base_layer_;};
+  string&                     get_base_layer_label() {return base_layer_;};
+  string&                     get_lat_layer_label() {return lat_layer_label_;};
+  string&                     get_long_layer_label() {return lon_layer_label_;};
+  double                      get_initial_seed_z() {return initialisation_seed_z_; };
   unsigned                    get_height() {return world_height_;};
   unsigned                    get_width() {return world_width_;};
 
@@ -128,8 +131,11 @@ protected:
   unsigned                    adressable_values_count_ = 1;
   bool                        sexed_ = false;
   string                      base_layer_;
+  string                      lat_layer_label_; // make it optional
+  string                      lon_layer_label_; // make it optional
   unsigned                    world_height_;
   unsigned                    world_width_;
+  double                      initialisation_seed_z_;
 
 
   Managers*                   managers_ = nullptr;

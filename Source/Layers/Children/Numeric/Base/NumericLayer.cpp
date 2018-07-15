@@ -67,8 +67,6 @@ void NumericLayer::DoBuild() {
     float value;
     for (unsigned i = 0; i < row.size(); ++i) {
       value = utilities::ToInline<string, float>(row[i]);
-      if (value < 0)
-        LOG_ERROR_P(PARAM_LAYER) << "at row '" << row_iter << "' and column '" << i + 1 << "' we found a value less than zero this is not allowed for this layer type, they must be >= 0, please sort out";
       grid_[row_iter][i] = value;
     }
     ++row_iter;

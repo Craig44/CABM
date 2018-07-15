@@ -15,6 +15,7 @@
 #include "Model/Model.h"
 #include "Reports/Manager.h"
 #include "Reports/Children/Process.h"
+#include "World/WorldView.h"
 
 // namespaces
 namespace niwa {
@@ -58,6 +59,9 @@ void Process::Validate() {
  * then call the child build method.
  */
 void Process::Build() {
+  world_ = model_->world_view();
+  if (!world_)
+    LOG_CODE_ERROR() << "!world_ could not create pointer to world viw model, something is wrong";
 
   DoBuild();
 }

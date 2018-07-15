@@ -17,15 +17,12 @@
 #ifndef REPORT_H_
 #define REPORT_H_
 
-#ifndef BOOST_USE_WINDOWS_H
-#define BOOST_USE_WINDOWS_H
-#endif
-
 // Headers
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <ostream>
+#include <mutex>
 
 #include "BaseClasses/Object.h"
 #include "Model/Model.h"
@@ -57,9 +54,6 @@ public:
   void                        Reset() {};
   void                        Execute();
   void                        Finalise();
-  void                        PrepareTabular();
-  void                        ExecuteTabular();
-  void                        FinaliseTabular();
   bool                        HasYear(unsigned year);
   void                        FlushCache();
 
@@ -79,14 +73,12 @@ protected:
   virtual void                DoPrepare() { };
   virtual void                DoExecute() = 0;
   virtual void                DoFinalise() { };
-  virtual void                DoPrepareTabular() { };
-  virtual void                DoExecuteTabular() = 0;
-  virtual void                DoFinaliseTabular() { };
 
   // Members
   Model*                      model_;
   RunMode::Type               run_mode_    = RunMode::kInvalid;
   State::Type                 model_state_ = State::kInitialise;
+  static std::mutex           lock_;
   string                      time_step_   = "";
   string                      file_name_   = "";
   bool                        first_write_ = true;

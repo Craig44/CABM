@@ -37,12 +37,13 @@ Layer* Factory::Create(Model* model, const string& object_type, const string& su
     else if (sub_type == PARAM_NUMERIC)
       result = new NumericLayer(model);
     //else if ()
+
+    if (result)
+      model->managers().layer()->AddObject(result);
   }
 
 
 
-  if (result)
-    model->managers().layer()->AddObject(result);
 
   return result;
 }

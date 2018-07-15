@@ -18,6 +18,7 @@
 #include "Model/Managers.h"
 #include "Reports/Manager.h"
 #include "Reports/Children/Process.h"
+#include "Reports/Children/InitialisationPartition.h"
 
 // Namespaces
 namespace niwa {
@@ -37,6 +38,8 @@ Report* Factory::Create(Model* model, const string& object_type, const string& s
   if (object_type == PARAM_REPORT) {
     if (sub_type == PARAM_PROCESS)
       result = new Process(model);
+    else if (sub_type == PARAM_INITIALISATION_PARTITION)
+      result = new InitialisationPartition(model);
 
     if (result)
       model->managers().report()->AddObject(result);

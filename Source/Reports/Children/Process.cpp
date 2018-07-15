@@ -54,18 +54,6 @@ void Process::DoExecute() {
   ready_for_writing_ = true;
 }
 
-/**
- * Execute this tabular report
- */
-void Process::DoExecuteTabular() {
-  cache_ << "\n";
-}
 
-/**
- *  End report signature
- */
-void Process::DoFinaliseTabular() {
-  ready_for_writing_ = true;
-}
 } /* namespace reports */
 } /* namespace niwa */
