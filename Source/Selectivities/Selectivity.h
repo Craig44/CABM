@@ -34,10 +34,10 @@ public:
   void                        Validate();
   virtual void                Build() { RebuildCache(); };
   void                        Reset();
+  virtual Double              GetResult(unsigned age_or_length);
 
 protected:
   // pure methods
-  virtual Double              GetResult(unsigned age_or_length);
   virtual void                DoValidate() = 0;
   // Members
   Model*                      model_ = nullptr;

@@ -27,11 +27,21 @@ Agent::Agent(double first_growth_par, double second_growth_par, double M, unsign
 /*
  * Survival event
 */
-void Agent::survival() {
+void Agent::survival(double& selectivity) {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-  if (not (rng.chance() > survival_))
+  if (not (rng.chance() > survival_ * selectivity))
     alive_ = false;
 }
 
+/*
+ * Survival event
+*/
+void Agent::maturity(double& selectivity) {
+  utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+  if (not mature_) {
+    if (rng.chance() < selectivity)
+      mature_ = true;
+  }
+}
 
 } /* namespace niwa */

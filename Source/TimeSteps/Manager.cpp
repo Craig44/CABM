@@ -192,6 +192,7 @@ void Manager::Execute(unsigned year) {
   for (current_time_step_ = 0; current_time_step_ < ordered_time_steps_.size(); ++current_time_step_) {
     LOG_FINE() << "Current Time Step: " <<  current_time_step_;
     ordered_time_steps_[current_time_step_]->Execute(year);
+    LOG_FINEST() << "execute reports " << ordered_time_steps_[current_time_step_]->label();
     report_manager.Execute(year, ordered_time_steps_[current_time_step_]->label());
   }
 

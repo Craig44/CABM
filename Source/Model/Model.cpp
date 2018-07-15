@@ -299,7 +299,7 @@ void Model::RunBasic() {
     /**
      * Running the model now
      */
-    LOG_FINE() << "Model: State change to Execute";
+    LOG_FINE() << "Model: State change to Initialisation";
     state_ = State::kInitialise;
     current_year_ = start_year_;
     // Iterate over all partition members and UpDate Mean Weight for the inital weight calculations
@@ -308,16 +308,15 @@ void Model::RunBasic() {
     init_phase_manager.Execute();
     managers_->report()->Execute(State::kInitialise);
 
-    state_ = State::kExecute;
+    LOG_FINE() << "Model: State change to Execute";
 
+    state_ = State::kExecute;
 
     timesteps::Manager& time_step_manager = *managers_->time_step();
     timevarying::Manager& time_varying_manager = *managers_->time_varying();
     for (current_year_ = start_year_; current_year_ <= final_year_; ++current_year_) {
       LOG_FINE() << "Iteration year: " << current_year_;
       time_varying_manager.Update(current_year_);
-      LOG_FINEST() << "finishing update time varying now Update Category mean length and weight before beginning annual cycle";
-
 
       time_step_manager.Execute(current_year_);
     }

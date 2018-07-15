@@ -34,8 +34,10 @@ TimeStep* Factory::Create(Model* model, const string& object_type, const string&
   if (object_type == PARAM_TIME_STEP || object_type == PARAM_TIME_STEPS) {
     object = new TimeStep(model);
 
-    if (object)
+    if (object) {
+      LOG_FINE() << "Creating time step " << sub_type;
       model->managers().time_step()->AddObject(object);
+    }
   }
 
   return object;

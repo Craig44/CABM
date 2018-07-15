@@ -37,8 +37,8 @@ public:
 
 protected:
   vector<double>			  time_step_proportions_;
-  double					  cv_;
-  string					  distribution_;
+  double					      cv_;
+  string					      distribution_;
 
 };
 

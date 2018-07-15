@@ -54,13 +54,15 @@ void MortalityConstantRate::DoBuild() {
  */
 void MortalityConstantRate::DoExecute() {
   // Iterate over all cells
+  double selectivity_at_age;
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
         auto& agents = cell->get_agents();
         for (auto iter = agents.begin(); iter != agents.end();) {
-          (*iter).survival();
+          selectivity_at_age = selectivity_->GetResult((*iter).age());
+          (*iter).survival(selectivity_at_age);
           if (not (*iter).is_alive()) {
             iter = agents.erase(iter);
           } else

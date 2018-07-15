@@ -19,6 +19,7 @@
 #include "Reports/Manager.h"
 #include "Reports/Children/Process.h"
 #include "Reports/Children/InitialisationPartition.h"
+#include "Reports/Children/WorldAgeFrequency.h"
 
 // Namespaces
 namespace niwa {
@@ -40,9 +41,13 @@ Report* Factory::Create(Model* model, const string& object_type, const string& s
       result = new Process(model);
     else if (sub_type == PARAM_INITIALISATION_PARTITION)
       result = new InitialisationPartition(model);
+    else if (sub_type == PARAM_WORLD_AGE_FREQUENCY)
+      result = new WorldAgeFrequency(model);
 
-    if (result)
+    if (result) {
+      LOG_FINE() << "Creating report " << sub_type;
       model->managers().report()->AddObject(result);
+    }
   }
 
   return result;

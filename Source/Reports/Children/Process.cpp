@@ -50,7 +50,14 @@ void Process::DoBuild() {
  */
 void Process::DoExecute() {
   LOG_FINE() <<" printing report " << label_ << " of type " << process_->type();
-  cache_ << "\n";
+  cache_ << "*"<< type_ << "[" << label_ << "]" << "\n";
+
+  auto parameters = process_->parameters().parameters();
+  for (auto parameter : parameters) {
+    cache_ << parameter.first << ": ";
+    string line = boost::algorithm::join(parameter.second->current_values(), " ");
+    cache_ << line << "\n";
+  }
   ready_for_writing_ = true;
 }
 

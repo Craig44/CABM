@@ -16,11 +16,12 @@
 
 // headers
 #include "Processes/Process.h"
+#include "Layers/Children/Numeric/Base/NumericLayer.h"
 
 // namespaces
 namespace niwa {
 namespace processes {
-
+using std::string;
 /**
  * Class definition
  */
@@ -30,9 +31,18 @@ public:
   explicit RecruitmentBevertonHolt(Model* model);
   virtual                     ~RecruitmentBevertonHolt() = default;
   void                        DoValidate() override final { };
-  void                        DoBuild() override final { };
+  void                        DoBuild() override final;
   void                        DoReset() override final { };
   void                        DoExecute() override final { };
+protected:
+  string                      ssb_label_;
+  string                      recruitment_layer_label_;
+  vector<double>              ycs_values_;
+  double                      b0_;
+  double                      steepness_;
+  layers::NumericLayer*       recruitment_layer_ = nullptr;
+
+
 };
 
 } /* namespace processes */

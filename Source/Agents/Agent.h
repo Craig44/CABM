@@ -36,7 +36,8 @@ public:
 
 
   //Dynamices
-  void                         survival();
+  void                         survival(double& selectivity);
+  void                         maturity(double& selectivity);
 protected:
   // Methods
 
@@ -46,6 +47,7 @@ protected:
   double                      survival_; // natural mortality
   unsigned                    age_;
   bool                        alive_ = true;
+  bool                        mature_ = false;
   //
 
 

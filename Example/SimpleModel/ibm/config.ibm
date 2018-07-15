@@ -22,7 +22,7 @@ type iterative
 years 1
 #convergence_years 20 40
 #lambda 1
-number_of_agents 100000 ## initial number of agents
+number_of_agents 1000000 ## initial number of agents
 layer_label Base
 growth_process_label von_bert
 natural_mortality_process_label natural_mort
@@ -33,7 +33,7 @@ natural_mortality_process_label natural_mort
 # - Growth
 # - M
 @time_step Annual
-processes von_bert natural_mort
+processes von_bert natural_mort Maturation
 
 # --------------
 # Process definitions
@@ -47,6 +47,12 @@ distribution lognormal
 cv 0.2
 time_step_proportions 1
 
+# Maturity
+@process Maturation
+type maturation
+selectivity_label mature_ogive
+
+# Natural Mortality
 @process natural_mort
 type mortality_constant_rate
 m_layer_label M_layer
@@ -67,6 +73,10 @@ y1 0.6
 y0 0.1
 y2 0.4
 
+@selectivity mature_ogive
+type logistic
+a50 6
+ato95 4
 
 # --------------
 # Define Reports
@@ -77,6 +87,11 @@ process natural_mort
 
 @report init
 type initialisation_partition
+
+@report total_age_freq
+type world_age_frequency
+years 1990:2018 ## defaults to model years
+time_step Annual
 # --------------
 # Include Layers
 # --------------

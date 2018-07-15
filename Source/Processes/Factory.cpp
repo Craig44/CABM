@@ -21,6 +21,7 @@
 #include "Children/RecruitmentBevertonHolt.h"
 #include "Children/Growth/GrowthVonBertalanffy.h"
 #include "Children/Mortality/MortalityConstantRate.h"
+#include "Children/Maturity.h"
 
 // Namespaces
 namespace niwa {
@@ -66,7 +67,8 @@ Process* Factory::Create(Model* model, const string& object_type, const string& 
       result = new GrowthVonBertalanffy(model);
     else if (sub == PARAM_MORTALITY_CONSTANT_RATE)
       result = new MortalityConstantRate(model);
-
+    else if (sub == PARAM_MATURATION)
+      result = new Maturity(model);
     if (result)
       model->managers().process()->AddObject(result);
   }

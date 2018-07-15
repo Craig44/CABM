@@ -9,3 +9,4 @@
 /BuildSystem/buildtools/windows/Python27
 /.settings/*.prefs
 /Documentation/UserManual/*.aux
+.Rproj.user
