@@ -66,4 +66,14 @@ For more information on build parameters look at the python scripts or run the c
 ```
 doBuild.bat help
 ```
+
+### Running the Program
+
+There is a partial user manual found in the Documentation folder, but a quick fire run through. This IBM program runs through the command line
+(no gui), using the executable name and run parameters e.g. ```ibm.exe -r --loglevel finest > output.log 2> err.log``` This command will run (```-r```) the ibm, which by
+default looks for a file named ```config.ibm``` to look for specific model tasks. The main output defined in the configuration files will be printed in
+ the file labeled ```output.log```. I have also added an additional print statement (```--loglevel```) which will print extra 
+information at run time into the file ```err.log```. There are 4 levels of ```loglevel```, ```medium```,  ```fine```, ```finest``` and ```trace```. If anyone is interested you can 
+look in the code base for statements such as ```LOG_FINEST()``` which will print information if the parameters is defined at run time.
+
 God speed
