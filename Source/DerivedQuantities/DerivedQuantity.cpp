@@ -13,7 +13,6 @@
 
 #include <limits>
 
-#include "Selectivities/Manager.h"
 #include "TimeSteps/Manager.h"
 
 // namespaces
@@ -34,15 +33,7 @@ DerivedQuantity::DerivedQuantity(Model* model)
   parameters_.Bind<string>(PARAM_LABEL, &label_, "Label of the derived quantity", "");
   parameters_.Bind<string>(PARAM_TYPE, &type_, "Type of derived quantity", "");
   parameters_.Bind<string>(PARAM_TIME_STEP, &time_step_label_, "The time step in which to calculate the derived quantity after", "");
-  parameters_.Bind<string>(PARAM_CATEGORIES, &category_labels_, "The list of categories to use when calculating the derived quantity", "");
-  parameters_.Bind<string>(PARAM_SELECTIVITIES, &selectivity_labels_, "A list of one selectivity", "");
-  parameters_.Bind<Double>(PARAM_TIME_STEP_PROPORTION, &time_step_proportion_, "Proportion through the mortality block of the time step when calculated", "", Double(0.5))->set_range(0.0, 1.0);
-  parameters_.Bind<string>(PARAM_TIME_STEP_PROPORTION_METHOD, &proportion_method_, "Method for interpolating for the proportion through the mortality block", "", PARAM_WEIGHTED_SUM)
-      ->set_allowed_values({ PARAM_WEIGHTED_SUM, PARAM_WEIGHTED_PRODUCT });
-
-  RegisterAsAddressable(PARAM_VALUES, &values_, addressable::kLookup);
-
-  mean_proportion_method_ = true;
+  parameters_.Bind<float>(PARAM_TIME_STEP_PROPORTION, &time_step_proportion_, "Proportion through the mortality block of the time step when calculated", "", float(0.5))->set_range(0.0, 1.0);
 }
 
 /**
@@ -54,8 +45,6 @@ DerivedQuantity::DerivedQuantity(Model* model)
 void DerivedQuantity::Validate() {
   parameters_.Populate(model_);
 
-  if (proportion_method_ == PARAM_WEIGHTED_PRODUCT)
-    mean_proportion_method_ = false;
   DoValidate();
 }
 
@@ -65,18 +54,6 @@ void DerivedQuantity::Validate() {
  */
 void DerivedQuantity::Build() {
   LOG_TRACE();
-
-  //partition_.Init(category_labels_);
-
-  selectivities::Manager& selectivity_manager = *model_->managers().selectivity();
-  for (string label : selectivity_labels_) {
-    Selectivity* selectivity = selectivity_manager.GetSelectivity(label);
-    if (!selectivity)
-      LOG_ERROR_P(PARAM_SELECTIVITIES) << " (" << label << ") could not be found. Have you defined it?";
-
-    selectivities_.push_back(selectivity);
-  }
-
   /**
    * ensure the time steps we have are valid
    */
@@ -85,6 +62,12 @@ void DerivedQuantity::Build() {
     LOG_FATAL_P(PARAM_TIME_STEP) << " (" << time_step_label_ << ") could not be found. Have you defined it?";
   time_step->SubscribeToBlock(this);
   time_step->SubscribeToInitialisationBlock(this);
+
+  world_ = model_->world_view();
+  if (!world_) {
+    LOG_CODE_ERROR() << "!world_ something has gone wrong because we cna't generate pointer to the world.";
+  }
+
   DoBuild();
 }
 
@@ -112,7 +95,7 @@ void DerivedQuantity::Reset() {
  * @param year The year to get the derived quantity value for.
  * @return The derived quantity value
  */
-Double DerivedQuantity::GetValue(unsigned year) {
+float DerivedQuantity::GetValue(unsigned year) {
   LOG_FINEST() << "get value for year: " << year;
   /*
   if (values_.find(year) != values_.end())
@@ -125,7 +108,7 @@ Double DerivedQuantity::GetValue(unsigned year) {
   // in to the init phases.
   unsigned years_to_go_back = model_->start_year() - year;
 
-  Double result = 0.0;
+  float result = 0.0;
   if (years_to_go_back == 0) {
     LOG_WARNING() << "Years to go back is 0 in derived quantity " << label_ << " when it shouldn't be";
     result = (*initialisation_values_.rbegin()->rbegin());
@@ -157,7 +140,7 @@ Double DerivedQuantity::GetValue(unsigned year) {
  * @param phase The index of the phase
  * @return The derived quantity value
  */
-Double DerivedQuantity::GetLastValueFromInitialisation(unsigned phase) {
+float DerivedQuantity::GetLastValueFromInitialisation(unsigned phase) {
   LOG_TRACE();
 /*  if (initialisation_values_.size() <= phase)
     LOG_ERROR() << "No values have been calculated for the initialisation value in phase: " << phase;
@@ -179,7 +162,7 @@ Double DerivedQuantity::GetLastValueFromInitialisation(unsigned phase) {
  * @param index The index of the value in the phase
  * @return derived quantity value
  */
-Double DerivedQuantity::GetInitialisationValue(unsigned phase, unsigned index) {
+float DerivedQuantity::GetInitialisationValue(unsigned phase, unsigned index) {
   LOG_FINEST() << "phase = " << phase << "; index = " << index << "; initialisation_values_.size() = " << initialisation_values_.size();
 /*  if (initialisation_values_.size() <= phase) {
     if (initialisation_values_.size() == 0)

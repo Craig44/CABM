@@ -33,7 +33,9 @@ public:
   // Accessors
   unsigned                     age() const {return age_;};
   bool                         is_alive() const {return alive_ ;};
-
+  float                        get_scalar() const {return scalar_;};
+  float                        get_weight() const {return weight_;};
+  float                        get_length() const {return length_;};
 
   //Dynamices
   void                         survival(double& selectivity);
@@ -48,6 +50,9 @@ protected:
   unsigned                    age_;
   bool                        alive_ = true;
   bool                        mature_ = false;
+  float                       scalar_;
+  float                       weight_;
+  float                       length_;
   //
 
 

@@ -41,6 +41,7 @@ protected:
   double                      b0_;
   double                      steepness_;
   layers::NumericLayer*       recruitment_layer_ = nullptr;
+  double                      initial_scalar_;
 
 
 };

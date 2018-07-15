@@ -22,8 +22,8 @@ public:
   explicit NumericLayer(Model* model);
   virtual                     ~NumericLayer();
   int                         countValidSpaces();
-  void                        set_value(int RowIndex, int ColIndex, float Value);  // TODO once we have children make this pure virtual
-  float                       get_value(int RowIndex, int ColIndex) {return 1.0;};
+  void                        set_value(unsigned RowIndex, unsigned ColIndex, float Value);  // TODO once we have children make this pure virtual
+  float                       get_value(unsigned RowIndex, unsigned ColIndex) {return 1.0;};
 
 
 protected:

@@ -126,6 +126,7 @@
 #define PARAM_BIOMASS                             "biomass"
 #define PARAM_BIOMASS_DENSITY                     "biomass_density"
 #define PARAM_BIOMASS_EVENT_MORTALITY             "biomass_event_mortality"
+#define PARAM_BIOMASS_LAYER_LABEL                 "biomass_layer_label"
 #define PARAM_BY_LENGTH                           "by_length"
 #define PARAM_C                                   "c"
 #define PARAM_CASAL_PENALTY                       "casal_penalty"

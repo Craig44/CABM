@@ -80,7 +80,7 @@ void IntLayer::DoBuild() {
 /*
  * setValue
 */
-void IntLayer::set_value(int RowIndex, int ColIndex, unsigned Value) {
+void IntLayer::set_value(unsigned RowIndex, unsigned ColIndex, unsigned Value) {
 #ifndef OPTIMIZE
 // TODO do some error catching for debugging purposes
 #endif

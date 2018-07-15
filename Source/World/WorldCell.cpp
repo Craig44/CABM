@@ -32,7 +32,7 @@ void WorldCell::Validate() {
  * category has because this will be addressed with the
  * accessor objects.
  */
-void WorldCell::Build(unsigned row, unsigned col, double lat, double lon, unsigned min_age, unsigned max_age) {
+void WorldCell::Build(unsigned row, unsigned col, float lat, float lon, unsigned min_age, unsigned max_age) {
   LOG_TRACE();
   row_ = row;
   col_ = col;
@@ -76,6 +76,26 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const vector<double>
     Agent new_agent(growth_par[agent][0], growth_par[agent][1], mort_par[agent], age); // seed it with lat long, K, L_inf
     agents_.push_back(new_agent);
   }
+}
+
+/*
+ * Returns the scaled up abundance for this cell
+*/
+float  WorldCell::get_abundance() {
+  float abundance = 0.0;
+  for (auto& agent : agents_)
+    abundance += agent.get_scalar();
+  return abundance;
+}
+
+/*
+ * Returns the scaled up biomass for this cell
+*/
+float  WorldCell::get_biomass() {
+  float biomass = 0.0;
+  for (auto& agent : agents_)
+    biomass += agent.get_weight() * agent.get_scalar();
+  return biomass;
 }
 
 /*

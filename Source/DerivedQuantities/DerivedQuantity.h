@@ -24,6 +24,7 @@ namespace niwa {
 
 class Model;
 class Selectivity;
+class WorldView;
 
 // classes
 class DerivedQuantity : public niwa::base::Executor {
@@ -35,9 +36,9 @@ public:
   void                        Validate();
   void                        Build();
   void                        Reset();
-  Double                      GetValue(unsigned year);
-  Double                      GetInitialisationValue(unsigned phase = 0, unsigned index = 0);
-  Double                      GetLastValueFromInitialisation(unsigned phase);
+  float                      GetValue(unsigned year);
+  float                      GetInitialisationValue(unsigned phase = 0, unsigned index = 0);
+  float                      GetLastValueFromInitialisation(unsigned phase);
 
   // pure methods
   virtual void                DoValidate() = 0;
@@ -45,22 +46,20 @@ public:
 
   // accessors
   const string&               time_step() { return time_step_label_; }
-  vector<vector<Double> >&    initialisation_values() { return initialisation_values_; }
-  const map<unsigned, Double>& values() { return values_; }
+  vector<vector<float> >&    initialisation_values() { return initialisation_values_; }
+  const map<unsigned, float>& values() { return values_; }
 
 protected:
   // Members
   Model*                      model_ = nullptr;
+  WorldView*                  world_ = nullptr;
   string                      time_step_label_ = "";
   unsigned                    current_initialisation_phase_ = 0;
-  vector<vector<Double>>      initialisation_values_;
-  map<unsigned, Double>       values_;
-  Double                      cache_value_;
-  vector<string>              selectivity_labels_;
-  vector<Selectivity*>        selectivities_;
-  vector<string>              category_labels_;
+  vector<vector<float>>       initialisation_values_;
+  map<unsigned, float>        values_;
+  float                       cache_value_;
   string                      proportion_method_;
-  Double                      time_step_proportion_;
+  float                       time_step_proportion_;
   bool                        mean_proportion_method_;
 
 

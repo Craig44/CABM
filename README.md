@@ -5,7 +5,8 @@ many entities that have identical attributes. The purpose of this is for scaling
 for investigating different stock assessment methods under hypothetical scenerios. The current repository is a mixture of  ideas that need to be acknowledged. 
 Firstly to the Casal2 team found [here](https://github.com/NIWAFisheriesModelling/CASAL2),
 which formulated the basis of the core code for error handling, parameter structure, configuration syntax and more. I also learnt about IBM's 
-via the model found [here](https://github.com/trophia/sna1) where some idea's have been brought across.
+via the model found [here](https://github.com/trophia/sna1), where some idea's have been brought across. And finally to the SPM  team found [here](https://github.com/NIWAFisheriesModelling/SPM),
+where most of the spatial code structure comes from.
 
 This is an open source project and if anyone is interested in this project please get in touch the more input the better. Although there is a lot
 code that has been pushed to the repository it is still in the design phase currently, have a look at this document for my current thoughts on code 

@@ -78,7 +78,7 @@ void NumericLayer::DoBuild() {
 /*
  * setValue
 */
-void NumericLayer::set_value(int RowIndex, int ColIndex, float Value) {
+void NumericLayer::set_value(unsigned RowIndex, unsigned ColIndex, float Value) {
 #ifndef OPTIMIZE
 // TODO do some error catching for debugging purposes
 #endif
