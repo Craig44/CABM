@@ -31,6 +31,7 @@ def print_usage():
   print '  clean - Remove any previous debug/release build information'
   print '  cleanall - Remove all previous build information'
   print '  check - Do a check of the build system'
+  print '  documentation - Build the syntax section of the manual from source code'
   print ''
   print 'Valid Build Parameters: (thirdparty only)'
   print '  <libary name> - Target third party library to build or rebuild'
