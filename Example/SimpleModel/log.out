@@ -1,0 +1,1181 @@
+[TRACE] C:\Work\Software\IBM\Source\Utilities\CommandLineParser\CommandLineParser.cpp(line: 84) - Method: Parse
+[FINEST] C:\Work\Software\IBM\Source\Reports\Report.cpp(line: 96): preparing report: 
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 44) - Method: OpenFile
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: config.ibm
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 61) - Method: Parse
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: @model
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '@model'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: start_year 1990
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'start_year 1990'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: final_year 2018
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'final_year 2018'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: min_age 0
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'min_age 0'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: max_age 30
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'max_age 30'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: age_plus true # other acceptable inputs for bool are '1' and 'yes'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: age_plus true # other acceptable inputs for bool are '1' and 'yes'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'age_plus true'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: initialisation_phase_labels Iterative #label to an @initialisation block
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: initialisation_phase_labels Iterative #label to an @initialisation block
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'initialisation_phase_labels Iterative'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: time_steps Annual # just one time step for now
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: time_steps Annual # just one time step for now
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'time_steps Annual'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: length_bins 0 5 10 15 20 25 30 35 40 45 50 55 60 65 70 # assumed cm's
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: length_bins 0 5 10 15 20 25 30 35 40 45 50 55 60 65 70 # assumed cm's
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'length_bins 0 5 10 15 20 25 30 35 40 45 50 55 60 65 70'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: length_plus true
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'length_plus true'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: initialisation_z_seed 0.2
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'initialisation_z_seed 0.2'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: base_layer_label Base #
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: base_layer_label Base #
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'base_layer_label Base'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: ## a single area model
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: ## a single area model
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: nrows 1
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'nrows 1'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: ncols 1 
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'ncols 1'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # Init Phase
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # Init Phase
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: @initialisation_phase Iterative
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '@initialisation_phase Iterative'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: type iterative
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'type iterative'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: years 1
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'years 1'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: #convergence_years 20 40
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: #convergence_years 20 40
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: #lambda 1
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: #lambda 1
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: number_of_agents 100000 ## initial number of agents
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: number_of_agents 100000 ## initial number of agents
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'number_of_agents 100000'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: layer_label Base
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'layer_label Base'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: growth_process_label von_bert
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'growth_process_label von_bert'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: natural_mortality_process_label natural_mort
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'natural_mortality_process_label natural_mort'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # Annual Time Sequence
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # Annual Time Sequence
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # - Growth
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # - Growth
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # - M
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # - M
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: @time_step Annual
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '@time_step Annual'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: processes von_bert natural_mort
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'processes von_bert natural_mort'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # Process definitions
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # Process definitions
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # Growth
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # Growth
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: @process von_bert
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '@process von_bert'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: type growth_von_bertalanffy
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'type growth_von_bertalanffy'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: l_inf_layer_label L_inf_layer
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'l_inf_layer_label L_inf_layer'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: k_layer_label k_layer
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'k_layer_label k_layer'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: distribution lognormal
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'distribution lognormal'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: cv 0.2
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'cv 0.2'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: time_step_proportions 1
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'time_step_proportions 1'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: @process natural_mort
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '@process natural_mort'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: type mortality_constant_rate
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'type mortality_constant_rate'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: m_layer_label M_layer
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'm_layer_label M_layer'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: distribution lognormal
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'distribution lognormal'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: cv 0.2
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'cv 0.2'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: time_step_proportions 1
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'time_step_proportions 1'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: selectivity_label natural_mortality_by_age
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'selectivity_label natural_mortality_by_age'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # Define selectivities
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # Define selectivities
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: @selectivity natural_mortality_by_age
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '@selectivity natural_mortality_by_age'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: type double_exponential
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'type double_exponential'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: x1 0
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'x1 0'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: x0 6
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'x0 6'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: x2 30
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'x2 30'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: y1 0.6
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'y1 0.6'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: y0 0.1
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'y0 0.1'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: y2 0.4
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'y2 0.4'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # Define Reports
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # Define Reports
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: @report M_report
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '@report M_report'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: type process
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'type process'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: process natural_mort
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'process natural_mort'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: @report init
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '@report init'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: type initialisation_partition
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'type initialisation_partition'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # Include Layers
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # Include Layers
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 165): Single line comment found: # --------------
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: !include "Layers/base_layer.ibm"
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '!include "Layers/base_layer.ibm"'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 98): Loading new configuration file via include  "Layers/base_layer.ibm"
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 44) - Method: OpenFile
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/base_layer.ibm
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 61) - Method: Parse
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: @layer Base
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '@layer Base'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: type numeric
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'type numeric'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: table layer
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'table layer'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: 1 
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '1'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: end_table
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'end_table'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: !include "Layers/lat.ibm"
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '!include "Layers/lat.ibm"'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 98): Loading new configuration file via include  "Layers/lat.ibm"
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 44) - Method: OpenFile
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/lat.ibm
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 61) - Method: Parse
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: @layer lat
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '@layer lat'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: type numeric
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'type numeric'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: table layer
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'table layer'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: -45
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '-45'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: end_table
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'end_table'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: !include "Layers/long.ibm"
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '!include "Layers/long.ibm"'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 98): Loading new configuration file via include  "Layers/long.ibm"
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 44) - Method: OpenFile
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/long.ibm
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 61) - Method: Parse
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: @layer lon
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '@layer lon'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: type numeric
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'type numeric'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: table layer
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'table layer'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: 172
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '172'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: end_table
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'end_table'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: !include "Layers/L_inf_layer.ibm"
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '!include "Layers/L_inf_layer.ibm"'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 98): Loading new configuration file via include  "Layers/L_inf_layer.ibm"
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 44) - Method: OpenFile
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/L_inf_layer.ibm
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 61) - Method: Parse
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: @layer L_inf_layer
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '@layer L_inf_layer'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: type numeric
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'type numeric'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: table layer
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'table layer'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: 64
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '64'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: end_table
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'end_table'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: !include "Layers/k_layer.ibm"
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '!include "Layers/k_layer.ibm"'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 98): Loading new configuration file via include  "Layers/k_layer.ibm"
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 44) - Method: OpenFile
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/k_layer.ibm
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 61) - Method: Parse
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: @layer k_layer
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '@layer k_layer'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: type numeric
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'type numeric'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: table layer
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'table layer'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: 0.32
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '0.32'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: end_table
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'end_table'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: !include "Layers/M_layer.ibm"
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '!include "Layers/M_layer.ibm"'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 98): Loading new configuration file via include  "Layers/M_layer.ibm"
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 44) - Method: OpenFile
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/M_layer.ibm
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 61) - Method: Parse
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: @layer M_layer
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '@layer M_layer'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: type numeric
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'type numeric'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: table layer
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'table layer'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: 1 
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == '1'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 139): HandleComments: end_table
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 88): current_line == 'end_table'
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 69): file_lines_.size() == 80
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 100) - Method: ParseFileLines
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 168) - Method: ParseBlock
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 1990
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [start_year]: 1990
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 2018
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [final_year]: 2018
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 0
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [min_age]: 0
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 30
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [max_age]: 30
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: true
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [age_plus]: true
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: Iterative
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [initialisation_phase_labels]: Iterative
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: Annual
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [time_steps]: Annual
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 0 5 10 15 20 25 30 35 40 45 50 55 60 65 70
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [length_bins]: 0 5 10 15 20 25 30 35 40 45 50 55 60 65 70
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: true
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [length_plus]: true
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 0.2
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [initialisation_z_seed]: 0.2
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: Base
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [base_layer_label]: Base
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 1
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [nrows]: 1
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 1
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [ncols]: 1
+[TRACE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 201) - Method: PopulateParameters
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 121) - Method: Populate
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 188): Binding parameters for @model defined at line 1 in config.ibm
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: age_plus
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: base_layer_label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: final_year
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: initialisation_phase_labels
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: initialisation_z_seed
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: latitude_layer_label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: length_bins
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: length_plus
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: longitude_layer_label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: max_age
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: min_age
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: ncols
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: nrows
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: start_year
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: time_steps
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 195): Binding complete
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 207): Populating 0 Tables
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 211): Populate complete
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 168) - Method: ParseBlock
+[TRACE] C:\Work\Software\IBM\Source\InitialisationPhases\InitialisationPhase.cpp(line: 26) - Method: InitialisationPhase
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: iterative
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [type]: iterative
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 1
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [years]: 1
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 100000
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [number_of_agents]: 100000
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: Base
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [layer_label]: Base
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: von_bert
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [growth_process_label]: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [natural_mortality_process_label]: natural_mort
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 168) - Method: ParseBlock
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 29) - Method: TimeStep
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: von_bert natural_mort
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [processes]: von_bert natural_mort
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 168) - Method: ParseBlock
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: growth_von_bertalanffy
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [type]: growth_von_bertalanffy
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: L_inf_layer
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [l_inf_layer_label]: L_inf_layer
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: k_layer
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [k_layer_label]: k_layer
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: lognormal
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [distribution]: lognormal
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 0.2
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [cv]: 0.2
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 1
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [time_step_proportions]: 1
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 168) - Method: ParseBlock
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: mortality_constant_rate
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [type]: mortality_constant_rate
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: M_layer
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [m_layer_label]: M_layer
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: lognormal
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [distribution]: lognormal
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 0.2
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [cv]: 0.2
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 1
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [time_step_proportions]: 1
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: natural_mortality_by_age
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [selectivity_label]: natural_mortality_by_age
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 168) - Method: ParseBlock
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: double_exponential
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [type]: double_exponential
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 0
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [x1]: 0
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 6
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [x0]: 6
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 30
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [x2]: 30
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 0.6
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [y1]: 0.6
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 0.1
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [y0]: 0.1
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: 0.4
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [y2]: 0.4
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 168) - Method: ParseBlock
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: process
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [type]: process
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [process]: natural_mort
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 168) - Method: ParseBlock
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: initialisation_partition
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [type]: initialisation_partition
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 168) - Method: ParseBlock
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 330) - Method: BindTable
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: numeric
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [type]: numeric
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 168) - Method: ParseBlock
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 330) - Method: BindTable
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: numeric
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [type]: numeric
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 168) - Method: ParseBlock
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 330) - Method: BindTable
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: numeric
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [type]: numeric
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 168) - Method: ParseBlock
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 330) - Method: BindTable
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: numeric
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [type]: numeric
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 168) - Method: ParseBlock
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 330) - Method: BindTable
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: numeric
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [type]: numeric
+[TRACE] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 168) - Method: ParseBlock
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 330) - Method: BindTable
+[FINEST] C:\Work\Software\IBM\Source\Utilities\String.cpp(line: 135): HandleOperators: numeric
+[FINEST] C:\Work\Software\IBM\Source\ConfigurationLoader\Loader.cpp(line: 363): Storing values: [type]: numeric
+[TRACE] C:\Work\Software\IBM\Source\GlobalConfiguration\GlobalConfiguration.cpp(line: 45) - Method: ParseOptions
+[TRACE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 131) - Method: Start
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 67) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 69): Checking 0 reports
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 145): Model: State Change to Validate
+[TRACE] C:\Work\Software\IBM\Source\Model\Managers.cpp(line: 71) - Method: Validate
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 155) - Method: Validate
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 121) - Method: Populate
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 188): Binding parameters for @time_step defined at line 35 in config.ibm
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: processes
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 195): Binding complete
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 207): Populating 0 Tables
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 211): Populate complete
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 170): ordered_time_steps_.size(): 1
+[TRACE] C:\Work\Software\IBM\Source\InitialisationPhases\Manager.cpp(line: 40) - Method: Validate
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 121) - Method: Populate
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 188): Binding parameters for @initialisation_phase defined at line 20 in config.ibm
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: convergence_years
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: growth_process_label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: lambda
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: layer_label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: natural_mortality_process_label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: number_of_agents
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: type
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: years
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 195): Binding complete
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 207): Populating 0 Tables
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 211): Populate complete
+[TRACE] C:\Work\Software\IBM\Source\InitialisationPhases\Children\Iterative.cpp(line: 47) - Method: DoValidate
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 121) - Method: Populate
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 188): Binding parameters for @layer defined at line 1 in Layers/base_layer.ibm
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: type
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 195): Binding complete
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 207): Populating 1 Tables
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 211): Populate complete
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 41) - Method: DoValidate
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 121) - Method: Populate
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 188): Binding parameters for @layer defined at line 1 in Layers/lat.ibm
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: type
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 195): Binding complete
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 207): Populating 1 Tables
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 211): Populate complete
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 41) - Method: DoValidate
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 121) - Method: Populate
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 188): Binding parameters for @layer defined at line 1 in Layers/long.ibm
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: type
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 195): Binding complete
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 207): Populating 1 Tables
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 211): Populate complete
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 41) - Method: DoValidate
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 121) - Method: Populate
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 188): Binding parameters for @layer defined at line 1 in Layers/L_inf_layer.ibm
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: type
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 195): Binding complete
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 207): Populating 1 Tables
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 211): Populate complete
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 41) - Method: DoValidate
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 121) - Method: Populate
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 188): Binding parameters for @layer defined at line 1 in Layers/k_layer.ibm
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: type
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 195): Binding complete
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 207): Populating 1 Tables
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 211): Populate complete
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 41) - Method: DoValidate
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 121) - Method: Populate
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 188): Binding parameters for @layer defined at line 1 in Layers/M_layer.ibm
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: type
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 195): Binding complete
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 207): Populating 1 Tables
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 211): Populate complete
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 41) - Method: DoValidate
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 121) - Method: Populate
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 188): Binding parameters for @report defined at line 74 in config.ibm
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: file_name
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: process
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: type
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: write_mode
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 195): Binding complete
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 207): Populating 0 Tables
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 211): Populate complete
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 121) - Method: Populate
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 188): Binding parameters for @report defined at line 78 in config.ibm
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: file_name
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: type
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: write_mode
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 195): Binding complete
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 207): Populating 0 Tables
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 211): Populate complete
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 121) - Method: Populate
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 188): Binding parameters for @selectivity defined at line 61 in config.ibm
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: alpha
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: length_based
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: type
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: x0
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: x1
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: x2
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: y0
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: y1
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: y2
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 195): Binding complete
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 207): Populating 0 Tables
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 211): Populate complete
+[TRACE] C:\Work\Software\IBM\Source\Processes\Manager.cpp(line: 32) - Method: Validate
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 37) - Method: Validate
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 121) - Method: Populate
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 188): Binding parameters for @process defined at line 42 in config.ibm
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: cv
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: distribution
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: k_layer_label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: l_inf_layer_label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: time_step_proportions
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: type
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 195): Binding complete
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 207): Populating 0 Tables
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 211): Populate complete
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 39): Validating process von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 53): Exit parent validation and into child validation
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 37) - Method: Validate
+[TRACE] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 121) - Method: Populate
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 188): Binding parameters for @process defined at line 50 in config.ibm
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: cv
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: distribution
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: m_layer_label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: selectivity_label
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: time_step_proportions
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 192): Binding: type
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 195): Binding complete
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 207): Populating 0 Tables
+[FINEST] C:\Work\Software\IBM\Source\ParameterList\ParameterList.cpp(line: 211): Populate complete
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 39): Validating process natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 53): Exit parent validation and into child validation
+[FINEST] C:\Work\Software\IBM\Source\Processes\Manager.cpp(line: 39): processes managedvon_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Manager.cpp(line: 39): processes managednatural_mort
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 41): label: Annual
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 50): returning: 0x2763fa0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 67) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 69): Checking 0 reports
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 155): Model: State Change to Build
+[TRACE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 258) - Method: Build
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 58) - Method: Build
+[TRACE] C:\Work\Software\IBM\Source\Layers\Manager.cpp(line: 55) - Method: GetNumericLayer
+[TRACE] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 36) - Method: Build
+[TRACE] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 36) - Method: Build
+[TRACE] C:\Work\Software\IBM\Source\Model\Managers.cpp(line: 86) - Method: Build
+[FINEST] C:/Work/Software/IBM/Source/BaseClasses/Manager-inl.h(line: 52): Starting Build... with 6 objects
+[TRACE] C:\Work\Software\IBM\Source\Layers\Layer.cpp(line: 54) - Method: Build
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 51) - Method: DoBuild
+[FINEST] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 57): rows = 1 columns = 1
+[TRACE] C:\Work\Software\IBM\Source\Layers\Layer.cpp(line: 54) - Method: Build
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 51) - Method: DoBuild
+[FINEST] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 57): rows = 1 columns = 1
+[TRACE] C:\Work\Software\IBM\Source\Layers\Layer.cpp(line: 54) - Method: Build
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 51) - Method: DoBuild
+[FINEST] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 57): rows = 1 columns = 1
+[TRACE] C:\Work\Software\IBM\Source\Layers\Layer.cpp(line: 54) - Method: Build
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 51) - Method: DoBuild
+[FINEST] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 57): rows = 1 columns = 1
+[TRACE] C:\Work\Software\IBM\Source\Layers\Layer.cpp(line: 54) - Method: Build
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 51) - Method: DoBuild
+[FINEST] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 57): rows = 1 columns = 1
+[TRACE] C:\Work\Software\IBM\Source\Layers\Layer.cpp(line: 54) - Method: Build
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 51) - Method: DoBuild
+[FINEST] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 57): rows = 1 columns = 1
+[FINEST] C:/Work/Software/IBM/Source/BaseClasses/Manager-inl.h(line: 57): Build Finished
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 56): Time step Annual has 2 processes
+[FINEST] C:/Work/Software/IBM/Source/BaseClasses/Manager-inl.h(line: 52): Starting Build... with 0 objects
+[FINEST] C:/Work/Software/IBM/Source/BaseClasses/Manager-inl.h(line: 57): Build Finished
+[FINEST] C:/Work/Software/IBM/Source/BaseClasses/Manager-inl.h(line: 52): Starting Build... with 0 objects
+[FINEST] C:/Work/Software/IBM/Source/BaseClasses/Manager-inl.h(line: 57): Build Finished
+[FINEST] C:/Work/Software/IBM/Source/BaseClasses/Manager-inl.h(line: 52): Starting Build... with 0 objects
+[FINEST] C:/Work/Software/IBM/Source/BaseClasses/Manager-inl.h(line: 57): Build Finished
+[FINEST] C:/Work/Software/IBM/Source/BaseClasses/Manager-inl.h(line: 52): Starting Build... with 0 objects
+[FINEST] C:/Work/Software/IBM/Source/BaseClasses/Manager-inl.h(line: 57): Build Finished
+[FINEST] C:/Work/Software/IBM/Source/BaseClasses/Manager-inl.h(line: 52): Starting Build... with 1 objects
+[FINEST] C:/Work/Software/IBM/Source/BaseClasses/Manager-inl.h(line: 57): Build Finished
+[FINEST] C:/Work/Software/IBM/Source/BaseClasses/Manager-inl.h(line: 52): Starting Build... with 0 objects
+[FINEST] C:/Work/Software/IBM/Source/BaseClasses/Manager-inl.h(line: 57): Build Finished
+[FINEST] C:/Work/Software/IBM/Source/BaseClasses/Manager-inl.h(line: 52): Starting Build... with 2 objects
+[TRACE] C:\Work\Software\IBM\Source\Layers\Manager.cpp(line: 55) - Method: GetNumericLayer
+[TRACE] C:\Work\Software\IBM\Source\Layers\Manager.cpp(line: 55) - Method: GetNumericLayer
+[TRACE] C:\Work\Software\IBM\Source\Layers\Manager.cpp(line: 55) - Method: GetNumericLayer
+[FINEST] C:/Work/Software/IBM/Source/BaseClasses/Manager-inl.h(line: 57): Build Finished
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 43): objects_.size(): 2
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 51): Adding report M_report to state reports, with model->state() = 6
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 51): Adding report init to state reports, with model->state() = 4
+[TRACE] C:\Work\Software\IBM\Source\InitialisationPhases\Manager.cpp(line: 50) - Method: Build
+[TRACE] C:\Work\Software\IBM\Source\InitialisationPhases\Children\Iterative.cpp(line: 54) - Method: DoBuild
+[TRACE] C:\Work\Software\IBM\Source\Layers\Manager.cpp(line: 55) - Method: GetNumericLayer
+[TRACE] C:\Work\Software\IBM\Source\Processes\Manager.cpp(line: 69) - Method: GetGrowthProcess
+[TRACE] C:\Work\Software\IBM\Source\Processes\Manager.cpp(line: 90) - Method: GetMortalityProcess
+[FINEST] C:\Work\Software\IBM\Source\InitialisationPhases\Children\Iterative.cpp(line: 80): number of cells = 1 number of agents per cell = 100000
+[FINEST] C:\Work\Software\IBM\Source\InitialisationPhases\Children\Iterative.cpp(line: 85): check seed = 0.2
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[FINEST] C:\Work\Software\IBM\Source\InitialisationPhases\Children\Iterative.cpp(line: 92): cell = 1 col = 1 size of Ms = 100000 number of seeds = 100000
+[TRACE] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 60) - Method: seed_agents
+[FINEST] C:\Work\Software\IBM\Source\InitialisationPhases\Children\Iterative.cpp(line: 96): row 1 col = 1 seeded 100000
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 67) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 69): Checking 1 reports
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 71): Checking report: init
+[FINE] C:\Work\Software\IBM\Source\Reports\Children\InitialisationPartition.cpp(line: 50):  printing report init
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[FINE] C:\Work\Software\IBM\Source\InitialisationPhases\Manager.cpp(line: 59): Ordering initialisation phases
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 205) - Method: BuildInitialisationProcesses
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 210): Including von_bert process in initialisation phase
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 210): Including natural_mort process in initialisation phase
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 67) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 69): Checking 0 reports
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 164): Model: State Change to Verify
+[TRACE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 268) - Method: Verify
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 67) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 69): Checking 0 reports
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 174): Preparing Reports
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 112) - Method: Prepare
+[FINEST] C:\Work\Software\IBM\Source\Reports\Report.cpp(line: 96): preparing report: M_report
+[FINEST] C:\Work\Software\IBM\Source\Reports\Report.cpp(line: 96): preparing report: init
+[TRACE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 287) - Method: RunBasic
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 302): Model: State change to Execute
+[TRACE] C:\Work\Software\IBM\Source\InitialisationPhases\Manager.cpp(line: 78) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 207) - Method: ExecuteInitialisation
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 83): Executing for initialisation phase: Iterative with 0 executors
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 84): initialisation_processes_[phase_label].size(): 2
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 67) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 69): Checking 1 reports
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 71): Checking report: init
+[FINE] C:\Work\Software\IBM\Source\Reports\Children\InitialisationPartition.cpp(line: 50):  printing report init
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 1990
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 1990; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 1991
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 1991; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 1992
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 1992; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 1993
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 1993; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 1994
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 1994; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 1995
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 1995; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 1996
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 1996; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 1997
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 1997; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 1998
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 1998; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 1999
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 1999; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2000
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2000; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2001
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2001; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2002
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2002; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2003
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2003; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2004
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2004; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2005
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2005; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2006
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2006; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2007
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2007; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2008
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2008; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2009
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2009; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2010
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2010; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2011
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2011; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2012
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2012; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2013
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2013; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2014
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2014; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2015
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2015; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2016
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2016; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2017
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2017; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 317): Iteration year: 2018
+[TRACE] C:\Work\Software\IBM\Source\TimeVarying\Manager.cpp(line: 32) - Method: Update
+[FINEST] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 319): finishing update time varying now Update Category mean length and weight before beginning annual cycle
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 189) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 193): Current Time Step: 0
+[TRACE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 114) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: von_bert
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): von_bert
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 128): Executing process: natural_mort
+[FINEST] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 81): natural_mort
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 85) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 146) - Method: get_base_square
+[TRACE] C:\Work\Software\IBM\Source\Processes\Process.cpp(line: 87) - Method: Execute
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 88) - Method: Execute
+[FINEST] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 89): year: 2018; time_step_label: Annual; reports: 0
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 105) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 332): Model: State change to Iteration Complete
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 67) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 69): Checking 1 reports
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 71): Checking report: M_report
+[FINE] C:\Work\Software\IBM\Source\Reports\Children\Process.cpp(line: 52):  printing report M_report of type mortality_constant_rate
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 188): Finalising Reports
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 67) - Method: Execute
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 69): Checking 0 reports
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 128) - Method: Finalise
+[TRACE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 139) - Method: Finalise
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 26) - Method: ~NumericLayer
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 26) - Method: ~NumericLayer
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 26) - Method: ~NumericLayer
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 26) - Method: ~NumericLayer
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 26) - Method: ~NumericLayer
+[TRACE] C:\Work\Software\IBM\Source\Layers\Children\Numeric\Base\NumericLayer.cpp(line: 26) - Method: ~NumericLayer
+[FINEST] C:\Work\Software\IBM\Source\main.cpp(line: 139): Done

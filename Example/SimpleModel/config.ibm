@@ -8,27 +8,84 @@ initialisation_phase_labels Iterative #label to an @initialisation block
 time_steps Annual # just one time step for now
 length_bins 0 5 10 15 20 25 30 35 40 45 50 55 60 65 70 # assumed cm's
 length_plus true
+initialisation_z_seed 0.2
 base_layer_label Base #
 ## a single area model
 nrows 1
 ncols 1 
 
+# --------------
+# Init Phase
+# --------------
 @initialisation_phase Iterative
 type iterative
-years 50
-number_of_agents 1000 ## initial number of agents
+years 1
+#convergence_years 20 40
+#lambda 1
+number_of_agents 100000 ## initial number of agents
 layer_label Base
+growth_process_label von_bert
+natural_mortality_process_label natural_mort
 
+# --------------
+# Annual Time Sequence
+# --------------
+# - Growth
+# - M
 @time_step Annual
-processes place_holder
+processes von_bert natural_mort
 
-@process place_holder
-type nop
+# --------------
+# Process definitions
+# --------------
+# Growth
+@process von_bert
+type growth_von_bertalanffy
+l_inf_layer_label L_inf_layer
+k_layer_label k_layer
+distribution lognormal
+cv 0.2
+time_step_proportions 1
 
+@process natural_mort
+type mortality_constant_rate
+m_layer_label M_layer
+distribution lognormal
+cv 0.2
+time_step_proportions 1
+selectivity_label natural_mortality_by_age
+
+# --------------
+# Define selectivities
+# --------------
+@selectivity natural_mortality_by_age
+type double_exponential
+x1 0
+x0 6
+x2 30
+y1 0.6
+y0 0.1
+y2 0.4
+
+
+# --------------
+# Define Reports
+# --------------
+@report M_report
+type process
+process natural_mort
+
+@report init
+type initialisation_partition
 # --------------
 # Include Layers
 # --------------
 !include "Layers/base_layer.ibm"
+!include "Layers/lat.ibm"
+!include "Layers/long.ibm"
+!include "Layers/L_inf_layer.ibm"
+!include "Layers/k_layer.ibm"
+!include "Layers/M_layer.ibm"
 
 
 
