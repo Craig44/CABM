@@ -119,6 +119,12 @@ natural_mortality_process_label natural_mort
 
 \subsection{\I{Population processes}}\label{sec:process}
 
+\subsubsection{\I{Ageing}}
+Ageing is an implicit process in the model, Each agent that is created or recruited gets assigned an birth year. This means that when ever we want to ask for the agent we just calculate \subcommand{current\_year - birth\_year}, thus there is no explicit ageing process. Note that we do return the \subcommand{max\_age} of the model, if the agent is older than that age (so we only work with the truncated age distribution).
+
+
+This means every fish automatically ages by one at the end of the year, or you could think of ageing a fish at the very beginning of the year (tomayto, tomahto), just be aware that you don't  have control over that, but if you want to account for growth in between annual increments that is possible via time step proportion increments, see growth processes for more information.
+
 \subsubsection{\I{Recruitment}}
 
 \paragraph{\I{Constant recruitment}}\label{subsubsec:constant-recruitment}
