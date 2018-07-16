@@ -258,8 +258,9 @@ void Model::Validate() {
  */
 void Model::Build() {
   LOG_TRACE();
+  managers_->BuildPreWorldView();
+  world_view_->Build(); // This needs processes to be built, but others want world to be built by DoBuild to do checks, hmmm
   managers_->Build();
-  world_view_->Build();
 
   // Do a quick check that we can obtain pointers to mortality and growth process
   processes::Manager& process_manager = *managers_->process();
@@ -324,7 +325,6 @@ void Model::RunBasic() {
     for (current_year_ = start_year_; current_year_ <= final_year_; ++current_year_) {
       LOG_FINE() << "Iteration year: " << current_year_;
       time_varying_manager.Update(current_year_);
-
       time_step_manager.Execute(current_year_);
     }
 

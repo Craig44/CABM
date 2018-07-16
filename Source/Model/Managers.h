@@ -60,6 +60,8 @@ protected:
   void                        Validate();
   void                        Build();
   void                        Reset();
+  void                        BuildPreWorldView();
+
 
   // members
   Model*                              model_;

@@ -84,7 +84,6 @@ void Managers::Validate() {
 
 void Managers::Build() {
   LOG_TRACE();
-  layer_->Build();
   time_step_->Build();
   assert_->Build();
   derived_quantity_->Build();
@@ -92,10 +91,18 @@ void Managers::Build() {
   observation_->Build();
   selectivity_->Build();
   time_varying_->Build();
-  process_->Build();
+  process_->BuildRemainingProcesses();
   report_->Build();
   initialisation_phase_->Build(model_);  // This calls report and process() so needs to be built after them
 }
+
+// bit of a hack to get around dependencies
+void Managers::BuildPreWorldView() {
+  LOG_TRACE();
+  layer_->Build();
+  process_->BuildGrowthAndMortalityProcesses();
+}
+
 
 void Managers::Reset() {
   LOG_TRACE();

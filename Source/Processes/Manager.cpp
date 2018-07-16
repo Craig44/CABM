@@ -40,6 +40,31 @@ void Manager::Validate(Model* model) {
   }
 }
 
+
+/**
+ * override Base classes and Build non mortality and growth processes
+ */
+void Manager::BuildRemainingProcesses() {
+  LOG_FINEST() << "Starting Build... with " << objects_.size() << " objects";
+  for(auto stored_object : objects_) {
+    if ((stored_object->process_type() != ProcessType::kGrowth) || (stored_object->process_type() != ProcessType::kMortality))
+      stored_object->Build();
+  }
+  LOG_FINEST() << "Build Finished";
+}
+
+/**
+ * override Base classes and Build mortality and growth processes
+ */
+void Manager::BuildGrowthAndMortalityProcesses() {
+  LOG_FINEST() << "Starting Build... with " << objects_.size() << " objects";
+  for(auto stored_object : objects_) {
+    if ((stored_object->process_type() == ProcessType::kGrowth) || (stored_object->process_type() == ProcessType::kMortality))
+      stored_object->Build();
+  }
+  LOG_FINEST() << "Build Finished";
+}
+
 /**
  * Return the process with the name passed in as a parameter.
  * If no process is found then an empty pointer will

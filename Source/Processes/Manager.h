@@ -37,6 +37,11 @@ public:
   // methods
   virtual                     ~Manager() noexcept(true);
   void                        Validate() override final;
+  void                        Build() override final { };
+  void                        BuildRemainingProcesses();
+  void                        BuildGrowthAndMortalityProcesses();
+
+
   void                        Validate(Model* model);
   Process*                    GetProcess(const string& label);
   Growth*                     GetGrowthProcess(const string& label);
