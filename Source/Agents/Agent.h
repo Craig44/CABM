@@ -28,7 +28,7 @@ class Agent { // Don't make this inherit from BaseClasses/Object.h
 public:
   // Methods
   virtual                       ~Agent() = default;
-  Agent(double first_growth_par, double second_growth_par, double M, unsigned age);
+  Agent(float lat, float lon, float first_age_length_par, float second_age_length_par, float M, unsigned age, float first_length_weight_par, float second_length_weigth_par);
   virtual void                  Reset() {};
   // Accessors
   unsigned                     age() const {return age_;};
@@ -38,21 +38,29 @@ public:
   float                        get_length() const {return length_;};
 
   //Dynamices
-  void                         survival(double& selectivity);
-  void                         maturity(double& selectivity);
+  void                         survival(float& selectivity);  // TODO consider moving these to the process and give processes access
+  void                         maturity(float& selectivity);
 protected:
   // Methods
-
+  void                        growth_init();
   // Members
-  double                      first_growth_par_;  // L_inf for von bert
-  double                      second_growth_par_; // k for von bert
-  double                      survival_; // natural mortality
+  float                       lat_;  // Current location
+  float                       lon_;
+  float                       first_age_length_par_;  // L_inf for von bert
+  float                       second_age_length_par_; // k for von bert
+  float                       survival_; // natural mortality
   unsigned                    age_;
   bool                        alive_ = true;
   bool                        mature_ = false;
-  float                       scalar_;
-  float                       weight_;
-  float                       length_;
+  bool                        sex_; // 1 = male, 0 = female
+  float                       scalar_ = 1.0;
+  float                       length_ = 0.0;
+  float                       weight_ = 1.0;
+  float                       first_length_weight_par_;   // a
+  float                       second_length_weight_par_;   // b
+  // TODO link an agent to its home for natal homing dynamics
+
+
   //
 
 
