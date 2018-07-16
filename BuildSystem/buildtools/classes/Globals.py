@@ -19,7 +19,7 @@ target_release_lib_path_ = ""
 target_special_lig_path_ = ""
 
 allowed_build_targets_ = [ "debug", "release", "thirdparty", "thirdpartylean",
-                            "all", "clean", "cleanall", "help",
+                            "all", "clean", "cleanall", "help", "documentation",
                            "check"]
 allowed_build_types_ = [ "debug", "release"]
 allowed_build_parameters_ = [ "" ]

@@ -138,6 +138,20 @@ This means every fish automatically ages by one at the end of the year, or you c
 \subsection{\I{Growth}\label{sec:age-at-age}}
 
 \subsection{\I{Length-weight relationship}\label{sec:mean-weight}}
+Growth currently means updating length and weight for an agent, if the Von Bertalanffy formula currently is used (currently the default in agent class for initialising length) it follows the following formula
+
+\begin{equation}\label{VB}
+	\Delta L = (L_{\infty} - L)(1 - e^k)
+\end{equation}
+
+
+If the basic length weight formulation is used, then an agents weight follows the following formula
+
+\begin{equation}\label{mean_weight}
+\bar{w} = aL^b
+\end{equation}
+
+Scaling the model agents up to the population biomass estimates is done via a stock specific scalar.}
 
 \subsection{\I{Selectivities}\label{sec:selectivities}}
 A selectivity is a function that can have a different value for each age class. Selectivities are used throughout \IBM\ to interpret observations (Section \ref{sec:estimation-section}) or to modify the effects of processes on each age class (Section \ref{sec:population-section}). \IBM\ implements a number of different parametric forms, including logistic, knife edge, and double normal selectivities. Selectivities are defined in there own command block (\command{selectivity}), where the unique label is used by observations or processes to identify which selectivity to apply.

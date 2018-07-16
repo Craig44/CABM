@@ -11,6 +11,7 @@ sys.path.insert(0, "buildtools/classes")
 from System import *
 from Globals import *
 from Builder import *
+from Documentation import *
 
 """
 Print the usage for this build system
@@ -31,7 +32,7 @@ def print_usage():
   print '  clean - Remove any previous debug/release build information'
   print '  cleanall - Remove all previous build information'
   print '  check - Do a check of the build system'
-  print '  documentation - Build the syntax section of the manual from source code'
+  print '  IBM - Build the syntax section of the manual from source code'
   print ''
   print 'Valid Build Parameters: (thirdparty only)'
   print '  <libary name> - Target third party library to build or rebuild'
@@ -147,14 +148,21 @@ def start():
   elif build_target == "clean":
     print "*************************************************************************"
     print "*************************************************************************"
-    print "--> Cleaning all CASAL2 built files"
+    print "--> Cleaning all IBM built files"
     cleaner = Cleaner()
     if not cleaner.clean():
       return False
+  elif build_target == "documentation":
+    print "*************************************************************************"
+    print "*************************************************************************"
+    print "--> Starting " + Globals.build_target_ + " Build"
+    documentation_builder = Documentation()
+    if not documentation_builder.start():
+      return False	  
   elif build_target == "cleanall":
     print "*************************************************************************"
     print "*************************************************************************"
-    print "--> Cleaning all CASAL2 built files, including third party headers and libs"
+    print "--> Cleaning all IBM built files, including third party headers and libs"
     cleaner = Cleaner()
     if not cleaner.clean_all():
       return False
