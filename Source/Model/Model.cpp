@@ -30,6 +30,7 @@
 #include "Observations/Manager.h"
 #include "World/WorldView.h"
 #include "Reports/Manager.h"
+#include "Processes/Manager.h"
 #include "TimeSteps/Manager.h"
 #include "TimeVarying/Manager.h"
 #include "Utilities/RandomNumberGenerator.h"
@@ -58,10 +59,11 @@ Model::Model() {
   parameters_.Bind<string>(PARAM_BASE_LAYER_LABEL, &base_layer_, "Label for the base layer", "");
   parameters_.Bind<string>(PARAM_LATITUDE_LAYER_LABEL, &lat_layer_label_, "Label for the latitude layer", "", "");
   parameters_.Bind<string>(PARAM_LONGITUDE_LAYER_LABEL, &lon_layer_label_, "Label for the longitude layer", "", "");
-  parameters_.Bind<double>(PARAM_INITIALISATION_SEED_Z, &initialisation_seed_z_, "A instantaneous Z value used to speed up the equilibrium state in initialisation set to M to begin with, but see manual for information", "");
+  parameters_.Bind<float>(PARAM_INITIALISATION_SEED_Z, &initialisation_seed_z_, "A instantaneous Z value used to speed up the equilibrium state in initialisation set to M to begin with, but see manual for information", "");
   parameters_.Bind<unsigned>(PARAM_NROWS, &world_height_, "number of rows in spatial domain", "");
   parameters_.Bind<unsigned>(PARAM_NCOLS, &world_width_, "number of columns in spatial domain", "");
-
+  parameters_.Bind<string>(PARAM_GROWTH_PROCESS_LABEL, &growth_process_label_, "Label for the growth process in the annual cycle", "");
+  parameters_.Bind<string>(PARAM_NATURAL_MORTALITY_PROCESS_LABEL, &natural_mortality_label_, "Label for the natural mortality process in the annual cycle", "");
 
 
   global_configuration_ = new GlobalConfiguration();
@@ -256,8 +258,17 @@ void Model::Validate() {
  */
 void Model::Build() {
   LOG_TRACE();
-  world_view_->Build();
   managers_->Build();
+  world_view_->Build();
+
+  // Do a quick check that we can obtain pointers to mortality and growth process
+  processes::Manager& process_manager = *managers_->process();
+  if (!process_manager.GetGrowthProcess(growth_process_label_)) {
+    LOG_FATAL_P(PARAM_GROWTH_PROCESS_LABEL) << "Does the growth process " << growth_process_label_ << " exist? please check that it does, and is a growth process";
+  }
+  if (!process_manager.GetMortalityProcess(natural_mortality_label_)) {
+    LOG_FATAL_P(PARAM_NATURAL_MORTALITY_PROCESS_LABEL) << "Does the mortality process " << natural_mortality_label_ << " exist? please check that it does, and is a mortality process";
+  }
 
 }
 
@@ -285,10 +296,6 @@ void Model::Reset() {
  */
 void Model::RunBasic() {
   LOG_TRACE();
-  vector<string> single_step_addressables;
-  vector<Double*> estimable_targets;
-  // Create an instance of all categories
-
   // Model is about to run
   for (unsigned i = 0; i < adressable_values_count_; ++i) {
     //if (addressable_values_file_) {

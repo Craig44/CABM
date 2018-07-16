@@ -48,7 +48,7 @@ protected:
   // members
   unsigned                    years_;
   vector<TimeStep*>           time_steps_;
-  Double                      lambda_;
+  float                      lambda_;
   vector<unsigned>            convergence_years_;
   unsigned                    number_agents_;
   string                      intial_layer_label_;

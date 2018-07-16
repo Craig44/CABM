@@ -55,8 +55,8 @@ public:
   void                        Reset() {};
 
   // Accessors
-  double                      get_abundance(void) {return 1.0; };
-  double                      get_biomass(void) {return 1.0; };
+  float                      get_abundance(void) {return 1.0; };
+  float                      get_biomass(void) {return 1.0; };
   //unsigned                    get_height() { return height_; }  // these can be called off the model
   //unsigned                    get_width() { return width_; }  // these can be called off the model
 
@@ -80,6 +80,7 @@ protected:
 private:
   // members
   Model*                      model_ = nullptr;
+
 
 };
 } /* namespace niwa */

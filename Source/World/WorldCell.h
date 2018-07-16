@@ -22,6 +22,8 @@
 
 #include "Agents/Agent.h"
 #include "Utilities/Types.h"
+#include "Processes/Children/Growth/Growth.h"
+#include "Processes/Children/Mortality/Mortality.h"
 
 // Namespaces
 namespace niwa {
@@ -39,12 +41,12 @@ public:
   WorldCell() = default;
   virtual                     ~WorldCell() = default;
   void                        Validate();
-  void                        Build(unsigned row, unsigned col, float lat, float lon, unsigned min_age, unsigned max_age);
+  void                        Build(unsigned row, unsigned col, float lat, float lon, Model* model);
   void                        Reset();
   void                        set_enabled(bool enabled) {enabled_ = enabled; };
   bool                        is_enabled() {return enabled_; };
   void                        set_area(float area) {area_ = area;}
-  void                        seed_agents(unsigned number_agents_to_seed, const vector<double>&  mort_par, const vector<vector<double>>&  growth_par, const double& seed_z);
+  void                        seed_agents(unsigned number_agents_to_seed, const float& seed_z);
   list<Agent>&                get_agents() {return agents_;};
   void                        get_age_frequency(vector<unsigned>& age_freq);
   float                       get_abundance();
@@ -64,10 +66,9 @@ protected:
   // when its being build as an array by the WorldView I can't give this class a model pointer, pretty annoying.
   float                        lon_ = 0.0;
   float                        lat_ = 0.0;
-  unsigned                     min_age_;
-  unsigned                     max_age_;
-  unsigned                     age_spread_;
-
+  Model*                       model_ = nullptr;
+  processes::Mortality*       mortality_ = nullptr;
+  processes::Growth*          growth_ = nullptr;
 };
 
 } /* namespace niwa */

@@ -88,15 +88,15 @@ void WorldView::Build() {
   }
 
   // Set Variables (Can't do it above. Stupid blah ISO C++)
-  double lat = 0.0, lon = 0.0;
+  float lat = 0.0, lon = 0.0;
   for (unsigned i = 0; i < height_; ++i) {
     for (unsigned j = 0; j < width_; ++j) {
       if (lat_layer_)
         lat = lat_layer_->get_value(i,j);
       if (long_layer_)
         lon = long_layer_->get_value(i,j);
-      base_grid_[i][j].Build(i,j,lat,lon, model_->min_age(), model_->max_age());
-      cached_grid_[i][j].Build(i,j,lat,lon, model_->min_age(), model_->max_age());
+      base_grid_[i][j].Build(i, j, lat, lon, model_);
+      cached_grid_[i][j].Build(i, j, lat, lon, model_);
     }
   }
 

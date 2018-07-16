@@ -13,6 +13,7 @@
 
 #include "Agents/Agent.h"
 #include "Utilities/RandomNumberGenerator.h"
+#include "Processes/Manager.h"
 
 // Namespaces
 namespace niwa {
@@ -32,16 +33,26 @@ void WorldCell::Validate() {
  * category has because this will be addressed with the
  * accessor objects.
  */
-void WorldCell::Build(unsigned row, unsigned col, float lat, float lon, unsigned min_age, unsigned max_age) {
+void WorldCell::Build(unsigned row, unsigned col, float lat, float lon, Model* model) {
   LOG_TRACE();
   row_ = row;
   col_ = col;
   lat_ = lat;
   lon_ = lon;
-  min_age_ = min_age;
-  max_age_ = max_age;
-  age_spread_ = max_age - min_age + 1;
+  model_ = model;
   // Get a pointer to the environment from the model and give each Agent a pointer to that environment.
+
+  // Build Growth and mortality functons
+  growth_ = model_->managers().process()->GetGrowthProcess(model_->get_growth_process());
+  if (!growth_) {
+    LOG_CODE_ERROR() << "!growth_ this should have been checked in the model class";
+  }
+
+  mortality_ = model_->managers().process()->GetMortalityProcess(model_->get_mortality_process());
+  if (!mortality_) {
+    LOG_CODE_ERROR() << "!mortality this should have been checked in the model class";
+  }
+
 
 }
 
@@ -50,30 +61,34 @@ void WorldCell::Build(unsigned row, unsigned col, float lat, float lon, unsigned
  */
 void WorldCell::Reset() {
   LOG_TRACE();
+  agents_.clear();
 }
 
 /**
  * This method is called in Initialisation where we seed agents over the spatial domain before we start iterating
  * each agent that is created will be call seed() this will seed an agent with an equilibrium age structure
  */
-void WorldCell::seed_agents(unsigned number_agents_to_seed, const vector<double>&  mort_par, const vector<vector<double>>&  growth_par, const double& seed_z) {
+void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z) {
   LOG_TRACE();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+
+  vector<float> mort_par;
+  vector<vector<float>> growth_pars;
+  mortality_->draw_rate_param(row_, col_, number_agents_to_seed, mort_par);
+  growth_->draw_growth_param(row_, col_, number_agents_to_seed, growth_pars);
 
   if (number_agents_to_seed != mort_par.size()) {
     LOG_CODE_ERROR() << "number_agents_to_seed != mort_par.size(), this must be a code error as these should always be true";
   }
-  if (number_agents_to_seed != growth_par.size()) {
-    LOG_CODE_ERROR() << "number_agents_to_seed != growth_par.size(), this must be a code error as these should always be true";
+  if (number_agents_to_seed != growth_pars.size()) {
+    LOG_CODE_ERROR() << "number_agents_to_seed != growth_pars.size(), this must be a code error as these should always be true";
   }
-
 
   unsigned age;
   for (unsigned agent = 0; agent < number_agents_to_seed; ++agent) {
-    age = std::max(std::min((unsigned)rng.exponential(seed_z), max_age_),min_age_); // truncate age to between min_age and max_age
+    age = std::max(std::min((unsigned)rng.exponential(seed_z), model_->max_age()),model_->min_age()); // truncate age to between min_age and max_age
     //LOG_FINEST() << age;
-
-    Agent new_agent(growth_par[agent][0], growth_par[agent][1], mort_par[agent], age); // seed it with lat long, K, L_inf
+    Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], age, growth_pars[agent][2], growth_pars[agent][3]); // seed it with lat long, L_inf, K
     agents_.push_back(new_agent);
   }
 }
@@ -103,9 +118,9 @@ float  WorldCell::get_biomass() {
 */
 void  WorldCell::get_age_frequency(vector<unsigned>& age_freq) {
   age_freq.clear();
-  age_freq.resize(age_spread_,0);
+  age_freq.resize(model_->age_spread(),0);
   for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
-    age_freq[(*iter).age() - min_age_]++;
+    age_freq[(*iter).age() - model_->min_age()]++;
   }
 }
 

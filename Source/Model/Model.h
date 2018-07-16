@@ -85,16 +85,27 @@ public:
   virtual unsigned            max_age() const { return max_age_; }
   virtual unsigned            age_spread() const { return (max_age_ - min_age_) + 1; }
   virtual bool                age_plus() const { return age_plus_; }
+  void                        set_b0(string recruitment_label, float b0) {b0_[recruitment_label] = b0; }
+  virtual const map<string, float>&          get_b0s() const {return b0_; }
+  void                        set_r0(string recruitment_label, unsigned b0) {r0_[recruitment_label] = b0; }
+  unsigned                    get_r0(string recruitment_label)  {return r0_[recruitment_label]; }
+  void                        set_m(float value) {m_ = value; }
+  float                       get_m()  {return m_; }
+  void                        set_n_agents(unsigned value) {n_agents_ = value; }
+  virtual const unsigned      get_n_agents() const {return n_agents_; }
+
   virtual const vector<string>& time_steps() const { return time_steps_; }
   const vector<string>&       initialisation_phases() const { return initialisation_phases_; }
   virtual const vector<unsigned>&     length_bins() const { return length_bins_; }
   virtual bool                length_plus() const { return length_plus_; }
-  string&                     get_base_layer_label() {return base_layer_;};
-  string&                     get_lat_layer_label() {return lat_layer_label_;};
-  string&                     get_long_layer_label() {return lon_layer_label_;};
-  double                      get_initial_seed_z() {return initialisation_seed_z_; };
-  unsigned                    get_height() {return world_height_;};
-  unsigned                    get_width() {return world_width_;};
+  string&                     get_base_layer_label() {return base_layer_;}
+  string&                     get_lat_layer_label() {return lat_layer_label_;}
+  string&                     get_long_layer_label() {return lon_layer_label_;}
+  float                       get_initial_seed_z() {return initialisation_seed_z_; }
+  unsigned                    get_height() {return world_height_;}
+  unsigned                    get_width() {return world_width_;}
+  string                      get_mortality_process() {return natural_mortality_label_;}
+  string                      get_growth_process() {return growth_process_label_;}
 
   // manager accessors
   virtual Managers&           managers();
@@ -135,7 +146,13 @@ protected:
   string                      lon_layer_label_; // make it optional
   unsigned                    world_height_;
   unsigned                    world_width_;
-  double                      initialisation_seed_z_;
+  float                       initialisation_seed_z_;
+  map<string, float>          b0_;
+  map<string, unsigned>       r0_;
+  unsigned                    n_agents_;
+  string                      natural_mortality_label_;
+  string                      growth_process_label_;
+  float                       m_; // natural mortality
 
 
   Managers*                   managers_ = nullptr;

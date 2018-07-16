@@ -33,11 +33,9 @@ Iterative::Iterative(Model* model)
   : InitialisationPhase(model) {
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "The number of iterations (years) over which to execute this initialisation phase", "");
   parameters_.Bind<unsigned>(PARAM_CONVERGENCE_YEARS, &convergence_years_, "The iteration (year) when the test for converegence (lambda) is evaluated", "", true);
-  parameters_.Bind<double>(PARAM_LAMBDA, &lambda_, "The maximum value of the absolute sum of differences (lambda) between the partition at year-1 and year that indicates successfull convergence", "", Double(0.0));
+  parameters_.Bind<float>(PARAM_LAMBDA, &lambda_, "The maximum value of the absolute sum of differences (lambda) between the partition at year-1 and year that indicates successfull convergence", "", float(0.0));
   parameters_.Bind<unsigned>(PARAM_NUMBER_OF_AGENTS, &number_agents_, "The number of agents to initially seed in the partition", "");
   parameters_.Bind<string>(PARAM_LAYER_LABEL, &intial_layer_label_, "The label of a layer that you want to seed a distribution by.", "", "");
-  parameters_.Bind<string>(PARAM_GROWTH_PROCESS_LABEL, &growth_process_label_, "Label for the growth process in the annual cycle", "");
-  parameters_.Bind<string>(PARAM_NATURAL_MORTALITY_PROCESS_LABEL, &natural_mortality_label_, "Label for the natural mortality process in the annual cycle", "");
 }
 
 /**
@@ -65,43 +63,6 @@ void Iterative::DoBuild() {
   if (!world_)
     LOG_CODE_ERROR() << "could not create the world via reference, something is wrong";
 
-  // Link to growth and mortality processes
-  processes::Growth* growth = model_->managers().process()->GetGrowthProcess(growth_process_label_);
-  if (!growth) {
-    LOG_FATAL_P(PARAM_GROWTH_PROCESS_LABEL) << "could not find this process does it exist?";
-  }
-
-  processes::Mortality* mortality = model_->managers().process()->GetMortalityProcess(natural_mortality_label_);
-  if (!mortality) {
-    LOG_FATAL_P(PARAM_NATURAL_MORTALITY_PROCESS_LABEL) << "could not find this process does it exist? if it does exist, is of type mortality? because it needs to be";
-  }
-  unsigned cells = world_->get_enabled_cells();
-  unsigned agents_per_cell = (int)number_agents_ / (int)cells;
-  LOG_FINEST() << "number of cells = " << cells << " number of agents per cell = " << agents_per_cell;
-  vector<double> Ms;
-  vector<vector<double>> growth_pars;
-  double seed_z = model_->get_initial_seed_z();
-
-  LOG_FINEST() << "check seed = " << seed_z;
-  // Seed some individuals in the world
-  for (unsigned row = 0; row < model_->get_height(); ++row) {
-    for (unsigned col = 0; col < model_->get_width(); ++col) {
-      WorldCell* cell = world_->get_base_square(row, col);
-      mortality->draw_rate_param(row, col, agents_per_cell, Ms);
-      growth->draw_growth_param(row, col, agents_per_cell, growth_pars);
-      LOG_FINEST() << "cell = " << row + 1 << " col = " << col + 1 << " size of Ms = " << Ms.size() << " number of seeds = " << agents_per_cell;
-
-      if (cell->is_enabled()) {
-        cell->seed_agents(agents_per_cell, Ms, growth_pars, seed_z);
-        LOG_FINEST() << "row " << row + 1 << " col = " << col + 1 << " seeded " << cell->get_agents().size();
-      }
-    }
-  }
-
-  // Ask to print the intialisation phase here;
-  model_->managers().report()->Execute(State::kInitialise);
-
-
   time_steps_ = model_->managers().time_step()->ordered_time_steps();
 
 
@@ -111,12 +72,64 @@ void Iterative::DoBuild() {
     if ((*convergence_years_.rbegin()) != years_)
       convergence_years_.push_back(years_);
   }
+
+  model_->set_n_agents(number_agents_);
 }
 
 /**
  * Execute our iterative initialisation phases.
  */
 void Iterative::Execute() {
+  LOG_TRACE();
+
+  // Check we get a sensible estimate of M
+  if (model_->get_m() <= 0.0)
+    LOG_FATAL() << "Could not get a sensible M value from the mortality process defined this is unusual you want to check everything is okay in the mortality process or contact a developer";
+
+  // Calculate the R0 values for the recruitment processes this is a bit crude but will do for now
+  unsigned large_age = model_->max_age() * 4;
+  float number = 0;
+  float m = model_->get_m();
+  for (unsigned age = 0; age < large_age; ++age)
+    number += exp(- m * age);
+
+  vector<string> recruitment_labels;
+  float total_b0 = 0.0;
+  for (auto iter : model_->get_b0s()) {
+    recruitment_labels.push_back(iter.first);
+    total_b0 += iter.second;
+  }
+
+  for (auto iter : model_->get_b0s()) {
+    unsigned value = number_agents_ / (unsigned)number * (unsigned)iter.second / (unsigned)total_b0;
+    model_->set_r0(iter.first, value);
+  }
+
+
+  // Move on and seed our n_agents
+  unsigned cells = world_->get_enabled_cells();
+  unsigned agents_per_cell = (int)number_agents_ / (int)cells;
+  LOG_FINEST() << "number of cells = " << cells << " number of agents per cell = " << agents_per_cell;
+
+  float seed_z = model_->get_initial_seed_z();
+
+  LOG_FINEST() << "check seed = " << seed_z;
+  // Seed some individuals in the world
+  for (unsigned row = 0; row < model_->get_height(); ++row) {
+    for (unsigned col = 0; col < model_->get_width(); ++col) {
+      WorldCell* cell = world_->get_base_square(row, col);
+      if (cell->is_enabled()) {
+        cell->seed_agents(agents_per_cell, seed_z);
+        LOG_FINEST() << "row " << row + 1 << " col = " << col + 1 << " seeded " << cell->get_agents().size();
+      }
+    }
+  }
+
+  // Ask to print the intialisation phase here;
+  model_->managers().report()->Execute(State::kInitialise);
+
+
+
   if (convergence_years_.size() == 0) {
     timesteps::Manager& time_step_manager = *model_->managers().time_step();
     time_step_manager.ExecuteInitialisation(label_, years_);
@@ -157,7 +170,7 @@ void Iterative::Execute() {
 template<typename T>
 bool Iterative::CheckConvergence(vector<T> pre_quantity, vector<T> post_quantity) {
   LOG_TRACE();
-  Double variance = 0.0;
+  float variance = 0.0;
 
   auto pre_iter = pre_quantity.begin();
   auto post_iter = post_quantity.begin();
