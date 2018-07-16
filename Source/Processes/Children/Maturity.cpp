@@ -16,6 +16,7 @@
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
 #include "Selectivities/Manager.h"
+#include "Utilities/RandomNumberGenerator.h"
 
 // namespaces
 namespace niwa {
@@ -46,6 +47,7 @@ void Maturity::DoBuild() {
  */
 void Maturity::DoExecute() {
   LOG_TRACE();
+  utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   // Iterate over all cells
   float probability_mature_at_age;
   for (unsigned row = 0; row < model_->get_height(); ++row) {
@@ -54,11 +56,13 @@ void Maturity::DoExecute() {
       if (cell->is_enabled()) {
         auto& agents = cell->get_agents();
         LOG_FINEST() << "about to convert " << agents.size() << " through the maturity process";
-        unsigned counter = 1;
+        //unsigned counter = 1;
         for (Agent& agent : agents) {
-          probability_mature_at_age = selectivity_->GetResult(agent.age());
-          agent.maturity(probability_mature_at_age);
-          counter++;
+          if (not agent.is_mature()) {
+            probability_mature_at_age = selectivity_->GetResult(agent.age());
+            if (rng.chance() < probability_mature_at_age)
+              agent.set_maturity(true);
+          }
         }
       }
     }

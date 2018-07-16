@@ -32,8 +32,6 @@ namespace initialisationphases {
 Iterative::Iterative(Model* model)
   : InitialisationPhase(model) {
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "The number of iterations (years) over which to execute this initialisation phase", "");
-  parameters_.Bind<unsigned>(PARAM_CONVERGENCE_YEARS, &convergence_years_, "The iteration (year) when the test for converegence (lambda) is evaluated", "", true);
-  parameters_.Bind<float>(PARAM_LAMBDA, &lambda_, "The maximum value of the absolute sum of differences (lambda) between the partition at year-1 and year that indicates successfull convergence", "", float(0.0));
   parameters_.Bind<unsigned>(PARAM_NUMBER_OF_AGENTS, &number_agents_, "The number of agents to initially seed in the partition", "");
   parameters_.Bind<string>(PARAM_LAYER_LABEL, &intial_layer_label_, "The label of a layer that you want to seed a distribution by.", "", "");
 }
@@ -66,13 +64,6 @@ void Iterative::DoBuild() {
   time_steps_ = model_->managers().time_step()->ordered_time_steps();
 
 
-  // Check convergence years are in strictly increasing order
-  if (convergence_years_.size() != 0) {
-    std::sort(convergence_years_.begin(), convergence_years_.end());
-    if ((*convergence_years_.rbegin()) != years_)
-      convergence_years_.push_back(years_);
-  }
-
   model_->set_n_agents(number_agents_);
 }
 
@@ -100,8 +91,11 @@ void Iterative::Execute() {
     total_b0 += iter.second;
   }
 
+  LOG_FINEST() << "total b0 = " << total_b0 << " number = " << number << " number of agents = " << number_agents_;
+
   for (auto iter : model_->get_b0s()) {
-    unsigned value = number_agents_ / (unsigned)number * (unsigned)iter.second / (unsigned)total_b0;
+    unsigned value = (unsigned)(number_agents_ / number * iter.second / total_b0);
+    LOG_FINEST() << "setting R0 for " << iter.first << " = " << value;
     model_->set_r0(iter.first, value);
   }
 
@@ -112,6 +106,9 @@ void Iterative::Execute() {
   LOG_FINEST() << "number of cells = " << cells << " number of agents per cell = " << agents_per_cell;
 
   float seed_z = model_->get_initial_seed_z();
+  // This is important to set, otherwise age distribution will get all weird
+  unsigned init_year = model_->start_year() - years_ - 1;
+  model_->set_current_year_in_initialisation(init_year);
 
   LOG_FINEST() << "check seed = " << seed_z;
   // Seed some individuals in the world
@@ -128,69 +125,14 @@ void Iterative::Execute() {
   // Ask to print the intialisation phase here;
   model_->managers().report()->Execute(State::kInitialise);
 
+  // Run out the initialisation phase
+  timesteps::Manager& time_step_manager = *model_->managers().time_step();
+  model_->set_current_year_in_initialisation(model_->start_year() - years_);
 
-
-  if (convergence_years_.size() == 0) {
-    timesteps::Manager& time_step_manager = *model_->managers().time_step();
-    time_step_manager.ExecuteInitialisation(label_, years_);
-  } else {
-    unsigned total_years = 0;
-    for (unsigned years : convergence_years_) {
-      timesteps::Manager& time_step_manager = *model_->managers().time_step();
-      time_step_manager.ExecuteInitialisation(label_, years - (total_years + 1));
-      total_years += years - (total_years + 1);
-      if ((total_years + 1) >= years_) {
-        time_step_manager.ExecuteInitialisation(label_, 1);
-        break;
-      }
-      vector<unsigned> cached_partition;
-      world_->get_world_age_frequency(cached_partition);
-      time_step_manager.ExecuteInitialisation(label_, 1);
-      ++total_years;
-
-      vector<unsigned> current_partition;
-      world_->get_world_age_frequency(current_partition);
-      if (CheckConvergence(cached_partition, current_partition)) {
-        LOG_FINEST() << " year Convergence was reached = " << years;
-        break;
-      }
-      LOG_FINEST() << "Initial year = " << years;
-    }
-  }
-}
-
-/**
- * Check for convergence on our partition and return true if it exceeds the
- * lambda threshold so we can quit early and save time.
- * @param pre_quantity a vector of partition attributes before we check
- * @param post_quantity a vector of partition attributes at the point of the check
- *
- * @return True if convergence, False otherwise
- */
-template<typename T>
-bool Iterative::CheckConvergence(vector<T> pre_quantity, vector<T> post_quantity) {
-  LOG_TRACE();
-  float variance = 0.0;
-
-  auto pre_iter = pre_quantity.begin();
-  auto post_iter = post_quantity.begin();
-
-  T sum = 0;
-  for (auto iter = post_quantity.begin(); iter != post_quantity.end(); ++iter)
-    sum += *iter;
-
-  LOG_FINEST() << "sum = " << sum;
-  for (; pre_iter != pre_quantity.end(); ++pre_iter, ++post_iter) {
-    variance += fabs((*pre_iter) - (*post_iter)) / sum;
-  }
-
-  LOG_FINEST() << "variance = " << variance << " lambda = " << lambda_;
-
-  if (variance < lambda_)
-    return true;
-
-
-  return false;
+  time_step_manager.ExecuteInitialisation(label_, years_);
+  // I removed the convergence check because we seed agents by birth_year so we really need to have an incremental inital years to have a sensible age distribution
+  // if we cut at 50 years when we thought we might be running for 100 years then this would cause an improper age distribution, So I leave it for the user to define
+  // The correct burin in time to reach equilibrium
 }
 
 

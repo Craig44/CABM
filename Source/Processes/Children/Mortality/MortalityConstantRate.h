@@ -36,12 +36,17 @@ public:
   virtual void                        DoReset() override final { };
   virtual void                        DoExecute() override final;
   void                                draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) override final;
+  void                                FillReportCache(ostringstream& cache) override final;
+
 protected:
   string                              m_layer_label_;
   layers::NumericLayer*               m_layer_ = nullptr;
   string                              selectivity_label_;
   Selectivity*                        selectivity_ = nullptr;
   float                               m_;
+
+  // For reporting
+  map<unsigned, unsigned>             removals_by_year_;
 
 };
 

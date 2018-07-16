@@ -77,6 +77,7 @@ void NumericLayer::DoBuild() {
  * get_value
 */
 float NumericLayer::get_value(unsigned RowIndex, unsigned ColIndex) {
+  LOG_TRACE();
 #ifndef OPTIMIZE
 // TODO do some error catching for debugging purposes
 #endif

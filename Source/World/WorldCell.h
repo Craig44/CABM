@@ -47,6 +47,7 @@ public:
   bool                        is_enabled() {return enabled_; };
   void                        set_area(float area) {area_ = area;}
   void                        seed_agents(unsigned number_agents_to_seed, const float& seed_z);
+  void                        birth_agents(unsigned number_agents_to_birth);
   list<Agent>&                get_agents() {return agents_;};
   void                        get_age_frequency(vector<unsigned>& age_freq);
   float                       get_abundance();
@@ -58,7 +59,7 @@ protected:
 
   // Members
   list<Agent>                  agents_;
-  bool                         enabled_;
+  bool                         enabled_ = true;
   float                        area_;
   unsigned                     row_;
   unsigned                     col_;
@@ -67,8 +68,8 @@ protected:
   float                        lon_ = 0.0;
   float                        lat_ = 0.0;
   Model*                       model_ = nullptr;
-  processes::Mortality*       mortality_ = nullptr;
-  processes::Growth*          growth_ = nullptr;
+  processes::Mortality*        mortality_ = nullptr;
+  processes::Growth*           growth_ = nullptr;
 };
 
 } /* namespace niwa */

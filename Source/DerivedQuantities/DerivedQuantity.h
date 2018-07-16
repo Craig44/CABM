@@ -36,9 +36,9 @@ public:
   void                        Validate();
   void                        Build();
   void                        Reset();
-  float                      GetValue(unsigned year);
-  float                      GetInitialisationValue(unsigned phase = 0, unsigned index = 0);
-  float                      GetLastValueFromInitialisation(unsigned phase);
+  float                       GetValue(unsigned year);
+  float                       GetInitialisationValue(unsigned phase = 0, unsigned index = 0);
+  float                       GetLastValueFromInitialisation(unsigned phase);
 
   // pure methods
   virtual void                DoValidate() = 0;

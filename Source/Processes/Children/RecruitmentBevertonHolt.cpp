@@ -16,6 +16,7 @@
 
 #include "DerivedQuantities/Manager.h"
 #include "Layers/Manager.h"
+#include "TimeSteps/Manager.h"
 //#include "Utilities/RandomNumberGenerator.h"
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
@@ -48,24 +49,62 @@ void RecruitmentBevertonHolt::DoBuild() {
 
   recruitment_layer_ = model_->managers().layer()->GetNumericLayer(recruitment_layer_label_);
   if (!recruitment_layer_)
-    LOG_ERROR_P(PARAM_RECRUITMENT_LAYER_LABEL) << "could not find the @layer block " << recruitment_layer_label_ << ", please make sure it exists, if it does exits make sure it is of type numeric";
+    LOG_FATAL_P(PARAM_RECRUITMENT_LAYER_LABEL) << "could not find the @layer block " << recruitment_layer_label_ << ", please make sure it exists, if it does exits make sure it is of type numeric";
 
   float props = 0.0;
   // Check that recuitment layer is not in conflict with base layer
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
+      LOG_FINEST() << "check this all works";
       float value = recruitment_layer_->get_value(row, col);
+      LOG_FINEST() << "value = " << value;
       if (!cell->is_enabled() & (value > 0))
-        LOG_FATAL_P(PARAM_RECRUITMENT_LAYER_LABEL) << "at row " << row + 1 << " and col " << col + 1 << " the base cell was disabled, but you have proportion of recruits in this cell, this is not allowed. please check these layers or see manual";
+        LOG_FATAL_P(PARAM_RECRUITMENT_LAYER_LABEL) << "at row " << row + 1 << " and col " << col + 1 << " the base cell was disabled, but you have proportion of recruits in this cell " << value << ", this is not allowed. please check these layers or see manual";
       props += value;
     }
   }
   if (!utilities::doublecompare::IsOne(props))
     LOG_ERROR_P(PARAM_RECRUITMENT_LAYER_LABEL) << "the recuitment layer does not sum to 1.0 it was " << props << ", we don't want leakage of indiviuals please sort this out";
-
   model_->set_b0(label_, b0_);
 
+  /**
+   * Check order of sequence make sure Spawning happens before recruitment
+   */
+  unsigned derived_quantity_time_step_index = model_->managers().time_step()->GetTimeStepIndex(derived_quantity_->time_step());
+  unsigned recruitment_index = std::numeric_limits<unsigned>::max();
+  const vector<TimeStep*> ordered_time_steps = model_->managers().time_step()->ordered_time_steps();
+  unsigned derived_quantity_index = std::numeric_limits<unsigned>::max();
+  unsigned time_step_index = 0;
+  unsigned process_index = 0;
+  bool mortailty_block = false;
+  // loop through time steps
+  for (auto time_step : ordered_time_steps) {
+    if (time_step_index == derived_quantity_time_step_index) {
+      for (auto process : time_step->processes()) {
+        if (process->process_type() == ProcessType::kMortality) {
+          mortailty_block = true;
+          derived_quantity_index = process_index;
+        }
+        process_index++;
+      }
+      LOG_FINEST() << "process_index = " << process_index;
+      if (!mortailty_block) {
+        process_index++;
+        derived_quantity_index = process_index;
+        process_index++;
+      }
+    } else {
+        process_index = time_step->processes().size();
+
+    }
+    time_step_index++;
+  }
+  recruitment_index = model_->managers().time_step()->GetProcessIndex(label_);
+
+  LOG_FINEST() << "recruitment index = " << recruitment_index << " ssb index = " << derived_quantity_index;
+  if (recruitment_index < derived_quantity_index)
+    LOG_ERROR_P(PARAM_SSB) << "it seems the derived quantity " << ssb_label_ << " occurs after the recruitment event, for obvious reasons this can't happen. If this doesn't make much sense look at the usermanual under mortality blocks";
 }
 
 
@@ -77,26 +116,44 @@ void RecruitmentBevertonHolt::DoExecute() {
     initial_recruits_ = model_->get_r0(label_);
     first_enter_execute_ = false;
   }
+
   if (model_->state() == State::kInitialise) {
-    LOG_FINEST() << "applying recruitment in initialisation";
+    LOG_FINEST() << "applying recruitment in initialisation year " << model_->current_year();
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
-
-
+          float value = recruitment_layer_->get_value(row, col);
+          unsigned new_agents = (unsigned)(initial_recruits_ * value);
+          LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " initial agents = " << initial_recruits_ << " new agents = " << new_agents;
+          cell->birth_agents(new_agents);
         }
       }
     }
   } else {
-    LOG_FINEST() << "applying recruitment in year " << model_->current_year();
+    float SSB = derived_quantity_->GetValue(model_->current_year());
+    Double ssb_ratio = SSB / b0_;
+    Double true_ycs = 1.0 * ssb_ratio / (1 - ((5 * steepness_ - 1) / (4 * steepness_)) * (1 - ssb_ratio));
 
+    LOG_FINEST() << "applying recruitment in year " << model_->current_year();
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        WorldCell* cell = world_->get_base_square(row, col);
+        if (cell->is_enabled()) {
+          float value = recruitment_layer_->get_value(row, col);
+          unsigned new_agents = (unsigned)(initial_recruits_ * value);
+          LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " initial agents = " << initial_recruits_ << " new agents = " << new_agents;
+          cell->birth_agents(new_agents);
+        }
+      }
+    }
   }
 }
 
 // FillReportCache, called in the report class, it will print out additional information that is stored in
 // containers in this class.
 void RecruitmentBevertonHolt::FillReportCache(ostringstream& cache) {
+  LOG_TRACE();
   cache << "initial_recruits: " << initial_recruits_ << "\n";
   cache << "years: ";
   for (auto& iter : recruits_by_year_)

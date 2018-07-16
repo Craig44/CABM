@@ -58,6 +58,10 @@ void Process::DoExecute() {
     string line = boost::algorithm::join(parameter.second->current_values(), " ");
     cache_ << line << "\n";
   }
+  LOG_FINEST() << "about to print cache";
+  process_->FillReportCache(cache_);
+  LOG_FINEST() << "finished printing cache";
+
   ready_for_writing_ = true;
 }
 

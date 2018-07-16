@@ -89,6 +89,11 @@ void GrowthVonBertalanffyWithBasic::DoBuild() {
 
 }
 
+// Execute the process
+void GrowthVonBertalanffyWithBasic::DoExecute() {
+
+
+}
 
 /*
  * This method is called at when ever an agent is created/seeded or moves. Agents will get a new/updated growth parameters
@@ -123,6 +128,7 @@ void  GrowthVonBertalanffyWithBasic::draw_growth_param(unsigned row, unsigned co
 	for (unsigned i = 0; i < number_of_draws; ++i) {
 	  vec[i].push_back(rng.lognormal(mean_linf, cv_));
 	  vec[i].push_back(rng.lognormal(mean_k, cv_));
+	  //LOG_FINEST() << vec[i][0] << " " << vec[i][1];
 	  vec[i].push_back(a);
 	  vec[i].push_back(b);
 	}

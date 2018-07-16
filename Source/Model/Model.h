@@ -80,7 +80,9 @@ public:
   void                        set_projection_final_phase(bool phase) {projection_final_phase_ = phase;}
   virtual vector<unsigned>    years() const;
   unsigned                    year_spread() const;
-  virtual unsigned            current_year() const { return current_year_; }
+  void                        increment_current_year_for_initialisation() {++current_year_ ;}
+  void                        set_current_year_in_initialisation(unsigned value) {current_year_ = value;}
+  virtual unsigned            current_year() const { return current_year_; } // pass it by reference so I can change it during initialisation
   virtual unsigned            min_age() const { return min_age_; }
   virtual unsigned            max_age() const { return max_age_; }
   virtual unsigned            age_spread() const { return (max_age_ - min_age_) + 1; }

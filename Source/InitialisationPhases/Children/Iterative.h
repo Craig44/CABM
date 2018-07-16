@@ -42,14 +42,10 @@ protected:
   // methods
   void                        DoValidate() override final;
   void                        DoBuild() override final;
-  template<typename T>
-  bool                        CheckConvergence(vector<T> pre_quantity, vector<T> post_quantity);
 
   // members
   unsigned                    years_;
   vector<TimeStep*>           time_steps_;
-  float                      lambda_;
-  vector<unsigned>            convergence_years_;
   unsigned                    number_agents_;
   string                      intial_layer_label_;
   niwa::layers::NumericLayer* initial_layer_ = nullptr;

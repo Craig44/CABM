@@ -61,7 +61,7 @@ void WorldAgeFrequency::DoExecute() {
   cache_ << "time_step: " << time_step_ << "\n";
   cache_ << "values "<< REPORT_R_DATAFRAME<<"\n";
   for (unsigned i = model_->min_age(); i <=  model_->max_age(); ++i)
-    cache_ << " " << i;
+    cache_ << i << " ";
   cache_ << "\n";
 
   vector<unsigned> age_freq;
@@ -69,7 +69,7 @@ void WorldAgeFrequency::DoExecute() {
   LOG_FINEST() << "size of age freq = " << age_freq.size();
 
   for(auto& age : age_freq)
-    cache_ << " " << age;
+    cache_ << age << " ";
 
   cache_ << "\n";
   ready_for_writing_ = true;

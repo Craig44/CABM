@@ -78,8 +78,10 @@ void DerivedQuantity::Reset() {
   initialisation_values_.clear();
 
   // initialise the values variable
-  for (unsigned year : model_->years())
+  for (unsigned year = model_->start_year(); year <= model_->final_year(); ++year) {
+    LOG_FINEST() << "year = " << year;
     values_[year] = 0.0;
+  }
 }
 
 /**

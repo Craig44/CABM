@@ -88,7 +88,23 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
   for (unsigned agent = 0; agent < number_agents_to_seed; ++agent) {
     age = std::max(std::min((unsigned)rng.exponential(seed_z), model_->max_age()),model_->min_age()); // truncate age to between min_age and max_age
     //LOG_FINEST() << age;
-    Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], age, growth_pars[agent][2], growth_pars[agent][3]); // seed it with lat long, L_inf, K
+    Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], (model_->current_year() - age), growth_pars[agent][2], growth_pars[agent][3], model_); // seed it with lat long, L_inf, K
+    agents_.push_back(new_agent);
+  }
+}
+
+/**
+ * This method is called in Recruitment processes where we create new agents.
+ */
+void WorldCell::birth_agents(unsigned birth_agents) {
+  LOG_TRACE();
+  vector<float> mort_par;
+  vector<vector<float>> growth_pars;
+  mortality_->draw_rate_param(row_, col_, birth_agents, mort_par);
+  growth_->draw_growth_param(row_, col_, birth_agents, growth_pars);
+
+  for (unsigned agent = 0; agent < birth_agents; ++agent) {
+    Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], model_->current_year(), growth_pars[agent][2], growth_pars[agent][3], model_); // seed it with lat long, L_inf, K
     agents_.push_back(new_agent);
   }
 }

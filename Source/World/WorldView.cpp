@@ -109,6 +109,7 @@ void WorldView::Build() {
     for (unsigned j = 0; j < width_; ++j) {
       if (base_layer_->get_value(i, j) <= 0) {
         base_grid_[i][j].set_enabled(false);
+        LOG_FINEST() << "disabling cell at row " << i + 1 << " and col " << j + 1;
         enabled_cells_--;
       } else if (base_layer_->get_value(i, j) < 0) {
         LOG_FATAL()<< "found a negative value in the base layer '" << model_->get_base_layer_label() << "', value must be equal to or greater than 0";

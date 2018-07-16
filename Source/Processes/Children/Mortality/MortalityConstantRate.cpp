@@ -63,25 +63,32 @@ void MortalityConstantRate::DoBuild() {
  * DoExecute
  */
 void MortalityConstantRate::DoExecute() {
+  utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   // Iterate over all cells
   float selectivity_at_age;
+  unsigned agents_removed = 0;
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
         auto& agents = cell->get_agents();
+        unsigned initial_size = agents.size();
+        LOG_FINEST() << initial_size << " initial agents";
         for (auto iter = agents.begin(); iter != agents.end();) {
           selectivity_at_age = selectivity_->GetResult((*iter).age());
-          (*iter).survival(selectivity_at_age);
-          if (not (*iter).is_alive()) {
+          if (rng.chance() <= (1 - std::exp(-(*iter).get_m() * selectivity_at_age))) {
             iter = agents.erase(iter);
+            initial_size--;
+            agents_removed++;
           } else
             ++iter;
-
         }
+        LOG_FINEST() << initial_size << " after mortality";
       }
     }
   }
+  if (model_->state() != State::kInitialise)
+    removals_by_year_[model_->current_year()] = agents_removed;
 }
 
 
@@ -104,6 +111,20 @@ void  MortalityConstantRate::draw_rate_param(unsigned row, unsigned col, unsigne
     float value = rng.lognormal(mean_m, cv_);
     vector[i] = value;
   }
+
+}
+
+// FillReportCache, called in the report class, it will print out additional information that is stored in
+// containers in this class.
+void  MortalityConstantRate::FillReportCache(ostringstream& cache) {
+  cache << "year: ";
+  for (auto& year : removals_by_year_)
+    cache << year.first << " ";
+
+  cache << "\nagents_removed: ";
+  for (auto& year : removals_by_year_)
+    cache << year.second << " ";
+  cache << "\n";
 
 }
 
