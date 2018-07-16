@@ -27,9 +27,9 @@ namespace processes {
  * constructor
  */
 MortalityConstantRate::MortalityConstantRate(Model* model) : Mortality(model) {
-  parameters_.Bind<string>(PARAM_M_LAYER_LABEL, &m_layer_label_, "Label for the numeric layer that describes mean instantaneous mortality rate through space", "");
+  parameters_.Bind<string>(PARAM_M_MULTIPLIER_LAYER_LABEL, &m_layer_label_, "Label for the numeric layer that describes a multiplier of M through space", "", ""); // TODO perhaps as a multiplier, 1.2 * 0.2 = 0.24
   parameters_.Bind<string>(PARAM_SELECTIVITY_LABEL, &selectivity_label_, "Label for the selectivity block", "");
-
+  parameters_.Bind<float>(PARAM_M, &m_, "Natural mortality for the model", "");
 }
 
 /**
@@ -37,15 +37,25 @@ MortalityConstantRate::MortalityConstantRate(Model* model) : Mortality(model) {
  */
 void MortalityConstantRate::DoBuild() {
   // Get the layers
-  m_layer_ = model_->managers().layer()->GetNumericLayer(m_layer_label_);
-  if (!m_layer_) {
-    LOG_ERROR_P(PARAM_M_LAYER_LABEL) << "could not find the layer '" << m_layer_label_ << "', please make sure it exists and that it is type 'numeric'";
+  if (m_layer_label_ != "") {
+    m_layer_ = model_->managers().layer()->GetNumericLayer(m_layer_label_);
+    if (!m_layer_) {
+      LOG_ERROR_P(PARAM_M_MULTIPLIER_LAYER_LABEL) << "could not find the layer '" << m_layer_label_ << "', please make sure it exists and that it is type 'numeric'";
+    }
+    // Do the multiplication
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        float multiplier = m_layer_->get_value(row, col);
+        m_layer_->set_value(row, col, multiplier * m_);
+      }
+    }
   }
 
   selectivity_ = model_->managers().selectivity()->GetSelectivity(selectivity_label_);
   if (!selectivity_)
     LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << ": selectivity " << selectivity_label_ << " does not exist. Have you defined it?";
 
+  model_->set_m(m_);
 }
 
 
@@ -54,7 +64,7 @@ void MortalityConstantRate::DoBuild() {
  */
 void MortalityConstantRate::DoExecute() {
   // Iterate over all cells
-  double selectivity_at_age;
+  float selectivity_at_age;
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
@@ -79,14 +89,19 @@ void MortalityConstantRate::DoExecute() {
  * This method is called at when ever an agent is created/seeded or moves. Agents will get a new/updated growth parameters
  * based on the spatial cells of the process. This is called in initialisation/Recruitment and movement processes if needed.
 */
-void  MortalityConstantRate::draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<double>& vector) {
+void  MortalityConstantRate::draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-  double mean_m = m_layer_->get_value(row, col);
+  float mean_m;
+  if (m_layer_)
+    mean_m = m_layer_->get_value(row, col);
+  else
+    mean_m = m_;
+
   vector.clear();
   vector.resize(number_of_draws);
 
   for (unsigned i = 0; i < number_of_draws; ++i) {
-    double value = rng.lognormal(mean_m, cv_);
+    float value = rng.lognormal(mean_m, cv_);
     vector[i] = value;
   }
 
