@@ -43,14 +43,6 @@ inline niwa::utilities::Double ZeroFun(Double x, Double delta) {
   return delta / (2.0 - (x / delta));
 }
 
-#ifdef USE_AUTODIFF
-inline double ZeroFun(double x) {
-  if (x >= ZERO)
-    return x;
-
-  return ZERO / (2.0 - (x / ZERO));
-}
-#endif
 
 } /* namespace doublecompare */
 } /* namespace utilities */

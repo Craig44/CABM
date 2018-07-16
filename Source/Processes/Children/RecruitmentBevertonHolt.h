@@ -17,7 +17,7 @@
 // headers
 #include "Processes/Process.h"
 #include "Layers/Children/Numeric/Base/NumericLayer.h"
-
+#include "DerivedQuantities/DerivedQuantity.h"
 // namespaces
 namespace niwa {
 namespace processes {
@@ -33,17 +33,23 @@ public:
   void                        DoValidate() override final { };
   void                        DoBuild() override final;
   void                        DoReset() override final { };
-  void                        DoExecute() override final { };
+  void                        DoExecute() override final;
+  void                        FillReportCache(ostringstream& cache) override final;
+
 protected:
   string                      ssb_label_;
   string                      recruitment_layer_label_;
-  vector<double>              ycs_values_;
-  double                      b0_;
-  double                      steepness_;
+  vector<float>               ycs_values_;
+  float                       b0_;
+  float                       steepness_;
   layers::NumericLayer*       recruitment_layer_ = nullptr;
-  double                      initial_scalar_;
+  DerivedQuantity*            derived_quantity_ = nullptr;
+  float                       initial_scalar_;
 
-
+  // Reporting containers that will be printed in FillReportCache() method
+  map<unsigned, float>        recruits_by_year_;
+  unsigned                    initial_recruits_;
+  bool                        first_enter_execute_ = true;
 };
 
 } /* namespace processes */

@@ -8,7 +8,8 @@
  *
  * @section DESCRIPTION
  *
- * This process is the parent growth class, so the manager can differentiate processes
+ * This process is the parent growth class, so the manager can differentiate processes via dynamic casts
+ * Growth in this sense is both length and weight of an agent
  */
 #ifndef SOURCE_PROCESSES_CHILDREN_GROWTH_H_
 #define SOURCE_PROCESSES_CHILDREN_GROWTH_H_
@@ -33,12 +34,12 @@ public:
   virtual void                        DoReset() { };
   virtual void                        DoExecute() { };
 
-  virtual void                       draw_growth_param(unsigned row, unsigned col, unsigned number_of_draws, vector<vector<double>>& vec) = 0;
+  virtual void                        draw_growth_param(unsigned row, unsigned col, unsigned number_of_draws, vector<vector<float>>& vec) = 0;
 
 protected:
-  vector<double>			  time_step_proportions_;
-  double					  cv_;
-  string					  distribution_;
+  vector<float>			  time_step_proportions_;
+  float					      cv_;
+  string					    distribution_;
 
 };
 

@@ -33,12 +33,12 @@ public:
   virtual void                        DoReset() { };
   virtual void                        DoExecute() { };
 
-  virtual void                       draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<double>& vector) = 0;
+  virtual void                        draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) = 0;
 
 protected:
-  vector<double>			  time_step_proportions_;
-  double					      cv_;
-  string					      distribution_;
+  vector<float>			                  time_step_proportions_;
+  float					                      cv_;
+  string					                    distribution_;
 
 };
 

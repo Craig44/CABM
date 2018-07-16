@@ -19,6 +19,7 @@
 
 // namespaces
 namespace niwa {
+class IntLayer;
 namespace derivedquantities {
 
 // classes
@@ -34,7 +35,7 @@ public:
 
 protected:
   string                      biomass_layer_label_;
-  layers::IntLayer*           biomass_layer_ = nullptr;
+  niwa::layers::IntLayer*     biomass_layer_ = nullptr;
 };
 
 } /* namespace derivedquantities */

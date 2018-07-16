@@ -47,7 +47,7 @@ void Maturity::DoBuild() {
 void Maturity::DoExecute() {
   LOG_TRACE();
   // Iterate over all cells
-  double probability_mature_at_age;
+  float probability_mature_at_age;
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
@@ -56,7 +56,6 @@ void Maturity::DoExecute() {
         LOG_FINEST() << "about to convert " << agents.size() << " through the maturity process";
         unsigned counter = 1;
         for (Agent& agent : agents) {
-          cout << counter << " ";
           probability_mature_at_age = selectivity_->GetResult(agent.age());
           agent.maturity(probability_mature_at_age);
           counter++;

@@ -12,6 +12,7 @@
 
 // Local Headers
 #include "Layers/Layer.h"
+#include "Layers/Children/Integer/IntLayer.h"
 
 namespace niwa {
 namespace layers {

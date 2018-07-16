@@ -10,6 +10,8 @@ length_bins 0 5 10 15 20 25 30 35 40 45 50 55 60 65 70 # assumed cm's
 length_plus true
 initialisation_z_seed 0.2
 base_layer_label Base #
+growth_process_label von_bert
+natural_mortality_process_label natural_mort
 ## a single area model
 nrows 1
 ncols 1 
@@ -19,13 +21,11 @@ ncols 1
 # --------------
 @initialisation_phase Iterative
 type iterative
-years 1
+years 50
 #convergence_years 20 40
 #lambda 1
 number_of_agents 1000000 ## initial number of agents
 layer_label Base
-growth_process_label von_bert
-natural_mortality_process_label natural_mort
 
 # --------------
 # Annual Time Sequence
@@ -40,9 +40,13 @@ processes von_bert natural_mort Maturation
 # --------------
 # Growth
 @process von_bert
-type growth_von_bertalanffy
-l_inf_layer_label L_inf_layer
-k_layer_label k_layer
+type growth_von_bertalanffy_with_basic_weight
+#linf_layer_label L_inf_layer
+linf 65
+#k_layer_label k_layer
+k 0.2
+a 0.000001
+b 3
 distribution lognormal
 cv 0.2
 time_step_proportions 1
@@ -55,7 +59,8 @@ selectivity_label mature_ogive
 # Natural Mortality
 @process natural_mort
 type mortality_constant_rate
-m_layer_label M_layer
+m_multiplier_layer_label M_layer
+m 0.2
 distribution lognormal
 cv 0.2
 time_step_proportions 1
@@ -79,27 +84,45 @@ a50 6
 ato95 4
 
 # --------------
+# Derived Quantities
+# --------------
+@derived_quantity SSB
+type biomass
+biomass_layer_label SSB_areas
+time_step Annual
+time_step_proportion 0.5 ## interpolate DQ's
+# --------------
 # Define Reports
 # --------------
+# print process properties
 @report M_report
 type process
 process natural_mort
 
+# print initail state of agents
 @report init
 type initialisation_partition
 
+# print age frequency
 @report total_age_freq
 type world_age_frequency
 years 1990:2018 ## defaults to model years
 time_step Annual
+
+# print SSB's
+@report derived_quants
+type derived_quantity
+
+
 # --------------
 # Include Layers
 # --------------
 !include "Layers/base_layer.ibm"
 !include "Layers/lat.ibm"
 !include "Layers/long.ibm"
-!include "Layers/L_inf_layer.ibm"
-!include "Layers/k_layer.ibm"
+!include "Layers/SSB_area.ibm"
+#!include "Layers/L_inf_layer.ibm"
+#!include "Layers/k_layer.ibm"
 !include "Layers/M_layer.ibm"
 
 

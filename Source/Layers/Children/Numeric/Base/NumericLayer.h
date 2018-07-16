@@ -23,7 +23,7 @@ public:
   virtual                     ~NumericLayer();
   int                         countValidSpaces();
   void                        set_value(unsigned RowIndex, unsigned ColIndex, float Value);  // TODO once we have children make this pure virtual
-  float                       get_value(unsigned RowIndex, unsigned ColIndex) {return 1.0;};
+  float                       get_value(unsigned RowIndex, unsigned ColIndex);
 
 
 protected:

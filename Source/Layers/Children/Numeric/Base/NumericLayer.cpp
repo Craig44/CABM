@@ -73,6 +73,15 @@ void NumericLayer::DoBuild() {
   }
 }
 
+/*
+ * get_value
+*/
+float NumericLayer::get_value(unsigned RowIndex, unsigned ColIndex) {
+#ifndef OPTIMIZE
+// TODO do some error catching for debugging purposes
+#endif
+  return grid_[RowIndex][ColIndex];
+}
 
 
 /*

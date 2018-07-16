@@ -54,6 +54,7 @@ public:
   virtual void                DoBuild() = 0;
   virtual void                DoReset() = 0;
   virtual void                DoExecute() = 0;
+  virtual void                FillReportCache(ostringstream& cache) { };  // If we want to store and report more information within a process use this method
 
   // accessors
   ProcessType                 process_type() const { return process_type_; }
