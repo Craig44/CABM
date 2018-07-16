@@ -17,6 +17,7 @@
 #include "Model/Model.h"
 #include "Model/Managers.h"
 #include "Reports/Manager.h"
+#include "Reports/Children/DerivedQuantity.h"
 #include "Reports/Children/Process.h"
 #include "Reports/Children/InitialisationPartition.h"
 #include "Reports/Children/WorldAgeFrequency.h"
@@ -43,6 +44,8 @@ Report* Factory::Create(Model* model, const string& object_type, const string& s
       result = new InitialisationPartition(model);
     else if (sub_type == PARAM_WORLD_AGE_FREQUENCY)
       result = new WorldAgeFrequency(model);
+    else if (sub_type == PARAM_DERIVED_QUANTITY)
+      result = new DerivedQuantity(model);
 
     if (result) {
       LOG_FINE() << "Creating report " << sub_type;

@@ -55,22 +55,25 @@ void WorldAgeFrequency::DoBuild() {
  */
 void WorldAgeFrequency::DoExecute() {
   LOG_FINE() <<" printing report " << label_;
-  if (std::find(years_.begin(),years_.end(),model_->current_year()) != years_.end()) {
-    cache_ << "*"<< type_ << "[" << label_ << "]" << "\n";
-    cache_ << "values "<< REPORT_R_DATAFRAME<<"\n";
-    cache_ << "row-col";
-    for (unsigned i = model_->min_age(); i <=  model_->max_age(); ++i)
-      cache_ << " " << i;
-    cache_ << "\n";
 
-    vector<unsigned> age_freq;
-    world_->get_world_age_frequency(age_freq);
-    for(auto& age : age_freq)
-      cache_ << " " << age;
+  cache_ << "*"<< type_ << "[" << label_ << "]" << "\n";
+  cache_ << "year: " << model_->current_year() << "\n";
+  cache_ << "time_step: " << time_step_ << "\n";
+  cache_ << "values "<< REPORT_R_DATAFRAME<<"\n";
+  for (unsigned i = model_->min_age(); i <=  model_->max_age(); ++i)
+    cache_ << " " << i;
+  cache_ << "\n";
 
-    cache_ << "\n";
-    ready_for_writing_ = true;
-  }
+  vector<unsigned> age_freq;
+  world_->get_world_age_frequency(age_freq);
+  LOG_FINEST() << "size of age freq = " << age_freq.size();
+
+  for(auto& age : age_freq)
+    cache_ << " " << age;
+
+  cache_ << "\n";
+  ready_for_writing_ = true;
+
 }
 
 } /* namespace reports */
