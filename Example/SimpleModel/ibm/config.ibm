@@ -1,6 +1,6 @@
 @model
 start_year 1990
-final_year 2018
+final_year 1992
 min_age 0
 max_age 30
 age_plus true # other acceptable inputs for bool are '1' and 'yes'
@@ -21,19 +21,21 @@ ncols 1
 # --------------
 @initialisation_phase Iterative
 type iterative
-years 50
+years 2
 #convergence_years 20 40
 #lambda 1
-number_of_agents 1000000 ## initial number of agents
+number_of_agents 10000 ## initial number of agents
 layer_label Base
 
 # --------------
 # Annual Time Sequence
 # --------------
+# - Recruitment
 # - Growth
 # - M
+# - Maturity
 @time_step Annual
-processes von_bert natural_mort Maturation
+processes Recruitment von_bert natural_mort Maturation 
 
 # --------------
 # Process definitions
@@ -48,7 +50,7 @@ k 0.2
 a 0.000001
 b 3
 distribution lognormal
-cv 0.2
+cv 0.0001
 time_step_proportions 1
 
 # Maturity
@@ -62,10 +64,18 @@ type mortality_constant_rate
 m_multiplier_layer_label M_layer
 m 0.2
 distribution lognormal
-cv 0.2
+cv 0.0001
 time_step_proportions 1
-selectivity_label natural_mortality_by_age
+selectivity_label One
 
+# Natural Mortality
+@process Recruitment
+type recruitment_beverton_holt
+recruitment_layer_label recruit_layer
+b0 1000000
+steepness 0.85
+ycs_values 1*29
+ssb SSB
 # --------------
 # Define selectivities
 # --------------
@@ -77,6 +87,10 @@ x2 30
 y1 0.6
 y0 0.1
 y2 0.4
+
+@selectivity One
+type constant
+c 1
 
 @selectivity mature_ogive
 type logistic
@@ -113,7 +127,10 @@ time_step Annual
 @report derived_quants
 type derived_quantity
 
-
+# print SSB's
+@report Recruitment_report
+type process
+process Recruitment
 # --------------
 # Include Layers
 # --------------
@@ -124,6 +141,7 @@ type derived_quantity
 #!include "Layers/L_inf_layer.ibm"
 #!include "Layers/k_layer.ibm"
 !include "Layers/M_layer.ibm"
+!include "Layers/recruitment_areas.ibm"
 
 
 

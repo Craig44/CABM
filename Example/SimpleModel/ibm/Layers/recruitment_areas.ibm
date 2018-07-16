@@ -1,5 +1,5 @@
-@layer M_layer
+@layer recruit_layer
 type numeric
 table layer
-0.0 
+1 
 end_table
