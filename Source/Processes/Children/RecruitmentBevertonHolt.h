@@ -50,6 +50,12 @@ protected:
   map<unsigned, float>        recruits_by_year_;
   unsigned                    initial_recruits_;
   bool                        first_enter_execute_ = true;
+  map<unsigned, float>        ycs_values_by_year_;
+  map<unsigned, float>        ssb_by_year_;
+  map<unsigned, float>        ssb_ratio_;
+  map<unsigned, float>        SR_;
+  map<unsigned, float>        true_ycs_;
+  float                       scalar_;
 };
 
 } /* namespace processes */

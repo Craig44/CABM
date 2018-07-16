@@ -52,6 +52,7 @@ public:
   void                        get_age_frequency(vector<unsigned>& age_freq);
   float                       get_abundance();
   float                       get_biomass();
+  float                       get_mature_biomass();
 
 
 protected:

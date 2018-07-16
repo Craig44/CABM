@@ -105,7 +105,7 @@ void Iterative::Execute() {
   unsigned agents_per_cell = (int)number_agents_ / (int)cells;
   LOG_FINEST() << "number of cells = " << cells << " number of agents per cell = " << agents_per_cell;
 
-  float seed_z = model_->get_initial_seed_z();
+  float seed_z = model_->get_m();
   // This is important to set, otherwise age distribution will get all weird
   unsigned init_year = model_->start_year() - years_ - 1;
   model_->set_current_year_in_initialisation(init_year);
@@ -133,6 +133,27 @@ void Iterative::Execute() {
   // I removed the convergence check because we seed agents by birth_year so we really need to have an incremental inital years to have a sensible age distribution
   // if we cut at 50 years when we thought we might be running for 100 years then this would cause an improper age distribution, So I leave it for the user to define
   // The correct burin in time to reach equilibrium
+
+  float ssb = 0.0, b0 = 0.0, scalar;
+  for (auto iter : model_->get_b0s()) {
+    b0 += iter.second;
+    ssb += model_->get_ssb(iter.first);
+  }
+  scalar = b0 / ssb;
+  model_->set_scalar(scalar);
+  LOG_FINEST() << "scalar = " << scalar;
+  // Set scalar before continuing on
+  for (unsigned row = 0; row < model_->get_height(); ++row) {
+    for (unsigned col = 0; col < model_->get_width(); ++col) {
+      WorldCell* cell = world_->get_base_square(row, col);
+      if (cell->is_enabled()) {
+        auto& agents = cell->get_agents();
+        for (auto iter = agents.begin(); iter != agents.end(); ++iter) {
+          (*iter).set_scalar(scalar);
+        }
+      }
+    }
+  }
 }
 
 

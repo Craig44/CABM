@@ -42,11 +42,13 @@ unsigned Agent::age() {
 /*
  * An internal function to set initial length at age when initially seeding agents in the world,
  * So that we have the equivalent length and weight frequency. Calculate expected length at age assuming von Bert parameters
+ * TODO figure out how to generalise this
  *
 */
 void Agent::growth_init() {
   length_ = first_age_length_par_ * (1-std::exp(-second_age_length_par_ * (float)age()));
   weight_ = first_length_weight_par_ * pow(length_, second_length_weight_par_); // Just update weight when ever we update length to save executions
+  //LOG_FINEST() << "initialise agent, age = " << age() << " length = " << length_ << " weight = " << weight_;
 }
 
 } /* namespace niwa */

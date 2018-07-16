@@ -15,7 +15,7 @@
 #include "Model/Managers.h"
 #include "DerivedQuantities/Manager.h"
 
-#include "DerivedQuantities/Children/Biomass.h"
+#include "DerivedQuantities/Children/MatureBiomass.h"
 
 // namespaces
 namespace niwa {
@@ -33,8 +33,8 @@ DerivedQuantity* Factory::Create(Model* model, const string& object_type, const 
   DerivedQuantity* result = nullptr;
 
   if (object_type == PARAM_DERIVED_QUANTITY || object_type == PARAM_DERIVED_QUANTITIES) {
-    if (sub_type == PARAM_BIOMASS)
-      result = new Biomass(model);
+    if (sub_type == PARAM_MATURE_BIOMASS)
+      result = new MatureBiomass(model);
     //else if (sub_type == PARAM_ABUNDANCE)
     //  result = new Abundance(model);
     if (result)

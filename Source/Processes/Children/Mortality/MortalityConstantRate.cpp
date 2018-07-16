@@ -46,7 +46,9 @@ void MortalityConstantRate::DoBuild() {
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         float multiplier = m_layer_->get_value(row, col);
+        LOG_FINEST() << "multiplier = " << multiplier << " m value = " << m_;
         m_layer_->set_value(row, col, multiplier * m_);
+        LOG_FINEST() << "check we set the right value = " << m_layer_->get_value(row, col);
       }
     }
   }
@@ -64,7 +66,6 @@ void MortalityConstantRate::DoBuild() {
  */
 void MortalityConstantRate::DoExecute() {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-  // Iterate over all cells
   float selectivity_at_age;
   unsigned agents_removed = 0;
   for (unsigned row = 0; row < model_->get_height(); ++row) {
@@ -76,6 +77,7 @@ void MortalityConstantRate::DoExecute() {
         LOG_FINEST() << initial_size << " initial agents";
         for (auto iter = agents.begin(); iter != agents.end();) {
           selectivity_at_age = selectivity_->GetResult((*iter).age());
+          //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
           if (rng.chance() <= (1 - std::exp(-(*iter).get_m() * selectivity_at_age))) {
             iter = agents.erase(iter);
             initial_size--;
@@ -107,8 +109,10 @@ void  MortalityConstantRate::draw_rate_param(unsigned row, unsigned col, unsigne
   vector.clear();
   vector.resize(number_of_draws);
 
+  LOG_FINEST() << "mean M = " << mean_m;
   for (unsigned i = 0; i < number_of_draws; ++i) {
     float value = rng.lognormal(mean_m, cv_);
+    LOG_FINEST() << "value of M = " << value;
     vector[i] = value;
   }
 

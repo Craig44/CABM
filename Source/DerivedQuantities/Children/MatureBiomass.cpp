@@ -1,5 +1,5 @@
 /**
- * @file Biomass.cpp
+ * @file MatureBiomass.cpp
  * @author  C.Marsh
  * @date 15/07/2018
  * @section LICENSE
@@ -8,7 +8,7 @@
  */
 
 // headers
-#include "Biomass.h"
+#include "MatureBiomass.h"
 
 #include "InitialisationPhases/Manager.h"
 #include "TimeSteps/Manager.h"
@@ -23,14 +23,14 @@ namespace derivedquantities {
 /**
  * Usual constructor
  */
-Biomass::Biomass(Model* model) : DerivedQuantity(model) {
+MatureBiomass::MatureBiomass(Model* model) : DerivedQuantity(model) {
   parameters_.Bind<string>(PARAM_BIOMASS_LAYER_LABEL, &biomass_layer_label_, "A label for the layer that indicates which cells to calculate biomass over", "");
 }
 
 /**
  * Validate class
  */
-void Biomass::DoValidate() {
+void MatureBiomass::DoValidate() {
 
 }
 
@@ -38,7 +38,7 @@ void Biomass::DoValidate() {
 /**
  * Build pointers class
  */
-void Biomass::DoBuild() {
+void MatureBiomass::DoBuild() {
   // Build Layers
   LOG_TRACE();
   biomass_layer_ = model_->managers().layer()->GetIntLayer(biomass_layer_label_);
@@ -51,7 +51,7 @@ void Biomass::DoBuild() {
  * Calculate the cached value to use
  * for any interpolation
  */
-void Biomass::PreExecute() {
+void MatureBiomass::PreExecute() {
   LOG_TRACE();
   cache_value_ = 0.0;
   unsigned time_step_index = model_->managers().time_step()->current_time_step();
@@ -63,7 +63,7 @@ void Biomass::PreExecute() {
         continue;
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
-        cache_value_ += cell->get_biomass();
+        cache_value_ += cell->get_mature_biomass();
       }
     }
   }
@@ -79,7 +79,7 @@ void Biomass::PreExecute() {
  * multiplied by the selectivities.
  *
  */
-void Biomass::Execute() {
+void MatureBiomass::Execute() {
   LOG_TRACE();
   float value = 0.0;
   unsigned time_step_index = model_->managers().time_step()->current_time_step();
@@ -92,7 +92,7 @@ void Biomass::Execute() {
         continue;
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
-        value += cell->get_biomass();
+        value += cell->get_mature_biomass();
       }
     }
   }
@@ -117,10 +117,6 @@ void Biomass::Execute() {
       b0_value = pow(cache_value_, 1 - time_step_proportion_) * pow(value ,time_step_proportion_);
       initialisation_values_[initialisation_phase].push_back(b0_value);
     }
-
-    // Store b0 or binitial on the model depending on what initialisation phase we are using
-
-
   } else {
     if (time_step_proportion_ == 0.0)
       values_[model_->current_year()] = cache_value_;

@@ -99,7 +99,7 @@ void DerivedQuantity::Reset() {
  */
 float DerivedQuantity::GetValue(unsigned year) {
   LOG_FINEST() << "get value for year: " << year;
-  /*
+
   if (values_.find(year) != values_.end())
     return values_[year];
   if (initialisation_values_.size() == 0)
@@ -122,18 +122,13 @@ float DerivedQuantity::GetValue(unsigned year) {
     result = (*(initialisation_values_.rbegin() + 1)->begin()); // first value of last init phase
   }
 
-  // Make an exception for intialisation phases such as derived which only requires to go back one year
-  if (model_->b0_initialised(label_)) {
-    result = (*initialisation_values_.rbegin()->rbegin());
-  }
-
   LOG_FINEST() << "years_to_go_back: " << years_to_go_back
       << "; year: " << year
       << "; result: " << result
       << "; .begin(): " << (*initialisation_values_.rbegin()->rbegin())
       << ": .size(): " << initialisation_values_.rbegin()->size();
-*/
-  return 0.0;
+
+  return result;
 }
 
 /**
@@ -144,14 +139,13 @@ float DerivedQuantity::GetValue(unsigned year) {
  */
 float DerivedQuantity::GetLastValueFromInitialisation(unsigned phase) {
   LOG_TRACE();
-/*  if (initialisation_values_.size() <= phase)
+  if (initialisation_values_.size() <= phase)
     LOG_ERROR() << "No values have been calculated for the initialisation value in phase: " << phase;
   if (initialisation_values_[phase].size() == 0)
     LOG_ERROR() << "No values have been calculated for the initialisation value in phase: " << phase;
 
   LOG_FINE() << "returning value = " << *initialisation_values_[phase].rbegin();
-  return *initialisation_values_[phase].rbegin();*/
-  return 0.0;
+  return *initialisation_values_[phase].rbegin();
 }
 
 /**
@@ -166,7 +160,7 @@ float DerivedQuantity::GetLastValueFromInitialisation(unsigned phase) {
  */
 float DerivedQuantity::GetInitialisationValue(unsigned phase, unsigned index) {
   LOG_FINEST() << "phase = " << phase << "; index = " << index << "; initialisation_values_.size() = " << initialisation_values_.size();
-/*  if (initialisation_values_.size() <= phase) {
+  if (initialisation_values_.size() <= phase) {
     if (initialisation_values_.size() == 0)
       return 0.0;
 
@@ -182,7 +176,7 @@ float DerivedQuantity::GetInitialisationValue(unsigned phase, unsigned index) {
   }
 
   return initialisation_values_[phase][index];
-*/
+
   return 0.0;
 }
 

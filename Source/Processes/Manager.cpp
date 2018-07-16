@@ -47,8 +47,10 @@ void Manager::Validate(Model* model) {
 void Manager::BuildRemainingProcesses() {
   LOG_FINEST() << "Starting Build... with " << objects_.size() << " objects";
   for(auto stored_object : objects_) {
-    if ((stored_object->process_type() != ProcessType::kGrowth) || (stored_object->process_type() != ProcessType::kMortality))
+    if ((stored_object->process_type() != ProcessType::kGrowth) && (stored_object->process_type() != ProcessType::kMortality)) {
+      LOG_FINEST() << "Building process = " << stored_object->label();
       stored_object->Build();
+    }
   }
   LOG_FINEST() << "Build Finished";
 }
@@ -59,8 +61,10 @@ void Manager::BuildRemainingProcesses() {
 void Manager::BuildGrowthAndMortalityProcesses() {
   LOG_FINEST() << "Starting Build... with " << objects_.size() << " objects";
   for(auto stored_object : objects_) {
-    if ((stored_object->process_type() == ProcessType::kGrowth) || (stored_object->process_type() == ProcessType::kMortality))
+    if ((stored_object->process_type() == ProcessType::kGrowth) || (stored_object->process_type() == ProcessType::kMortality)) {
       stored_object->Build();
+      LOG_FINEST() << "Building process = " << stored_object->label();
+    }
   }
   LOG_FINEST() << "Build Finished";
 }

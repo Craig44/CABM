@@ -85,9 +85,11 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
   }
 
   unsigned age;
+  //bool mature;
   for (unsigned agent = 0; agent < number_agents_to_seed; ++agent) {
     age = std::max(std::min((unsigned)rng.exponential(seed_z), model_->max_age()),model_->min_age()); // truncate age to between min_age and max_age
-    //LOG_FINEST() << age;
+    // Need to add Maturity and sex into this
+
     Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], (model_->current_year() - age), growth_pars[agent][2], growth_pars[agent][3], model_); // seed it with lat long, L_inf, K
     agents_.push_back(new_agent);
   }
@@ -128,6 +130,19 @@ float  WorldCell::get_biomass() {
     biomass += agent.get_weight() * agent.get_scalar();
   return biomass;
 }
+
+/*
+ * Returns the scaled up mature biomass for this cell
+*/
+float  WorldCell::get_mature_biomass() {
+  float biomass = 0.0;
+  for (auto& agent : agents_) {
+    if (agent.is_mature())
+      biomass += agent.get_weight() * agent.get_scalar();
+  }
+  return biomass;
+}
+
 
 /*
  * Returns the age frequency of agents in this cell

@@ -17,6 +17,7 @@
 #include "DerivedQuantities/Manager.h"
 #include "Layers/Manager.h"
 #include "TimeSteps/Manager.h"
+#include "InitialisationPhases/Manager.h"
 //#include "Utilities/RandomNumberGenerator.h"
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
@@ -105,6 +106,18 @@ void RecruitmentBevertonHolt::DoBuild() {
   LOG_FINEST() << "recruitment index = " << recruitment_index << " ssb index = " << derived_quantity_index;
   if (recruitment_index < derived_quantity_index)
     LOG_ERROR_P(PARAM_SSB) << "it seems the derived quantity " << ssb_label_ << " occurs after the recruitment event, for obvious reasons this can't happen. If this doesn't make much sense look at the usermanual under mortality blocks";
+
+  if (model_->years().size() != ycs_values_.size()) {
+    LOG_ERROR_P(PARAM_YCS_VALUES) << "number of years '" << model_->years().size() <<  "' doesn't match number of ycs values you supplied '" << ycs_values_.size() << "' please make sure these are the same";
+  }
+
+  unsigned iter = 0;
+  for (unsigned year = model_->start_year(); year <= model_->final_year(); ++year, ++iter) {
+    ycs_values_by_year_[year] = ycs_values_[iter];
+  }
+
+
+
 }
 
 
@@ -119,6 +132,9 @@ void RecruitmentBevertonHolt::DoExecute() {
 
   if (model_->state() == State::kInitialise) {
     LOG_FINEST() << "applying recruitment in initialisation year " << model_->current_year();
+    initialisationphases::Manager& init_phase_manager = *model_->managers().initialisation_phase();
+    float SSB = derived_quantity_->GetLastValueFromInitialisation(init_phase_manager.last_executed_phase());
+    model_->set_ssb(label_, SSB);
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
@@ -132,17 +148,23 @@ void RecruitmentBevertonHolt::DoExecute() {
     }
   } else {
     float SSB = derived_quantity_->GetValue(model_->current_year());
-    Double ssb_ratio = SSB / b0_;
-    Double true_ycs = 1.0 * ssb_ratio / (1 - ((5 * steepness_ - 1) / (4 * steepness_)) * (1 - ssb_ratio));
-
-    LOG_FINEST() << "applying recruitment in year " << model_->current_year();
+    ssb_by_year_[model_->current_year()] = SSB;
+    float ssb_ratio = SSB / b0_;
+    float SR = ssb_ratio / (1.0 - ((5.0 * steepness_ - 1.0) / (4.0 * steepness_)) * (1.0 - ssb_ratio));
+    float true_ycs = ycs_values_by_year_[model_->current_year()] * SR;
+    float amount_per = unsigned(initial_recruits_ * true_ycs);
+    recruits_by_year_[model_->current_year()] = amount_per;
+    ssb_ratio_[model_->current_year()] = ssb_ratio;
+    SR_[model_->current_year()] = SR;
+    true_ycs_[model_->current_year()] = true_ycs;
+    LOG_FINEST() << "applying recruitment in year " << model_->current_year() << " SR = " << SR << " ssb_ratio = " << ssb_ratio << " true ycs = " << true_ycs << " intial recruits = " << initial_recruits_;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
           float value = recruitment_layer_->get_value(row, col);
-          unsigned new_agents = (unsigned)(initial_recruits_ * value);
-          LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " initial agents = " << initial_recruits_ << " new agents = " << new_agents;
+          unsigned new_agents = (unsigned)(amount_per * value);
+          LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " new agents = " << amount_per << " new agents = " << new_agents;
           cell->birth_agents(new_agents);
         }
       }
@@ -160,6 +182,18 @@ void RecruitmentBevertonHolt::FillReportCache(ostringstream& cache) {
     cache << iter.first << " ";
   cache << "\nrecruits: ";
   for (auto& iter : recruits_by_year_)
+    cache << iter.second << " ";
+  cache << "\nssb: ";
+  for (auto& iter : ssb_by_year_)
+    cache << iter.second << " ";
+  cache << "\nssb_ratio: ";
+  for (auto& iter : ssb_ratio_)
+    cache << iter.second << " ";
+  cache << "\nSR: ";
+  for (auto& iter : SR_)
+    cache << iter.second << " ";
+  cache << "\ntrue_ycs: ";
+  for (auto& iter : true_ycs_)
     cache << iter.second << " ";
   cache << "\n";
 }

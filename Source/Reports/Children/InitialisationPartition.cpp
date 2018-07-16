@@ -48,12 +48,13 @@ void InitialisationPartition::DoBuild() {
  */
 void InitialisationPartition::DoExecute() {
   LOG_FINE() <<" printing report " << label_;
-  if (call_number_)
+  if (call_number_) {
     cache_ << "*"<< type_ << "[" << label_ << "_1]" << "\n";
-  else
+    cache_ << "ewuilibrium_shortcut: " << model_->current_year() << "\n";
+  } else {
     cache_ << "*"<< type_ << "[" << label_ << "_2]" << "\n";
-
-  cache_ << "ewuilibrium_shortcut: " << model_->current_year() << "\n";
+    cache_ << "year: " << model_->current_year() << "\n";
+  }
   cache_ << "values "<< REPORT_R_DATAFRAME<<"\n";
   cache_ << "row-col";
   for (unsigned i = model_->min_age(); i <=  model_->max_age(); ++i)

@@ -1,5 +1,5 @@
 /**
- * @file Biomass.h
+ * @file MatureBiomass.h
  * @author  C.Marsh
  * @date 15/07/2018
  * @section LICENSE
@@ -9,8 +9,8 @@
  * This derived quantity will calculate the amount of biomass
  * in the partition with a selectivity
  */
-#ifndef DERIVEDQUANTITIES_BIOMASS_H_
-#define DERIVEDQUANTITIES_BIOMASS_H_
+#ifndef DERIVEDQUANTITIES_MATURE_BIOMASS_H_
+#define DERIVEDQUANTITIES_MATURE_BIOMASS_H_
 
 // headers
 #include "DerivedQuantities/DerivedQuantity.h"
@@ -23,11 +23,11 @@ class IntLayer;
 namespace derivedquantities {
 
 // classes
-class Biomass : public niwa::DerivedQuantity {
+class MatureBiomass : public niwa::DerivedQuantity {
 public:
   // methods
-  explicit Biomass(Model* model);
-  virtual                     ~Biomass() = default;
+  explicit MatureBiomass(Model* model);
+  virtual                     ~MatureBiomass() = default;
   void                        PreExecute() override final;  // TODO play with this concept, but might be a bit too computationally demanding
   void                        Execute() override final;
   void                        DoValidate() override final;
@@ -40,4 +40,4 @@ protected:
 
 } /* namespace derivedquantities */
 } /* namespace niwa */
-#endif /* DERIVEDQUANTITIES_BIOMASS_H_ */
+#endif /* DERIVEDQUANTITIES_MATURE_BIOMASS_H_ */

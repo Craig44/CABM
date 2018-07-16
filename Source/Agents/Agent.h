@@ -36,9 +36,9 @@ public:
   virtual const float&         get_length() const {return length_;};
   virtual const float&         get_m() const {return M_;};
   virtual const float&         get_first_age_length_par() const {return first_age_length_par_;};
-  virtual const float&         get_second_age_length_par() const {return first_age_length_par_;};
+  virtual const float&         get_second_age_length_par() const {return second_age_length_par_;};
   virtual const float&         get_first_length_weight_par() const {return first_length_weight_par_;};
-  virtual const float&         get_second_length_weight_par() const {return first_length_weight_par_;};
+  virtual const float&         get_second_length_weight_par() const {return second_length_weight_par_;};
 
   void                         set_length(float new_length) {length_ = new_length;}
   void                         set_weight(float new_weight) {weight_ = new_weight;}

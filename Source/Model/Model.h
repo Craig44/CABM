@@ -87,10 +87,16 @@ public:
   virtual unsigned            max_age() const { return max_age_; }
   virtual unsigned            age_spread() const { return (max_age_ - min_age_) + 1; }
   virtual bool                age_plus() const { return age_plus_; }
+
+  // The following are recruitment specific quantities/accessors these are stock characteristics that are shared around the model
   void                        set_b0(string recruitment_label, float b0) {b0_[recruitment_label] = b0; }
   virtual const map<string, float>&          get_b0s() const {return b0_; }
-  void                        set_r0(string recruitment_label, unsigned b0) {r0_[recruitment_label] = b0; }
+  void                        set_r0(string recruitment_label, unsigned r0) {r0_[recruitment_label] = r0; }
   unsigned                    get_r0(string recruitment_label)  {return r0_[recruitment_label]; }
+  void                        set_ssb(string recruitment_label, unsigned ssb) {ssb_[recruitment_label] = ssb; }
+  float                       get_ssb(string recruitment_label)  {return ssb_[recruitment_label]; }
+  void                        set_scalar(float value) {global_scalar_ = value; }
+  float                       get_scalar()  {return global_scalar_; }
   void                        set_m(float value) {m_ = value; }
   float                       get_m()  {return m_; }
   void                        set_n_agents(unsigned value) {n_agents_ = value; }
@@ -103,7 +109,6 @@ public:
   string&                     get_base_layer_label() {return base_layer_;}
   string&                     get_lat_layer_label() {return lat_layer_label_;}
   string&                     get_long_layer_label() {return lon_layer_label_;}
-  float                       get_initial_seed_z() {return initialisation_seed_z_; }
   unsigned                    get_height() {return world_height_;}
   unsigned                    get_width() {return world_width_;}
   string                      get_mortality_process() {return natural_mortality_label_;}
@@ -148,13 +153,16 @@ protected:
   string                      lon_layer_label_; // make it optional
   unsigned                    world_height_;
   unsigned                    world_width_;
-  float                       initialisation_seed_z_;
   map<string, float>          b0_;
   map<string, unsigned>       r0_;
   unsigned                    n_agents_;
   string                      natural_mortality_label_;
   string                      growth_process_label_;
   float                       m_; // natural mortality
+  map<string, float>          ssb_;
+  float                       global_scalar_ = 1.0;
+  bool                        sex_;
+  vector<string>              maturity_ogives_;
 
 
   Managers*                   managers_ = nullptr;

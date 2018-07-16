@@ -15,6 +15,9 @@
 
 #include "Layers/Manager.h"
 #include "Utilities/RandomNumberGenerator.h"
+#include "World/WorldCell.h"
+#include "World/WorldView.h"
+
 // namespaces
 namespace niwa {
 namespace processes {
@@ -31,7 +34,6 @@ GrowthVonBertalanffyWithBasic::GrowthVonBertalanffyWithBasic(Model* model) : Gro
   parameters_.Bind<float>(PARAM_K, &k_, "Label for the numeric layer that describes mean k through space", "", 0);
   parameters_.Bind<float>(PARAM_A, &a_, "Label for the numeric layer that describes mean a in the weight calcualtion through space", "", 0);
   parameters_.Bind<float>(PARAM_B, &b_, "Label for the numeric layer that describes mean b in the weight calcualtion through space", "", 0);
-
 }
 
 // check users have defined spatial or non_spatial
@@ -91,8 +93,23 @@ void GrowthVonBertalanffyWithBasic::DoBuild() {
 
 // Execute the process
 void GrowthVonBertalanffyWithBasic::DoExecute() {
-
-
+  LOG_TRACE();
+  for (unsigned row = 0; row < model_->get_height(); ++row) {
+    for (unsigned col = 0; col < model_->get_width(); ++col) {
+      WorldCell* cell = world_->get_base_square(row, col);
+      if (cell->is_enabled()) {
+        auto& agents = cell->get_agents();
+        for (auto iter = agents.begin(); iter != agents.end(); ++iter) {
+          //LOG_FINEST() << "length = " << (*iter).get_length() << " weight = " << (*iter).get_weight() << " L-inf " << (*iter).get_first_age_length_par() << " k = " << (*iter).get_second_age_length_par();
+          float new_length = (*iter).get_length() + ((*iter).get_first_age_length_par() - (*iter).get_length()) * (1 - exp(-(*iter).get_second_age_length_par()));
+          float weight = (*iter).get_first_length_weight_par() * pow(new_length, (*iter).get_second_length_weight_par());
+          //LOG_FINEST() << "length = " << new_length << " weight = " << weight;
+          (*iter).set_length(new_length);
+          (*iter).set_weight(weight);
+        }
+      }
+    }
+  }
 }
 
 /*

@@ -60,7 +60,7 @@ void Maturity::DoExecute() {
         for (Agent& agent : agents) {
           if (not agent.is_mature()) {
             probability_mature_at_age = selectivity_->GetResult(agent.age());
-            if (rng.chance() < probability_mature_at_age)
+            if (rng.chance() <= probability_mature_at_age)
               agent.set_maturity(true);
           }
         }
