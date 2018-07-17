@@ -28,6 +28,7 @@
 #include "InitialisationPhases/Manager.h"
 #include "Logging/Logging.h"
 #include "Observations/Manager.h"
+#include "Selectivities/Manager.h"
 #include "World/WorldView.h"
 #include "Reports/Manager.h"
 #include "Processes/Manager.h"
@@ -59,9 +60,10 @@ Model::Model() {
   parameters_.Bind<string>(PARAM_BASE_LAYER_LABEL, &base_layer_, "Label for the base layer", "");
   parameters_.Bind<string>(PARAM_LATITUDE_LAYER_LABEL, &lat_layer_label_, "Label for the latitude layer", "", "");
   parameters_.Bind<string>(PARAM_LONGITUDE_LAYER_LABEL, &lon_layer_label_, "Label for the longitude layer", "", "");
-  parameters_.Bind<unsigned>(PARAM_NROWS, &world_height_, "number of rows in spatial domain", "");
-  parameters_.Bind<unsigned>(PARAM_NCOLS, &world_width_, "number of columns in spatial domain", "");
-  parameters_.Bind<bool>(PARAM_SEXED, &sex_, "Is sex an attribute of you agent?", "");
+  parameters_.Bind<unsigned>(PARAM_NROWS, &world_height_, "number of rows in spatial domain", "")->set_lower_bound(1,true);
+  parameters_.Bind<unsigned>(PARAM_NCOLS, &world_width_, "number of columns in spatial domain", "")->set_lower_bound(1,true);
+  parameters_.Bind<bool>(PARAM_SEXED, &sex_, "Is sex an attribute of you agent?", "", false);
+  parameters_.Bind<float>(PARAM_PROPORTION_MALE, &proportion_male_, "what proportion of the generated agents should be male?", "", 1.0)->set_range(0.0, 1.0, true, true);
   parameters_.Bind<string>(PARAM_MATRUITY_OGIVE_LABEL, &maturity_ogives_, "Maturity ogive label for each sex", "", false);
   parameters_.Bind<string>(PARAM_GROWTH_PROCESS_LABEL, &growth_process_label_, "Label for the growth process in the annual cycle", "");
   parameters_.Bind<string>(PARAM_NATURAL_MORTALITY_PROCESS_LABEL, &natural_mortality_label_, "Label for the natural mortality process in the annual cycle", "");
@@ -270,6 +272,16 @@ void Model::Build() {
   }
   if (!process_manager.GetMortalityProcess(natural_mortality_label_)) {
     LOG_FATAL_P(PARAM_NATURAL_MORTALITY_PROCESS_LABEL) << "Does the mortality process " << natural_mortality_label_ << " exist? please check that it does, and is a mortality process";
+  }
+
+  if (maturity_ogives_.size() > 2) {
+    LOG_ERROR_P(PARAM_NATURAL_MORTALITY_PROCESS_LABEL) << "You have specified '" << maturity_ogives_.size() << "' maturity ogives, we only use one if it is unsexed or two if it is sexed";
+  }
+  // Check maturity Ogive exists and flag to user
+  for (unsigned i = 0; i < maturity_ogives_.size(); ++i) {
+    Selectivity* selec = managers_->selectivity()->GetSelectivity(maturity_ogives_[i]);
+    if (!selec)
+      LOG_ERROR_P(PARAM_NATURAL_MORTALITY_PROCESS_LABEL) << "Could not find maturity ogive (selectivity) '" << maturity_ogives_[i] << "', make sure it is defined";
   }
 
 }

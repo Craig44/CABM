@@ -113,6 +113,10 @@ public:
   unsigned                    get_width() {return world_width_;}
   string                      get_mortality_process() {return natural_mortality_label_;}
   string                      get_growth_process() {return growth_process_label_;}
+  vector<string>              get_maturity_ogive() {return maturity_ogives_;};
+  bool                        get_sexed() const {return sex_;};
+  float                       get_male_proportions() const {return proportion_male_;};
+
 
   // manager accessors
   virtual Managers&           managers();
@@ -162,6 +166,7 @@ protected:
   map<string, float>          ssb_;
   float                       global_scalar_ = 1.0;
   bool                        sex_;
+  float                       proportion_male_;
   vector<string>              maturity_ogives_;
 
 

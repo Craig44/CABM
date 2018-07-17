@@ -1,5 +1,5 @@
 @model
-start_year 1990
+start_year 1940
 final_year 1992
 min_age 0
 max_age 30
@@ -8,10 +8,11 @@ initialisation_phase_labels Iterative #label to an @initialisation block
 time_steps Annual # just one time step for now
 length_bins 0 5 10 15 20 25 30 35 40 45 50 55 60 65 70 # assumed cm's
 length_plus true
-initialisation_z_seed 0.2
 base_layer_label Base #
 growth_process_label von_bert
 natural_mortality_process_label natural_mort
+#sexed false
+maturity_ogive_label mature_ogive
 ## a single area model
 nrows 1
 ncols 1 
@@ -21,7 +22,7 @@ ncols 1
 # --------------
 @initialisation_phase Iterative
 type iterative
-years 2
+years 40
 #convergence_years 20 40
 #lambda 1
 number_of_agents 10000 ## initial number of agents
@@ -35,7 +36,7 @@ layer_label Base
 # - M
 # - Maturity
 @time_step Annual
-processes Recruitment von_bert natural_mort Maturation 
+processes  von_bert natural_mort Recruitment_const   Maturation 
 
 # --------------
 # Process definitions
@@ -56,7 +57,6 @@ time_step_proportions 1
 # Maturity
 @process Maturation
 type maturation
-selectivity_label mature_ogive
 
 # Natural Mortality
 @process natural_mort
@@ -68,13 +68,21 @@ cv 0.0001
 time_step_proportions 1
 selectivity_label One
 
-# Natural Mortality
+/*
+# Recruitment Beverton Holt
 @process Recruitment
 type recruitment_beverton_holt
 recruitment_layer_label recruit_layer
-b0 1000000
+b0 100000
 steepness 0.85
-ycs_values 1*29
+ycs_values 1*53
+ssb SSB
+*/
+# Constant
+@process Recruitment_const
+type recruitment_constant
+recruitment_layer_label recruit_layer
+b0 100000
 ssb SSB
 # --------------
 # Define selectivities
@@ -94,14 +102,14 @@ c 1
 
 @selectivity mature_ogive
 type logistic
-a50 6
+a50 4
 ato95 4
 
 # --------------
 # Derived Quantities
 # --------------
 @derived_quantity SSB
-type biomass
+type mature_biomass
 biomass_layer_label SSB_areas
 time_step Annual
 time_step_proportion 0.5 ## interpolate DQ's
@@ -113,6 +121,15 @@ time_step_proportion 0.5 ## interpolate DQ's
 type process
 process natural_mort
 
+@report mature_report
+type process
+process Maturation
+
+/*
+@report Recruitment_report
+type process
+process Recruitment
+*/
 # print initail state of agents
 @report init
 type initialisation_partition
@@ -120,17 +137,13 @@ type initialisation_partition
 # print age frequency
 @report total_age_freq
 type world_age_frequency
-years 1990:2018 ## defaults to model years
+#years 1990:2018 ## defaults to model years
 time_step Annual
 
 # print SSB's
 @report derived_quants
 type derived_quantity
 
-# print SSB's
-@report Recruitment_report
-type process
-process Recruitment
 # --------------
 # Include Layers
 # --------------

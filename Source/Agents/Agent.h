@@ -26,11 +26,12 @@ class Agent { // Don't make this inherit from BaseClasses/Object.h
 public:
   // Methods
   virtual                       ~Agent() = default;
-  Agent(float lat, float lon, float first_age_length_par, float second_age_length_par, float M, unsigned birth_year, float first_length_weight_par, float second_length_weigth_par, Model* model);
+  Agent(float lat, float lon, float first_age_length_par, float second_age_length_par, float M, unsigned birth_year, float first_length_weight_par, float second_length_weigth_par, Model* model, bool mature, unsigned sex);
   virtual void                  Reset() {};
   // Accessors
   unsigned                     age();
   virtual const bool&          is_mature() const {return mature_ ;};
+  virtual const unsigned&      sex() const {return sex_ ;};
   virtual const float&         get_scalar() const {return scalar_;};
   virtual const float&         get_weight() const {return weight_;};
   virtual const float&         get_length() const {return length_;};
@@ -60,8 +61,6 @@ protected:
   float                       second_age_length_par_; // k for von bert
   float                       M_; // natural mortality
   unsigned                    birth_year_;
-  bool                        mature_ = false;
-  bool                        sex_; // 1 = male, 0 = female TODO
   float                       scalar_ = 1.0;
   float                       length_ = 0.0;
   float                       weight_ = 1.0;
@@ -69,6 +68,8 @@ protected:
   float                       second_length_weight_par_;   // b
   // TODO link an agent to its home for natal homing dynamics
   Model*                      model_ = nullptr;
+  bool                        mature_ = false;
+  unsigned                    sex_ = 0; // 1 = male, 0 = female TODO
 
 private:
 

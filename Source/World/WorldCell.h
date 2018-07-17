@@ -32,6 +32,7 @@ using std::list;
 
 class Model;
 class Agent;
+class Selectivity;
 /**
  * Class Definition
  */
@@ -71,6 +72,7 @@ protected:
   Model*                       model_ = nullptr;
   processes::Mortality*        mortality_ = nullptr;
   processes::Growth*           growth_ = nullptr;
+  vector<Selectivity*>         selectivity_;
 };
 
 } /* namespace niwa */

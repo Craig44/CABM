@@ -89,7 +89,6 @@ void Managers::Build() {
   derived_quantity_->Build();
   likelihood_->Build();
   observation_->Build();
-  selectivity_->Build();
   time_varying_->Build();
   process_->BuildRemainingProcesses();
   report_->Build();
@@ -100,7 +99,9 @@ void Managers::Build() {
 void Managers::BuildPreWorldView() {
   LOG_TRACE();
   layer_->Build();
+  selectivity_->Build();
   process_->BuildGrowthAndMortalityProcesses();
+
 }
 
 

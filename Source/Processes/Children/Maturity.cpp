@@ -27,7 +27,6 @@ namespace processes {
  */
 Maturity::Maturity(Model* model) : Process(model) {
   process_type_ = ProcessType::kTransition;
-  parameters_.Bind<string>(PARAM_SELECTIVITY_LABEL, &selectivity_label_, "Label for the selectivity block note that this selectivity represents probability of becoming mature", "");
 }
 
 /**
@@ -36,9 +35,14 @@ Maturity::Maturity(Model* model) : Process(model) {
 void Maturity::DoBuild() {
   LOG_TRACE();
   // Get selectivity
-  selectivity_ = model_->managers().selectivity()->GetSelectivity(selectivity_label_);
-  if (!selectivity_)
-    LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << ": selectivity " << selectivity_label_ << " does not exist. Have you defined it?";
+  selectivity_label_ = model_->get_maturity_ogive();
+  for (auto label : selectivity_label_) {
+    Selectivity* temp_selectivity = nullptr;
+    temp_selectivity = model_->managers().selectivity()->GetSelectivity(label);
+    if (!temp_selectivity)
+      LOG_CODE_ERROR()<< "this should have been checked on the ModelDoBuild please check out";
+    selectivity_.push_back(temp_selectivity);
+  }
 }
 
 
@@ -47,6 +51,7 @@ void Maturity::DoBuild() {
  */
 void Maturity::DoExecute() {
   LOG_TRACE();
+  unsigned mature_conversion = 0;
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   // Iterate over all cells
   float probability_mature_at_age;
@@ -59,15 +64,36 @@ void Maturity::DoExecute() {
         //unsigned counter = 1;
         for (Agent& agent : agents) {
           if (not agent.is_mature()) {
-            probability_mature_at_age = selectivity_->GetResult(agent.age());
-            if (rng.chance() <= probability_mature_at_age)
+            probability_mature_at_age = selectivity_[agent.sex()]->GetResult(agent.age());
+            if (rng.chance() <= probability_mature_at_age) {
               agent.set_maturity(true);
+              ++mature_conversion;
+            }
           }
         }
       }
     }
   }
+
+  if (model_->state() != State::kInitialise)
+    mature_individuals_by_year_[model_->current_year()] = mature_conversion;
   LOG_TRACE();
 }
+
+
+// FillReportCache, called in the report class, it will print out additional information that is stored in
+// containers in this class.
+void  Maturity::FillReportCache(ostringstream& cache) {
+  cache << "year: ";
+  for (auto& year : mature_individuals_by_year_)
+    cache << year.first << " ";
+
+  cache << "\nagents_mature: ";
+  for (auto& year : mature_individuals_by_year_)
+    cache << year.second << " ";
+  cache << "\n";
+
+}
+
 } /* namespace processes */
 } /* namespace niwa */

@@ -14,6 +14,7 @@
 #include "Agents/Agent.h"
 #include "Utilities/RandomNumberGenerator.h"
 #include "Processes/Manager.h"
+#include "Selectivities/Manager.h"
 
 // Namespaces
 namespace niwa {
@@ -53,7 +54,14 @@ void WorldCell::Build(unsigned row, unsigned col, float lat, float lon, Model* m
     LOG_CODE_ERROR() << "!mortality this should have been checked in the model class";
   }
 
-
+  vector<string> mature_labels =  model_->get_maturity_ogive();
+  for (auto label : mature_labels) {
+    Selectivity* temp_selectivity = nullptr;
+    temp_selectivity = model_->managers().selectivity()->GetSelectivity(label);
+    if (!temp_selectivity)
+      LOG_CODE_ERROR()<< "this should have been checked on the ModelDoBuild please check out, issue with " << label << " selectivity";
+    selectivity_.push_back(temp_selectivity);
+  }
 }
 
 /**
@@ -84,13 +92,27 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
     LOG_CODE_ERROR() << "number_agents_to_seed != growth_pars.size(), this must be a code error as these should always be true";
   }
 
-  unsigned age;
-  //bool mature;
+  unsigned age, sex;
+  bool mature = false, sexed;
+  float male_prop = 1.0, probability_mature_at_age;
+  sexed = model_->get_sexed();
+
+  if (sexed)
+    male_prop = model_->get_male_proportions();
+
   for (unsigned agent = 0; agent < number_agents_to_seed; ++agent) {
+    sex = 0;
+    mature = false;
     age = std::max(std::min((unsigned)rng.exponential(seed_z), model_->max_age()),model_->min_age()); // truncate age to between min_age and max_age
     // Need to add Maturity and sex into this
-
-    Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], (model_->current_year() - age), growth_pars[agent][2], growth_pars[agent][3], model_); // seed it with lat long, L_inf, K
+    if (sexed) {
+      if (rng.chance() >= male_prop)
+        sex = 1;
+    }
+    probability_mature_at_age =selectivity_[sex]->GetResult(age);
+    if (rng.chance() <= probability_mature_at_age)
+      mature = true;
+    Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], (model_->current_year() - age), growth_pars[agent][2], growth_pars[agent][3], model_, mature, sex); // seed it with lat long, L_inf, K
     agents_.push_back(new_agent);
   }
 }
@@ -100,13 +122,22 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
  */
 void WorldCell::birth_agents(unsigned birth_agents) {
   LOG_TRACE();
+  utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   vector<float> mort_par;
   vector<vector<float>> growth_pars;
   mortality_->draw_rate_param(row_, col_, birth_agents, mort_par);
   growth_->draw_growth_param(row_, col_, birth_agents, growth_pars);
+  bool sexed = model_->get_sexed();
+  float male_prop = model_->get_male_proportions();
 
+  unsigned sex;
   for (unsigned agent = 0; agent < birth_agents; ++agent) {
-    Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], model_->current_year(), growth_pars[agent][2], growth_pars[agent][3], model_); // seed it with lat long, L_inf, K
+    sex = 0;
+    if (sexed) {
+      if (rng.chance() >= male_prop)
+        sex = 1;
+    }
+    Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], model_->current_year(), growth_pars[agent][2], growth_pars[agent][3], model_, false, sex); // seed it with lat long, L_inf, K
     agents_.push_back(new_agent);
   }
 }

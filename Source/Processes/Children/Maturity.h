@@ -33,10 +33,12 @@ public:
   void                        DoBuild() override final;
   void                        DoReset() override final { };
   void                        DoExecute() override final;
+  void                        FillReportCache(ostringstream& cache) override final;
 
 protected:
-  string                     selectivity_label_;
-  Selectivity*               selectivity_ = nullptr;
+  vector<string>             selectivity_label_;
+  vector<Selectivity*>       selectivity_;
+  map<unsigned, unsigned>    mature_individuals_by_year_;
 };
 
 } /* namespace processes */

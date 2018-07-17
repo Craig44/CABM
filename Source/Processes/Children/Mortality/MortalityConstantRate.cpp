@@ -109,10 +109,10 @@ void  MortalityConstantRate::draw_rate_param(unsigned row, unsigned col, unsigne
   vector.clear();
   vector.resize(number_of_draws);
 
-  LOG_FINEST() << "mean M = " << mean_m;
+  //LOG_FINEST() << "mean M = " << mean_m;
   for (unsigned i = 0; i < number_of_draws; ++i) {
     float value = rng.lognormal(mean_m, cv_);
-    LOG_FINEST() << "value of M = " << value;
+    //LOG_FINEST() << "value of M = " << value;
     vector[i] = value;
   }
 
