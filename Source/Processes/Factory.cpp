@@ -22,6 +22,7 @@
 #include "Children/RecruitmentConstant.h"
 #include "Children/Growth/GrowthVonBertalanffyWithBasic.h"
 #include "Children/Mortality/MortalityConstantRate.h"
+#include "Children/Mortality/MortalityEventBiomass.h"
 #include "Children/Maturity.h"
 
 // Namespaces
@@ -70,6 +71,8 @@ Process* Factory::Create(Model* model, const string& object_type, const string& 
       result = new GrowthVonBertalanffyWithBasic(model);
     else if (sub == PARAM_MORTALITY_CONSTANT_RATE)
       result = new MortalityConstantRate(model);
+    else if (sub == PARAM_MORTALITY_EVENT_BIOMASS)
+      result = new MortalityEventBiomass(model);
     else if (sub == PARAM_MATURATION)
       result = new Maturity(model);
     if (result)

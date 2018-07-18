@@ -44,6 +44,9 @@ protected:
   string                              selectivity_label_;
   Selectivity*                        selectivity_ = nullptr;
   float                               m_;
+  vector<float>                       time_step_proportions_;
+  float                               cv_;
+  string                              distribution_;
 
   // For reporting
   map<unsigned, unsigned>             removals_by_year_;

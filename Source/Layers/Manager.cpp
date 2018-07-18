@@ -42,7 +42,7 @@ IntLayer* Manager::GetIntLayer(const string& label) {
       return pPtr;
     }
   }
-  return nullptr;
+  return pPtr;
 }
 
 /**

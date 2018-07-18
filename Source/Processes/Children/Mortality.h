@@ -37,9 +37,7 @@ public:
   virtual void                        draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) = 0;
 
 protected:
-  vector<float>			                  time_step_proportions_;
-  float					                      cv_;
-  string					                    distribution_;
+
 
 };
 
