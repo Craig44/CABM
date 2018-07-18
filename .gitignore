@@ -10,3 +10,6 @@
 /.settings/*.prefs
 /Documentation/UserManual/*.aux
 .Rproj.user
+/R-libraries/ibm/man
+/R-libraries/ibm/NAMESPACE
+/R-libraries/ibm/DESCRIPTION
