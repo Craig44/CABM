@@ -14,9 +14,9 @@
 #define SOURCE_PROCESSES_CHILDREN_GROWTH_VON_BERTALANFFY_WITH_BASIC_H_
 
 // headers
-#include "Processes/Children/Growth/Growth.h"
+#include "Processes/Children/Growth.h"
 
-#include "Layers/Children/Numeric/Base/NumericLayer.h"
+#include "Layers/Children/NumericLayer.h"
 // namespaces
 namespace niwa {
 namespace processes {

@@ -62,6 +62,7 @@ int main(int argc, char * argv[]) {
     case RunMode::kVersion:
     case RunMode::kHelp:
     case RunMode::kLicense:
+      break;
 
     case RunMode::kBasic:
       if (!model.global_configuration().disable_standard_report()) {

@@ -17,7 +17,7 @@
 // headers
 #include "InitialisationPhases/InitialisationPhase.h"
 
-#include "Layers/Children/Numeric/Base/NumericLayer.h"
+#include "Layers/Children/NumericLayer.h"
 #include "World/WorldView.h"
 
 // namespaces

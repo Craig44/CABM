@@ -14,9 +14,9 @@
 #define SOURCE_PROCESSES_CHILDREN_MORTALITY_CONSTANT_RATE_H_
 
 // headers
-#include "Processes/Children/Mortality/Mortality.h"
+#include "Processes/Children/Mortality.h"
 
-#include "Layers/Children/Numeric/Base/NumericLayer.h"
+#include "Layers/Children/NumericLayer.h"
 
 // namespaces
 namespace niwa {

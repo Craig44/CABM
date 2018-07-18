@@ -76,7 +76,7 @@ void MortalityConstantRate::DoExecute() {
         unsigned initial_size = agents.size();
         LOG_FINEST() << initial_size << " initial agents";
         for (auto iter = agents.begin(); iter != agents.end();) {
-          selectivity_at_age = selectivity_->GetResult((*iter).age());
+          selectivity_at_age = selectivity_->GetResult((*iter).get_age());
           //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
           if (rng.chance() <= (1 - std::exp(-(*iter).get_m() * selectivity_at_age))) {
             iter = agents.erase(iter);

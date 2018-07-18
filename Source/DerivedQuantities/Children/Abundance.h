@@ -1,16 +1,16 @@
 /**
- * @file MatureBiomass.h
+ * @file Abundance.h
  * @author  C.Marsh
  * @date 15/07/2018
  * @section LICENSE
  *
  * @section DESCRIPTION
  *
- * This derived quantity will calculate the amount of biomass
+ * This derived quantity will calculate the amount of Abundance
  * in the partition with a selectivity
  */
-#ifndef DERIVEDQUANTITIES_MATURE_BIOMASS_H_
-#define DERIVEDQUANTITIES_MATURE_BIOMASS_H_
+#ifndef DERIVEDQUANTITIES_ABUNDANCE_H_
+#define DERIVEDQUANTITIES_ABUNDANCE_H_
 
 // headers
 #include "DerivedQuantities/DerivedQuantity.h"
@@ -20,24 +20,27 @@
 // namespaces
 namespace niwa {
 class IntLayer;
+class Selectivity;
 namespace derivedquantities {
 
 // classes
-class MatureBiomass : public niwa::DerivedQuantity {
+class Abundance : public niwa::DerivedQuantity {
 public:
   // methods
-  explicit MatureBiomass(Model* model);
-  virtual                     ~MatureBiomass() = default;
+  explicit Abundance(Model* model);
+  virtual                     ~Abundance() = default;
   void                        PreExecute() override final;  // TODO play with this concept, but might be a bit too computationally demanding
   void                        Execute() override final;
   void                        DoValidate() override final;
   void                        DoBuild() override final;
 
 protected:
-  string                      biomass_layer_label_;
-  niwa::layers::IntLayer*     biomass_layer_ = nullptr;
+  string                      abundance_layer_label_;
+  niwa::layers::IntLayer*     abundance_layer_ = nullptr;
+  string                      selectivity_label_;
+  Selectivity*                selectivity_ = nullptr;
 };
 
 } /* namespace derivedquantities */
 } /* namespace niwa */
-#endif /* DERIVEDQUANTITIES_MATURE_BIOMASS_H_ */
+#endif /* DERIVEDQUANTITIES_ABUNDANCE_H_ */

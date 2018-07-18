@@ -15,6 +15,8 @@
 #include "Model/Managers.h"
 #include "DerivedQuantities/Manager.h"
 
+#include "DerivedQuantities/Children/Abundance.h"
+#include "DerivedQuantities/Children/Biomass.h"
 #include "DerivedQuantities/Children/MatureBiomass.h"
 
 // namespaces
@@ -35,8 +37,10 @@ DerivedQuantity* Factory::Create(Model* model, const string& object_type, const 
   if (object_type == PARAM_DERIVED_QUANTITY || object_type == PARAM_DERIVED_QUANTITIES) {
     if (sub_type == PARAM_MATURE_BIOMASS)
       result = new MatureBiomass(model);
-    //else if (sub_type == PARAM_ABUNDANCE)
-    //  result = new Abundance(model);
+    else if (sub_type == PARAM_ABUNDANCE)
+      result = new Abundance(model);
+    else if (sub_type == PARAM_BIOMASS)
+      result = new Biomass(model);
     if (result)
       model->managers().derived_quantity()->AddObject(result);
   }

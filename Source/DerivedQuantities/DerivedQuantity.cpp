@@ -33,7 +33,7 @@ DerivedQuantity::DerivedQuantity(Model* model)
   parameters_.Bind<string>(PARAM_LABEL, &label_, "Label of the derived quantity", "");
   parameters_.Bind<string>(PARAM_TYPE, &type_, "Type of derived quantity", "");
   parameters_.Bind<string>(PARAM_TIME_STEP, &time_step_label_, "The time step in which to calculate the derived quantity after", "");
-  parameters_.Bind<float>(PARAM_TIME_STEP_PROPORTION, &time_step_proportion_, "Proportion through the mortality block of the time step when calculated", "", float(0.5))->set_range(0.0, 1.0);
+  parameters_.Bind<float>(PARAM_PROPORTION_TRHOUGH_MORTALITY, &time_step_proportion_, "Proportion through the mortality block of the time step when calculated", "", float(0.5))->set_range(0.0, 1.0);
 }
 
 /**

@@ -63,8 +63,8 @@ void Maturity::DoExecute() {
         LOG_FINEST() << "about to convert " << agents.size() << " through the maturity process";
         //unsigned counter = 1;
         for (Agent& agent : agents) {
-          if (not agent.is_mature()) {
-            probability_mature_at_age = selectivity_[agent.sex()]->GetResult(agent.age());
+          if (not agent.get_maturity()) {
+            probability_mature_at_age = selectivity_[agent.get_sex()]->GetResult(agent.get_age());
             if (rng.chance() <= probability_mature_at_age) {
               agent.set_maturity(true);
               ++mature_conversion;

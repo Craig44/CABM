@@ -20,8 +20,8 @@
 #include "BaseClasses/Manager.h"
 #include "Processes/Process.h"
 
-#include "Processes/Children/Growth/Growth.h"
-#include "Processes/Children/Mortality/Mortality.h"
+#include "Processes/Children/Growth.h"
+#include "Processes/Children/Mortality.h"
 
 // Namespaces
 namespace niwa {

@@ -32,7 +32,7 @@
 #include <vector>
 #include <string>
 
-#include "Layers/Children/Numeric/Base/NumericLayer.h"
+#include "Layers/Children/NumericLayer.h"
 // namespaces
 namespace niwa {
 

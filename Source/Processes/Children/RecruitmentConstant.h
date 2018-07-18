@@ -15,7 +15,7 @@
 
 // headers
 #include "Processes/Process.h"
-#include "Layers/Children/Numeric/Base/NumericLayer.h"
+#include "Layers/Children/NumericLayer.h"
 #include "DerivedQuantities/DerivedQuantity.h"
 // namespaces
 namespace niwa {

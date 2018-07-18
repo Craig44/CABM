@@ -16,8 +16,8 @@
 #include "BaseClasses/Manager.h"
 
 #include "Layers/Layer.h"
-#include "Children/Integer/IntLayer.h"
-#include "Children/Numeric/Base/NumericLayer.h"
+#include "Children/IntLayer.h"
+#include "Children/NumericLayer.h"
 
 
 #include "Model/Managers.h"

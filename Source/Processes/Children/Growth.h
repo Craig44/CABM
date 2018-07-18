@@ -9,7 +9,7 @@
  * @section DESCRIPTION
  *
  * This process is the parent growth class, so the manager can differentiate processes via dynamic casts
- * Growth in this sense is both length and weight of an agent
+ * Growth in this sense is both length and weight of an agent, any child growth class should inherit this as a parent
  */
 #ifndef SOURCE_PROCESSES_CHILDREN_GROWTH_H_
 #define SOURCE_PROCESSES_CHILDREN_GROWTH_H_

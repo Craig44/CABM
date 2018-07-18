@@ -9,6 +9,7 @@
  * @section DESCRIPTION
  *
  * This process is the parent mortlity class, so the manager can generate dynamicasts<> processes
+ * any child mortality class should inherit this as a parent
  */
 #ifndef SOURCE_PROCESSES_CHILDREN_MORTALITY_H_
 #define SOURCE_PROCESSES_CHILDREN_MORTALITY_H_

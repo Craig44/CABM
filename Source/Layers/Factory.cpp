@@ -13,8 +13,8 @@
 #include "Model/Model.h"
 #include "Model/Managers.h"
 #include "Layers/Manager.h"
-#include "Layers/Children/Integer/IntLayer.h"
-#include "Layers/Children/Numeric/Base/NumericLayer.h"
+#include "Layers/Children/IntLayer.h"
+#include "Layers/Children/NumericLayer.h"
 
 
 // namespaces

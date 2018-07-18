@@ -11,11 +11,15 @@
 
 const std::string license =
 R"(
-IBM. Copyright (C) 2018 NIWA
+IBM. 
+
+Contains a mixture of copyright (C) 2018 NIWA, any file that is new 
+or changed substantially will not have the earlier copyright. We please
+ask that you acknowledge the authors of this program if you use it.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License.
+the Free Software Foundation, either version 2 of the License or later.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,8 +29,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-For more information see http://www.niwa.co.nz, or contact the development 
-team at Craig.Marsh@niwa.co.nz or craig.marsh10@gmail.com
+For more information contact the development 
+team at Craig.Marsh@bigbluedata.co.nz or craig.marsh10@gmail.com
 
 )";
 
