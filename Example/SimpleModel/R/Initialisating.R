@@ -17,7 +17,7 @@
 M = 0.2
 Survival = 1 - exp(-M)
 N = 100000;
-age_specific_m = 0.33
+age_specific_m = 1
 
 chance = runif(N, 0,1)
 
@@ -26,5 +26,40 @@ Survival
 
 sum(chance <= Survival * age_specific_m) / N
 sum(chance <=  1 - exp(-M * age_specific_m)) / N
+
+start_year = 1990;
+init_year = 50
+first_year = start_year - init_year
+length(first_year:(start_year - 1))
+
+## initial distribution
+M = 0.2
+N = 10000
+dist = rexp(N,0.2)
+hist(dist, breaks = 30)
+
+actual_dist = cut(dist, breaks = c(0:29,100))
+age_dist = as.numeric(table(actual_dist))
+
+seed = sum(dist < 1)
+
+## track a cohort and create the same plot
+nums = vector()
+nums[1] = seed
+for (i in 2:30)  {
+  nums[i] = nums[i - 1] *  sum(chance <=  1 - exp(-M * age_specific_m)) / N
+}
+
+nums
+
+## length and weight calculation
+L_inf = 60
+k = 0.2
+t0 = 0
+
+a = 
+
+
+
 
 

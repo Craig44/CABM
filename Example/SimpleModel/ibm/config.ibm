@@ -25,7 +25,7 @@ type iterative
 years 40
 #convergence_years 20 40
 #lambda 1
-number_of_agents 10000 ## initial number of agents
+number_of_agents 1000000 ## initial number of agents
 layer_label Base
 
 # --------------
@@ -36,7 +36,7 @@ layer_label Base
 # - M
 # - Maturity
 @time_step Annual
-processes  von_bert natural_mort Recruitment_const   Maturation 
+processes  von_bert Maturation natural_mort Recruitment_const  
 
 # --------------
 # Process definitions
@@ -45,11 +45,11 @@ processes  von_bert natural_mort Recruitment_const   Maturation
 @process von_bert
 type growth_von_bertalanffy_with_basic_weight
 #linf_layer_label L_inf_layer
-linf 65
+linf 101.8
 #k_layer_label k_layer
-k 0.2
-a 0.000001
-b 3
+k 0.161
+a 2.0e-6 
+b 3.288
 distribution lognormal
 cv 0.0001
 time_step_proportions 1
@@ -78,11 +78,12 @@ steepness 0.85
 ycs_values 1*53
 ssb SSB
 */
+
 # Constant
 @process Recruitment_const
 type recruitment_constant
 recruitment_layer_label recruit_layer
-b0 100000
+b0 29924.6 
 ssb SSB
 # --------------
 # Define selectivities
@@ -112,7 +113,21 @@ ato95 4
 type mature_biomass
 biomass_layer_label SSB_areas
 time_step Annual
-time_step_proportion 0.5 ## interpolate DQ's
+proportion_through_mortality_block 0.5
+
+@derived_quantity total_biomass
+type biomass
+biomass_layer_label SSB_areas
+selectivity One
+time_step Annual
+proportion_through_mortality_block 0.5
+
+@derived_quantity total_abundance
+type abundance
+layer_label SSB_areas
+selectivity One
+time_step Annual
+proportion_through_mortality_block 0.5
 # --------------
 # Define Reports
 # --------------
@@ -144,6 +159,11 @@ time_step Annual
 @report derived_quants
 type derived_quantity
 
+# summarises a random selection of agents at each time step of each year, useful when debugging new processes
+@report agents
+type summarise_agents
+number_of_agents 10
+time_step Annual
 # --------------
 # Include Layers
 # --------------

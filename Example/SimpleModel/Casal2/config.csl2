@@ -1,0 +1,141 @@
+#THE MODEL constraints
+@model
+start_year 1940 
+final_year 1992
+min_age 0
+max_age 30
+age_plus true
+base_weight_units tonnes
+initialisation_phases Equilibrium_state
+time_steps Annual##
+
+#CATEGORIES
+@categories 
+format stock  ## Single sex and area population
+names HAK4 
+age_lengths age_size 
+
+@initialisation_phase Equilibrium_state
+type derived
+
+## Define the processes in the Annual Cycle
+## This is a list of labels that correspond to a process
+@time_step Annual 
+processes Ageing M Recruitment 
+
+########################
+## Define the Processes
+########################
+## Recruitment
+@process Recruitment
+type recruitment_beverton_holt
+categories HAK4
+proportions 1 
+ssb SSB 
+b0 29892.9
+steepness 1
+age 0
+ycs_years 1940:1992
+ycs_values 1*53
+## Ageing
+@process Ageing
+type ageing
+categories HAK4
+
+## Fishing and Natural Mortality
+@process M
+type mortality_constant_rate
+categories HAK4
+selectivities One
+m 0.2
+######################
+## Derived Quantities
+######################
+## SSB which gets feed into Recruitment
+@derived_quantity SSB
+type biomass
+time_step Annual
+categories HAK4
+time_step_proportion 1
+time_step_proportion_method weighted_sum
+selectivities MaturationSel
+
+## you can add other derived quantities for reporting purposes as well
+
+#################
+# SELECTIVITIES
+#################
+@selectivity MaturationSel
+type logistic
+a50 4
+ato95 4
+
+
+@selectivity One
+type constant 
+c 1
+
+#################
+## Length at age
+#################
+@age_length age_size
+type von_bertalanffy
+casal_switch F
+length_weight Length_weight
+k 0.161
+t0 0
+linf 101.8
+time_step_proportions 1
+
+
+#################
+## Weigth at Length
+#################
+@length_weight Length_weight
+type basic
+units kgs 
+a 2.0e-6 
+b 3.288
+
+############################
+## Report section for now
+## Print estimate values
+@report Rec
+type process
+process Recruitment
+
+## print the partition
+@report Init
+type initialisation_partition
+
+@report Annual_part
+type partition
+time_step Annual
+
+## Derived Quantities
+@report derived_quants
+type derived_quantity
+
+/*
+## Fits Observations
+@report obs_tan
+type observation
+observation chatTANbiomass
+
+@report tan_at_age
+type observation
+observation chatTANage
+
+@report eastF_at_age
+type observation
+observation chatOBSest
+
+@report westF_at_age
+type observation
+observation chatOBSwst
+
+## Ageing error matrix
+@report age_error
+type ageing_error
+ageing_error Normal_ageing
+*/
