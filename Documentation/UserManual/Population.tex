@@ -11,6 +11,7 @@ The population section consists of several components, including:
   \item The annual cycle (time-steps and processes that are applied in each time-step)\index{Annual cycle};
   \item The specification and parameters of the population processes (i.e., processes that add, remove individuals to or from the partition, or shift numbers between ages and categories in the partition);
   \item Selectivities;
+  \item The spatial domain via defining layers
   \item Parameter values and their definitions; and
   \item Derived IBM, required as parameters for some processes (e.g. mature biomass to resolve any density dependent processes, such as the spawner-recruit relationship in a recruitment process).
 \end{itemize}
@@ -39,7 +40,7 @@ An example, to specify a model with 2 categories (male and female) with ages 1-2
 		max_age 20
 		age_plus_group True
 		initialisation_phases iphase
-		time_steps step1 step2 step 3
+		time_steps step1 step2 step3
 \end{verbatim}}}
 
 \subsection{\I{The state object and the partition}}
@@ -53,8 +54,7 @@ The time sequence of the model is defined in the following parts;
   \item \I{Annual cycle}
   \item \I{Mortality blocks}
   \item \I{Initialisation}
-  \item \I{Model run years}
-  \item \I{Projection year}s
+  \item \I{Model run years}\textsl{}
 \end{itemize}
 
 \subsubsection{\I{Annual cycle}}
@@ -64,7 +64,7 @@ The annual cycle is implemented as a set of processes that occur, in a user-defi
 
 For every time step in an annual cycle there is an associated \emph{mortality block}. Mortality blocks are a key concept in \IBM.
 
-Mortality blocks are used to define the `point' in the model time sequence when observations (see Section~\ref{sec:observation-section}) are evaluated, and derived IBM (see Section~\ref{sec:derived-IBM}) are calculated.
+Mortality blocks are used to define the `point' in the model time sequence when observations (see Section~\ref{sec:observation-section}) are evaluated, and derived quantities (see Section~\ref{sec:derived-quantities}) are calculated.
 
 A mortality block is defined as a consecutive sequence of mortality processes within a time step. The processes that are mortality processes are all pre-defined in \IBM, and cannot be modified. These mortality processes are described in subsection~\ref{sec:mortality}. 
 
@@ -129,11 +129,20 @@ This means every fish automatically ages by one at the end of the year, or you c
 
 \paragraph{\I{Constant recruitment}}\label{subsubsec:constant-recruitment}
 
+\paragraph{\I{Beverton-Holt recruitment}}\label{subsubsec:bev-holt-recruitment}
+
+
 \subsubsection{\I{Mortality}\label{sec:mortality}}
+Mortality processes remove individuals from the model domain (and also from memory).
 
 \paragraph{Constant mortality rate}
 
-\subsection{\I{Derived Quantities}\label{sec:derived-IBM}}
+
+\subsection{\I{Derived Quantities}\label{sec:derived-quantities}}
+Derived quantities surround a mortality block and so the value of the derived quantity is calculated twice, once before the mortality block, and once after. The final value is an interpolation based on how much mortality the user wants to into account when calculating derived quantities.
+\paragraph*{Biomass}
+\paragraph*{Mature Biomass}
+\paragraph*{Abundance}
 
 \subsection{\I{Growth}\label{sec:age-at-age}}
 
@@ -151,7 +160,7 @@ If the basic length weight formulation is used, then an agents weight follows th
 \bar{w} = aL^b
 \end{equation}
 
-Scaling the model agents up to the population biomass estimates is done via a stock specific scalar.}
+Scaling the model agents up to the population biomass estimates is done via a global scalar.
 
 \subsection{\I{Selectivities}\label{sec:selectivities}}
 A selectivity is a function that can have a different value for each age class. Selectivities are used throughout \IBM\ to interpret observations (Section \ref{sec:estimation-section}) or to modify the effects of processes on each age class (Section \ref{sec:population-section}). \IBM\ implements a number of different parametric forms, including logistic, knife edge, and double normal selectivities. Selectivities are defined in there own command block (\command{selectivity}), where the unique label is used by observations or processes to identify which selectivity to apply.

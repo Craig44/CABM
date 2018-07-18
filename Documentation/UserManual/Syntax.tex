@@ -6,9 +6,6 @@
 \subsection{\I{Initialisation}}
 \input{Syntax/InitialisationPhase} 
 
-\subsection{\I{Categories}}
-\input{Syntax/Categories} 
-
 \subsection{\I{Time-steps}}
 \input{Syntax/TimeStep} 
 
@@ -21,37 +18,29 @@
 \subsection{\I{Derived quantities}}
 \input{Syntax/DerivedQuantity} 
 
-\subsection{\I{Age-length relationship}}
-\input{Syntax/AgeLength} 
-
-\subsection{\I{Length-weight}}
-\input{Syntax/LengthWeight}
-
 \subsection{\I{Selectivities}}
 \input{Syntax/Selectivity} 
 
-\section{Estimation command and subcommand syntax\label{sec:estimation-syntax}}
+\subsection{\I{Layers}}
+\input{Syntax/Layer} 
 
-\subsection{\I{Estimation methods}}
-\input{Syntax/Estimate}
+An example of how to specify a table in the layers for an Int-layer or integer layer you could specify
 
-\subsection{\I{Point estimation}}
-\input{Syntax/Minimiser}
+{\small{\begin{verbatim}
+table layer
+1 1 1 1
+1 1 0 1
+1 1 1 1
+end_table
+\end{verbatim}}}
 
-\subsection{\I{Monte Carlo Markov Chain (MCMC)}\label{sec:estimation-syntax-MCMC}}
-\input{Syntax/MCMC}
-
-\subsection{\I{Profiles}}
-\input{Syntax/Profile}
-
-\subsection{\I{Defining catchability constants}}
-\input{Syntax/Catchability}
-
-\subsection{\I{Defining penalties}}
-\input{Syntax/Penalty}
-
-\subsection{\I{Defining priors on parameter ratios, differences, and means}}
-\input{Syntax/AdditionalPrior}
+for a Numeric layer you could have decimal and negative values
+{\small{\begin{verbatim}
+table layer
+2.2 3.2 -23
+6.4 -4.5 2.3
+end_table
+\end{verbatim}}}
 
 \section{Observation command and subcommand syntax\label{sec:observation-syntax}}
 
@@ -75,21 +64,6 @@ Each type of observation requires a set of subcommands and arguments specific to
 \subsection{\I{Likelihoods}}
 \input{Syntax/Likelihood}
 
-\subsection{\I{Defining ageing error}}
-
-The methods for including ageing error into estimation with observations are,
-
-\begin{itemize}
-	\item None
-	\item Data
-	\item Normal
-	\item Off-by-one
-\end{itemize}
-
-Each type of ageing error requires a set of subcommands and arguments specific to its type.
-
-\input{Syntax/AgeingError}
-
 \section{Report command and subcommand syntax\label{sec:report-syntax}}
 \subsection{\I{Report commands and subcommands}}
 
@@ -104,5 +78,5 @@ Each type of ageing error requires a set of subcommands and arguments specific t
 \defDefault{No default}
 \defValue{A valid external file}
 \defCondition{The file name must be enclosed in double quotes}
-\defExample{\command{include} \argument{\ "my\_file.csl2"}}
-\defNote{\command{include} does not denote the end of the previous command block as is the case for all other commands}
+\defExample{!\texttt{include} \argument{\ "my\_file.ibm"}}
+\defNote{!\texttt{include} does not denote the end of the previous command block as is the case for all other commands}

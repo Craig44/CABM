@@ -304,7 +304,7 @@ This class is responsible for cleaning the build folders
 """   
 class Cleaner:    
   def clean(self):
-    print '--> Starting clean of CASAL2 build files only (not cleaning third party)'      
+    print '--> Starting clean of IBM build files only (not cleaning third party)'      
     for build_type in Globals.allowed_build_types_:    
       for param in Globals.allowed_build_parameters_:
         build_directory = os.path.normpath(os.getcwd()) + "/bin/" + Globals.operating_system_ + '/' + build_type
@@ -316,7 +316,7 @@ class Cleaner:
     return True
           
   def clean_all(self):
-    print '--> Starting clean of all CASAL2 build files (including third party)'
+    print '--> Starting clean of all IBM build files (including third party)'
     build_directory = os.path.normpath(os.getcwd()) + "/bin/" + Globals.operating_system_
     if (os.path.exists(build_directory)):
       shutil.rmtree(build_directory)

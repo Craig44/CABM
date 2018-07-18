@@ -54,17 +54,20 @@ class Documentation:
     def __init__(self):
         print '--> Starting Documentation Builder'
         type_aliases_['double']           = 'constant'
+        type_aliases_['float']            = 'float'		
         type_aliases_['unsigned']         = 'non-negative integer'
         type_aliases_['bool']             = 'boolean'
         type_aliases_['int']              = 'integer'
         type_aliases_['string']           = 'string'
         type_aliases_['vector<double>']   = 'constant vector'
+        type_aliases_['vector<float>']   = 'constant-float vector'
         type_aliases_['vector<unsigned>'] = 'non-negative integer vector'
         type_aliases_['vector<bool>']     = 'boolean vector'
         type_aliases_['vector<int>']      = 'integer vector'
         type_aliases_['vector<string>']   = 'string vector'
         type_aliases_['map<string, vector<string>>'] = 'string matrix'
-        type_aliases_['map<string, vector<Double>>'] = 'constant vector'
+        type_aliases_['map<string, vector<double>>'] = 'constant vector'
+        type_aliases_['map<string, vector<float>>'] = 'constant-float vector'
         type_aliases_['parameters::table*']          = 'constant'
         
     """
@@ -116,19 +119,18 @@ class ClassLoader:
         global parent_class_
         src_folder = '../Source/'
 		
-        parent_class_folders = [ 'Asserts',
-                        'Agents', 'DerivedQuantities',
+        parent_class_folders = ['DerivedQuantities',
                         'InitialisationPhases',
                         'Likelihoods',
                         'Model', 'Observations', 'Processes',
                         'Reports', 'Selectivities', 'TimeSteps', 'TimeVarying', 'Layers' ]
-        type_without_children_folders = [ 'Model', 'Agents', 'TimeSteps']
+        type_without_children_folders = [ 'Model', 'TimeSteps']
         type_to_exclude_third_level_children = [ '' ]
         for folder in parent_class_folders:
             parent_class_ = Class()
             print folder
 			# Start with Common folder, but know we also go through age and length folders
-            if (os.path.exists(folder + folder) or folder in type_without_children_folders):
+            if (os.path.exists(src_folder + folder) or folder in type_without_children_folders):
                 label_ = Variable()
                 label_.name_ = 'label'
                 label_.type_ = 'string'
@@ -173,8 +175,10 @@ class ClassLoader:
                                 if folder not in type_to_exclude_third_level_children:
                                     child_file_list = os.listdir(src_folder + folder + '/Children/' + file)
                                     for child_file in child_file_list:
+                                        print 'looking at child file = ' + child_file
                                         if not child_file.endswith('.h'):
                                             continue
+                                        print file[1:4];
                                         if file not in parent_class_.child_classes_:
                                             return Globals.PrintError('Child class ' + file + ' was not found in ' + parent_class_.name_ + ' child classes')
 
@@ -187,8 +191,6 @@ class ClassLoader:
                                         if not VariableLoader().Load('../Source/' + folder + '/Children/' + file + '/' + child_file, sub_child_class):
                                             return False
 
-                        # Go through Age folders
-                        print '--- Does Source/Age have any children folder named ' + folder                
             parent_class_.child_classes_ = collections.OrderedDict(sorted(parent_class_.child_classes_.items()))
             Printer().Run()
         return True
@@ -279,7 +281,7 @@ class VariableLoader:
         return True
 
     def HandleParameterBindLine(self, line, class_):
-        line = line.replace('Double(', '') 
+        line = line.replace('float(', '') 
         lines = re.split('->', line)
         short_line = lines[0].replace('parameters_.Bind<', '')
         pieces = re.split(',|<|>|;|(|)', short_line)
@@ -372,7 +374,7 @@ class VariableLoader:
 
         # Check for the name of the variable we're binding too
         used_variable = pieces[1].rstrip().lstrip().lower()
-
+        print 'used_variable: ' + used_variable
         variable = Variable()
         if used_variable in class_.variables_:
             variable = class_.variables_[used_variable];
@@ -382,6 +384,7 @@ class VariableLoader:
         # Check for Name
         variable.name_ = translations_[pieces[0].rstrip().lstrip()]
 
+        print 'printing table for ' + variable.name_
         # Set the description
         index = 2;
         description = pieces[index]
@@ -389,7 +392,7 @@ class VariableLoader:
             index += 1
             description += ',' + pieces[index]
         variable.description_ = description.replace('R"(', '').replace(')"', '').replace('"', '').rstrip().lstrip()
-
+        print 'with description ' + variable.description_
         # Set the value
         index += 1
         value = pieces[index]
@@ -397,8 +400,9 @@ class VariableLoader:
             index += 1
             value += ',' + pieces[index]
         value = value.replace(')', '')
-        variable.value_ = value.replace(')', '').replace('R"(', '').replace(')"', '').replace('"', '').replace(')', '').rstrip().lstrip()
- 
+        variable.value_ = 'a Matrix of space seperated values'
+        print 'with value ' + variable.value_
+
         return True
  
          # Set the default value
@@ -452,10 +456,6 @@ class Printer:
         print '--> Running Latex Printer'
         print '--> Top Class ' + parent_class_.name_
         self.current_output_file_ = self.output_path_ + parent_class_.name_
-
-        # Handle an Issue with MCMC
-        if parent_class_.name_  != 'MCMC':
-            parent_class_.name_  = re.sub( '(?<!^)(?=[A-Z])', '\_', parent_class_.name_)
 
         if not os.path.exists('../Documentation/UserManual/Syntax/'):
             os.makedirs('../Documentation/UserManual/Syntax/')
@@ -604,34 +604,34 @@ class Latex:
               return Globals.PrintError('makeindex failed')
         print '-- Built the IBM usermanual'
 
-        os.chdir('../GettingStartedGuide/')
-        for i in range(0,3):
-          if Globals.operating_system_ == "linux":
-            if os.system('pdflatex --halt-on-error --interaction=nonstopmode GettingStartedGuide') != EX_OK:
-              return False
-            if os.system('bibtex GettingStartedGuide') != EX_OK:
-              return False
-            if os.system('makeindex GettingStartedGuide') != EX_OK:
-              return False
-            if not os.path.exists('GettingStartedGuide.pdf'):
-              return False
-          else:
-            if os.system('pdflatex.exe --halt-on-error --enable-installer GettingStartedGuide') != EX_OK:
-              return Globals.PrintError('pdflatex failed')
-            if os.system('bibtex.exe GettingStartedGuide') != EX_OK:
-              return Globals.PrintError('bibtex failed')
-            if os.system('makeindex.exe GettingStartedGuide') != EX_OK:
-              return Globals.PrintError('makeindex failed')
+        #os.chdir('../GettingStartedGuide/')
+        #for i in range(0,3):
+        #  if Globals.operating_system_ == "linux":
+        #    if os.system('pdflatex --halt-on-error --interaction=nonstopmode GettingStartedGuide') != EX_OK:
+        #      return False
+        #    if os.system('bibtex GettingStartedGuide') != EX_OK:
+        #      return False
+        #    if os.system('makeindex GettingStartedGuide') != EX_OK:
+        #      return False
+        #    if not os.path.exists('GettingStartedGuide.pdf'):
+        #      return False
+        #  else:
+        #    if os.system('pdflatex.exe --halt-on-error --enable-installer GettingStartedGuide') != EX_OK:
+        #      return Globals.PrintError('pdflatex failed')
+        #    #if os.system('bibtex.exe GettingStartedGuide') != EX_OK:
+        #    #  return Globals.PrintError('bibtex failed')
+        #    #if os.system('makeindex.exe GettingStartedGuide') != EX_OK:
+        #    #  return Globals.PrintError('makeindex failed')
               
-        print '-- Built the GettingStartedGuide'
-        os.chdir('../ContributorsManual/')
-        for i in range(0,3):
-          if Globals.operating_system_ == "linux":
-            if os.system('pdflatex --halt-on-error --interaction=nonstopmode ContributorsGuide') != EX_OK:
-              return False
-          else:
-            if os.system('pdflatex.exe --halt-on-error --enable-installer ContributorsGuide') != EX_OK:
-              return Globals.PrintError('pdflatex failed')
-        print '-- Built the ContributorsGuide'
+        #print '-- Built the GettingStartedGuide'
+        #os.chdir('../ContributorsManual/')
+        #for i in range(0,3):
+        #  if Globals.operating_system_ == "linux":
+        #    if os.system('pdflatex --halt-on-error --interaction=nonstopmode ContributorsGuide') != EX_OK:
+        #      return False
+        #  else:
+        #    if os.system('pdflatex.exe --halt-on-error --enable-installer ContributorsGuide') != EX_OK:
+        #      return Globals.PrintError('pdflatex failed')
+        #print '-- Built the ContributorsGuide'
 
         return True
