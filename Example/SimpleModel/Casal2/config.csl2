@@ -21,7 +21,7 @@ type derived
 ## Define the processes in the Annual Cycle
 ## This is a list of labels that correspond to a process
 @time_step Annual 
-processes Ageing M Recruitment 
+processes Ageing M Fishing Recruitment 
 
 ########################
 ## Define the Processes
@@ -41,6 +41,16 @@ ycs_values 1*53
 @process Ageing
 type ageing
 categories HAK4
+
+## Fishing
+@process Fishing
+type mortality_event_biomass
+categories HAK4
+years 1970 1981:1990
+catches 2800 5000 3800 4800 800 1000 800 800 800 800 1000 
+u_max 0.9
+selectivities trawl_selectivity
+
 
 ## Fishing and Natural Mortality
 @process M
@@ -70,6 +80,10 @@ type logistic
 a50 4
 ato95 4
 
+@selectivity trawl_selectivity
+type logistic
+a50 3.5
+ato95 8
 
 @selectivity One
 type constant 
@@ -103,6 +117,10 @@ b 3.288
 @report Rec
 type process
 process Recruitment
+
+@report Mort
+type process
+process Fishing
 
 ## print the partition
 @report Init

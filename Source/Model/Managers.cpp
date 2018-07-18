@@ -13,6 +13,7 @@
 #include "Managers.h"
 
 #include "Model/Model.h"
+#include "AgeingErrors/Manager.h"
 #include "Asserts/Manager.h"
 #include "DerivedQuantities/Manager.h"
 #include "InitialisationPhases/Manager.h"
@@ -36,6 +37,7 @@ Managers::Managers(Model* model) {
 
   model_ = model;
 
+  ageing_error_           = new ageingerrors::Manager();
   assert_                 = new asserts::Manager();
   derived_quantity_       = new derivedquantities::Manager();
   initialisation_phase_   = new initialisationphases::Manager();
@@ -53,7 +55,7 @@ Managers::Managers(Model* model) {
  * Destructor
  */
 Managers::~Managers() {
-
+  delete ageing_error_;
   delete assert_;
   delete derived_quantity_;
   delete initialisation_phase_;
@@ -69,6 +71,7 @@ Managers::~Managers() {
 
 void Managers::Validate() {
   LOG_TRACE();
+  ageing_error_->Validate();
   time_step_->Validate(model_);
   initialisation_phase_->Validate();
   assert_->Validate();
@@ -84,6 +87,7 @@ void Managers::Validate() {
 
 void Managers::Build() {
   LOG_TRACE();
+  ageing_error_->Build();
   time_step_->Build();
   assert_->Build();
   derived_quantity_->Build();
@@ -107,6 +111,7 @@ void Managers::BuildPreWorldView() {
 
 void Managers::Reset() {
   LOG_TRACE();
+  ageing_error_->Reset();
   assert_->Reset();
   derived_quantity_->Reset();
   initialisation_phase_->Reset();

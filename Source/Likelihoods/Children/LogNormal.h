@@ -32,8 +32,6 @@ public:
   LogNormal(Model* model) : Likelihood(model) { };
   virtual                     ~LogNormal() = default;
   void                        DoValidate() override final { };
-  Double                      AdjustErrorValue(const Double process_error, const Double error_value) override final;
-  void                        GetScores(map<unsigned, vector<observations::Comparison> >& comparisons) override final;
   void                        SimulateObserved(map<unsigned, vector<observations::Comparison> >& comparisons) override final;
 };
 

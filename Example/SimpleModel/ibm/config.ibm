@@ -25,7 +25,7 @@ type iterative
 years 40
 #convergence_years 20 40
 #lambda 1
-number_of_agents 1000000 ## initial number of agents
+number_of_agents 100000 ## initial number of agents
 layer_label Base
 
 # --------------
@@ -36,7 +36,7 @@ layer_label Base
 # - M
 # - Maturity
 @time_step Annual
-processes  von_bert Maturation natural_mort Recruitment_const  
+processes  von_bert Maturation natural_mort fishing Recruitment_const  
 
 # --------------
 # Process definitions
@@ -65,8 +65,16 @@ m_multiplier_layer_label M_layer
 m 0.2
 distribution lognormal
 cv 0.0001
-time_step_proportions 1
 selectivity_label One
+
+
+# Fishing Mortality
+@process fishing
+type mortality_event_biomass
+years 1970 1981:1990
+catch_layers catch_1970 catch_1981 catch_1982 catch_1983 catch_1984 catch_1985 catch_1986 catch_1987 catch_1988 catch_1989 catch_1990 
+selectivity trawl_selectivity
+
 
 /*
 # Recruitment Beverton Holt
@@ -106,6 +114,11 @@ type logistic
 a50 4
 ato95 4
 
+@selectivity trawl_selectivity
+type logistic
+a50 3.5
+ato95 8
+
 # --------------
 # Derived Quantities
 # --------------
@@ -140,6 +153,10 @@ process natural_mort
 type process
 process Maturation
 
+@report fishing
+type process
+process fishing
+
 /*
 @report Recruitment_report
 type process
@@ -159,6 +176,10 @@ time_step Annual
 @report derived_quants
 type derived_quantity
 
+# print SSB's
+@report model_attributes
+type model_attributes
+
 # summarises a random selection of agents at each time step of each year, useful when debugging new processes
 @report agents
 type summarise_agents
@@ -176,6 +197,16 @@ time_step Annual
 !include "Layers/M_layer.ibm"
 !include "Layers/recruitment_areas.ibm"
 
-
-
+## Catch layers
+!include "Layers/CatchLayers/catch_1970.ibm"
+!include "Layers/CatchLayers/catch_1981.ibm"
+!include "Layers/CatchLayers/catch_1982.ibm"
+!include "Layers/CatchLayers/catch_1983.ibm"
+!include "Layers/CatchLayers/catch_1984.ibm"
+!include "Layers/CatchLayers/catch_1985.ibm"
+!include "Layers/CatchLayers/catch_1986.ibm"
+!include "Layers/CatchLayers/catch_1987.ibm"
+!include "Layers/CatchLayers/catch_1988.ibm"
+!include "Layers/CatchLayers/catch_1989.ibm"
+!include "Layers/CatchLayers/catch_1990.ibm"
 

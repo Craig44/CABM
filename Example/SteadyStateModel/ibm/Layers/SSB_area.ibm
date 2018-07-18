@@ -1,0 +1,5 @@
+@layer SSB_areas
+type integer
+table layer
+1 
+end_table

@@ -1,0 +1,181 @@
+@model
+start_year 1940
+final_year 1992
+min_age 0
+max_age 30
+age_plus true # other acceptable inputs for bool are '1' and 'yes'
+initialisation_phase_labels Iterative #label to an @initialisation block
+time_steps Annual # just one time step for now
+length_bins 0 5 10 15 20 25 30 35 40 45 50 55 60 65 70 # assumed cm's
+length_plus true
+base_layer_label Base #
+growth_process_label von_bert
+natural_mortality_process_label natural_mort
+#sexed false
+maturity_ogive_label mature_ogive
+## a single area model
+nrows 1
+ncols 1 
+
+# --------------
+# Init Phase
+# --------------
+@initialisation_phase Iterative
+type iterative
+years 40
+#convergence_years 20 40
+#lambda 1
+number_of_agents 1000000 ## initial number of agents
+layer_label Base
+
+# --------------
+# Annual Time Sequence
+# --------------
+# - Recruitment
+# - Growth
+# - M
+# - Maturity
+@time_step Annual
+processes  von_bert Maturation natural_mort Recruitment_const  
+
+# --------------
+# Process definitions
+# --------------
+# Growth
+@process von_bert
+type growth_von_bertalanffy_with_basic_weight
+#linf_layer_label L_inf_layer
+linf 101.8
+#k_layer_label k_layer
+k 0.161
+a 2.0e-6 
+b 3.288
+distribution lognormal
+cv 0.0001
+time_step_proportions 1
+
+# Maturity
+@process Maturation
+type maturation
+
+# Natural Mortality
+@process natural_mort
+type mortality_constant_rate
+m_multiplier_layer_label M_layer
+m 0.2
+distribution lognormal
+cv 0.0001
+time_step_proportions 1
+selectivity_label One
+
+/*
+# Recruitment Beverton Holt
+@process Recruitment
+type recruitment_beverton_holt
+recruitment_layer_label recruit_layer
+b0 100000
+steepness 0.85
+ycs_values 1*53
+ssb SSB
+*/
+
+# Constant
+@process Recruitment_const
+type recruitment_constant
+recruitment_layer_label recruit_layer
+b0 29924.6 
+ssb SSB
+# --------------
+# Define selectivities
+# --------------
+@selectivity natural_mortality_by_age
+type double_exponential
+x1 0
+x0 6
+x2 30
+y1 0.6
+y0 0.1
+y2 0.4
+
+@selectivity One
+type constant
+c 1
+
+@selectivity mature_ogive
+type logistic
+a50 4
+ato95 4
+
+# --------------
+# Derived Quantities
+# --------------
+@derived_quantity SSB
+type mature_biomass
+biomass_layer_label SSB_areas
+time_step Annual
+proportion_through_mortality_block 0.5
+
+@derived_quantity total_biomass
+type biomass
+biomass_layer_label SSB_areas
+selectivity One
+time_step Annual
+proportion_through_mortality_block 0.5
+
+@derived_quantity total_abundance
+type abundance
+layer_label SSB_areas
+selectivity One
+time_step Annual
+proportion_through_mortality_block 0.5
+# --------------
+# Define Reports
+# --------------
+# print process properties
+@report M_report
+type process
+process natural_mort
+
+@report mature_report
+type process
+process Maturation
+
+/*
+@report Recruitment_report
+type process
+process Recruitment
+*/
+# print initail state of agents
+@report init
+type initialisation_partition
+
+# print age frequency
+@report total_age_freq
+type world_age_frequency
+#years 1990:2018 ## defaults to model years
+time_step Annual
+
+# print SSB's
+@report derived_quants
+type derived_quantity
+
+# summarises a random selection of agents at each time step of each year, useful when debugging new processes
+@report agents
+type summarise_agents
+number_of_agents 10
+time_step Annual
+# --------------
+# Include Layers
+# --------------
+!include "Layers/base_layer.ibm"
+!include "Layers/lat.ibm"
+!include "Layers/long.ibm"
+!include "Layers/SSB_area.ibm"
+#!include "Layers/L_inf_layer.ibm"
+#!include "Layers/k_layer.ibm"
+!include "Layers/M_layer.ibm"
+!include "Layers/recruitment_areas.ibm"
+
+
+
+

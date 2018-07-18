@@ -32,7 +32,7 @@ public:
 //  void                        PreExecute(unsigned year, const string& time_step);
 //  void                        Execute(unsigned year, const string& time_step);
   Observation*                GetObservation(const string& label);
-  void                        CalculateScores();
+  void                        SimulateData();
 
 protected:
   // methods

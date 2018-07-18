@@ -341,7 +341,7 @@ void Model::RunBasic() {
       time_step_manager.Execute(current_year_);
     }
 
-    managers_->observation()->CalculateScores();
+    managers_->observation()->SimulateData();
 
     for (auto executor : executors_[State::kExecute])
       executor->Execute();
@@ -381,7 +381,7 @@ void Model::Iterate() {
     time_step_manager.Execute(current_year_);
   }
 
-  managers_->observation()->CalculateScores();
+  managers_->observation()->SimulateData();
 
   for (auto executor : executors_[State::kExecute])
     executor->Execute();

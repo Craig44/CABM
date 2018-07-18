@@ -73,9 +73,9 @@ Observation* Manager::GetObservation(const string& label) {
 /**
  *
  */
-void Manager::CalculateScores() {
+void Manager::SimulateData() {
   for (auto observation : objects_) {
-    observation->CalculateScore();
+    observation->Simulate();
   }
 }
 

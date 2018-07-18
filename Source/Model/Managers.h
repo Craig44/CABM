@@ -20,6 +20,7 @@
 namespace niwa {
 
 // forward decs
+namespace ageingerrors { class Manager; }
 namespace asserts { class Manager; }
 namespace derivedquantities { class Manager; }
 namespace initialisationphases { class Manager; }
@@ -41,6 +42,7 @@ class Managers {
   friend class MockManagers;
 public:
   // accessors
+  virtual ageingerrors::Manager*          ageing_error() { return ageing_error_; }
   virtual asserts::Manager*               assertx() { return assert_; }
   virtual derivedquantities::Manager*     derived_quantity() { return derived_quantity_; }
   virtual initialisationphases::Manager*  initialisation_phase() { return initialisation_phase_; }
@@ -65,6 +67,7 @@ protected:
 
   // members
   Model*                              model_;
+  ageingerrors::Manager*              ageing_error_;
   asserts::Manager*                   assert_;
   derivedquantities::Manager*         derived_quantity_;
   initialisationphases::Manager*      initialisation_phase_;

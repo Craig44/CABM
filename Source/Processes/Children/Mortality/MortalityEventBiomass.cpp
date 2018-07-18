@@ -73,8 +73,9 @@ void MortalityEventBiomass::DoExecute() {
   LOG_TRACE();
   auto iter = years_.begin();
   if (find(iter, years_.end(), model_->current_year()) != years_.end()) {
-    LOG_FINEST() << "applying F in year " << model_->current_year();
+    iter = find(years_.begin(), years_.end(), model_->current_year());
     unsigned catch_ndx = distance(years_.begin(), iter);
+    LOG_FINEST() << "applying F in year " << model_->current_year() << " catch index = " << catch_ndx;
     // Get the pointer to the right catch layer
     utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
     float catch_taken;
@@ -120,7 +121,6 @@ void MortalityEventBiomass::DoExecute() {
     if (model_->state() != State::kInitialise) {
       removals_by_year_[model_->current_year()] = world_catch_to_take;
       actual_removals_by_year_[model_->current_year()] = actual_catch_taken;
-
     }
   } // find(years_.begin(), years_.end(), model_->current_year()) != years_.end()
 }

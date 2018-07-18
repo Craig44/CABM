@@ -17,16 +17,6 @@
 namespace niwa {
 namespace likelihoods {
 
-/**
- * Adjust the error value based on the process error
- *
- * @param process_error The observations process_error
- * @param error_value The observations error_value
- * @return An adjusted error value
- */
-Double Pseudo::AdjustErrorValue(const Double process_error, const Double error_value) {
-  return 0.0;
-}
 
 /**
  * Simulate observed values
@@ -38,7 +28,7 @@ void Pseudo::SimulateObserved(map<unsigned, vector<observations::Comparison> >& 
   for (; iterator != comparisons.end(); ++iterator) {
     LOG_FINE() << "Simulating values for year: " << iterator->first;
     for (observations::Comparison& comparison : iterator->second) {
-      comparison.observed_ = 0.0;
+      comparison.simulated_ = 0.0;
     }
   }
 }
