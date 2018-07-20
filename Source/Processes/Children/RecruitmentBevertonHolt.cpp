@@ -22,7 +22,7 @@
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
 #include "Utilities/DoubleCompare.h"
-
+#include <omp.h>
 // namespaces
 namespace niwa {
 namespace processes {

@@ -116,6 +116,7 @@ public:
   vector<string>              get_maturity_ogive() {return maturity_ogives_;};
   bool                        get_sexed() const {return sex_;};
   float                       get_male_proportions() const {return proportion_male_;};
+  unsigned                    get_max_threads() const {return max_threads_;}
 
 
   // manager accessors
@@ -168,6 +169,7 @@ protected:
   bool                        sex_;
   float                       proportion_male_;
   vector<string>              maturity_ogives_;
+  unsigned                    max_threads_;
 
 
   Managers*                   managers_ = nullptr;

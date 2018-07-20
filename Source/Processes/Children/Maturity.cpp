@@ -17,6 +17,7 @@
 #include "World/WorldView.h"
 #include "Selectivities/Manager.h"
 #include "Utilities/RandomNumberGenerator.h"
+#include <omp.h>
 
 // namespaces
 namespace niwa {
@@ -43,6 +44,9 @@ void Maturity::DoBuild() {
       LOG_CODE_ERROR()<< "this should have been checked on the ModelDoBuild please check out";
     selectivity_.push_back(temp_selectivity);
   }
+
+
+
 }
 
 
@@ -55,6 +59,7 @@ void Maturity::DoExecute() {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   // Iterate over all cells
   float probability_mature_at_age;
+  #pragma omp parallel for collapse(2)
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);

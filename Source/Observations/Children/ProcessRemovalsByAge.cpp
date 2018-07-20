@@ -14,6 +14,7 @@
 #include <algorithm>
 
 #include "Model/Model.h"
+#include "Processes/Manager.h"
 #include "TimeSteps/Manager.h"
 #include "AgeingErrors/Manager.h"
 #include "Utilities/Map.h"
@@ -121,6 +122,8 @@ void ProcessRemovalsByAge::DoValidate() {
       LOG_FATAL_P(PARAM_ERROR_VALUES) << "We counted " << error_values_by_year[year].size() << " error values by year but expected " << obs_expected -1 << " based on the obs table";
   }
 
+  age_spread_ = max_age_ - min_age_ + 1;
+
 }
 
 /**
@@ -137,61 +140,10 @@ void ProcessRemovalsByAge::DoBuild() {
     if (ageing_error_label_ == "") {
       LOG_WARNING() << "You are suppling a an age based observation with no ageing_misclassification";
     }
-/*
 
-  age_results_.resize(age_spread_ * category_labels_.size(), 0.0);
-
-  for (string time_label : time_step_label_) {
-    auto time_step = model_->managers().time_step()->GetTimeStep(time_label);
-    if (!time_step) {
-      LOG_FATAL_P(PARAM_TIME_STEP) << time_label << " could not be found. Have you defined it?";
-    } else {
-      auto process = time_step->SubscribeToProcess(this, years_, process_label_);
-      mortality_instantaneous_ = dynamic_cast<MortalityInstantaneous*>(process);
-    }
-  }
-
-  // Need to split the categories if any are combined for checking
-  vector<string> temp_split_category_labels, split_category_labels;
-
-  for (const string& category_label : category_labels_) {
-    boost::split(temp_split_category_labels, category_label, boost::is_any_of("+"));
-    for (const string& split_category_label : temp_split_category_labels) {
-      split_category_labels.push_back(split_category_label);
-    }
-  }
-  for (auto category : split_category_labels)
-    LOG_FINEST() << category;
-  if (!mortality_instantaneous_)
-    LOG_ERROR_P(PARAM_PROCESS) << "This observation can only be used for Process of type = " << PARAM_MORTALITY_INSTANTANEOUS << " could not find process " << process_label_ << " have you defined it?";
-  // Do some checks so that the observation and process are compatible
-  if (!mortality_instantaneous_->check_methods_for_removal_obs(method_))
-    LOG_ERROR_P(PARAM_METHOD_OF_REMOVAL) << "could not find all these methods in the instantaneous_mortality process labeled " << process_label_ << " please check that the methods are compatible with this process";
-  if (!mortality_instantaneous_->check_categories_in_methods_for_removal_obs(method_, split_category_labels))
-    LOG_ERROR_P(PARAM_CATEGORIES) << "could not find all these categories in the instantaneous_mortality process labeled " << process_label_ << " please check that the categories are compatible with this process";
-  if (!mortality_instantaneous_->check_years_in_methods_for_removal_obs(years_, method_))
-    LOG_ERROR_P(PARAM_YEARS) << "could not find catches with catch in all years in the instantaneous_mortality process labeled " << process_label_ << " please check that the years are compatible with this process";
-
-  // If this observation is made up of multiple methods lets find out the last one, because that is when we execute the process
-  vector<unsigned> time_step_index;
-  for (string label : time_step_label_)
-    time_step_index.push_back(model_->managers().time_step()->GetTimeStepIndex(label));
-
-  unsigned last_method_time_step = 9999;
-  if (time_step_index.size() > 1) {
-    for (unsigned i = 0; i < (time_step_index.size() - 1); ++i) {
-      if (time_step_index[i] > time_step_index[i + 1])
-        last_method_time_step = time_step_index[i];
-      else
-        last_method_time_step = time_step_index[i + 1];
-    }
-    time_step_to_execute_ = last_method_time_step;
-  } else {
-    time_step_to_execute_ = time_step_index[0];
-  }
-*/
-
-  LOG_FINEST() << "Executing observation in time step = " << time_step_to_execute_;
+    mortality_process_ = model_->managers().process()->GetMortalityProcess(process_label_);
+    if (!mortality_process_)
+      LOG_FATAL_P(PARAM_PROCESS_LABEL) << "could not find the process " << process_label_ << ", please make sure it exists";
 
 }
 
@@ -211,10 +163,14 @@ void ProcessRemovalsByAge::PreExecute() {
 void ProcessRemovalsByAge::Execute() {
   LOG_TRACE();
   LOG_FINEST() << "Entering observation " << label_;
+/*  if (time_step_to_execute_ == current_time_step) {
+    unsigned current_time_step = model_->managers().time_step()->current_time_step();
+    map<unsigned, vector<unsigned>>& age_freq = mortality_process_->get_removals_by_age();
+
+
+  }*/
 /*
   // Check if we are in the final time_step so we have all the relevent information from the Mortaltiy process
-  unsigned current_time_step = model_->managers().time_step()->current_time_step();
-	if (time_step_to_execute_ == current_time_step) {
 
 		unsigned year = model_->current_year();
 		map<unsigned,map<string, map<string, vector<float>>>> &Removals_at_age = mortality_instantaneous_->catch_at();

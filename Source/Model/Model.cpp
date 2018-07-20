@@ -19,6 +19,7 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/trim_all.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <omp.h>
 
 #include "Factory.h"
 #include "Managers.h"
@@ -67,6 +68,7 @@ Model::Model() {
   parameters_.Bind<string>(PARAM_MATRUITY_OGIVE_LABEL, &maturity_ogives_, "Maturity ogive label for each sex", "", false);
   parameters_.Bind<string>(PARAM_GROWTH_PROCESS_LABEL, &growth_process_label_, "Label for the growth process in the annual cycle", "");
   parameters_.Bind<string>(PARAM_NATURAL_MORTALITY_PROCESS_LABEL, &natural_mortality_label_, "Label for the natural mortality process in the annual cycle", "");
+  parameters_.Bind<unsigned>(PARAM_MAX_THREADS_TO_USE, &max_threads_, "The maxiumum threads you want to give access to this program", "",2);
 
 
   global_configuration_ = new GlobalConfiguration();
@@ -283,6 +285,17 @@ void Model::Build() {
     if (!selec)
       LOG_ERROR_P(PARAM_NATURAL_MORTALITY_PROCESS_LABEL) << "Could not find maturity ogive (selectivity) '" << maturity_ogives_[i] << "', make sure it is defined";
   }
+
+  // Check thread logic
+  unsigned procs = (omp_get_num_procs() * 2) - 1; // Default to number of cores less one
+  if ( max_threads_ > 0 && max_threads_ < procs )
+    procs = max_threads_;
+  if ( procs < 1)
+    procs = 1;
+
+  LOG_MEDIUM() << "setting number of threads = " << procs;
+  omp_set_dynamic(0);
+  omp_set_num_threads(procs);
 
 }
 

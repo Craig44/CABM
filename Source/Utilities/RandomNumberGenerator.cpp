@@ -44,6 +44,7 @@ RandomNumberGenerator& RandomNumberGenerator::Instance() {
  *
  */
 void RandomNumberGenerator::Reset(unsigned new_seed) {
+  LOG_FINEST() << "resetting seed to " << new_seed;
   generator_.seed(new_seed);
 }
 

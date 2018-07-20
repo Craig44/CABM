@@ -18,7 +18,7 @@
 #include "Utilities/RandomNumberGenerator.h"
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
-
+#include <omp.h>
 // namespaces
 namespace niwa {
 namespace processes {
@@ -70,6 +70,7 @@ void MortalityConstantRate::DoExecute() {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   float selectivity_at_age;
   unsigned agents_removed = 0;
+  #pragma omp parallel for collapse(2)
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);

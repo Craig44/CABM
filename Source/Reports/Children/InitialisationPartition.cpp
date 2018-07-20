@@ -72,9 +72,8 @@ void InitialisationPartition::DoExecute() {
           cache_ << " " << age;
       }
     }
+    cache_ << "\n";
   }
-
-  cache_ << "\n";
   ready_for_writing_ = true;
   call_number_ = false;
 }

@@ -22,7 +22,7 @@
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
 #include "Utilities/DoubleCompare.h"
-
+#include <omp.h>
 // namespaces
 namespace niwa {
 namespace processes {
@@ -122,6 +122,7 @@ void RecruitmentConstant::DoExecute() {
     initialisationphases::Manager& init_phase_manager = *model_->managers().initialisation_phase();
     float SSB = derived_quantity_->GetLastValueFromInitialisation(init_phase_manager.last_executed_phase());
     model_->set_ssb(label_, SSB);
+    #pragma omp parallel for collapse(2)
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
@@ -139,6 +140,7 @@ void RecruitmentConstant::DoExecute() {
     float amount_per = initial_recruits_;
     recruits_by_year_[model_->current_year()] = amount_per;
     LOG_FINEST() << "applying recruitment in year " << model_->current_year();
+    #pragma omp parallel for collapse(2)
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);

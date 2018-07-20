@@ -18,6 +18,7 @@
 #include "Utilities/RandomNumberGenerator.h"
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
+#include <omp.h>
 
 // namespaces
 namespace niwa {
@@ -63,6 +64,7 @@ void MortalityEventBiomass::DoBuild() {
   selectivity_ = model_->managers().selectivity()->GetSelectivity(selectivity_label_);
   if (!selectivity_)
     LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << ": selectivity " << selectivity_label_ << " does not exist. Have you defined it?";
+
 }
 
 
@@ -71,58 +73,61 @@ void MortalityEventBiomass::DoBuild() {
  */
 void MortalityEventBiomass::DoExecute() {
   LOG_TRACE();
+  vector<unsigned> age_freq(model_->age_spread());
   auto iter = years_.begin();
-  if (find(iter, years_.end(), model_->current_year()) != years_.end()) {
-    iter = find(years_.begin(), years_.end(), model_->current_year());
-    unsigned catch_ndx = distance(years_.begin(), iter);
-    LOG_FINEST() << "applying F in year " << model_->current_year() << " catch index = " << catch_ndx;
-    // Get the pointer to the right catch layer
-    utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-    float catch_taken;
-    float actual_catch_taken = 0;;
-    float world_catch_to_take = 0;;
-
-    unsigned catch_attempts = 1;
-    unsigned catch_max = 1;
-    unsigned random_agent;
-    for (unsigned row = 0; row < model_->get_height(); ++row) {
-      for (unsigned col = 0; col < model_->get_width(); ++col) {
-        WorldCell* cell = world_->get_base_square(row, col);
-        if (cell->is_enabled()) {
-          catch_taken = catch_layer_[catch_ndx]->get_value(row, col);
-          if (catch_taken > 0) {
-            LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << catch_taken;
-            catch_attempts = 1;
-            world_catch_to_take += catch_taken;
-            auto& agents = cell->get_agents();
-            catch_max = agents.size();
-            while (catch_taken > 0) {
-              // Random access bullshit for lists
-              ++catch_attempts;
-              auto iter = agents.begin();
-              random_agent = rng.chance() * agents.size();
-              advance(iter, random_agent);
-              // See if this agent is unlucky
-              if (rng.chance() <= selectivity_->GetResult((*iter).get_age())) {
-                catch_taken -= (*iter).get_weight() * (*iter).get_scalar();
-                actual_catch_taken += (*iter).get_weight() * (*iter).get_scalar();
-                agents.erase(iter); // erase agent from memory
-              }
-              // Make sure we don't end up fishing for infinity
-              if (catch_attempts >= catch_max) {
-                LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << model_->current_year() << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have\n" <<
-                   " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation";
+  if (model_->state() != State::kInitialise) {
+    if (find(iter, years_.end(), model_->current_year()) != years_.end()) {
+      iter = find(years_.begin(), years_.end(), model_->current_year());
+      unsigned catch_ndx = distance(years_.begin(), iter);
+      LOG_FINEST() << "applying F in year " << model_->current_year() << " catch index = " << catch_ndx;
+      // Get the pointer to the right catch layer
+      utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+      float actual_catch_taken = 0;;
+      float world_catch_to_take = 0;;
+      // Thread out each loop
+      #pragma omp parallel for collapse(2)
+      for (unsigned row = 0; row < model_->get_height(); ++row) {
+        for (unsigned col = 0; col < model_->get_width(); ++col) {
+          unsigned catch_attempts = 1;
+          unsigned catch_max = 1;
+          unsigned random_agent;
+          WorldCell* cell = world_->get_base_square(row, col);
+          if (cell->is_enabled()) {
+            float catch_taken = catch_layer_[catch_ndx]->get_value(row, col);
+            if (catch_taken > 0) {
+              LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << catch_taken;
+              catch_attempts = 1;
+              world_catch_to_take += catch_taken;
+              auto& agents = cell->get_agents();
+              catch_max = agents.size();
+              while (catch_taken > 0) {
+                // Random access bullshit for lists
+                ++catch_attempts;
+                auto iter = agents.begin();
+                random_agent = rng.chance() * agents.size();
+                advance(iter, random_agent);
+                // See if this agent is unlucky
+                if (rng.chance() <= selectivity_->GetResult((*iter).get_age())) {
+                  catch_taken -= (*iter).get_weight() * (*iter).get_scalar();
+                  actual_catch_taken += (*iter).get_weight() * (*iter).get_scalar();
+                  age_freq[(*iter).get_age() - model_->min_age()]++;
+                  agents.erase(iter); // erase agent from memory
+                }
+                // Make sure we don't end up fishing for infinity
+                if (catch_attempts >= catch_max) {
+                  LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << model_->current_year() << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have\n" <<
+                     " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation";
+                }
               }
             }
           }
         }
       }
-    }
-    if (model_->state() != State::kInitialise) {
       removals_by_year_[model_->current_year()] = world_catch_to_take;
       actual_removals_by_year_[model_->current_year()] = actual_catch_taken;
-    }
-  } // find(years_.begin(), years_.end(), model_->current_year()) != years_.end()
+      removals_by_age_[model_->current_year()] = age_freq;
+    } // find(years_.begin(), years_.end(), model_->current_year()) != years_.end()
+  }  //model_->state() != State::kInitialise
 }
 
 
@@ -140,7 +145,18 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
   for (auto& year : removals_by_year_)
     cache << year.second << " ";
   cache << "\n";
-
+  cache << "values " << REPORT_R_DATAFRAME << "\n";
+  cache << "year ";
+  for (unsigned i = model_->min_age(); i <= model_->max_age(); ++i)
+    cache << i << " ";
+  cache << "\n";
+  for (auto& age_freq : removals_by_age_) {
+    cache << age_freq.first << " ";
+    for (auto age_value : age_freq.second)
+      cache << age_value << " ";
+    cache << "\n";
+  }
+  cache << "\n";
 }
 
 } /* namespace processes */

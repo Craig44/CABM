@@ -45,8 +45,8 @@ protected:
   Selectivity*                        selectivity_ = nullptr;
   vector<unsigned>                    years_;
   // For reporting
-  map<unsigned, unsigned>             actual_removals_by_year_;
-  map<unsigned, unsigned>             removals_by_year_;
+  map<unsigned, float>                actual_removals_by_year_;
+  map<unsigned, float>                removals_by_year_;
 
 };
 

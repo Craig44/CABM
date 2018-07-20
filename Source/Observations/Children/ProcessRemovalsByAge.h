@@ -55,8 +55,8 @@ protected:
   parameters::Table*            error_values_table_ = nullptr;
   AgeingError*                  ageing_error_ = nullptr;
   string                        ageing_error_label_;
-  vector<float>                age_results_;
   Mortality*                    mortality_process_ = nullptr;
+  vector<float>                 age_results_;
   vector<string>                time_step_label_;
   string                        process_label_;
   unsigned                      time_step_to_execute_;

@@ -113,8 +113,11 @@ void WorldView::Build() {
         enabled_cells_--;
       } else if (base_layer_->get_value(i, j) < 0) {
         LOG_FATAL()<< "found a negative value in the base layer '" << model_->get_base_layer_label() << "', value must be equal to or greater than 0";
-      } else
-      base_grid_[i][j].set_area(base_layer_->get_value(i,j));
+      } else {
+        base_grid_[i][j].set_area(base_layer_->get_value(i,j));
+        enabled_rows_.push_back(i);
+        enabled_cols_.push_back(j);
+      }
     }
   }
 
