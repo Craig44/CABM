@@ -76,7 +76,7 @@ A mortality block is defined as a consecutive sequence of mortality processes wi
 \subsubsection{\I{Initialisation}}\label{subsec:initialisation}
 Initialisation is the process of determining the world's state just before \subcommand{start\_year}, whether it be equilibrium/steady state or some other initial state for the model (e.g exploited), prior to the start year of the model. This can be computationally expensive if a plus group is present in the partition.
 
-Currently users can only initialise the partition via an iterative process. \IBM\ does a few tricks to help speed up the initialisation. The first thing \IBM\ does is gets the parameter \subcommand{number\_of\_agents} and spits that number of agents uniformly, over the spatial domain, alternatively the user could supply a layer \subcommand{layer\_label} of proportions to seed the initial spatial distribution. This layer should sum to one so that the model initially seeds \subcommand{number\_of\_agents}. When the \IBM\ seeds the initial number of agents it also randomly assigns the agents an age based on an exponential distribution where the parameter $\lambda$ of the exponential distribution is set by the command on the \command{model}, \subcommand{initialisation\_z\_seed}. We suggest setting this command to the assumed natural mortality of the model. To see what age structure this would look like you can quickly use \R\ to visualise. by running the following code in an \R\ terminal you could see.
+Currently users can only initialise the partition via an iterative process. \IBM\ does a few tricks to help speed up the initialisation. The first thing \IBM\ does is gets the parameter \subcommand{number\_of\_agents} and spits that number of agents uniformly, over the spatial domain, alternatively the user could supply a layer \subcommand{layer\_label} of proportions to seed the initial spatial distribution. This layer should sum to one so that the model initially seeds \subcommand{number\_of\_agents}. When the \IBM\ seeds the initial number of agents it also randomly assigns the agents an age based on an exponential distribution where the parameter $\lambda$ of the exponential distribution is set by the command on the \command{model}, \subcommand{natural\_mortality\_process\_label}. We suggest setting this command to the assumed natural mortality of the model. To see what age structure this would look like you can quickly use \R\ to visualise. by running the following code in an \R\ terminal you could see.
 
 \begin{lstlisting}
 Z_param = 0.2;
@@ -84,12 +84,7 @@ agents_per_cell = 1000;
 hist(rexp(agents_per_cell,Z_param), breaks = 30, xlab = "age", ylab = "frequency", main = "Initial age structure in each cell")
 \end{lstlisting}
 
-Once \IBM\ has seeded the agents, it iterates over the annual cycle to change an approximated initialisation state to one that is more like what would occur for your annual cycle, this is controlled by the \subcommand{years} command in the \command{initialisation} block. The number of iterations in the iterative initialisation can effect the model output, and these should be chosen to be large enough to allow the population state to fully converge. We recommend that a period of about two generations to ensure convergence. \IBM\ can be requested to report a number of convergence statistics that can assist the user in determining the level of convergence.
-
-In addition, the iterative initialisation phase can optionally be stopped early if some user defined convergence criteria is met. For a list of supplied years in the initialisation phase, convergence is defined as met if the proportional absolute summed difference between the state in year $t-1$ and the state in year $t$ ($\widehat{\lambda}$) is less than a user defined $\lambda$ where, 
-\begin{equation}
-  \widehat{\lambda} = \frac{\sum\limits_{i} \sum\limits_{j} \left|\text{element}(i,j)_t - \text{element}(i,j)_{t-1} \right|}{\sum\limits_{i} \sum\limits_{j} \frac{}{}\text{element}(i,j)_t}
-\end{equation}
+Once \IBM\ has seeded the agents, it iterates over the annual cycle to change an approximated initialisation state to one that is more like what would occur for your annual cycle, this is controlled by the \subcommand{years} command in the \command{initialisation} block. The number of iterations in the iterative initialisation can effect the model output, and these should be chosen to be large enough to allow the population state to fully converge. We recommend that a period of about two generations to ensure convergence. \
 
 Hence, for an iterative initialisation you need to define:
 \begin{itemize}
@@ -117,7 +112,9 @@ growth_process_label von_bert
 natural_mortality_process_label natural_mort
 \end{verbatim}}}
 
-\subsection{\I{Population processes}}\label{sec:process}
+\subsection{\I{Processes}}\label{sec:process}
+Processes are a set of classes that get access to agents parameters and either modifies them (growth), moves them (to anther cell), adds new agents (recruitment) or removes them (mortality). Some users may not think having an analagous to population processes fits in the Individual based model framework, but it is structured this way for convenience and code maintenance more than anything. The other thing to note is that most proceses are dictated by agent specific parameters such as natural mortality and growth etc.
+
 
 \subsubsection{\I{Ageing}}
 Ageing is an implicit process in the model, Each agent that is created or recruited gets assigned an birth year. This means that when ever we want to ask for the agent we just calculate \subcommand{current\_year - birth\_year}, thus there is no explicit ageing process. Note that we do return the \subcommand{max\_age} of the model, if the agent is older than that age (so we only work with the truncated age distribution).
@@ -137,6 +134,10 @@ Mortality processes remove individuals from the model domain (and also from memo
 
 \paragraph{Constant mortality rate}
 
+\paragraph{Event-Biomass}
+This is a removal event such as fishing, where we iterate over a range of cells and remove agents based on some selectivity or vulnerability.
+
+
 
 \subsection{\I{Derived Quantities}\label{sec:derived-quantities}}
 Derived quantities surround a mortality block and so the value of the derived quantity is calculated twice, once before the mortality block, and once after. The final value is an interpolation based on how much mortality the user wants to into account when calculating derived quantities.
@@ -145,22 +146,38 @@ Derived quantities surround a mortality block and so the value of the derived qu
 \paragraph*{Abundance}
 
 \subsection{\I{Growth}\label{sec:age-at-age}}
-
-\subsection{\I{Length-weight relationship}\label{sec:mean-weight}}
 Growth currently means updating length and weight for an agent, if the Von Bertalanffy formula currently is used (currently the default in agent class for initialising length) it follows the following formula
 
 \begin{equation}\label{VB}
-	\Delta L = (L_{\infty} - L)(1 - e^k)
+	\Delta L_i = (L_{i,\infty} - L_i)(1 - e^-{k_i})
 \end{equation}
 
 
-If the basic length weight formulation is used, then an agents weight follows the following formula
+Where $i$ indexes each agents own length and growth parameters. If the basic length weight formulation is used, then an agents weight follows the following formula.
 
 \begin{equation}\label{mean_weight}
-\bar{w} = aL^b
+\bar{w_i} = a_iL_i^{b_i}
 \end{equation}
 
-Scaling the model agents up to the population biomass estimates is done via a global scalar.
+
+When an agent is created (either in initialisation or through a recruitment process) or moves cell, it gets assigned new growth parameters that relate to that cell. This allows for spatial growth, one could hypothesis that environment may explain growth and so different environments over cells will cause different rates of growth. For the growth process you must specify either a spatial layer for mean values of each growth parameter or a single value (if growth doesn't change through space), a distribution and Coefficient of variation (CV). This randomly generates an agent a parameter from that distribution, an example of the syntax in a four area model,
+
+{\small{\begin{verbatim}
+		@model
+		...
+		initialisation_phases Iterative_initialisation
+		
+		@initialisation_phase Iterative_initialisation
+		type iterative
+		years 50
+		lambda 0.0001
+		convergence_years 20 40
+		layer_label Base
+		growth_process_label von_bert
+		natural_mortality_process_label natural_mort
+\end{verbatim}}}
+
+
 
 \subsection{\I{Selectivities}\label{sec:selectivities}}
 A selectivity is a function that can have a different value for each age class. Selectivities are used throughout \IBM\ to interpret observations (Section \ref{sec:estimation-section}) or to modify the effects of processes on each age class (Section \ref{sec:population-section}). \IBM\ implements a number of different parametric forms, including logistic, knife edge, and double normal selectivities. Selectivities are defined in there own command block (\command{selectivity}), where the unique label is used by observations or processes to identify which selectivity to apply.
@@ -307,3 +324,21 @@ Selectivities \subcommand{all\_values} and \subcommand{all\_values\_bounded} can
 		parameter selectivity[maturity].values{3:8}
 		
 		\end{verbatim}}}
+	
+	
+\subsection{\I{Tips setting up configuration files}\label{sec:tips}}
+\IBM\ can take a while if you have a complex spatial model and complex life history. So there are some tips and tricks that I have come found can be useful when setting up configuration files.
+
+\subsubsection*{The initialisation Phase}
+The first thing you wont to nail down before getting gun hoe on the configuration and complex dynamics you want to get a model that reaches an appropriate initialisation state \emph{quickly!}. So my suggestion is to not worry about fishing in the first instance, set the \subcommand{start\_year} and \subcommand{final\_year} one year apart and play with the initialisation phase commands to see how to efficiently reach a desired initial state. The parameters I am talking about are the subcommands \subcommand{years} and \subcommand{layer\_label}. The \subcommand{years} parameter sets how many annual cycles to run through to set your initialisation state, you want this as small as possible. So my advice is run the model with a range of \subcommand{years} say 5, 10, 20, 30, 40, 50 and 100 to find out how sensitive your initial state is to this. You find that you have to make a compromise between speed and accuracy, unfortunately life is full of such compromises.
+
+Along with the \subcommand{years} parameter you can also set the spatial distribution of the initial seeding of agents through the \subcommand{layer\_label}, if you have a spatial model with movement this would be an interesting one to play with. So pretty much my advice is tweak these initialisation parameters as much as you can before you move onto fishing and generate observations, it will be well worth your while if you treasure time.
+
+\subsubsection*{The number of agents in the system} 
+This one should be obvious and we suggest that you play with the initialisation parameter \subcommand{number\_of\_agents} to see how sensitive model outputs are to this parameter. The less agents in the system the faster your model run, however the less agents the more coarse you model becomes because then an entity all of a sudden represents 1000 entities, so once again we return to a compromise.
+
+\subsubsection*{The number of threads available} 
+\IBM\ is threaded using the OpenMP C++ library, by default \IBM\ will set the number threads available equal to number available on your machine minus 1. You can set this through the \command{model} parameter \subcommand{max\_threads\_to\_use}, we suggest you set this to the number of spatial cells in the system, there might be more overheads with making more threads available than the model will ever use (disclaimer I haven't tested this). 
+
+
+

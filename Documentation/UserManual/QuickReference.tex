@@ -48,15 +48,19 @@
 \defSub{maturity\_ogive\_label} {Maturity ogive label for each sex}
 \defSub{growth\_process\_label} {Label for the growth process in the annual cycle}
 \defSub{natural\_mortality\_process\_label} {Label for the natural mortality process in the annual cycle}
+\defSub{max\_threads\_to\_use} {The maxiumum threads you want to give access to this program}
 \defComLab{observation}{Define an object of type \emph{observation}}\par\par
 \defSub{label} {Label}
 \defSub{type} {Type of observation}
-\defSub{likelihood} {Type of likelihood to use}
-\defSub{categories} {Category labels to use}
-\defSub{delta} {Robustification value (delta) for the likelihood}
 \defSub{simulation\_likelihood} {Simulation likelihood to use}
-\defSub{likelihood\_multiplier} {Likelihood score multiplier}
-\defSub{error\_value\_multiplier} {Error value multiplier for likelihood}
+\par\textbf{\commandlabsubarg{observation}{type}{process\_removals\_by\_age}}\par
+\defSub{min\_age} {Minimum age}
+\defSub{max\_age} {Maximum age}
+\defSub{plus\_group} {Use age plus group}
+\defSub{time\_step} {The label of time-step that the observation occurs in}
+\defSub{years} {Years for which there are observations}
+\defSub{ageing\_error} {Label of ageing error to use}
+\defSub{process\_label} {The label of the mortality process for the observation}
 \defComLab{process}{Define an object of type \emph{process}}\par\par
 \defSub{label} {The label of the process}
 \defSub{type} {The type of process}
@@ -65,8 +69,12 @@
 \defSub{cv} {The cv of the distribution}
 \par\textbf{\commandlabsubarg{process}{type}{maturity}}\par
 \par\textbf{\commandlabsubarg{process}{type}{mortality\_constant\_rate\_mortality}}\par
-\defSub{distribution} {the distribution to allocate the parameters to the agents}
-\defSub{cv} {The cv of the distribution}
+\par\textbf{\commandlabsubarg{process}{type}{mortality\_event\_biomass\_mortality}}\par
+\par\textbf{\commandlabsubarg{process}{type}{movement\_box\_transfer}}\par
+\defSub{selectivity} {Selectivity label}
+\defSub{years} {years to apply the process}
+\defSub{origin\_cell} {The origin cell associated with each spatial layer (should have a one to one relationship with specified layers), format follows row-col (1-2}
+\defSub{probability\_layers} {Spatial layers (one layer for each origin cell) describing the probability of moving from an origin cell to all other cells in the spatial domain.}
 \par\textbf{\commandlabsubarg{process}{type}{nop}}\par
 \par\textbf{\commandlabsubarg{process}{type}{recruitment\_beverton\_holt}}\par
 \defSub{b0} {B0}
@@ -85,6 +93,7 @@
 \defSub{write\_mode} {The write mode}
 \par\textbf{\commandlabsubarg{report}{type}{derived\_quantity}}\par
 \par\textbf{\commandlabsubarg{report}{type}{initialisation\_partition}}\par
+\par\textbf{\commandlabsubarg{report}{type}{model\_attributes}}\par
 \par\textbf{\commandlabsubarg{report}{type}{process}}\par
 \defSub{process} {Process label that is reported}
 \par\textbf{\commandlabsubarg{report}{type}{standard\_header}}\par
