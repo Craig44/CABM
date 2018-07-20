@@ -11,11 +11,11 @@ STRING(REPLACE "BuildSystem" "Source" PROJECT_HOME_DIRECTORY ${CMAKE_HOME_DIRECT
 
 # GLOBAL BUILD VARIABLES AND LIBRARIES
 IF (DEBUG)
- SET(COMPILE_OPTIONS "-O0 -g3 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs")
+ SET(COMPILE_OPTIONS "-fopenmp -O0 -g3 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs")
 ELSEIF (RELEASE)
- SET(COMPILE_OPTIONS "-O2 -g0 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs")
+ SET(COMPILE_OPTIONS "-fopenmp -O2 -g0 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs")
 ELSE()
- SET(COMPILE_OPTIONS "-O2 -g0 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs")
+ SET(COMPILE_OPTIONS "-fopenmp -O2 -g0 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs")
 ENDIF ()
 
 # Set variables based on OS
@@ -65,7 +65,7 @@ FOREACH(library ${specialLibraries})
 SET(thirdPartyLibraries ${thirdPartyLibraries} ${library})
 ENDFOREACH()
 
-SET(LINK_OPTIONS " ")
+SET(LINK_OPTIONS " -fopenmp ")
 
 IF (LIBRARY)
   ADD_LIBRARY(${EXE_NAME} SHARED ${sourceFiles} )
