@@ -140,9 +140,11 @@ This is a removal event such as fishing, where we iterate over a range of cells 
 
 
 \subsection{\I{Derived Quantities}\label{sec:derived-quantities}}
-Derived quantities surround a mortality block and so the value of the derived quantity is calculated twice, once before the mortality block, and once after. The final value is an interpolation based on how much mortality the user wants to into account when calculating derived quantities.
+Derived quantities surround a mortality block and so the value of the derived quantity is calculated twice, once before the mortality block (Pre-Execute), and once after (Execute). The final value is an interpolation based on how much mortality the user wants to take into account when calculating derived quantities. If users set the \subcommand{proportion\_through\_mortality\_block} parameter equal to one or zero then only one calculation is taken, and can reduce the run time of some models, so it is worth exploring.
 \paragraph*{Biomass}
+
 \paragraph*{Mature Biomass}
+
 \paragraph*{Abundance}
 
 \subsection{\I{Growth}\label{sec:age-at-age}}

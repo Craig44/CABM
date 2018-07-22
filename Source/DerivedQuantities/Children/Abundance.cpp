@@ -17,6 +17,7 @@
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
 #include "Utilities/RandomNumberGenerator.h"
+#include "Utilities/DoubleCompare.h"
 
 // namespaces
 namespace niwa {
@@ -61,6 +62,8 @@ void Abundance::DoBuild() {
  */
 void Abundance::PreExecute() {
   LOG_TRACE();
+  if (utilities::doublecompare::IsOne(time_step_proportion_))
+    return;
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   cache_value_ = 0.0;
   float probability_mature_at_age;
@@ -97,6 +100,9 @@ void Abundance::PreExecute() {
  */
 void Abundance::Execute() {
   LOG_TRACE();
+
+  if (utilities::doublecompare::IsZero(time_step_proportion_))
+    return;
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   float value = 0.0;
   float probability_mature_at_age;
@@ -129,10 +135,10 @@ void Abundance::Execute() {
 
     float b0_value = 0;
 
-    if (time_step_proportion_ == 0.0) {
+    if (utilities::doublecompare::IsZero(time_step_proportion_)) {
       b0_value = cache_value_;
       initialisation_values_[initialisation_phase].push_back(b0_value);
-    } else if (time_step_proportion_ == 1.0) {
+    } else if (utilities::doublecompare::IsOne(time_step_proportion_)) {
       b0_value = value;
       initialisation_values_[initialisation_phase].push_back(b0_value);
     } else if (mean_proportion_method_) {
@@ -143,9 +149,9 @@ void Abundance::Execute() {
       initialisation_values_[initialisation_phase].push_back(b0_value);
     }
   } else {
-    if (time_step_proportion_ == 0.0)
+    if (utilities::doublecompare::IsZero(time_step_proportion_))
       values_[model_->current_year()] = cache_value_;
-    else if (time_step_proportion_ == 1.0)
+    else if (utilities::doublecompare::IsOne(time_step_proportion_))
       values_[model_->current_year()] = value;
     if (mean_proportion_method_)
       values_[model_->current_year()] = cache_value_ + ((value - cache_value_) * time_step_proportion_);

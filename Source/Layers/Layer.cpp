@@ -41,7 +41,7 @@ void Layer::Validate() {
   parameters_.Populate(model_);
 
   height_ = model_->get_height();
-  width_ = model_->get_height();
+  width_ = model_->get_width();
 
   DoValidate();
 }

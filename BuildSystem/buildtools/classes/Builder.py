@@ -35,11 +35,6 @@ class MainCode:
     if not os.path.exists(third_party_dir):
       return Globals.PrintError("Third party libraries have not been built. Please build these first with thirdparty argument")
 	
-	##
-	## Add this later (TODO
-	## I skipped this because I wanted to see how it was going to go, before I pushed to a public repo.
-	##
-	
     # Build the Version.h file
     if Globals.git_path_ != '':
       print '-- Build Source/Version.h with Git log information'
