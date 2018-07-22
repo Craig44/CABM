@@ -75,14 +75,13 @@ void MortalityConstantRate::DoExecute() {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
-        auto& agents = cell->get_agents();
-        unsigned initial_size = agents.size();
+        unsigned initial_size = cell->agents_.size();
         LOG_FINEST() << initial_size << " initial agents";
-        for (auto iter = agents.begin(); iter != agents.end();) {
+        for (auto iter = cell->agents_.begin(); iter != cell->agents_.end();) {
           selectivity_at_age = selectivity_->GetResult((*iter).get_age());
           //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
           if (rng.chance() <= (1 - std::exp(-(*iter).get_m() * selectivity_at_age))) {
-            iter = agents.erase(iter);
+            iter = cell->agents_.erase(iter);
             initial_size--;
             agents_removed++;
           } else

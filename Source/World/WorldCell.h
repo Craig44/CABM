@@ -49,18 +49,18 @@ public:
   void                        set_area(float area) {area_ = area;}
   void                        seed_agents(unsigned number_agents_to_seed, const float& seed_z);
   void                        birth_agents(unsigned number_agents_to_birth);
-  list<Agent>&                get_agents() {return agents_;};
+  //list<Agent>&                get_agents() {return agents_;};
   void                        get_age_frequency(vector<unsigned>& age_freq);
   float                       get_abundance();
   float                       get_biomass();
   float                       get_mature_biomass();
+  list<Agent>                 agents_;
 
 
 protected:
   // Methods
 
   // Members
-  list<Agent>                  agents_;
   bool                         enabled_ = true;
   float                        area_;
   unsigned                     row_;

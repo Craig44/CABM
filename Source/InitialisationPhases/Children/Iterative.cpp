@@ -117,7 +117,7 @@ void Iterative::Execute() {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
         cell->seed_agents(agents_per_cell, seed_z);
-        LOG_FINEST() << "row " << row + 1 << " col = " << col + 1 << " seeded " << cell->get_agents().size();
+        LOG_FINEST() << "row " << row + 1 << " col = " << col + 1 << " seeded " << cell->agents_.size();
       }
     }
   }
@@ -147,8 +147,7 @@ void Iterative::Execute() {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
-        auto& agents = cell->get_agents();
-        for (auto iter = agents.begin(); iter != agents.end(); ++iter) {
+        for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter) {
           (*iter).set_scalar(scalar);
         }
       }

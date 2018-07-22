@@ -76,8 +76,7 @@ void Abundance::PreExecute() {
         continue;
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
-        auto& agents = cell->get_agents();
-        for (Agent& agent : agents) {
+        for (Agent& agent : cell->agents_) {
           probability_mature_at_age = selectivity_->GetResult(agent.get_age());
           if (rng.chance() <= probability_mature_at_age) {
             ++cache_value_;
@@ -117,8 +116,7 @@ void Abundance::Execute() {
         continue;
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
-        auto& agents = cell->get_agents();
-        for (Agent& agent : agents) {
+        for (Agent& agent : cell->agents_) {
           probability_mature_at_age = selectivity_->GetResult(agent.get_age());
           if (rng.chance() <= probability_mature_at_age) {
             ++value;

@@ -78,9 +78,8 @@ void SummariseAgents::DoExecute() {
     LOG_FINEST() << "col index = " << col_index << " row index " << row_index;
     WorldCell* cell = world_->get_base_square(rows_[row_index], cols_[col_index]);
     if (cell->is_enabled()) {
-      auto& agents = cell->get_agents();
-      unsigned agent_ndx = rng.chance() * agents.size();
-      auto agent = agents.begin();
+      unsigned agent_ndx = rng.chance() * cell->agents_.size();
+      auto agent = cell->agents_.begin();
       advance(agent,agent_ndx);
       cache_ << row_index + 1 << "-" << col_index + 1 << " " << agent_ndx + 1 <<  " " << (*agent).get_age() << " " << (*agent).get_length() << " " << (*agent).get_weight() << " " << (*agent).get_scalar() << " " <<  (*agent).get_sex() << " " << (*agent).get_maturity() << "\n";
       --temp_n_agents;

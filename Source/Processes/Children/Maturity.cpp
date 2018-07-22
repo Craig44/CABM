@@ -64,10 +64,9 @@ void Maturity::DoExecute() {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
-        auto& agents = cell->get_agents();
-        LOG_FINEST() << "about to convert " << agents.size() << " through the maturity process";
+        LOG_FINEST() << "about to convert " << cell->agents_.size() << " through the maturity process";
         //unsigned counter = 1;
-        for (Agent& agent : agents) {
+        for (Agent& agent : cell->agents_) {
           if (not agent.get_maturity()) {
             probability_mature_at_age = selectivity_[agent.get_sex()]->GetResult(agent.get_age());
             if (rng.chance() <= probability_mature_at_age) {

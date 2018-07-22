@@ -127,10 +127,29 @@ void WorldView::Build() {
 }
 
 /*
+ * This method iterates over all cells and combines the cached grid onto the actual grid, used mainly in movement where we need to temporary hold individuals
+ *
+*/
+void WorldView::MergeCachedGrid() {
+  LOG_TRACE();
+  for (unsigned i = 0; i < height_; ++i) {
+    for (unsigned j = 0; j < width_; ++j) {
+      if (base_grid_[i][j].is_enabled()) {
+        // Splice agents to real world grid and delete from cache
+        // TODO think about how we are going to update agents parameters effeciently from new cell
+        base_grid_[i][j].agents_.splice(base_grid_[i][j].agents_.end(), cached_grid_[i][j].agents_);
+        cached_grid_[i][j].agents_.clear();
+      }
+    }
+  }
+}
+
+/*
  * This method gets the age frequencey of the world, this is called in intialisation to see if we have meet an equilibrium state
  *
 */
 void WorldView::get_world_age_frequency(vector<unsigned>& world_age_freq) {
+  LOG_TRACE();
   world_age_freq.clear();
   world_age_freq.resize(model_->age_spread());
   vector<unsigned> temp;

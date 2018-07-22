@@ -33,6 +33,7 @@ protected:
   // Variables
   float                       **grid_;
   parameters::Table*          data_table_ = nullptr;
+  bool                        proportion_;
 
 };
 

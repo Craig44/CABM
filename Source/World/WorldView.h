@@ -67,7 +67,7 @@ public:
   vector<unsigned>            get_enabled_rows() {return enabled_rows_; };
   vector<unsigned>            get_enabled_cols() {return enabled_cols_; };
 
-  void                        MergeCachedGrid() {};
+  void                        MergeCachedGrid();
   void                        get_world_age_frequency(vector<unsigned>& world_age_freq);
 
 protected:

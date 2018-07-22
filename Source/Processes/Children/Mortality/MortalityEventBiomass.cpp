@@ -98,20 +98,19 @@ void MortalityEventBiomass::DoExecute() {
               LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << catch_taken;
               catch_attempts = 1;
               world_catch_to_take += catch_taken;
-              auto& agents = cell->get_agents();
-              catch_max = agents.size();
+              catch_max = cell->agents_.size();
               while (catch_taken > 0) {
                 // Random access bullshit for lists
                 ++catch_attempts;
-                auto iter = agents.begin();
-                random_agent = rng.chance() * agents.size();
+                auto iter = cell->agents_.begin();
+                random_agent = rng.chance() * cell->agents_.size();
                 advance(iter, random_agent);
                 // See if this agent is unlucky
                 if (rng.chance() <= selectivity_->GetResult((*iter).get_age())) {
                   catch_taken -= (*iter).get_weight() * (*iter).get_scalar();
                   actual_catch_taken += (*iter).get_weight() * (*iter).get_scalar();
                   age_freq[(*iter).get_age() - model_->min_age()]++;
-                  agents.erase(iter); // erase agent from memory
+                  cell->agents_.erase(iter); // erase agent from memory
                 }
                 // Make sure we don't end up fishing for infinity
                 if (catch_attempts >= catch_max) {
@@ -145,18 +144,20 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
   for (auto& year : removals_by_year_)
     cache << year.second << " ";
   cache << "\n";
-  cache << "values " << REPORT_R_DATAFRAME << "\n";
-  cache << "year ";
-  for (unsigned i = model_->min_age(); i <= model_->max_age(); ++i)
-    cache << i << " ";
-  cache << "\n";
-  for (auto& age_freq : removals_by_age_) {
-    cache << age_freq.first << " ";
-    for (auto age_value : age_freq.second)
-      cache << age_value << " ";
+
+  if (removals_by_age_.size() > 0) {
+    cache << "age_frequency " << REPORT_R_DATAFRAME << "\n";
+    cache << "year ";
+    for (unsigned i = model_->min_age(); i <= model_->max_age(); ++i)
+      cache << i << " ";
     cache << "\n";
+    for (auto& age_freq : removals_by_age_) {
+      cache << age_freq.first << " ";
+      for (auto age_value : age_freq.second)
+        cache << age_value << " ";
+      cache << "\n";
+    }
   }
-  cache << "\n";
 }
 
 } /* namespace processes */
