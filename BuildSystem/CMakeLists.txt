@@ -9,29 +9,39 @@ SET(CMAKE_ROOT   bin/cmake)
 
 STRING(REPLACE "BuildSystem" "Source" PROJECT_HOME_DIRECTORY ${CMAKE_HOME_DIRECTORY})
 
+
 # GLOBAL BUILD VARIABLES AND LIBRARIES
 IF (DEBUG)
- SET(COMPILE_OPTIONS "-fopenmp -O0 -g3 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs")
+ SET(COMPILE_OPTIONS " -O0 -g3 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs")
 ELSEIF (RELEASE)
- SET(COMPILE_OPTIONS "-fopenmp -O2 -g0 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs")
+ SET(COMPILE_OPTIONS " -O2 -g0 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs")
 ELSE()
- SET(COMPILE_OPTIONS "-fopenmp -O2 -g0 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs")
+ SET(COMPILE_OPTIONS " -O2 -g0 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs")
+ENDIF ()
+
+
+find_package(OpenMP REQUIRED)
+IF (OPENMP_FOUND)
+    set (COMPILE_OPTIONS "${COMPILE_OPTIONS} ${OpenMP_CXX_FLAGS}")
+ELSE()
+  message(FATAL_ERROR "Could not find OpenMP on your compiler, please check that you have a compiler that supports OpenMP")
 ENDIF ()
 
 # Set variables based on OS
 IF (WIN32)
  ## WINDOWS BUILD VARIABLES AND LIBRARIES
  SET(buildOS windows) 
- SET(COMPILE_OPTIONS "${COMPILE_OPTIONS} -D__GNUDOS__ -std=c++11")
+ SET(COMPILE_OPTIONS "${COMPILE_OPTIONS} -D__GNUDOS__ -std=c++14")
  SET(thirdPartyLibraries ${thirdPartyLibraries} pthread)
  
 ELSE (WIN32)
  ## LINUX BUILD VARIABLES AND LIBRARIES
  SET(buildOS linux)
- SET(COMPILE_OPTIONS "${COMPILE_OPTIONS} -fPIC -std=c++11")
+ SET(COMPILE_OPTIONS "${COMPILE_OPTIONS} -fPIC -std=c++14")
  SET(thirdPartyLibraries ${thirdPartyLibraries} pthread rt)
 ENDIF ()
 
+  
 # BUILD PARAMETERS
 
 MESSAGE("COMPILE_OPTIONS: ${COMPILE_OPTIONS}")
@@ -65,7 +75,7 @@ FOREACH(library ${specialLibraries})
 SET(thirdPartyLibraries ${thirdPartyLibraries} ${library})
 ENDFOREACH()
 
-SET(LINK_OPTIONS " -fopenmp ")
+SET(LINK_OPTIONS "${OpenMP_CXX_FLAGS}")
 
 IF (LIBRARY)
   ADD_LIBRARY(${EXE_NAME} SHARED ${sourceFiles} )
