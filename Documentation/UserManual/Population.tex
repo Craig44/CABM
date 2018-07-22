@@ -11,10 +11,46 @@ The population section consists of several components, including:
   \item The annual cycle (time-steps and processes that are applied in each time-step)\index{Annual cycle};
   \item The specification and parameters of the population processes (i.e., processes that add, remove individuals to or from the partition, or shift numbers between ages and categories in the partition);
   \item Selectivities;
-  \item The spatial domain via defining layers
+  \item Layers (used by processes, observations and reports) and their definitions
   \item Parameter values and their definitions; and
   \item Derived IBM, required as parameters for some processes (e.g. mature biomass to resolve any density dependent processes, such as the spawner-recruit relationship in a recruitment process).
 \end{itemize}
+
+\subsection{\I{Spatial structure}\label{sec:spatial-structure}}
+
+The spatial structure of \IBM\ is represented by an $n_{rows} \times n_{cols}$ grid, with rows $i=1 \dots n_{rows}$ and columns $j=1 \ldots n_{cols}$. Each cell of this matrix records the population structure at that point in space, where the population structure is represented by an $n_{categories} \times n_{ages}$ rectangular matrix (with categories $k=1 \ldots n_{categories}$ and ages $l=1 \ldots n_{ages} = age_{min} \ldots age_{max}$. Hence we can describe any spatial and population element of the model as element$(i,j,k,l)$. We define, within the spatial grid ($n_{rows} \times n_{cols}$), locations where the population can and cannot potentially be present using a \emph{layer}. 
+
+\IBM\ implements a single spatial structure, a grid of \emph{square} cells (Figure \ref{fig:SquareSpatialStructure}). The spatial grid can be of an arbitrary size, but must be rectangular. 
+
+The dimensions of the spatial grid are user defined but must be at least a $1 \times 1$ grid (i.e., a single spatial cell), and the largest spatial structure currently allowed by \IBM\ is a grid of $1000 \times 1000$ cells\index{Maximum size of the spatial grid} -- although we note that models of this size are untested and will probably have very long run times. 
+
+Associated with the $n_{rows} \times n_{cols}$ spatial structure is the one compulsory layer (see Section \ref{sec:layers}), the \emph{base layer}\index{Base layer}. This defines the locations where the population can and cannot potentially be present (e.g., in a marine model, the locations associated with the sea and not land). These are defined as the cells where the base layer has a value greater than zero. There must be at least one cell in the spatial grid where the population can be present. In addition, the base layer also defines the relative \emph{area}\index{Cell area} of each spatial cell that is used for density calculations within \IBM.
+
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=0.66\textwidth]{Figures/SquareStructure}
+	\caption{An illustration of the spatial structure}
+	\label{fig:SquareSpatialStructure}
+\end{figure}
+
+Models are implemented as a grid of square cells making up a rectangular matrix.
+
+Hence, the definition of the spatial structure includes;
+\begin{itemize}
+	\item The type of spatial grid and its dimensions, $n_{rows}$ and $n_{cols}$
+	\item The label of a numeric layer to be used as the base layer (defining the locations where the population can be present as well as the area of each cell)
+\end{itemize}
+
+For example, to specify a model with 3 rows and 4 columns (i.e., 12 spatial cells) with a base layer called \texttt{base}, then the syntax for \texttt{@model} would include,
+{\small{\begin{verbatim}
+		@model
+		nrows 3
+		ncols 4
+		layer base
+		\end{verbatim}}}
+
+See below for how to define a layer using \texttt{@layer}. 
+
 
 \subsection{\I{Population structure}}\label{sub:sec:pop_sec}
 The basic structure of the population section of a \IBM\ model is defined in terms of an annual cycle, time steps, states, and transitions.
@@ -43,7 +79,129 @@ An example, to specify a model with 2 categories (male and female) with ages 1-2
 		time_steps step1 step2 step3
 \end{verbatim}}}
 
-\subsection{\I{The state object and the partition}}
+\subsection{\I{Layers}\label{sec:layers}}
+
+Layers are a key underlying concept in \IBM. They comprise of a grid of known values, with a value for every spatial cell in the model. Layers are used by processes, observations, and outputs commands to supply spatially explicit covariates and any categorical groupings required. 
+
+Layers are used by \IBM\ to evaluate locations where the population may be present (via the \emph{base layer}), to provide sets of known attributes or values of each spatial location (for some processes and for preference based movements), and to group or categorise cells for use by processes and observations. Layers consist of an $n_{rows} \times n_{cols}$ matrix and can be either \emph{numeric} or \emph{categorical}. 
+
+Every model must define at least one layer, the base layer $L_B$. A layer is defined as a $n_{rows} \times n_{cols}$ matrix of values (albeit with the exception of layers that describe distance --- these are described in detail below), where the value in each cell represents a known quantity. For example layers may represent classifications, physical attributes, or some other known or assumed quantity. Typically they are provided by the user as a matrix of values, although some layers (e.g., abundance or distance layers) can be calculated by \IBM\ during a model run. 
+
+Within \IBM, layers are used in the following contexts:
+\begin{enumerate}
+	\item The base layer\index{Base layer}\index{Layers ! the base layer}: The base layer $L_B$ is a special layer (there must be exactly one base layer defined within the model) that defines the locations where the population can and cannot potentially be present (e.g., locations associated with the sea and not land in a marine model). Here, we define that a cell may potentially have part of the population present if every element $L_B(i,j) \ge 0$. Further, positive values of the base layer $L_B$ represent the \emph{area} represented by that spatial cell. Note, the values in the base layer must be numeric, but cannot be a meta-layer (\emph{see below}).
+	\item \I{Covariate layers}: A model may have many covariate layers, and these are used as covariates of some population or movement process (e.g., the sea floor depth may be a covariate of some movement process). The values in layers used as covariates can be either numeric or categorical.
+	\item \I{Classification layers}: A model may have many classification layers, and these are used as a classification or grouping variable for aggregating data over individual spatial cells $(i,j)$, e.g., statistical areas or management areas. Such layers are typically used to aggregate the population within cells into groups so-as to allow comparison with observations. The values in layers used as classification layers must be categorical.
+\end{enumerate}
+
+\IBM\ defines the following types of layer;
+
+\begin{enumerate}
+	\item{\I{Numeric layers}\label{numeric-layer}}: A model may have many numeric layers, and these can be used as covariates of a population or movement process (e.g., depth may be a covariate of some movement process), and/or locations of event mortality. Numeric layers can contain only continuous (numeric) variables. Values for a numeric layer must be supplied for each cell by the user. Numeric layers can be rescaled to sum to some user-defined value, and unlike other layers, the values for each cell can be estimated. 
+	
+	For example, to specify a numeric layer for a spatial model with $3 \times 4$ cells called, say \texttt{base}, with the top left and bottom right cells set to zero and all other cells set to one and not rescaled, use,
+	{\small{\begin{verbatim}
+			@layer base
+			type numeric
+			data 0 1 1 1
+			data 1 1 1 1
+			data 1 1 1 0
+			\end{verbatim}}}
+	
+	\item {\I{Categorical layers}\label{categorical-layer}}: A model may have many categorical layers, and these can be used as a classification or grouping variable for aggregating data over individual cells, e.g., management areas; or as covariates of a population or movement process. Such layers are typically used to aggregate the population within cells into groups for comparing with observations, or to apply specific movement characteristics. The values in layers used as categorical layers can contain any characters (except white space), and are interpreted as categorical values. Values for a categorical layer must be supplied for each cell by the user.
+	
+	For example, to specify a categorical layer for a spatial model with $3 \times 4$ cells called, say \texttt{zone}, with the top left cells allocated as zone \texttt{A}, the bottom right allocated as zone \texttt{C}, and the rest as zone \texttt{B}, then use,
+	{\small{\begin{verbatim}
+			@layer zone
+			type categorical
+			data A A B B
+			data A A C C
+			data B B C C
+			\end{verbatim}}}
+	
+	
+	\item{\I{Abundance layers}}: The abundance layer is the sum of the number of individuals within cell $a$ in categories $k$ and with selectivity $S_l$ at age $l$. 
+	\begin{equation}
+	N(a) = \sum\limits_{k} \sum\limits_l S_l \ \text{element}(i,j,k,l)
+	\end{equation}
+	\IBM\ calculates the values of the layer when running the model at the point in time where the value is required.
+	
+	For example, to specify an abundance layer of all individuals who are categorised as \texttt{mature}, use,
+	{\small{\begin{verbatim}
+			@layer Abundance
+			type abundance
+			categories mature
+			selectivities One
+			\end{verbatim}}}
+	
+	\item {\I{Biomass layers}}: The biomass layer is the sum of the biomass of individuals within cell $a$ in categories $k$, with selectivity $S_l$ at age $l$, and mean weight $w_{kl}$
+	\begin{equation}
+	N(a) = \sum\limits_{k} \sum\limits_l w_{k,l} S_l \ \text{element}(i,j,k,l) 
+	\end{equation}
+	\IBM\ calculates the values of the layer when running the model at the point in time where the value is required.
+	
+	For example, to specify a biomass layer of all individuals who are categorised as \texttt{mature}, use,
+	{\small{\begin{verbatim}
+			@layer Biomass
+			type biomass
+			categories mature
+			selectivities One
+			\end{verbatim}}}
+	
+	\item {\I{Abundance-density layers}}: The abundance density layer is the density of the number of individuals within cell $a$ with area $A_a$ in categories $k$, with selectivity $S_l$ at age $l$,
+	\begin{equation}
+	N(a) = \frac{1}{A_a} \sum\limits_{k} \sum\limits_l S_l \ \text{element}(i,j,k,l)
+	\end{equation}
+	\IBM\ calculates the values of the layer when running the model at the point in time where the value is required.
+	
+	For example, to specify an abundance density layer of all individuals who are categorised as \texttt{mature}, use,
+	{\small{\begin{verbatim}
+			@layer AbundanceDensity
+			type abundance_density
+			categories mature
+			selectivities One
+			\end{verbatim}}}
+	
+	\item {\I{Biomass-density layers}}: The biomass-density layer is the density of the biomass of individuals within cell $a$ with area $A_a$ in categories $k$, with selectivity $S_l$ at age $l$, and mean weight $w_{kl}$,
+	\begin{equation}
+	N(a) = \frac{1}{A_a} \sum\limits_{k} \sum\limits_l w_{k,l} S_l \ \text{element}(i,j,k,l)
+	\end{equation}
+	\IBM\ calculates the values of the layer when running the model at the point in time where the value is required.
+	
+	For example, to specify a biomass density layer of all individuals who are categorised as \texttt{mature}, use,
+	{\small{\begin{verbatim}
+			@layer BiomassDensity
+			type bioomass_density
+			categories mature
+			selectivities One
+			\end{verbatim}}}
+
+	\item {\I{Meta-layers}\label{meta-layers}}: \IBM\ defines a special type of layer known as a \emph{meta-layer}. Meta-layers allows individual layers to be indexed by year and applied as an annually varying layer within the model. For example, assume a model that uses Sea Surface Temperature (SST) as a layer, perhaps to drive some movement process. The SST values for each year of the model would be defined as individual layers, each with a unique label. A meta-layer could be defined that indexed the individual annual SST layers by year, and used as a covariate layer in the movement process. Meta-layers have a \emph{default} layer that is used for time periods that are not specifically defined. Meta layers can be used wherever ordinary layers are used (except that they cannot be used as the base layer), with \IBM\ extracting the appropriate layer value corresponding to the year or the initialisation phase.
+	
+	\begin{enumerate}
+		
+		\item {\I{Numeric meta-layers}\label{numeric meta-layer}}: Numeric meta-layers are a meta layer of numeric layers --- the individual ordinary layers that make up the meta-layer must all be of numeric type. For example, assuming that the layers \texttt{SST} and \texttt{SST1990}, \texttt{SST1995}, etc., are defined elsewhere, then to specify a numeric meta-layer with specific values for the years 1990-1995, and a default for all other years (including the initialisation phases), use, 
+		
+		{\small{\begin{verbatim}
+				@layer AnnualNumericLayer
+				type numeric_meta
+				default_layer SST
+				years    1990    1991    1992    1993    1994    1995
+				layers SST1990 SST1991 SST1992 SST1993 SST1994 SST1995
+				\end{verbatim}}}
+		
+		\item {\I{Categorical meta-layers}\label{categorical meta-layer}}: Categorical meta-layers are a meta layer of categorical layers --- the individual ordinary layers that make up the meta-layer must all be of categorical type. Categorical meta-layers are specified in the same way as numeric meta-layers. For example, assuming that the layers \texttt{zones} and \texttt{zone1990}, \texttt{zone1995}, etc., are defined elsewhere, then to specify a categorical meta-layer with specific values for the years 1990-1995, and a default for all other years (including the initialisation phases), use, 
+		
+		{\small{\begin{verbatim}
+				@layer AnnualCategoricalLayer
+				type categorical_meta
+				default_layer zones
+				years     1990     1991     1992     1993     1994     1995
+				layers zone1990 zone1991 zone1992 zone1993 zone1994 zone1995
+				\end{verbatim}}}
+	\end{enumerate}
+\end{enumerate}
+
 
 
 
