@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.12)
 project(IBM)
 
 # Variables
@@ -91,8 +91,3 @@ ENDIF(LIBRARY)
 
 SET_TARGET_PROPERTIES(${EXE_NAME} PROPERTIES COMPILE_FLAGS ${COMPILE_OPTIONS} LINK_FLAGS ${LINK_OPTIONS})
 TARGET_LINK_LIBRARIES(${EXE_NAME} ${thirdPartyLibraries})
-IF(NOT TEST)
-	IF(WIN32)
-	  ADD_DEPENDENCIES(${EXE_NAME} version icon)
-	ENDIF(WIN32)
-ENDIF()
