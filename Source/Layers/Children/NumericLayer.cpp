@@ -19,6 +19,8 @@ NumericLayer::NumericLayer(Model* model) : Layer(model) {
   data_table_ = new parameters::Table(PARAM_LAYER);
   parameters_.BindTable(PARAM_LAYER, data_table_, "Table of layer attributes", "", false, true);
   parameters_.Bind<bool>(PARAM_PROPORTIONS, &proportion_, "Is this layer proportion values?", "", false);
+  layer_type_ = LayerType::kNumeric;
+
   // Default Variables
   grid_ = 0;
 }

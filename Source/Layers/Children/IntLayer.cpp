@@ -17,6 +17,8 @@ namespace layers {
 IntLayer::IntLayer(Model* model) : Layer(model) {
   int_table_ = new parameters::Table(PARAM_LAYER);
   parameters_.BindTable(PARAM_LAYER, int_table_, "Table of layer attributes", "", false, false);
+  layer_type_ = LayerType::kInteger;
+
   // Default Variables
   grid_ = 0;
 }

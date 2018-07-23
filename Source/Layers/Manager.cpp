@@ -37,7 +37,7 @@ Layer* Manager::GetLayer(const string& label) {
 IntLayer* Manager::GetIntLayer(const string& label) {
   IntLayer* pPtr = nullptr;
   for (auto layer : objects_) {
-    if (layer->label() == label && layer->type() == PARAM_INTEGER) {
+    if (layer->label() == label && (layer->layer_type() == LayerType::kInteger)) {
       pPtr = dynamic_cast<IntLayer*>(layer);
       return pPtr;
     }
@@ -55,7 +55,7 @@ NumericLayer* Manager::GetNumericLayer(const string& label) {
   LOG_TRACE()
   NumericLayer* pPtr = nullptr;
   for (auto layer : objects_) {
-    if ((layer->label() == label) && (layer->type() == PARAM_NUMERIC)) {
+    if ((layer->label() == label) && (layer->layer_type() == LayerType::kNumeric)) {
       pPtr = dynamic_cast<NumericLayer*>(layer);
       return pPtr;
     }

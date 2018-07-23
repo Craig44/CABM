@@ -37,6 +37,14 @@ namespace niwa {
 
 class Model;
 
+enum class LayerType {
+  kUnknown,
+  kNumeric,
+  kInteger,
+  kCategorical,
+};
+
+
 // classes
 class Layer : public niwa::base::Object {
 public:
@@ -52,11 +60,13 @@ public:
   virtual void                DoBuild() = 0;
 
   // accessors
+  LayerType                  layer_type() const { return layer_type_; }
 
 
 protected:
   // Members
   Model*                      model_ = nullptr;
+  LayerType                   layer_type_ = LayerType::kUnknown;
   unsigned                    height_;
   unsigned                    width_;
 };

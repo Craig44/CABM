@@ -15,6 +15,7 @@
 #include "Layers/Manager.h"
 #include "Layers/Children/IntLayer.h"
 #include "Layers/Children/NumericLayer.h"
+#include "Layers/Children/Numeric/MetaLayer.h"
 
 
 // namespaces
@@ -36,7 +37,8 @@ Layer* Factory::Create(Model* model, const string& object_type, const string& su
       result = new IntLayer(model);
     else if (sub_type == PARAM_NUMERIC)
       result = new NumericLayer(model);
-    //else if ()
+    else if (sub_type == PARAM_META_NUMERIC)
+      result = new MetaLayer(model);
 
     if (result)
       model->managers().layer()->AddObject(result);
