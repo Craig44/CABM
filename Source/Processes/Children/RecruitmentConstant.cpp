@@ -159,6 +159,14 @@ void RecruitmentConstant::DoExecute() {
 // containers in this class.
 void RecruitmentConstant::FillReportCache(ostringstream& cache) {
   LOG_TRACE();
+  cache << "r0: " << initial_recruits_ << "\n";
+  cache << "years: ";
+  for (auto& iter : recruits_by_year_)
+    cache << iter.first << " ";
+  cache << "\nrecruits: ";
+  for (auto& iter : recruits_by_year_)
+    cache << iter.second << " ";
+  cache << "\n";
 
 }
 

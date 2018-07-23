@@ -112,7 +112,8 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
     probability_mature_at_age =selectivity_[sex]->GetResult(age);
     if (rng.chance() <= probability_mature_at_age)
       mature = true;
-    Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], (model_->current_year() - age), growth_pars[agent][2], growth_pars[agent][3], model_, mature, sex, model_->get_scalar()); // seed it with lat long, L_inf, K
+    Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], (model_->current_year() - age),
+        growth_pars[agent][2], growth_pars[agent][3], model_, mature, sex, model_->get_scalar(), row_, col_); // seed it with lat long, L_inf, K
     agents_.push_back(new_agent);
   }
 }
@@ -137,7 +138,8 @@ void WorldCell::birth_agents(unsigned birth_agents) {
       if (rng.chance() >= male_prop)
         sex = 1;
     }
-    Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], model_->current_year(), growth_pars[agent][2], growth_pars[agent][3], model_, false, sex, model_->get_scalar()); // seed it with lat long, L_inf, K
+    Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], model_->current_year(),
+        growth_pars[agent][2], growth_pars[agent][3], model_, false, sex, model_->get_scalar(), row_, col_); // seed it with lat long, L_inf, K
     agents_.push_back(new_agent);
   }
 }

@@ -19,6 +19,7 @@
 #include "Reports/Manager.h"
 #include "Reports/Children/SummariseAgents.h"
 #include "Reports/Children/DerivedQuantity.h"
+#include "Reports/Children/AgeFrequencyByCell.h"
 #include "Reports/Children/Process.h"
 #include "Reports/Children/InitialisationPartition.h"
 #include "Reports/Children/WorldAgeFrequency.h"
@@ -42,6 +43,8 @@ Report* Factory::Create(Model* model, const string& object_type, const string& s
   if (object_type == PARAM_REPORT) {
     if (sub_type == PARAM_PROCESS)
       result = new Process(model);
+    else if (sub_type == PARAM_AGE_FREQUENCY_BY_CELL)
+      result = new AgeFrequencyByCell(model);
     else if (sub_type == PARAM_INITIALISATION_PARTITION)
       result = new InitialisationPartition(model);
     else if (sub_type == PARAM_SUMMARISE_AGENTS)

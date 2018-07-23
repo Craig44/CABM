@@ -19,7 +19,8 @@ namespace niwa {
 
 
 Agent::Agent(float lat, float lon, float first_age_length_par, float second_age_length_par, float M, unsigned birth_year,
-    float first_length_weight_par, float second_length_weigth_par, Model* model, bool mature, unsigned sex, float scalar) :
+    float first_length_weight_par, float second_length_weigth_par, Model* model, bool mature, unsigned sex, float scalar,
+    unsigned home_row, unsigned home_col) :
     lat_(lat),
     lon_(lon),
     first_age_length_par_(first_age_length_par),
@@ -31,7 +32,9 @@ Agent::Agent(float lat, float lon, float first_age_length_par, float second_age_
     model_(model),
     mature_(mature),
     sex_(sex),
-    scalar_(scalar)
+    scalar_(scalar),
+    home_row_(home_row),
+    home_col_(home_col)
 
 {
   growth_init(); // if age = 0 will set length_ = 0; otherwise will set to what ever the length at age dictates.

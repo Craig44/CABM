@@ -21,15 +21,14 @@ public:
   // Functions
   explicit NumericLayer(Model* model);
   virtual                     ~NumericLayer();
-  int                         countValidSpaces();
-  void                        set_value(unsigned RowIndex, unsigned ColIndex, float Value);  // TODO once we have children make this pure virtual
-  float                       get_value(unsigned RowIndex, unsigned ColIndex);
+  virtual void                set_value(unsigned RowIndex, unsigned ColIndex, float Value);  // TODO once we have children make this pure virtual
+  virtual float               get_value(unsigned RowIndex, unsigned ColIndex);
 
 
 protected:
   //member
-  virtual void                DoValidate() override final;
-  virtual void                DoBuild() override final;
+  virtual void                DoValidate();
+  virtual void                DoBuild();
   // Variables
   float                       **grid_;
   parameters::Table*          data_table_ = nullptr;

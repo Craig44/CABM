@@ -15,7 +15,7 @@
 #include "MovementBoxTransfer.h"
 
 #include "Layers/Manager.h"
-#include "Selectivities/Manager.h"
+//#include "Selectivities/Manager.h"
 #include "Utilities/RandomNumberGenerator.h"
 #include "Utilities/To.h"
 
@@ -36,7 +36,7 @@ namespace processes {
  */
 MovementBoxTransfer::MovementBoxTransfer(Model* model) : Process(model) {
   process_type_ = ProcessType::kTransition;
-  parameters_.Bind<string>(PARAM_SELECTIVITY, &selectivity_label_, "Selectivity label", "");
+  //parameters_.Bind<string>(PARAM_SELECTIVITY, &selectivity_label_, "Selectivity label", "");
   parameters_.Bind<string>(PARAM_ORIGIN_CELL, &origin_cell_, "The origin cell associated with each spatial layer (should have a one to one relationship with specified layers), format follows row-col (1-2)", "");
   parameters_.Bind<string>(PARAM_PROBABILITY_LAYERS, &probability_layer_labels_, "Spatial layers (one layer for each origin cell) describing the probability of moving from an origin cell to all other cells in the spatial domain. ", "");
   // TODO markovian (current implementation) vs natal i.e origin cell refers to where they are (Markovian) or where they were born (Natal Homing)
@@ -61,11 +61,13 @@ void MovementBoxTransfer::DoBuild() {
     }
     probability_layers_.push_back(temp_layer);
   }
+/*
 
   selectivity_ = model_->managers().selectivity()->GetSelectivity(selectivity_label_);
   if (!selectivity_)
     LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << ": selectivity " << selectivity_label_ << " does not exist. Have you defined it?";
 
+*/
 
   // Split out cell origins for quick look up at execution
   for (auto origin : origin_cell_) {
@@ -108,27 +110,53 @@ void MovementBoxTransfer::DoExecute() {
         if ((origin_rows_[origin_element] == row) && (origin_cols_[origin_element] == col))
           break;
       }
-      LOG_FINEST() << "row = " << row << " col = " << col << " layer pointer vlaue = " << origin_element;
+      LOG_FINEST() << "row = " << row << " col = " << col << " layer pointer vlaue = " << origin_element << " thread id = " << omp_get_thread_num();
       WorldCell* origin_cell = world_->get_base_square(row, col);
       WorldCell* destination_cell;
       if (origin_cell->is_enabled()) {
-        MovementData store_infor(model_->get_height(), model_->get_width(), origin_cell_[origin_element], model_->current_year(), origin_cell->agents_.size());
-        for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++iter) {
-          // Pick a random destination cell
-          unsigned destination_row = possible_rows_[possible_rows_.size() * rng.chance()];
-          unsigned destination_col = possible_cols_[possible_cols_.size() * rng.chance()];
-          if (rng.chance() <= (probability_layers_[origin_element]->get_value(destination_row, destination_col) * selectivity_->GetResult((*iter).get_age()))) {
-            // We are moving splice this agent to the destination cache cell
-            store_infor.destination_of_agents_moved_[destination_row][destination_col]++;
-            #pragma omp critical // Make a critical section in case multiple threads writing to same destination cell, thread protection // TODO this might slow things down, we could look at putting mutex's on each cell of the grid, and locking and unlocking each destination cell?
-            {
-              destination_cell = world_->get_cached_square(destination_row, destination_col);
-              auto nx = next(iter); // Need to next the iter else we iter changes scope to cached agents, an annoying stl thing
-              destination_cell->agents_.splice(destination_cell->agents_.end(), origin_cell->agents_, iter);
-              iter = nx;
+        LOG_FINEST() << "number of agents in this cell = " << origin_cell->agents_.size();
+        MovementData store_infor(model_->get_height(), model_->get_width(), origin_cell_[origin_element], model_->current_year());
+        float temp_sum, random;
+        unsigned counter = 0;
+        unsigned counter_jump = 0;
+        for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++counter) {
+          // Iterate over possible cells compare to chance()
+          temp_sum = 0;
+          random = rng.chance();
+          // Calcualte a multinomial via the following algorithm
+          // compare a random standard uniform value to the cumulative sums of the probabilities and return the first index for which
+          // the cumulative sum is greater than the random uniform
+          for (unsigned potential_destination = 0; potential_destination < possible_rows_.size(); ++potential_destination) {
+            temp_sum += probability_layers_[origin_element]->get_value(possible_rows_[potential_destination], possible_cols_[potential_destination]);
+            if (temp_sum > random) {
+              ++counter_jump;
+              //LOG_FINEST() << counter <<  " iter distance = " << distance(origin_cell->agents_.begin(), iter) << " cum prob = " << temp_sum << " random = " << random << " current row = " << row << " current col = " << col << "destination row = " << possible_rows_[potential_destination] << " destination col = " << possible_cols_[potential_destination];
+              store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]]++;
+              // if we are moving to this cell lets not move in memory
+              if ((possible_rows_[potential_destination] == row) && (possible_cols_[potential_destination] == col)) {
+                ++iter;
+                break;
+              }
+              // We are moving 'splice' this agent to the destination cache cell
+              #pragma omp critical
+              {
+                destination_cell = world_->get_cached_square(possible_rows_[potential_destination], possible_cols_[potential_destination]);
+                auto nx = next(iter); // Need to next the iter else we iter changes scope to cached agents, an annoying stl thing
+                destination_cell->agents_.splice(destination_cell->agents_.end(), origin_cell->agents_, iter);
+                iter = nx;
+              }
+              break;
+
             }
           }
         }
+        unsigned total = 0;
+        for (unsigned i = 0; i < store_infor.destination_of_agents_moved_.size(); ++i) {
+          for (unsigned j = 0; j < store_infor.destination_of_agents_moved_[i].size(); ++j )
+            total += store_infor.destination_of_agents_moved_[i][j];
+        }
+        store_infor.initial_numbers_ = counter;
+        LOG_FINEST() << "individuals at teh beginning = " << counter << " but we moved " << counter_jump << " total stored = " << total;
         if (model_->state() != State::kInitialise) {
           #pragma omp critical
           {
@@ -140,16 +168,18 @@ void MovementBoxTransfer::DoExecute() {
   }
   // merge destination agents into the actual grid
   world_->MergeCachedGrid();
+  LOG_TRACE();
 }
 
 // FillReportCache, called in the report class, it will print out additional information that is stored in
 // containers in this class.
 void  MovementBoxTransfer::FillReportCache(ostringstream& cache) {
+  LOG_TRACE();
   for (auto& values : moved_agents_by_year_) {
     cache << "initial_numbers: " << values.initial_numbers_ << "\n";
     cache << values.year_ << "_" << values.origin_cell_ << " " << REPORT_R_MATRIX << "\n";
-    for (unsigned i = 0; i < model_->get_height(); ++i) {
-      for (unsigned j = 0; j < model_->get_width(); ++j)
+    for (unsigned i = 0; i < values.destination_of_agents_moved_.size(); ++i) {
+      for (unsigned j = 0; j < values.destination_of_agents_moved_[i].size(); ++j )
         cache << values.destination_of_agents_moved_[i][j] << " ";
       cache << "\n";
     }

@@ -20,7 +20,7 @@
 
 // namespaces
 namespace niwa {
-class Selectivity;
+//class Selectivity;
 namespace processes {
 
 /**
@@ -29,9 +29,9 @@ namespace processes {
 struct MovementData {
   string origin_cell_;
   unsigned year_;
-  unsigned initial_numbers_;
+  unsigned initial_numbers_ = 0;
   vector<vector<unsigned>> destination_of_agents_moved_;
-  MovementData(unsigned rows, unsigned cols, string origin_cell, unsigned year, unsigned initial_values) : origin_cell_(origin_cell), year_(year), initial_numbers_(initial_values)
+  MovementData(unsigned rows, unsigned cols, string origin_cell, unsigned year) : origin_cell_(origin_cell), year_(year)
   {
     // set up matrix in constructor, save some sloppy run time code
     destination_of_agents_moved_.resize(rows);
@@ -55,8 +55,8 @@ public:
   void                        FillReportCache(ostringstream& cache);
 protected:
   vector<unsigned>            years_;
-  string                      selectivity_label_;
-  Selectivity*                selectivity_ = nullptr;
+//  string                      selectivity_label_;
+//  Selectivity*                selectivity_ = nullptr;
   vector<string>              origin_cell_;
   vector<string>              probability_layer_labels_;
   vector<layers::NumericLayer*>  probability_layers_;

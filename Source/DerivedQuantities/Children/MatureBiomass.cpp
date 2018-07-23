@@ -84,20 +84,20 @@ void MatureBiomass::PreExecute() {
  */
 void MatureBiomass::Execute() {
   LOG_TRACE();
-  if (utilities::doublecompare::IsZero(time_step_proportion_))
-    return;
   float value = 0.0;
-  unsigned time_step_index = model_->managers().time_step()->current_time_step();
-  LOG_FINE() << "Time step for calculating biomass = " << time_step_index;
+  if (utilities::doublecompare::IsZero(time_step_proportion_)) {
+    unsigned time_step_index = model_->managers().time_step()->current_time_step();
+    LOG_FINE() << "Time step for calculating biomass = " << time_step_index;
 
-  for (unsigned row = 0; row < model_->get_height(); ++row) {
-    for (unsigned col = 0; col < model_->get_width(); ++col) {
-      unsigned val = biomass_layer_->get_value(row, col);
-      if (val <= 0)
-        continue;
-      WorldCell* cell = world_->get_base_square(row, col);
-      if (cell->is_enabled()) {
-        value += cell->get_mature_biomass();
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        unsigned val = biomass_layer_->get_value(row, col);
+        if (val <= 0)
+          continue;
+        WorldCell* cell = world_->get_base_square(row, col);
+        if (cell->is_enabled()) {
+          value += cell->get_mature_biomass();
+        }
       }
     }
   }

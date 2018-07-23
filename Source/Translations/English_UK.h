@@ -71,6 +71,7 @@
 #define PARAM_AGE                                 "age"
 #define PARAM_AGE_WEIGHT_LABELS                   "age_weight_labels"
 #define PARAM_AGES                                "ages"
+#define PARAM_AGE_FREQUENCY_BY_CELL               "age_frequency_by_cell"
 #define PARAM_AGE_INDEX                           "age_index"
 #define PARAM_AGE_LENGTH                          "age_length"
 #define PARAM_AGE_LENGTHS                         "age_lengths"

@@ -27,7 +27,7 @@ public:
   // Methods
   virtual                       ~Agent() = default;
   Agent(float lat, float lon, float first_age_length_par, float second_age_length_par, float M, unsigned birth_year, float first_length_weight_par,
-      float second_length_weigth_par, Model* model, bool mature, unsigned sex, float scalar);
+      float second_length_weigth_par, Model* model, bool mature, unsigned sex, float scalar, unsigned home_row, unsigned home_col);
   virtual void                  Reset() {};
   // Accessors
   unsigned                     get_age();
@@ -41,6 +41,8 @@ public:
   virtual const float&         get_second_age_length_par() const {return second_age_length_par_;};
   virtual const float&         get_first_length_weight_par() const {return first_length_weight_par_;};
   virtual const float&         get_second_length_weight_par() const {return second_length_weight_par_;};
+  virtual const unsigned&      get_home_row() const {return home_row_ ;};
+  virtual const unsigned&      get_home_col() const {return home_col_ ;};
 
   void                         set_length(float new_length) {length_ = new_length;}
   void                         set_weight(float new_weight) {weight_ = new_weight;}
@@ -71,6 +73,8 @@ protected:
   bool                        mature_ = false;
   unsigned                    sex_ = 0; // 1 = male, 0 = female TODO
   float                       scalar_ = 1.0;
+  unsigned                    home_row_;
+  unsigned                    home_col_;
 
 private:
 

@@ -104,7 +104,7 @@ void RecruitmentBevertonHolt::DoBuild() {
   recruitment_index = model_->managers().time_step()->GetProcessIndex(label_);
 
   LOG_FINEST() << "recruitment index = " << recruitment_index << " ssb index = " << derived_quantity_index;
-  if (recruitment_index < derived_quantity_index)
+  if ((recruitment_index < derived_quantity_index) && (model_->min_age() <= 0))
     LOG_ERROR_P(PARAM_SSB) << "it seems the derived quantity " << ssb_label_ << " occurs after the recruitment event, for obvious reasons this can't happen. If this doesn't make much sense look at the usermanual under mortality blocks";
 
   if (model_->years().size() != ycs_values_.size()) {

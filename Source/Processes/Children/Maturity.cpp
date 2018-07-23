@@ -44,9 +44,6 @@ void Maturity::DoBuild() {
       LOG_CODE_ERROR()<< "this should have been checked on the ModelDoBuild please check out";
     selectivity_.push_back(temp_selectivity);
   }
-
-
-
 }
 
 
