@@ -13,7 +13,6 @@ FILE = [open('Syntax/DerivedQuantity.tex', 'r'),
         open('Syntax/Process.tex', 'r'),
         open('Syntax/Report.tex', 'r'),
         open('Syntax/Selectivity.tex', 'r'),
-        open('Syntax/Layer.tex', 'r'),        
         open('Syntax/TimeStep.tex', 'r'),
         open('Syntax/TimeVarying.tex', 'r')]
 OUTFILE = open('QuickReference.tex', 'w')

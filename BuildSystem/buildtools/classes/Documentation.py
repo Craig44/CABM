@@ -123,7 +123,7 @@ class ClassLoader:
                         'InitialisationPhases',
                         'Likelihoods',
                         'Model', 'Observations', 'Processes',
-                        'Reports', 'Selectivities', 'TimeSteps', 'TimeVarying', 'Layers' ]
+                        'Reports', 'Selectivities', 'TimeSteps', 'TimeVarying']
         type_without_children_folders = [ 'Model', 'TimeSteps']
         type_to_exclude_third_level_children = [ '' ]
         for folder in parent_class_folders:
@@ -178,7 +178,6 @@ class ClassLoader:
                                         print 'looking at child file = ' + child_file
                                         if not child_file.endswith('.h'):
                                             continue
-                                        print file[1:4];
                                         if file not in parent_class_.child_classes_:
                                             return Globals.PrintError('Child class ' + file + ' was not found in ' + parent_class_.name_ + ' child classes')
 

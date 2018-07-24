@@ -22,11 +22,55 @@
 \input{Syntax/Selectivity} 
 
 \subsection{\I{Layers}}
-\input{Syntax/Layer} 
+\defComLab{layer}{Define an object of type \emph{layer}}
+
+\defSub{label} {The label for this layer}
+\defType{string}
+\defDefault{No Default}
+
+\defSub{type} {The type of layer}
+\defType{string}
+\defDefault{No Default}
+
+\subsubsection[Numeric]{\commandlabsubarg{layer}{type}{numeric}}
+\defSub{table layer} {}
+Table contents here\\
+\defSub{end\_table} {}
+\defType{table}
+\defDefault{No Default}
+
+\defSub{proportions} {is the table proportions}
+\defType{boolean}
+\defDefault{false}
+
+\subsubsection[Numeric]{\commandlabsubarg{layer}{type}{numeric\_meta\_layer}}
+\defSub{years} {The year to apply the layer in}
+\defType{string}
+\defDefault{No Default}
+
+\defSub{default\_layer} {The layer to apply in initialisation phase}
+\defType{string}
+\defDefault{No Default}
+
+\defSub{layer\_labels} {The labels for corresponding \emph{numeric} layers to apply in the above years}
+\defType{string}
+\defDefault{No Default}
+
+\subsubsection[Numeric]{\commandlabsubarg{layer}{type}{integer}}
+\defSub{table layer} {}
+Table contents here\\
+\defSub{end\_table} {}
+\defType{table}
+\defDefault{No Default}
+
+
+
 
 An example of how to specify a table in the layers for an Int-layer or integer layer you could specify
 
 {\small{\begin{verbatim}
+@layer base_layer
+type integer		
 table layer
 1 1 1 1
 1 1 0 1

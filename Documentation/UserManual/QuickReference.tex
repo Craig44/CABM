@@ -71,8 +71,6 @@
 \par\textbf{\commandlabsubarg{process}{type}{mortality\_constant\_rate\_mortality}}\par
 \par\textbf{\commandlabsubarg{process}{type}{mortality\_event\_biomass\_mortality}}\par
 \par\textbf{\commandlabsubarg{process}{type}{movement\_box\_transfer}}\par
-\defSub{selectivity} {Selectivity label}
-\defSub{years} {years to apply the process}
 \defSub{origin\_cell} {The origin cell associated with each spatial layer (should have a one to one relationship with specified layers), format follows row-col (1-2}
 \defSub{probability\_layers} {Spatial layers (one layer for each origin cell) describing the probability of moving from an origin cell to all other cells in the spatial domain.}
 \par\textbf{\commandlabsubarg{process}{type}{nop}}\par
@@ -91,6 +89,9 @@
 \defSub{type} {The type of report}
 \defSub{file\_name} {The File Name if you want this report to be in a seperate file}
 \defSub{write\_mode} {The write mode}
+\par\textbf{\commandlabsubarg{report}{type}{age\_frequency\_by\_cell}}\par
+\defSub{years} {Years}
+\defSub{time\_step} {Time Step label}
 \par\textbf{\commandlabsubarg{report}{type}{derived\_quantity}}\par
 \par\textbf{\commandlabsubarg{report}{type}{initialisation\_partition}}\par
 \par\textbf{\commandlabsubarg{report}{type}{model\_attributes}}\par
@@ -157,7 +158,8 @@
 \defSub{label} {Label of the Layer}
 \defSub{type} {Type of Layer}
 \par\textbf{\commandlabsubarg{layer}{type}{int\_layer}}\par
-\par\textbf{\commandlabsubarg{layer}{type}{numeric\_layer}}\par
+\par\textbf{\commandlabsubarg{layer}{type}{numeric\_meta\_layer\_numeric}}\par
+\defSub{proportions} {Is this layer proportion values?}
 \defComLab{timestep}{Define an object of type \emph{timestep}}\par\par
 \defSub{label} {The label of the timestep}
 \defSub{processes} {The labels of the processes for this time step in the order that they occur}
