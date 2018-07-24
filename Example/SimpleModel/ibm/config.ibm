@@ -126,8 +126,8 @@ ato95 8
 type mature_biomass
 biomass_layer_label SSB_areas
 time_step Annual
-proportion_through_mortality_block 0.5
-
+proportion_through_mortality_block 1
+/*
 @derived_quantity total_biomass
 type biomass
 biomass_layer_label SSB_areas
@@ -141,6 +141,7 @@ layer_label SSB_areas
 selectivity One
 time_step Annual
 proportion_through_mortality_block 0.5
+*/
 # --------------
 # Define Reports
 # --------------

@@ -47,7 +47,7 @@ categories HAK4
 type mortality_event_biomass
 categories HAK4
 years 1970 1981:1990
-catches 2800 5000 3800 4800 800 1000 800 800 800 800 1000 
+catches  2800 5000 3800 4800 800 1000 800 800 800 800 1000 
 u_max 0.9
 selectivities trawl_selectivity
 
@@ -99,7 +99,7 @@ length_weight Length_weight
 k 0.161
 t0 0
 linf 101.8
-time_step_proportions 1
+time_step_proportions 0
 
 
 #################
