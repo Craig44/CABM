@@ -54,6 +54,7 @@ public:
   float                       get_abundance();
   float                       get_biomass();
   float                       get_mature_biomass();
+  void                        update_agent_parameters();
   list<Agent>                 agents_;
 
 

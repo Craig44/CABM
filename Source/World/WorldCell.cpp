@@ -145,6 +145,25 @@ void WorldCell::birth_agents(unsigned birth_agents) {
 }
 
 /*
+ * Called in WorldView usually after a movement process, where agents get assigned new parameters if we have spatial Mortality, or growth
+*/
+void  WorldCell::update_agent_parameters() {
+  LOG_TRACE();
+  vector<float> mort_par;
+  vector<vector<float>> growth_pars;
+  mortality_->draw_rate_param(row_, col_, agents_.size(), mort_par);
+  growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars);
+  unsigned counter = 0;
+  for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+    (*iter).set_first_age_length_par(growth_pars[counter][0]);
+    (*iter).set_second_age_length_par(growth_pars[counter][1]);
+    (*iter).set_first_length_weight_par(growth_pars[counter][2]);
+    (*iter).set_second_length_weight_par(growth_pars[counter][3]);
+    (*iter).set_m(mort_par[counter]);
+  }
+}
+
+/*
  * Returns the scaled up abundance for this cell
 */
 float  WorldCell::get_abundance() {

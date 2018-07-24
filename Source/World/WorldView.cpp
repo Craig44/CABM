@@ -136,6 +136,7 @@ void WorldView::MergeCachedGrid() {
     for (unsigned j = 0; j < width_; ++j) {
       if (base_grid_[i][j].is_enabled()) {
         // Splice agents to real world grid and delete from cache
+        cached_grid_[i][j].update_agent_parameters();
         // TODO think about how we are going to update agents parameters effeciently from new cell
         base_grid_[i][j].agents_.splice(base_grid_[i][j].agents_.end(), cached_grid_[i][j].agents_);
         cached_grid_[i][j].agents_.clear();
