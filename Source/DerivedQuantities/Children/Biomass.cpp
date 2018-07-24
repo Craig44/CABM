@@ -102,7 +102,7 @@ void Biomass::Execute() {
   LOG_TRACE();
   float value = 0.0;
 
-  if (utilities::doublecompare::IsZero(time_step_proportion_)) {
+  if (!utilities::doublecompare::IsZero(time_step_proportion_)) {
 
     utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
     float probability_mature_at_age;
@@ -157,7 +157,7 @@ void Biomass::Execute() {
       values_[model_->current_year()] = cache_value_ + ((value - cache_value_) * time_step_proportion_);
     else
       values_[model_->current_year()] = pow(cache_value_, 1 - time_step_proportion_) * pow(value ,time_step_proportion_);
-    LOG_FINEST() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value << " Final value " << values_[model_->current_year()];
+    LOG_FINEST() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value << " Final value ";
   }
 }
 

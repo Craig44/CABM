@@ -8,7 +8,7 @@
 //============================================================================
 
 // Local headers
-#include "MetaLayer.h"
+#include "NumericMetaLayer.h"
 
 #include "Layers/Manager.h"
 
@@ -16,7 +16,7 @@ namespace niwa {
 namespace layers {
 
 // Constructor
-MetaLayer::MetaLayer(Model* model) : NumericLayer(model) {
+NumericMetaLayer::NumericMetaLayer(Model* model) : NumericLayer(model) {
   // Default Variables
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "the years to apply the following layer", "");
   parameters_.Bind<string>(PARAM_DEFAULT_LAYER, &default_Layer_label_, "The default layer to apply in initialisation phase", "");
@@ -29,7 +29,7 @@ MetaLayer::MetaLayer(Model* model) : NumericLayer(model) {
 // void CNumericMetaLayer::validate()
 // Validate the layer
 //**********************************************************************
-void MetaLayer::DoValidate() {
+void NumericMetaLayer::DoValidate() {
   LOG_TRACE();
   if (years_.size() != layer_names_.size())
     LOG_ERROR_P(PARAM_LAYER_LABELS) << "there needs to be a year for each layer label, you supplied '" << years_.size() << "' but '" << layer_names_.size() << "' layer labels. Please sort this out, chairs =)";
@@ -39,7 +39,7 @@ void MetaLayer::DoValidate() {
 // void CNumericMetaLayer::build()
 // Build the layer
 //**********************************************************************
-void MetaLayer::DoBuild() {
+void NumericMetaLayer::DoBuild() {
   LOG_TRACE();
   for (auto year : model_->years()) {
     if (find(years_.begin(), years_.end(), year) == years_.end())
@@ -55,7 +55,7 @@ void MetaLayer::DoBuild() {
       LOG_FATAL_P(PARAM_LAYER_LABELS) << "the layer = " << layer_names_[i] << " is not numeric, can you please sort that out";
 
     }
-    years_layer_.push_back(layer);
+    years_layer_[years_[i]] = layer;
   }
 
   default_layer_ = model_->managers().layer()->GetNumericLayer(default_Layer_label_);
@@ -70,17 +70,11 @@ void MetaLayer::DoBuild() {
 // double getValue(int RowIndex, int ColIndex, int TargetRow, int TargetCol)
 // get value
 //**********************************************************************
-float MetaLayer::get_value(unsigned RowIndex, unsigned ColIndex) {
+float NumericMetaLayer::get_value(unsigned RowIndex, unsigned ColIndex) {
   float value = 0.0;
   if (model_->state() == State::kInitialise)
     return default_layer_->get_value(RowIndex, ColIndex);
-  unsigned current_year = model_->current_year();
-  unsigned year_ndx = 0;
-  for (;year_ndx < years_.size(); ++year_ndx) {
-    if (years_[year_ndx] == current_year)
-      break;
-  }
-  value = years_layer_[year_ndx]->get_value(RowIndex, ColIndex);
+  value = years_layer_[model_->current_year()]->get_value(RowIndex, ColIndex);
   return value;
 }
 

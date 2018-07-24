@@ -343,6 +343,7 @@
 #define PARAM_NUMBER_OF_GROWTH_EPISODES           "number_of_growth_episodes"
 #define PARAM_NUMBER_OF_AGENTS					         "number_of_agents"
 #define PARAM_NUMERIC                             "numeric"
+#define PARAM_NUMERIC_META_NUMERIC                "numeric_meta_layer"
 #define PARAM_NROWS                               "nrows"
 #define PARAM_OBJECTIVE                           "objective"
 #define PARAM_OBJECTIVE_FUNCTION                  "objective_function"

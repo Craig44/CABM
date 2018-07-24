@@ -48,6 +48,12 @@ public:
   void                         set_weight(float new_weight) {weight_ = new_weight;}
   void                         set_scalar(float scalar) {scalar_ = scalar;}
   void                         set_maturity(bool mature) {mature_ = mature;}
+  void                         set_growth(float scalar) {scalar_ = scalar;}
+  void                         set_first_age_length_par(float value) {first_age_length_par_ = value;}
+  void                         set_second_age_length_par(float value) {second_age_length_par_ = value;}
+  void                         set_first_length_weight_par(float value) {first_length_weight_par_ = value;}
+  void                         set_second_length_weight_par(float value) {second_length_weight_par_ = value;}
+  void                         set_m(float value) {M_ = value;}
 
 
 

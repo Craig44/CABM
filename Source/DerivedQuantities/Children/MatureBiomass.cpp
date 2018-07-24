@@ -85,7 +85,7 @@ void MatureBiomass::PreExecute() {
 void MatureBiomass::Execute() {
   LOG_TRACE();
   float value = 0.0;
-  if (utilities::doublecompare::IsZero(time_step_proportion_)) {
+  if (!utilities::doublecompare::IsZero(time_step_proportion_)) {
     unsigned time_step_index = model_->managers().time_step()->current_time_step();
     LOG_FINE() << "Time step for calculating biomass = " << time_step_index;
 
@@ -100,6 +100,7 @@ void MatureBiomass::Execute() {
         }
       }
     }
+    LOG_FINEST() << "executing and value = " << value;
   }
 
   if (model_->state() == State::kInitialise) {
@@ -131,8 +132,9 @@ void MatureBiomass::Execute() {
       values_[model_->current_year()] = cache_value_ + ((value - cache_value_) * time_step_proportion_);
     else
       values_[model_->current_year()] = pow(cache_value_, 1 - time_step_proportion_) * pow(value ,time_step_proportion_);
-    LOG_FINEST() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value << " Final value " << values_[model_->current_year()];
   }
+  LOG_FINEST() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value << " Final value ";
+
 }
 
 } /* namespace derivedquantities */

@@ -1,5 +1,5 @@
 //============================================================================
-// Name        : MetaLayer.h
+// Name        : NumericMetaLayer.h
 // Author      : S.Rasmussen
 // Date        : 16/01/2009
 // Copyright   : Copyright NIWA Science ©2009 - www.niwa.co.nz
@@ -19,11 +19,11 @@ namespace layers {
 //
 //
 //**********************************************************************
-class MetaLayer : public NumericLayer {
+class NumericMetaLayer : public NumericLayer {
 public:
   // Functions
-  MetaLayer(Model* model);
-  virtual                     ~MetaLayer() {};
+  NumericMetaLayer(Model* model);
+  virtual                     ~NumericMetaLayer() {};
   virtual void                set_value(unsigned RowIndex, unsigned ColIndex, float Value) {};  // TODO once we have children make this pure virtual
   virtual float               get_value(unsigned RowIndex, unsigned ColIndex);
 protected:
@@ -33,7 +33,7 @@ protected:
   string                       default_Layer_label_;
   vector<unsigned>             years_;
   vector<string>               layer_names_;
-  vector<NumericLayer*>        years_layer_;
+  map<unsigned, NumericLayer*> years_layer_;
   NumericLayer*                default_layer_;
   bool                         has_years_;
 };
