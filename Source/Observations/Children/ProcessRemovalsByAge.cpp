@@ -15,7 +15,6 @@
 
 #include "Model/Model.h"
 #include "Processes/Manager.h"
-#include "TimeSteps/Manager.h"
 #include "AgeingErrors/Manager.h"
 #include "Utilities/Map.h"
 #include "Utilities/Math.h"
@@ -38,7 +37,6 @@ ProcessRemovalsByAge::ProcessRemovalsByAge(Model* model) : Observation(model) {
   parameters_.Bind<unsigned>(PARAM_MIN_AGE, &min_age_, "Minimum age", "");
   parameters_.Bind<unsigned>(PARAM_MAX_AGE, &max_age_, "Maximum age", "");
   parameters_.Bind<bool>(PARAM_PLUS_GROUP, &plus_group_, "Use age plus group", "", true);
-  parameters_.Bind<string>(PARAM_TIME_STEP, &time_step_label_, "The label of time-step that the observation occurs in", "");
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "Years for which there are observations", "");
   parameters_.Bind<string>(PARAM_AGEING_ERROR, &ageing_error_label_, "Label of ageing error to use", "", "");
   parameters_.BindTable(PARAM_ERROR_VALUES, error_values_table_, "Table of error values of the observed values (note the units depend on the likelihood)", "", false);
@@ -60,8 +58,6 @@ ProcessRemovalsByAge::~ProcessRemovalsByAge() {
  */
 void ProcessRemovalsByAge::DoValidate() {
   age_spread_ = (max_age_ - min_age_) + 1;
-  map<unsigned, vector<float>> error_values_by_year;
-
   /**
    * Do some simple checks
    */
@@ -71,6 +67,7 @@ void ProcessRemovalsByAge::DoValidate() {
     LOG_ERROR_P(PARAM_MAX_AGE) << ": max_age (" << max_age_ << ") is greater than the model's max_age (" << model_->max_age() << ")";
 
   for (auto year : years_) {
+    LOG_FINEST() << "year : " << year;
   	if((year < model_->start_year()) || (year > model_->final_year()))
   		LOG_ERROR_P(PARAM_YEARS) << "Years can't be less than start_year (" << model_->start_year() << "), or greater than final_year (" << model_->final_year() << "). Please fix this.";
   }
@@ -113,16 +110,17 @@ void ProcessRemovalsByAge::DoValidate() {
         LOG_ERROR_P(PARAM_ERROR_VALUES) << ": error_value (" << value << ") cannot be less than 0.0";
       }
 
-      error_values_by_year[year].push_back(value);
+      error_values_by_year_[year].push_back(value);
     }
-    if (error_values_by_year[year].size() == 1) {
-      error_values_by_year[year].assign(obs_expected - 1, error_values_by_year[year][0]);
+    if (error_values_by_year_[year].size() == 1) {
+      error_values_by_year_[year].assign(obs_expected - 1, error_values_by_year_[year][0]);
     }
-    if (error_values_by_year[year].size() != obs_expected - 1)
-      LOG_FATAL_P(PARAM_ERROR_VALUES) << "We counted " << error_values_by_year[year].size() << " error values by year but expected " << obs_expected -1 << " based on the obs table";
+    LOG_FINEST() << "number of error values in year " << year << " = " << error_values_by_year_[year].size();
+    if (error_values_by_year_[year].size() != obs_expected - 1)
+      LOG_FATAL_P(PARAM_ERROR_VALUES) << "We counted " << error_values_by_year_[year].size() << " error values by year but expected " << obs_expected -1 << " based on the obs table";
   }
 
-  age_spread_ = max_age_ - min_age_ + 1;
+
 
 }
 
@@ -133,9 +131,9 @@ void ProcessRemovalsByAge::DoValidate() {
 void ProcessRemovalsByAge::DoBuild() {
   // Create a pointer to misclassification matrix
     if( ageing_error_label_ != "") {
-    ageing_error_ = model_->managers().ageing_error()->GetAgeingError(ageing_error_label_);
-    if (!ageing_error_)
-      LOG_ERROR_P(PARAM_AGEING_ERROR) << "(" << ageing_error_label_ << ") could not be found. Have you defined it?";
+      ageing_error_ = model_->managers().ageing_error()->GetAgeingError(ageing_error_label_);
+      if (!ageing_error_)
+        LOG_ERROR_P(PARAM_AGEING_ERROR) << "(" << ageing_error_label_ << ") could not be found. Have you defined it?";
     }
     if (ageing_error_label_ == "") {
       LOG_WARNING() << "You are suppling a an age based observation with no ageing_misclassification";
@@ -148,104 +146,18 @@ void ProcessRemovalsByAge::DoBuild() {
 }
 
 /**
- * This method is called at the start of the targetted
- * time step for this observation.
- *
- * At this point we need to build our cache for the partition
- * structure to use with any interpolation
+ * We have to have a pre-execute and execute but all the information is stored on the process so I am just going to do
+ * all the calculations in teh Simulate call
  */
 void ProcessRemovalsByAge::PreExecute() {
+
 }
 
 /**
  *
  */
 void ProcessRemovalsByAge::Execute() {
-  LOG_TRACE();
-  LOG_FINEST() << "Entering observation " << label_;
-/*  if (time_step_to_execute_ == current_time_step) {
-    unsigned current_time_step = model_->managers().time_step()->current_time_step();
-    map<unsigned, vector<unsigned>>& age_freq = mortality_process_->get_removals_by_age();
 
-
-  }*/
-/*
-  // Check if we are in the final time_step so we have all the relevent information from the Mortaltiy process
-
-		unsigned year = model_->current_year();
-		map<unsigned,map<string, map<string, vector<float>>>> &Removals_at_age = mortality_instantaneous_->catch_at();
-
-		auto partition_iter = partition_->Begin(); // vector<vector<partition::Category> >
-		for (unsigned category_offset = 0; category_offset < category_labels_.size(); ++category_offset, ++partition_iter) {
-			vector<float> expected_values(age_spread_, 0.0);
-			vector<float> accumulated_expected_values(age_spread_, 0.0);
-			LOG_FINEST() << "Category = " << category_labels_[category_offset];
-			auto category_iter = partition_iter->begin();
-			for (; category_iter != partition_iter->end(); ++category_iter) {
-				// Go through all the fisheries and accumulate the expectation whilst also applying ageing error
-				unsigned method_offset = 0;
-				for (string fishery : method_) {
-				  // This should get caught in the DoBuild now.
-					if (Removals_at_age[year][fishery][(*category_iter)->name_].size() == 0) {
-						LOG_FATAL() << "There is no catch at age data in year " << year << " for method " << fishery << " applied to category = " << (*category_iter)->name_ << " please check that your mortality_instantaneous process '" << process_label_<< "' is comparable with the observation " << label_;
-					}
-
-					 *  Apply Ageing error on Removals at age vector
-
-					if (ageing_error_label_ != "") {
-						vector < vector < float >> &mis_matrix = ageing_error_->mis_matrix();
-						vector<float> temp(Removals_at_age[year][fishery][(*category_iter)->name_].size(), 0.0);
-						LOG_FINEST() << "category = " << (*category_iter)->name_;
-						LOG_FINEST() << "size = " << Removals_at_age[year][fishery][(*category_iter)->name_].size();
-
-						for (unsigned i = 0; i < mis_matrix.size(); ++i) {
-							for (unsigned j = 0; j < mis_matrix[i].size(); ++j) {
-								temp[j] += Removals_at_age[year][fishery][(*category_iter)->name_][i] * mis_matrix[i][j];
-							}
-						}
-						Removals_at_age[year][fishery][(*category_iter)->name_] = temp;
-					}
-					LOG_TRACE();
-
-					 *  Now collapse the number_age into the expected_values for the observation
-
-					for (unsigned k = 0; k < Removals_at_age[year][fishery][(*category_iter)->name_].size(); ++k) {
-						LOG_FINE() << "----------";
-						LOG_FINE() << "Fishery: " << fishery;
-						LOG_FINE() << "Numbers At Age After Ageing error: " << (*category_iter)->min_age_ + k << "for category " << (*category_iter)->name_ << " " << Removals_at_age[year][fishery][(*category_iter)->name_][k];
-
-						unsigned age_offset = min_age_ - model_->min_age();
-						if (k >= age_offset && (k - age_offset + min_age_) <= max_age_)
-						expected_values[k - age_offset] = Removals_at_age[year][fishery][(*category_iter)->name_][k];
-						// Deal with the plus group
-						if (((k - age_offset + min_age_) > max_age_) && plus_group_)
-						expected_values[age_spread_ - 1] += Removals_at_age[year][fishery][(*category_iter)->name_][k];
-					}
-
-					if (expected_values.size() != proportions_[model_->current_year()][category_labels_[category_offset]].size())
-					LOG_CODE_ERROR()<< "expected_values.size(" << expected_values.size() << ") != proportions_[category_offset].size("
-					<< proportions_[model_->current_year()][category_labels_[category_offset]].size() << ")";
-
-					// Accumulate the expectations if they come form multiple fisheries
-					for (unsigned i = 0; i < expected_values.size(); ++i)
-					accumulated_expected_values[i] += expected_values[i];
-
-					method_offset++;
-				}
-			}
-
-			*
-			 * save our comparisons so we can use them to generate the score from the likelihoods later
-
-			for (unsigned i = 0; i < expected_values.size(); ++i) {
-				LOG_FINEST() << "-----";
-				LOG_FINEST() << "Numbers at age for category: " << category_labels_[category_offset] << " for age " << min_age_ + i << " = " << accumulated_expected_values[i];
-				SaveComparison(category_labels_[category_offset], min_age_ + i, 0.0, accumulated_expected_values[i],
-				proportions_[model_->current_year()][category_labels_[category_offset]][i], process_errors_by_year_[model_->current_year()],
-				error_values_[model_->current_year()][category_labels_[category_offset]][i],0.0, delta_, 0.0);
-			}
-		}
-	}*/
 }
 
 /**
@@ -257,8 +169,56 @@ void ProcessRemovalsByAge::Simulate() {
    * Simulate or generate results
    * During simulation mode we'll simulate results for this observation
    */
-  LOG_FINEST() << "Calculating score for observation = " << label_;
+  LOG_MEDIUM() << "Simulating data for observation = " << label_;
+  map<unsigned, vector<unsigned>>& age_frequency = mortality_process_->get_removals_by_age();
+  LOG_FINEST() << "number of years for this observation = " << age_frequency.size();
+  unsigned age_offset = min_age_ - model_->min_age();
+  // Apply ageing error
+  float plus_group = 0.0;
+  if (ageing_error_) {
+    vector<vector<float>> &mis_matrix = ageing_error_->mis_matrix();
+    for (auto year_age_freq : age_frequency) {
+      vector<float> temp(model_->age_spread(), 0.0);
+      if (find(years_.begin(), years_.end(), year_age_freq.first) != years_.end()) {
+        for (unsigned i = 0; i < mis_matrix.size(); ++i) {
+          for (unsigned j = 0; j < mis_matrix[i].size(); ++j) {
+            temp[j] += (float)year_age_freq.second[i] * mis_matrix[i][j];
+          }
+        }
+        /*
+         *  Now collapse the number_age into the expected_values for the observation
+         */
+        for (unsigned k = 0; k < model_->age_spread(); ++k) {
+          if (k >= age_offset && (k - age_offset + min_age_) < max_age_)
+            SaveComparison(k + model_->min_age(), 0, temp[k], 0.0, error_values_by_year_[year_age_freq.first][k - age_offset], year_age_freq.first);
+          // Deal with the plus group
+          if (((k - age_offset + min_age_) >= max_age_) && plus_group_)
+            plus_group += temp[k];
+          else if (((k - age_offset + min_age_) == max_age_) && !plus_group_)
+            plus_group = temp[k]; // no plus group and we are max age
 
+        }
+        SaveComparison(max_age_, 0, plus_group, 0.0, error_values_by_year_[year_age_freq.first][max_age_ - min_age_], year_age_freq.first);
+      }
+    }
+  } else {
+    for (auto year_age_freq : age_frequency) {
+      LOG_FINEST() << "year = " << year_age_freq.first << " age offset = " << age_offset;
+      if (find(years_.begin(), years_.end(), year_age_freq.first) != years_.end()) {
+        for (unsigned k = 0; k < model_->age_spread(); ++k) {
+          if (k >= age_offset && (k - age_offset + min_age_) < max_age_)
+            SaveComparison(k + model_->min_age(), 0, (float)year_age_freq.second[k], 0.0, error_values_by_year_[year_age_freq.first][k - age_offset], year_age_freq.first);
+          if (((k - age_offset + min_age_) >= max_age_) && plus_group_)
+            plus_group += (float)year_age_freq.second[k];
+          else if (((k - age_offset + min_age_) == max_age_) && !plus_group_)
+            plus_group = (float)year_age_freq.second[k]; // no plus group and we are max age
+        }
+        SaveComparison(max_age_, 0, plus_group, 0.0, error_values_by_year_[year_age_freq.first][max_age_ - min_age_], year_age_freq.first);
+      }
+    }
+  }
+
+  // Convert to propotions before simulating
   for (auto& iter : comparisons_) {
     float total_expec = 0.0;
     for (auto& comparison : iter.second)
@@ -267,6 +227,7 @@ void ProcessRemovalsByAge::Simulate() {
       comparison.expected_ /= total_expec;
   }
   likelihood_->SimulateObserved(comparisons_);
+  // Simualte numbers at age, but we want proportion
   for (auto& iter : comparisons_) {
     float total = 0.0;
     for (auto& comparison : iter.second)

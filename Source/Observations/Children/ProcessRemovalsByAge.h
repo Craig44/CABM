@@ -57,12 +57,11 @@ protected:
   string                        ageing_error_label_;
   Mortality*                    mortality_process_ = nullptr;
   vector<float>                 age_results_;
-  vector<string>                time_step_label_;
   string                        process_label_;
   unsigned                      time_step_to_execute_;
-
-  map<unsigned, map<string, vector<float>>>  proportions_;
-  map<unsigned, map<string, vector<float>>>  error_values_;
+  map<unsigned, vector<float>>  error_values_by_year_;
+  map<unsigned,vector<float>>   proportions_;
+  map<unsigned, vector<float>>  error_values_;
 
 };
 

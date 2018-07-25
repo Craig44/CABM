@@ -32,7 +32,7 @@ namespace niwa {
 Observation::Observation(Model* model) : model_(model) {
   parameters_.Bind<string>(PARAM_LABEL, &label_, "Label", "");
   parameters_.Bind<string>(PARAM_TYPE, &type_, "Type of observation", "");
-  parameters_.Bind<string>(PARAM_SIMULATION_LIKELIHOOD, &simulation_likelihood_label_, "Simulation likelihood to use", "", "");
+  parameters_.Bind<string>(PARAM_SIMULATION_LIKELIHOOD, &simulation_likelihood_label_, "Simulation likelihood to use", "");
 }
 
 /**
@@ -86,14 +86,14 @@ void Observation::Reset() {
  * @param observed The value passed in from the configuration file
  * @param error_value The error value for this comparison
  */
-void Observation::SaveComparison(unsigned age, float length, float expected, float simulated, float error_value){
+void Observation::SaveComparison(unsigned age, float length, float expected, float simulated, float error_value, unsigned year){
   observations::Comparison new_comparison;
   new_comparison.age_ = age;
   new_comparison.length_ = length;
   new_comparison.expected_ = expected;
   new_comparison.simulated_ = simulated;
   new_comparison.error_value_ = error_value;
-  comparisons_[model_->current_year()].push_back(new_comparison);
+  comparisons_[year].push_back(new_comparison);
 }
 
 } /* namespace niwa */

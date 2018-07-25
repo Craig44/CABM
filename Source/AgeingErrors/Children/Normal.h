@@ -37,7 +37,7 @@ protected:
 
 private:
   // members
-  Double                      cv_ = 0.0;
+  float                      cv_ = 0.0;
   unsigned                    k_;
 };
 

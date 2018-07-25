@@ -27,7 +27,6 @@
 namespace niwa {
 class Model;
 
-using niwa::utilities::Double;
 
 /**
  * Default Constructor
@@ -46,7 +45,7 @@ public:
   unsigned                    min_age() const { return min_age_; }
   unsigned                    max_age() const { return max_age_; }
   bool                        plus_group() const { return plus_group_; }
-  vector<vector<Double> >&    mis_matrix() { return mis_matrix_; }
+  vector<vector<float> >&    mis_matrix() { return mis_matrix_; }
 
 protected:
   // Methods
@@ -60,7 +59,7 @@ protected:
   unsigned                    max_age_ = 0;
   bool                        plus_group_ = false;
   unsigned                    age_spread_ = 0;
-  vector<vector<Double> >     mis_matrix_;
+  vector<vector<float> >     mis_matrix_;
 };
 
 } /* namespace niwa */

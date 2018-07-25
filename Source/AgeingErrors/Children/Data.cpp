@@ -54,11 +54,11 @@ void Data::DoBuild() {
     return;
   }
 
-  Double value = 0.0;
+  float value = 0.0;
   for (unsigned i = 0; i < data.size(); ++i) {
     for (unsigned j = 0; j < data[i].size(); ++j) {
-      if (!utilities::To<string, Double>(data[i][j], value))
-        LOG_ERROR_P(PARAM_TABLE) << "Could not convert the value " << data[i][j] << " to a double for storage in the misclassification matrix";
+      if (!utilities::To<string, float>(data[i][j], value))
+        LOG_ERROR_P(PARAM_TABLE) << "Could not convert the value " << data[i][j] << " to a float for storage in the misclassification matrix";
 
       mis_matrix_[i][j] = value;
     }

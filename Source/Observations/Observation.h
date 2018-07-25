@@ -56,7 +56,7 @@ public:
 
 protected:
   // methods
-  void                        SaveComparison(unsigned age, float length, float expected, float simulated, float error_value);
+  void                        SaveComparison(unsigned age, float length, float expected, float simulated, float error_value, unsigned year);
   // members
   Model*                      model_ = nullptr;
   float                       proportion_of_time_ = 0;

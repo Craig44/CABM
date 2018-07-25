@@ -135,9 +135,9 @@ void WorldView::MergeCachedGrid() {
   for (unsigned i = 0; i < height_; ++i) {
     for (unsigned j = 0; j < width_; ++j) {
       if (base_grid_[i][j].is_enabled()) {
-        // Splice agents to real world grid and delete from cache
+        // Are we updateing agents parameters
         cached_grid_[i][j].update_agent_parameters();
-        // TODO think about how we are going to update agents parameters effeciently from new cell
+        // Splice agents to real world grid and delete from cache
         base_grid_[i][j].agents_.splice(base_grid_[i][j].agents_.end(), cached_grid_[i][j].agents_);
         cached_grid_[i][j].agents_.clear();
       }
@@ -167,13 +167,13 @@ void WorldView::get_world_age_frequency(vector<unsigned>& world_age_freq) {
 
 // Return a cell of the base world
 WorldCell* WorldView::get_base_square(int RowIndex, int ColIndex) {
-  LOG_TRACE();
+  //LOG_TRACE();
   return &base_grid_[RowIndex][ColIndex];
 }
 
 // Return a cell of the cached world
 WorldCell* WorldView::get_cached_square(int RowIndex, int ColIndex) {
-  LOG_TRACE();
+  //LOG_TRACE();
   return &cached_grid_[RowIndex][ColIndex];
 }
 

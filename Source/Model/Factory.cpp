@@ -14,6 +14,7 @@
 
 // Common Factories
 #include "BaseClasses/Object.h"
+#include "AgeingErrors/Factory.h"
 #include "Asserts/Factory.h"
 #include "Layers/Factory.h"
 #include "DerivedQuantities/Factory.h"
@@ -61,6 +62,8 @@ base::Object* Factory::CreateObject(const string& object_type, const string& sub
     return asserts::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_LAYER)
     return layers::Factory::Create(model_, lwr_object_type, lwr_sub_type);
+  else if (lwr_object_type == PARAM_AGEING_ERROR || lwr_object_type == PARAM_AGEING_ERRORS)
+    return ageingerrors::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_DERIVED_QUANTITY || lwr_object_type == PARAM_DERIVED_QUANTITIES)
     return derivedquantities::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_INITIALISATION_PHASE || lwr_object_type == PARAM_INITIALISATION_PHASES)

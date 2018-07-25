@@ -22,6 +22,7 @@
 #include "Reports/Children/AgeFrequencyByCell.h"
 #include "Reports/Children/Process.h"
 #include "Reports/Children/InitialisationPartition.h"
+#include "Reports/Children/Observation.h"
 #include "Reports/Children/WorldAgeFrequency.h"
 #include "Reports/Children/ModelAttributes.h"
 
@@ -53,6 +54,8 @@ Report* Factory::Create(Model* model, const string& object_type, const string& s
       result = new WorldAgeFrequency(model);
     else if (sub_type == PARAM_DERIVED_QUANTITY)
       result = new DerivedQuantity(model);
+    else if (sub_type == PARAM_OBSERVATION)
+      result = new Observation(model);
     else if (sub_type == PARAM_MODEL_ATTRIBUTES)
       result = new ModelAttributes(model);
     if (result) {

@@ -16,6 +16,7 @@
 #include "Model/Model.h"
 #include "Model/Managers.h"
 #include "Observations/Manager.h"
+#include "Observations/Children/ProcessRemovalsByAge.h"
 
 
 
@@ -33,10 +34,15 @@ namespace observations {
  */
 Observation* Factory::Create(Model* model, const string& object_type, const string& sub_type) {
   Observation* result = nullptr;
+  if (object_type == PARAM_OBSERVATION) {
 
-  if (result)
-    model->managers().observation()->AddObject(result);
+    if (sub_type == PARAM_PROCESS_REMOVALS_BY_AGE)
+          result = new ProcessRemovalsByAge(model);
 
+
+    if (result)
+      model->managers().observation()->AddObject(result);
+  }
   return result;
 }
 
