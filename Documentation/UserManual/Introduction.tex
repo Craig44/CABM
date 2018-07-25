@@ -1,16 +1,18 @@
 \section{Introduction\label{sec:Introduction}} 
 
-\IBM\ ia a project I embarked on during my PhD and I hope that it will be useful to some one out in the wide world. \IBM\ simulates a generalised individual based model that allows a great deal of choice in specifying the agent dynamics and model outputs. \IBM\ is designed for flexibility. The \IBM\ is a spatially explicit as I thought that would be a valuable model characteristic and was the area of interest for me.
+\IBM\ ia a project I embarked on during my PhD and I hope that it will be useful to some one out in the wide world. \IBM\ simulates a generalised individual based model that allows a great deal of choice in specifying the agent dynamics, spatial resolution, timing of events and model outputs. \IBM\ is designed for flexibility and is spatially explicit. The term Individual in this document also means agent or super individual, where an a modelled entity can represent many entities with identical characteristics. Unfortunately I have used these terms interchangeably through out this document and the code. I am hoping to tidy this up for consistency in the future, apologies if this adds confusion.
+
+\IBM\ may not be as fast as specific Individual based models as generality usually comes at a cost of speed, but I hope that is fast enough to do most tasks the users desire. The bonus in generality is if it gets uptake in the community you can have faith in the underlying dynamics, also because of the syntax and error handling it should be easy to set up models than it would be to code your own (always pros and cons).
 
 The time period and annual cycle of \IBM\ is completely defined by the user. It can simulate many different user defined IBM, for example removals-at-length or -age from an anthropogenic or exploitation event (e.g. fishery or other human impact), scientific survey and other biomass indices, and mark-recapture data.
 
-The real power of \IBM\ comes with management strategy evaluation and population assessment model investigation.
+The real power of \IBM\ I hope will be when it used in management strategy evaluation and population assessment model investigation.
 
 
 \subsection{\I{Where to get \IBM }}
 \IBM\ source code is hosted on github, and can be found at \url{https://github.com/Craig44/IBM}\index{github}.
 
-Currently you have to compile the code, to get an executable but, the repository contains all the required thirdparty libraries and has been developed for ease of compilation.
+Currently you have to compile the code, to get an executable but, the repository contains all the required thirdparty libraries and has been developed for ease of compilation (it is very easy see the github page for information). I am hoping for a beta version of \IBM\ in August.
 
 \subsection{\I{System requirements}}
 \IBM\ is available for most IBM compatible machines running 64-bit \I{Linux} and \I{Microsoft Windows} operating systems.

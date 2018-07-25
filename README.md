@@ -74,4 +74,4 @@ default looks for a file named ```config.ibm``` to look for specific model tasks
 information at run time into the file ```err.log```. There are 4 levels of ```loglevel```, ```medium```,  ```fine```, ```finest``` and ```trace```. If anyone is interested you can 
 look in the code base for statements such as ```LOG_FINEST()``` which will print information if the parameters is defined at run time.
 
-God speed
+Godspeed
