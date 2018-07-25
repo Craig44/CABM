@@ -22,7 +22,6 @@ NumericMetaLayer::NumericMetaLayer(Model* model) : NumericLayer(model) {
   parameters_.Bind<string>(PARAM_DEFAULT_LAYER, &default_Layer_label_, "The default layer to apply in initialisation phase", "");
   parameters_.Bind<string>(PARAM_LAYER_LABELS, &layer_names_, "The layer label associated with each year", "");
   layer_type_ = LayerType::kNumeric;
-
 }
 
 //**********************************************************************

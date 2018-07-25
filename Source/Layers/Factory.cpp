@@ -37,7 +37,7 @@ Layer* Factory::Create(Model* model, const string& object_type, const string& su
       result = new IntLayer(model);
     else if (sub_type == PARAM_NUMERIC)
       result = new NumericLayer(model);
-    else if (sub_type == PARAM_NUMERIC_META_NUMERIC)
+    else if (sub_type == PARAM_NUMERIC_META)
       result = new NumericMetaLayer(model);
 
     if (result)
