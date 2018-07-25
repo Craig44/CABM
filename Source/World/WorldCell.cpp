@@ -149,17 +149,33 @@ void WorldCell::birth_agents(unsigned birth_agents) {
 */
 void  WorldCell::update_agent_parameters() {
   LOG_TRACE();
-  vector<float> mort_par;
-  vector<vector<float>> growth_pars;
-  mortality_->draw_rate_param(row_, col_, agents_.size(), mort_par);
-  growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars);
   unsigned counter = 0;
-  for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
-    (*iter).set_first_age_length_par(growth_pars[counter][0]);
-    (*iter).set_second_age_length_par(growth_pars[counter][1]);
-    (*iter).set_first_length_weight_par(growth_pars[counter][2]);
-    (*iter).set_second_length_weight_par(growth_pars[counter][3]);
-    (*iter).set_m(mort_par[counter]);
+  if (growth_->update_growth() && mortality_->update_mortality()) {
+    vector<float> mort_par;
+    vector<vector<float>> growth_pars;
+    mortality_->draw_rate_param(row_, col_, agents_.size(), mort_par);
+    growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars);
+    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+      (*iter).set_first_age_length_par(growth_pars[counter][0]);
+      (*iter).set_second_age_length_par(growth_pars[counter][1]);
+      (*iter).set_first_length_weight_par(growth_pars[counter][2]);
+      (*iter).set_second_length_weight_par(growth_pars[counter][3]);
+      (*iter).set_m(mort_par[counter]);
+    }
+  } else if (!growth_->update_growth() && mortality_->update_mortality()) {
+    vector<float> mort_par;
+    mortality_->draw_rate_param(row_, col_, agents_.size(), mort_par);
+    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter)
+      (*iter).set_m(mort_par[counter]);
+  } else if (growth_->update_growth() && !mortality_->update_mortality()) {
+    vector<vector<float>> growth_pars;
+    growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars);
+    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+      (*iter).set_first_age_length_par(growth_pars[counter][0]);
+      (*iter).set_second_age_length_par(growth_pars[counter][1]);
+      (*iter).set_first_length_weight_par(growth_pars[counter][2]);
+      (*iter).set_second_length_weight_par(growth_pars[counter][3]);
+    }
   }
 }
 

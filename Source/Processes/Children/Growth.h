@@ -35,11 +35,13 @@ public:
   virtual void                        DoExecute() { };
 
   virtual void                        draw_growth_param(unsigned row, unsigned col, unsigned number_of_draws, vector<vector<float>>& vec) = 0;
+  bool                                update_growth() {return update_growth_parameters_;};
 
 protected:
   vector<float>			  time_step_proportions_;
   float					      cv_;
   string					    distribution_;
+  bool                update_growth_parameters_;
 
 };
 

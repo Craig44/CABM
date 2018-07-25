@@ -58,7 +58,7 @@ StandardHeader::~StandardHeader() {
 void StandardHeader::DoPrepare() {
 
   ostringstream               header;
-  header << "CASAL2" << endl;
+  header << "IBM" << endl;
 
   /**
    * Build the Command line
@@ -76,7 +76,6 @@ void StandardHeader::DoPrepare() {
    * Version information
    */
   header << "Version: " << SOURCE_CONTROL_VERSION << endl;
-  header << "Copyright (c) 2018 - " << SOURCE_CONTROL_YEAR << ", NIWA (www.niwa.co.nz)" << endl;
 
   /**
    * User and Computer Information

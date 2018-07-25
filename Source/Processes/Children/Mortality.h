@@ -37,10 +37,13 @@ public:
   virtual void                        draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) = 0;
   map<unsigned, vector<unsigned>>&    get_removals_by_age() {return removals_by_age_;};
   map<unsigned, vector<unsigned>>&    get_removals_by_length() {return removals_by_length_;};
+  virtual bool                        update_mortality() {return update_natural_mortality_parameters_;};
 
 protected:
   map<unsigned, vector<unsigned>>     removals_by_age_;
   map<unsigned, vector<unsigned>>     removals_by_length_;
+  bool                                update_natural_mortality_parameters_;
+
 
 
 };
