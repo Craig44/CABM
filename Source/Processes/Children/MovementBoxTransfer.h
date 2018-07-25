@@ -23,6 +23,14 @@ namespace niwa {
 //class Selectivity;
 namespace processes {
 
+
+enum class MovementType {
+  kUnknown = 0,
+  kMarkovian = 1,
+  kNatal_homing = 2
+};
+
+
 /**
  * A movement struct that stores movement information
  */
@@ -65,6 +73,8 @@ protected:
 
   vector<unsigned>            possible_rows_;
   vector<unsigned>            possible_cols_;
+  string                      movement_type_string_;
+  MovementType                movement_type_ = MovementType::kUnknown;
 
   // Report containers
   vector<MovementData>        moved_agents_by_year_;
