@@ -15,6 +15,7 @@
 #include "Layers/Manager.h"
 #include "Layers/Children/IntLayer.h"
 #include "Layers/Children/NumericLayer.h"
+#include "Layers/Children/CategoricalLayer.h"
 #include "Layers/Children/Numeric/NumericMetaLayer.h"
 
 
@@ -37,6 +38,8 @@ Layer* Factory::Create(Model* model, const string& object_type, const string& su
       result = new IntLayer(model);
     else if (sub_type == PARAM_NUMERIC)
       result = new NumericLayer(model);
+    else if (sub_type == PARAM_CATEGORICAL)
+      result = new CategoricalLayer(model);
     else if (sub_type == PARAM_NUMERIC_META)
       result = new NumericMetaLayer(model);
 

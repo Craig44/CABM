@@ -18,6 +18,7 @@
 #include "Layers/Layer.h"
 #include "Children/IntLayer.h"
 #include "Children/NumericLayer.h"
+#include "Children/CategoricalLayer.h"
 
 
 #include "Model/Managers.h"
@@ -36,6 +37,7 @@ public:
   Layer*                      GetLayer(const string& label);
   IntLayer*                   GetIntLayer(const string& label);
   NumericLayer*               GetNumericLayer(const string& label);
+  CategoricalLayer*           GetCategoricalLayer(const string& label);
 
 };
 

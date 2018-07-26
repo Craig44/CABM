@@ -52,11 +52,23 @@ IntLayer* Manager::GetIntLayer(const string& label) {
  * @return pointer to quantity, or empty pointer if not found
  */
 NumericLayer* Manager::GetNumericLayer(const string& label) {
-  LOG_TRACE()
+  LOG_TRACE();
   NumericLayer* pPtr = nullptr;
   for (auto layer : objects_) {
     if ((layer->label() == label) && (layer->layer_type() == LayerType::kNumeric)) {
       pPtr = dynamic_cast<NumericLayer*>(layer);
+      return pPtr;
+    }
+  }
+  return pPtr;
+}
+
+CategoricalLayer* Manager::GetCategoricalLayer(const string& label) {
+  LOG_TRACE();
+  CategoricalLayer* pPtr = nullptr;
+  for (auto layer : objects_) {
+    if ((layer->label() == label) && (layer->layer_type() == LayerType::kCategorical)) {
+      pPtr = dynamic_cast<CategoricalLayer*>(layer);
       return pPtr;
     }
   }
