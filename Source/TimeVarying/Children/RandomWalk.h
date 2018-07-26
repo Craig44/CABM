@@ -36,15 +36,15 @@ public:
 
 private:
   // members
-  Double                      mu_ = 0.0;
-  Double                      sigma_ = 1.0;
-  Double                      rho_ = 1.0;
-  Double                      intercept_;
+  float                      mu_ = 0.0;
+  float                      sigma_ = 1.0;
+  float                      rho_ = 1.0;
+  float                      intercept_;
   string                      distribution_;
-  map<unsigned, Double>       values_by_year_;
+  map<unsigned, float>       values_by_year_;
   bool                        has_at_estimate_;
-  Double                      lower_bound_;
-  Double                      upper_bound_;
+  float                      lower_bound_;
+  float                      upper_bound_;
 
 };
 

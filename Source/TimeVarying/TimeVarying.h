@@ -25,7 +25,7 @@ namespace niwa {
  *
  */
 class TimeVarying : public niwa::base::Object {
-  typedef void (TimeVarying::*UpdateFunction)(Double);
+  typedef void (TimeVarying::*UpdateFunction)(float);
 public:
   // methods
   TimeVarying() = delete;
@@ -37,16 +37,16 @@ public:
   void                        Update(unsigned current_year);
 
   //accessors
-  map<unsigned, Double>&      get_parameter_by_year() { return parameter_by_year_; }
+  map<unsigned, float>&      get_parameter_by_year() { return parameter_by_year_; }
 
 protected:
   // methods
   void                        RestoreOriginalValue();
 
   // settors
-  void                        set_single_value(Double value);
-  void                        set_vector_value(Double value);
-  void                        set_map_value(Double value);
+  void                        set_single_value(float value);
+  void                        set_vector_value(float value);
+  void                        set_map_value(float value);
 
   // pure virtual methods
   virtual void                DoValidate() = 0;
@@ -63,11 +63,11 @@ protected:
   string                      type_ = "";
   vector<unsigned>            years_;
   string                      parameter_;
-  Double                      original_value_ = 0;
-  map<unsigned, Double>*      addressable_map_ = 0;
-  vector<Double>*             addressable_vector_ = 0;
-  Double*                     addressable_ = 0;
-  map<unsigned, Double>       parameter_by_year_;
+  float                      original_value_ = 0;
+  map<unsigned, float>*      addressable_map_ = 0;
+  vector<float>*             addressable_vector_ = 0;
+  float*                     addressable_ = 0;
+  map<unsigned, float>       parameter_by_year_;
 };
 
 typedef std::shared_ptr<TimeVarying> TimeVaryingPtr;

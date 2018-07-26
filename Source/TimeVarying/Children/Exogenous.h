@@ -35,9 +35,9 @@ public:
 
 private:
   // members
-  vector<Double>              exogenous_;
-  Double                      a_;
-  map<unsigned, Double>       values_by_year_;
+  vector<float>              exogenous_;
+  float                      a_;
+  map<unsigned, float>       values_by_year_;
 };
 
 } /* namespace timevarying */

@@ -35,7 +35,7 @@ public:
 
 private:
   // members
-  vector<Double>              values_;
+  vector<float>              values_;
 };
 
 } /* namespace timevarying */

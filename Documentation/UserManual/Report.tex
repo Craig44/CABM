@@ -1,9 +1,82 @@
 \section{\I{The report section}\label{sec:report-section}}\index{Reports}\index{Reports section}
-The report section specifies the printouts and other outputs from the model. \IBM\ does not, in general, produce any output unless requested by a valid \command{report} block. 
+The report section specifies the printouts and other outputs from the model. \IBM\ does \textbf{not} produce any output unless requested by a valid \command{report} block. This important to note, as model runs can take a few minutes to run it will be in vain if there are no reports.
 
 Reports from \IBM\ can be defined to print partition and states objects at a particular point in time, observation summaries, estimated parameters and objective function values. See below for a more extensive list of report types, and an example of an observation report.
 
 
-\subsubsection{\I{Initialisation Partition}}
+\subsubsection{Initialisation Partition}
 A very useful report for looking at the initialisation partition. This report prints too instances of the partition. The first is right after we do an exponential approximation in each cell, and the second is after we have run the initial annual cycle for \subcommand{years} and are about to enter the actual annual cycle.
 
+{\small{\begin{verbatim}
+		@report init
+		type initialisation_partition
+\end{verbatim}}}
+
+
+\subsubsection{Age Frequency}
+There are two reports for printing the age frequency, you can print it for the all cells the total age frequency at the end of a time step using the \subcommand{type} \subcommand{world\_age\_frequency}. Or you could choice to print the age frequency for each cell using the \subcommand{type} \subcommand{age\_frequency\_by\_cell}. 
+{\small{\begin{verbatim}
+# print age frequency by cell
+@report age_freq
+type age_frequency_by_cell
+#years 1990:2018 ## defaults to model years
+time_step Annual
+\end{verbatim}}}
+
+{\small{\begin{verbatim}
+# print age frequency for all cells
+@report world_age_freq
+type world_age_frequency
+#years 1990:2018 ## defaults to model years
+time_step Annual
+\end{verbatim}}}
+
+
+
+\subsubsection{Observation}
+This prints a summary of an observation and simulated values, for each year and cell.
+
+{\small{\begin{verbatim}
+@observation fishery_age
+type process_removals_by_age
+simulation_likelihood multinomial
+process_label fishing
+years 2000
+min_age 0
+max_age 28
+#plus_group true
+ageing_error None
+table error_values
+2000 10000
+end_table
+cell_layer cells
+cells r1-c1	
+		
+@report fisher_age_freq
+type observation
+observation fishery_age
+\end{verbatim}}}
+
+
+\subsubsection{Model Attributes}
+This pretty much just prints the global scalar used to convert numbers and biomass from agent space to population level.
+{\small{\begin{verbatim}
+@report model_attributes
+type model_attributes
+\end{verbatim}}}
+
+
+\subsubsection{Derived Quantities}
+This report will print all the derived quantities for all years in the model.
+{\small{\begin{verbatim}
+@report derived_quants
+type derived_quantity
+\end{verbatim}}}
+
+\subsubsection{Process}
+This report will print all parameters that were set for a specific process and any auxiliary information that you want from the specific process.
+{\small{\begin{verbatim}
+@report M_report
+type process
+process natural_mort
+\end{verbatim}}}

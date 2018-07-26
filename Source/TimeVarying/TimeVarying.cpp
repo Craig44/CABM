@@ -49,7 +49,7 @@ void TimeVarying::Build() {
 
   string error = "";
   if (!model_->objects().VerfiyAddressableForUse(parameter_, addressable::kTimeVarying, error)) {
-    LOG_FATAL_P(PARAM_PARAMETER) << "could not be verified for use in a time_varying block. Error was " << error << ", please double checked you have specified the parameter correctly.";
+    LOG_FATAL_P(PARAM_PARAMETER) << "could not be verified for use in a time_varying block. Error was " << error << ", please float checked you have specified the parameter correctly.";
   }
 
   addressable::Type addressable_type = model_->objects().GetAddressableType(parameter_);
@@ -109,21 +109,21 @@ void TimeVarying::RestoreOriginalValue() {
 /**
  *
  */
-void TimeVarying::set_single_value(Double value) {
+void TimeVarying::set_single_value(float value) {
   *addressable_ = value;
 }
 
 /**
  *
  */
-void TimeVarying::set_vector_value(Double value) {
+void TimeVarying::set_vector_value(float value) {
   addressable_vector_->push_back(value);
 }
 
 /**
  *
  */
-void TimeVarying::set_map_value(Double value) {
+void TimeVarying::set_map_value(float value) {
   (*addressable_map_)[model_->current_year()] = value;
 }
 

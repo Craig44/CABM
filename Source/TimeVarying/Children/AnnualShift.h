@@ -35,12 +35,12 @@ public:
 
 private:
   // members
-  vector<Double>              values_;
-  Double                      a_;
-  Double                      b_;
-  Double                      c_;
+  vector<float>              values_;
+  float                      a_;
+  float                      b_;
+  float                      c_;
   vector<unsigned>            scaling_years_;
-  map<unsigned, Double>       values_by_year_;
+  map<unsigned, float>       values_by_year_;
 };
 
 } /* namespace timevarying */

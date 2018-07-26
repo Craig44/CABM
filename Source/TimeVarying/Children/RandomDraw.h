@@ -36,14 +36,14 @@ public:
 
 private:
   // members
-  Double                      mu_;
-  Double                      sigma_;
-  Double                      intercept_;
+  float                      mu_;
+  float                      sigma_;
+  float                      intercept_;
   bool                        has_at_estimate_ = false;
   string                      distribution_;
-  Double*                     value_;
-  Double                      lower_bound_;
-  Double                      upper_bound_;
+  float*                     value_;
+  float                      lower_bound_;
+  float                      upper_bound_;
 
 };
 

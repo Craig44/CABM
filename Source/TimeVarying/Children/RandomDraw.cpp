@@ -25,12 +25,9 @@ namespace timevarying {
  * Default constructor
  */
 RandomDraw::RandomDraw(Model* model) : TimeVarying(model) {
-  parameters_.Bind<Double>(PARAM_MEAN, &mu_, "Mean", "", 0);
-  parameters_.Bind<Double>(PARAM_SIGMA, &sigma_, "Standard deviation", "", 1);
+  parameters_.Bind<float>(PARAM_MEAN, &mu_, "Mean", "", 0);
+  parameters_.Bind<float>(PARAM_SIGMA, &sigma_, "Standard deviation", "", 1);
   parameters_.Bind<string>(PARAM_DISTRIBUTION, &distribution_, "distribution", "", PARAM_NORMAL)->set_allowed_values({PARAM_NORMAL,PARAM_LOGNORMAL});
-
-  RegisterAsAddressable(PARAM_MEAN, &mu_);
-  RegisterAsAddressable(PARAM_SIGMA, &sigma_);
 }
 
 /**
@@ -55,11 +52,11 @@ void RandomDraw::DoBuild() {
  */
 void RandomDraw::DoReset() {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-  Double new_value = 0.0;
+  float new_value = 0.0;
   // Draw from the random distribution
   if (distribution_ == PARAM_NORMAL) {
     for (unsigned year : years_) {
-    new_value = rng.normal(AS_DOUBLE(mu_), AS_DOUBLE(sigma_));
+    new_value = rng.normal(mu_, sigma_);
     LOG_FINEST() << "with mean = " << mu_ << " and sigma = " << sigma_ << " new value = " << new_value;
     // Set value
     if (has_at_estimate_) {
@@ -80,8 +77,8 @@ void RandomDraw::DoReset() {
     }
   } else if (distribution_ == PARAM_LOGNORMAL)  {
     for (unsigned year : years_) {
-      Double cv = sigma_ / mu_;
-      new_value = rng.lognormal(AS_DOUBLE(mu_), AS_DOUBLE(cv));
+      float cv = sigma_ / mu_;
+      new_value = rng.lognormal(mu_, cv);
       LOG_FINEST() << "with mean = " << mu_ << " and sigma = " << sigma_ << " new value = " << new_value;
       // Set value
       if (has_at_estimate_) {

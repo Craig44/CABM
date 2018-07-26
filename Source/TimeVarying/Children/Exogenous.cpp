@@ -23,10 +23,8 @@ namespace timevarying {
  * Default constructor
  */
 Exogenous::Exogenous(Model* model) : TimeVarying(model) {
-  parameters_.Bind<Double>(PARAM_A, &a_, "Shift parameter", "");
-  parameters_.Bind<Double>(PARAM_EXOGENOUS_VARIABLE, &exogenous_, "Values of exogeneous variable for each year", "");
-
-  RegisterAsAddressable(PARAM_A, &a_);
+  parameters_.Bind<float>(PARAM_A, &a_, "Shift parameter", "");
+  parameters_.Bind<float>(PARAM_EXOGENOUS_VARIABLE, &exogenous_, "Values of exogeneous variable for each year", "");
 }
 
 /**
@@ -44,9 +42,6 @@ void Exogenous::DoValidate() {
  *  values_by_year.
  */
 void Exogenous::DoBuild() {
-  // Check that the parameter is of type scalar
-  if (model_->objects().GetAddressableType(parameter_) != addressable::kSingle)
-    LOG_ERROR_P(PARAM_PARAMETER) << "Parameter must be a scalar, other addressable types not supported yet";
   DoReset();
 }
 
@@ -56,14 +51,14 @@ void Exogenous::DoBuild() {
 void Exogenous::DoReset() {
   // Add this to the Reset so that if a, is estimated the model can actually update the model.
   values_by_year_ = utilities::Map::create(years_, exogenous_);
-  Double* value = model_->objects().GetAddressable(parameter_);
+  float* value = model_->objects().GetAddressable(parameter_);
   LOG_FINEST() << "Parameter value = " << (*value);
-  Double total = 0.0;
+  float total = 0.0;
 
-  for (Double value : exogenous_)
+  for (float value : exogenous_)
     total += value;
 
-  Double mean = total / exogenous_.size();
+  float mean = total / exogenous_.size();
 
   for (unsigned year : years_)
     parameter_by_year_[year] = (*value) + (a_ * (values_by_year_[year] - mean));

@@ -25,11 +25,8 @@ namespace timevarying {
  * Default constructor
  */
 Linear::Linear(Model* model) : TimeVarying(model) {
-  parameters_.Bind<Double>(PARAM_SLOPE, &slope_, "The slope of the linear trend (additive unit per year)", "");
-  parameters_.Bind<Double>(PARAM_INTERCEPT, &intercept_, "The intercept of the linear trend value for the first year", "");
-
-  RegisterAsAddressable(PARAM_SLOPE, &slope_);
-  RegisterAsAddressable(PARAM_INTERCEPT, &intercept_);
+  parameters_.Bind<float>(PARAM_SLOPE, &slope_, "The slope of the linear trend (additive unit per year)", "");
+  parameters_.Bind<float>(PARAM_INTERCEPT, &intercept_, "The intercept of the linear trend value for the first year", "");
 
 }
 
@@ -57,7 +54,7 @@ void Linear::DoReset() {
   unsigned diff = model_->current_year() - years_[0];
   LOG_FINE() << "diff unsigned = " << diff;
 
-  Double years_since_first_year = (Double)model_->current_year() - (Double)years_[0];
+  float years_since_first_year = (float)model_->current_year() - (float)years_[0];
   LOG_FINE() << "diff from start of year = " << years_since_first_year;
   LOG_FINE() << " did we make it past this if statement " << current_year;
   if (current_year) {

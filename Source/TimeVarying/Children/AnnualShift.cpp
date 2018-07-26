@@ -22,10 +22,10 @@ namespace timevarying {
  * Default constructor
  */
 AnnualShift::AnnualShift(Model* model) : TimeVarying(model) {
-  parameters_.Bind<Double>(PARAM_VALUES, &values_, "", "");
-  parameters_.Bind<Double>(PARAM_A, &a_, "", "");
-  parameters_.Bind<Double>(PARAM_B, &b_, "", "");
-  parameters_.Bind<Double>(PARAM_C, &c_, "", "");
+  parameters_.Bind<float>(PARAM_VALUES, &values_, "", "");
+  parameters_.Bind<float>(PARAM_A, &a_, "", "");
+  parameters_.Bind<float>(PARAM_B, &b_, "", "");
+  parameters_.Bind<float>(PARAM_C, &c_, "", "");
   parameters_.Bind<unsigned>(PARAM_SCALING_YEARS, &scaling_years_, "" ,"", true);
 
 }
@@ -50,15 +50,15 @@ void AnnualShift::DoValidate() {
  *
  */
 void AnnualShift::DoBuild() {
-  map<unsigned, Double> values = utilities::Map::create(years_, values_);
+  map<unsigned, float> values = utilities::Map::create(years_, values_);
 
-  Double total = 0.0;
+  float total = 0.0;
   for (unsigned scaling_year : scaling_years_) {
     total += values[scaling_year];
   }
 
   for (unsigned year : years_) {
-    Double scaled_value = values[year] - (total / scaling_years_.size());
+    float scaled_value = values[year] - (total / scaling_years_.size());
     values_by_year_[year] = a_ * scaled_value + b_ * pow(scaled_value, 2) + c_ * pow(scaled_value, 3);
   }
 }

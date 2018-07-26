@@ -36,10 +36,10 @@ public:
 
 private:
   // members
-  Double                      slope_;
-  Double                      intercept_;
-  Double*                     value_;
-  map<unsigned, Double>       values_by_year_;
+  float                      slope_;
+  float                      intercept_;
+  float*                     value_;
+  map<unsigned, float>       values_by_year_;
 
 };
 

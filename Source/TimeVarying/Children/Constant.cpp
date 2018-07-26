@@ -14,9 +14,8 @@ namespace timevarying {
  * Default constructor
  */
 Constant::Constant(Model* model) : TimeVarying(model) {
-  parameters_.Bind<Double>(PARAM_VALUES, &values_, "Value to assign to addressable", "");
+  parameters_.Bind<float>(PARAM_VALUES, &values_, "Value to assign to addressable", "");
 
-  RegisterAsAddressable(PARAM_VALUES, &parameter_by_year_);
 }
 
 /**

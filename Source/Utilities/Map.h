@@ -75,8 +75,8 @@ public:
    * @param value The values to use
    * @return a Map of keys and values
    */
-  static std::map<unsigned, Double> create(const std::vector<unsigned>& key, const std::vector<Double>& value) {
-    std::map<unsigned, Double> result;
+  static std::map<unsigned, float> create(const std::vector<unsigned>& key, const std::vector<float>& value) {
+    std::map<unsigned, float> result;
 
     for (unsigned i = 0; i < key.size(); ++i)
       result[key[i]] = value[i];
@@ -92,8 +92,8 @@ public:
    * @param value The values to use
    * @return a Map of keys and values
    */
-  static std::map<std::string, Double> create(const std::vector<std::string>& key, const std::vector<Double>& value) {
-    std::map<std::string, Double> result;
+  static std::map<std::string, float> create(const std::vector<std::string>& key, const std::vector<float>& value) {
+    std::map<std::string, float> result;
 
     for (unsigned i = 0; i < key.size(); ++i)
       result[key[i]] = value[i];
