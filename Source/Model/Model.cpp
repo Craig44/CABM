@@ -297,6 +297,10 @@ void Model::Build() {
   omp_set_dynamic(0);
   omp_set_num_threads(procs);
 
+  // Calculate length bin midpoints
+  for (unsigned length_ndx = 1; length_ndx < length_bins_.size(); ++length_ndx)
+    length_bin_mid_points_.push_back((float)(length_bins_[length_ndx] - length_bins_[length_ndx - 1] / 2));
+
 }
 
 /**

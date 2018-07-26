@@ -104,7 +104,9 @@ public:
 
   virtual const vector<string>& time_steps() const { return time_steps_; }
   const vector<string>&       initialisation_phases() const { return initialisation_phases_; }
-  virtual const vector<unsigned>&     length_bins() const { return length_bins_; }
+  virtual const vector<unsigned>&  length_bins() const { return length_bins_; }
+  virtual const vector<float>&     length_bin_mid_points() const { return length_bin_mid_points_; }
+
   virtual bool                length_plus() const { return length_plus_; }
   string&                     get_base_layer_label() {return base_layer_;}
   string&                     get_lat_layer_label() {return lat_layer_label_;}
@@ -150,6 +152,7 @@ protected:
   vector<string>              time_steps_;
   vector<unsigned>            length_bins_;
   bool                        length_plus_ = true;
+  vector<float>               length_bin_mid_points_;
   bool                        addressable_values_file_ = false;
   unsigned                    adressable_values_count_ = 1;
   bool                        sexed_ = false;
