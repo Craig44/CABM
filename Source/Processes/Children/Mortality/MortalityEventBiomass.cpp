@@ -73,7 +73,7 @@ void MortalityEventBiomass::DoBuild() {
  */
 void MortalityEventBiomass::DoExecute() {
   LOG_TRACE();
-  vector<unsigned> age_freq(model_->age_spread());
+  vector<unsigned> global_age_freq(model_->age_spread());
   auto iter = years_.begin();
   if (model_->state() != State::kInitialise) {
     if (find(iter, years_.end(), model_->current_year()) != years_.end()) {
@@ -91,6 +91,8 @@ void MortalityEventBiomass::DoExecute() {
           unsigned catch_attempts = 1;
           unsigned catch_max = 1;
           unsigned random_agent;
+          composition_data age_freq(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
+          composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->length_bins().size());
           WorldCell* cell = world_->get_base_square(row, col);
           if (cell->is_enabled()) {
             float catch_taken = catch_layer_[catch_ndx]->get_value(row, col);
@@ -109,7 +111,9 @@ void MortalityEventBiomass::DoExecute() {
                 if (rng.chance() <= selectivity_->GetResult((*iter).get_age())) {
                   catch_taken -= (*iter).get_weight() * (*iter).get_scalar();
                   actual_catch_taken += (*iter).get_weight() * (*iter).get_scalar();
-                  age_freq[(*iter).get_age() - model_->min_age()]++;
+                  age_freq.frequency_[(*iter).get_age() - model_->min_age()]++;
+                  length_freq.frequency_[(*iter).get_length_bin_index()]++;
+                  global_age_freq[(*iter).get_age() - model_->min_age()]++;
                   cell->agents_.erase(iter); // erase agent from memory
                 }
                 // Make sure we don't end up fishing for infinity
@@ -119,12 +123,14 @@ void MortalityEventBiomass::DoExecute() {
                 }
               }
             }
+            removals_by_length_and_area_.push_back(length_freq);
+            removals_by_age_and_area_.push_back(age_freq);
           }
         }
       }
       removals_by_year_[model_->current_year()] = world_catch_to_take;
       actual_removals_by_year_[model_->current_year()] = actual_catch_taken;
-      removals_by_age_[model_->current_year()] = age_freq;
+      removals_by_age_[model_->current_year()] = global_age_freq;
     } // find(years_.begin(), years_.end(), model_->current_year()) != years_.end()
   }  //model_->state() != State::kInitialise
 }

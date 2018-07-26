@@ -45,7 +45,15 @@ unsigned Agent::get_age() {
     unsigned age =  std::min((model_->current_year() - birth_year_), model_->max_age());
     return age;
 }
-
+// an index for which length the individual falls in.
+unsigned Agent::get_length_bin_index() {
+  vector<unsigned> lengths = model_->length_bins();
+  for(unsigned length_max = 1; length_max < lengths.size(); ++length_max) {
+    if (length_ <= lengths[length_max])
+      return length_max - 1;
+  }
+  return lengths.size() - 1;
+}
 /*
  * An internal function to set initial length at age when initially seeding agents in the world,
  * So that we have the equivalent length and weight frequency. Calculate expected length at age assuming von Bert parameters

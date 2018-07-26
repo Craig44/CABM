@@ -22,6 +22,7 @@
 
 #include "Processes/Children/Mortality.h"
 #include "AgeingErrors/AgeingError.h"
+#include "Layers/Children/CategoricalLayer.h"
 
 // Namespace
 namespace niwa {
@@ -58,10 +59,17 @@ protected:
   Mortality*                    mortality_process_ = nullptr;
   vector<float>                 age_results_;
   string                        process_label_;
+
   unsigned                      time_step_to_execute_;
   map<unsigned, vector<float>>  error_values_by_year_;
   map<unsigned,vector<float>>   proportions_;
   map<unsigned, vector<float>>  error_values_;
+  vector<string>                cells_;
+  vector<unsigned>              cell_rows_;
+  vector<unsigned>              cell_cols_;
+  layers::CategoricalLayer*     layer_ = nullptr;
+  string                        layer_label_;
+
 
 };
 
