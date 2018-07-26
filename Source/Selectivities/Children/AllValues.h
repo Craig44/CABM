@@ -39,9 +39,9 @@ protected:
 
 private:
   // Members
-  vector<Double>              v_;
-  vector<Double>              v_age_;
-  vector<Double>              v_length_;
+  vector<float>              v_;
+  vector<float>              v_age_;
+  vector<float>              v_length_;
 };
 
 } /* namespace selectivities */

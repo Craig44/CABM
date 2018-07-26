@@ -28,9 +28,9 @@ namespace selectivities {
 AllValues::AllValues(Model* model)
 : Selectivity(model) {
 
-  parameters_.Bind<Double>(PARAM_V, &v_, "V", "");
+  parameters_.Bind<float>(PARAM_V, &v_, "V", "");
 
-  RegisterAsAddressable(PARAM_V, &v_);
+  //RegisterAsAddressable(PARAM_V, &v_);
 }
 
 

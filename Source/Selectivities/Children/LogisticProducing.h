@@ -41,9 +41,9 @@ private:
   // Members
   unsigned                    low_;
   unsigned                    high_;
-  Double                      a50_;
-  Double                      ato95_;
-  Double                      alpha_;
+  float                      a50_;
+  float                      ato95_;
+  float                      alpha_;
 };
 
 } /* namespace selectivities */

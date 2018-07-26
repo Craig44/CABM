@@ -30,10 +30,10 @@ Increasing::Increasing(Model* model)
 
   parameters_.Bind<unsigned>(PARAM_L, &low_, "Low", "");
   parameters_.Bind<unsigned>(PARAM_H, &high_, "High", "");
-  parameters_.Bind<Double>(PARAM_V, &v_, "V", "");
-  parameters_.Bind<Double>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
+  parameters_.Bind<float>(PARAM_V, &v_, "V", "");
+  parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
 
-  RegisterAsAddressable(PARAM_V, &v_);
+  //RegisterAsAddressable(PARAM_V, &v_);
 }
 
 /**
@@ -48,14 +48,14 @@ Increasing::Increasing(Model* model)
 void Increasing::DoValidate() {
 
   if (alpha_ <= 0.0)
-    LOG_ERROR_P(PARAM_ALPHA) << ": alpha (" << AS_DOUBLE(alpha_) << ") cannot be less than or equal to 0.0";
+    LOG_ERROR_P(PARAM_ALPHA) << ": alpha (" << alpha_ << ") cannot be less than or equal to 0.0";
 
   if (high_ <= low_)
     LOG_ERROR_P(PARAM_H) << ": 'h' (" << high_ << ") cannot be less than or the same as 'l' (" << low_ << ")";
 
   for (unsigned i = 0; i < v_.size(); ++i) {
     if (v_[i] < 0.0 || v_[i] > 1.0) {
-      LOG_ERROR_P(PARAM_V) << " 'v' element " << i + 1 << " (" << AS_DOUBLE(v_[i]) << ") is not between 0.0 and 1.0";
+      LOG_ERROR_P(PARAM_V) << " 'v' element " << i + 1 << " (" << v_[i] << ") is not between 0.0 and 1.0";
     }
   }
 
@@ -105,7 +105,7 @@ void Increasing::RebuildCache() {
         values_[age - min_index_] = *v_.rbegin();
 
       } else {
-        Double value = *v_.begin();
+        float value = *v_.begin();
         for (unsigned i = low_ + 1; i < age; ++i) {
           if (i > high_ || value >= alpha_)
             break;
@@ -126,7 +126,7 @@ void Increasing::RebuildCache() {
       }
     }
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index) {
-      Double temp = (Double)length_bins[length_bin_index];
+      float temp = (float)length_bins[length_bin_index];
       if (temp < low_) {
         length_values_[length_bin_index] = 0.0;
 
@@ -134,7 +134,7 @@ void Increasing::RebuildCache() {
         length_values_[length_bin_index] = *v_.rbegin();
 
       } else {
-        Double value = *v_.begin();
+        float value = *v_.begin();
         for (unsigned i = start_element + 1; i < length_bin_index; ++i) {
           if (length_bins[i] > high_ || value >= alpha_)
             break;

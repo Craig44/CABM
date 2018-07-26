@@ -41,7 +41,7 @@ private:
   // Members
   unsigned                    low_;
   unsigned                    high_;
-  vector<Double>              v_;
+  vector<float>              v_;
 };
 
 } /* namespace selectivities */

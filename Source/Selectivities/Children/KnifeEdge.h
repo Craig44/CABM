@@ -39,8 +39,8 @@ protected:
 
 private:
   // Members
-  Double                      edge_;
-  Double                      alpha_;
+  float                      edge_;
+  float                      alpha_;
 
 };
 

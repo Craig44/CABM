@@ -20,7 +20,6 @@ namespace niwa {
 
 // Using
 using std::map;
-using niwa::utilities::Double;
 
 /**
  * Class Definition
@@ -34,7 +33,8 @@ public:
   void                        Validate();
   virtual void                Build() { RebuildCache(); };
   void                        Reset();
-  virtual Double              GetResult(unsigned age_or_length);
+  virtual float               GetResult(unsigned age_or_length);
+  bool                        is_length_based() {return length_based_;}
 
 protected:
   // pure methods
@@ -42,9 +42,9 @@ protected:
   // Members
   Model*                      model_ = nullptr;
   bool                        length_based_ = false;
-//  map<unsigned, Double>       values_;
-  vector<Double>              values_;
-  vector<Double>              length_values_;
+//  map<unsigned, float>       values_;
+  vector<float>               values_;
+  vector<float>               length_values_;
   unsigned                    min_index_;
 };
 } /* namespace niwa */

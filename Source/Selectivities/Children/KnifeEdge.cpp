@@ -29,11 +29,11 @@ namespace selectivities {
 KnifeEdge::KnifeEdge(Model* model)
 : Selectivity(model) {
 
-  parameters_.Bind<Double>(PARAM_E, &edge_, "Edge", "");
-  parameters_.Bind<Double>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
+  parameters_.Bind<float>(PARAM_E, &edge_, "Edge", "");
+  parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
 
-  RegisterAsAddressable(PARAM_ALPHA, &alpha_);
-  RegisterAsAddressable(PARAM_E, &edge_);
+  //RegisterAsAddressable(PARAM_ALPHA, &alpha_);
+ // RegisterAsAddressable(PARAM_E, &edge_);
 }
 
 /**
@@ -46,7 +46,7 @@ KnifeEdge::KnifeEdge(Model* model)
 void KnifeEdge::RebuildCache() {
   if (not length_based_) {
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
-      Double temp = age * 1.0;
+      float temp = age * 1.0;
       if (temp >= edge_)
         values_[age - min_index_] = alpha_;
       else
@@ -56,7 +56,7 @@ void KnifeEdge::RebuildCache() {
     vector<unsigned> length_bins = model_->length_bins();
 
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index) {
-      Double temp = (Double)length_bins[length_bin_index];
+      float temp = (float)length_bins[length_bin_index];
       if (temp >= edge_)
         length_values_[length_bin_index] = alpha_;
       else

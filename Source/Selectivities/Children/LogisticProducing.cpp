@@ -30,13 +30,13 @@ LogisticProducing::LogisticProducing(Model* model)
 
   parameters_.Bind<unsigned>(PARAM_L, &low_, "Low", "");
   parameters_.Bind<unsigned>(PARAM_H, &high_, "High", "");
-  parameters_.Bind<Double>(PARAM_A50, &a50_, "A50", "");
-  parameters_.Bind<Double>(PARAM_ATO95, &ato95_, "Ato95", "");
-  parameters_.Bind<Double>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
+  parameters_.Bind<float>(PARAM_A50, &a50_, "A50", "");
+  parameters_.Bind<float>(PARAM_ATO95, &ato95_, "Ato95", "");
+  parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
 
-  RegisterAsAddressable(PARAM_A50, &a50_);
-  RegisterAsAddressable(PARAM_ATO95, &ato95_);
-  RegisterAsAddressable(PARAM_ALPHA, &alpha_);
+  //RegisterAsAddressable(PARAM_A50, &a50_);
+  //RegisterAsAddressable(PARAM_ATO95, &ato95_);
+  //RegisterAsAddressable(PARAM_ALPHA, &alpha_);
 }
 
 /**
@@ -54,9 +54,9 @@ void LogisticProducing::DoValidate() {
   }
 
   if (alpha_ <= 0.0)
-    LOG_ERROR_P(PARAM_ALPHA) << ": alpha (" << AS_DOUBLE(alpha_) << ") cannot be less than or equal to 0.0";
+    LOG_ERROR_P(PARAM_ALPHA) << ": alpha (" << alpha_ << ") cannot be less than or equal to 0.0";
   if (ato95_ <= 0.0)
-    LOG_ERROR_P(PARAM_ATO95) << ": ato95 (" << AS_DOUBLE(ato95_) << ") cannot be less than or equal to 0.0";
+    LOG_ERROR_P(PARAM_ATO95) << ": ato95 (" << ato95_ << ") cannot be less than or equal to 0.0";
 }
 
 /**
@@ -75,13 +75,13 @@ void LogisticProducing::RebuildCache() {
       else if (age >= high_)
         values_[age - min_index_] = alpha_;
       else if (age == low_)
-        values_[age - min_index_] = 1.0 / (1.0 + pow(19.0, (a50_ - (Double)age) / ato95_)) * alpha_;
+        values_[age - min_index_] = 1.0 / (1.0 + pow(19.0, (a50_ - (float)age) / ato95_)) * alpha_;
       else {
-        Double lambda2 = 1.0 / (1.0 + pow(19.0, (a50_- ((Double)age - 1)) / ato95_));
+        float lambda2 = 1.0 / (1.0 + pow(19.0, (a50_- ((float)age - 1)) / ato95_));
         if (lambda2 > 0.9999) {
           values_[age - min_index_] = alpha_;
         } else {
-          Double lambda1 = 1.0 / (1.0 + pow(19.0, (a50_ - (Double)age) / ato95_));
+          float lambda1 = 1.0 / (1.0 + pow(19.0, (a50_ - (float)age) / ato95_));
           values_[age - min_index_] = (lambda1 - lambda2) / (1.0 - lambda2) * alpha_;
           LOG_FINEST() << "age = " << age << " lambda1 = " << lambda1 << " lambda2 = " << lambda2 << " value = " <<  values_[age];
         }
@@ -91,19 +91,19 @@ void LogisticProducing::RebuildCache() {
     vector<unsigned> length_bins = model_->length_bins();
 
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index) {
-      Double temp = (Double)length_bins[length_bin_index];
+      float temp = (float)length_bins[length_bin_index];
       if (temp < low_)
         length_values_[length_bin_index] = 0.0;
       else if (temp >= high_)
         length_values_[length_bin_index] = alpha_;
       else if (temp == low_)
-        length_values_[length_bin_index] = 1.0 / (1.0 + pow(19.0, (a50_ - (Double)temp) / ato95_)) * alpha_;
+        length_values_[length_bin_index] = 1.0 / (1.0 + pow(19.0, (a50_ - (float)temp) / ato95_)) * alpha_;
       else {
-        Double lambda2 = 1.0 / (1.0 + pow(19.0, (a50_- ((Double)temp - 1)) / ato95_));
+        float lambda2 = 1.0 / (1.0 + pow(19.0, (a50_- ((float)temp - 1)) / ato95_));
         if (lambda2 > 0.9999) {
           length_values_[length_bin_index] = alpha_;
         } else {
-          Double lambda1 = 1.0 / (1.0 + pow(19.0, (a50_ - (Double)temp) / ato95_));
+          float lambda1 = 1.0 / (1.0 + pow(19.0, (a50_ - (float)temp) / ato95_));
           length_values_[length_bin_index] = (lambda1 - lambda2) / (1.0 - lambda2) * alpha_;
           LOG_FINEST() << "length = " << temp << " lambda1 = " << lambda1 << " lambda2 = " << lambda2 << " value = " <<  length_values_[length_bin_index];
         }

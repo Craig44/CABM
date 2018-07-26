@@ -29,15 +29,15 @@ namespace selectivities {
 DoubleNormal::DoubleNormal(Model* model)
 : Selectivity(model) {
 
-  parameters_.Bind<Double>(PARAM_MU, &mu_, "Mu", "");
-  parameters_.Bind<Double>(PARAM_SIGMA_L, &sigma_l_, "Sigma L", "");
-  parameters_.Bind<Double>(PARAM_SIGMA_R, &sigma_r_, "Sigma R", "");
-  parameters_.Bind<Double>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
+  parameters_.Bind<float>(PARAM_MU, &mu_, "Mu", "");
+  parameters_.Bind<float>(PARAM_SIGMA_L, &sigma_l_, "Sigma L", "");
+  parameters_.Bind<float>(PARAM_SIGMA_R, &sigma_r_, "Sigma R", "");
+  parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
 
-  RegisterAsAddressable(PARAM_MU, &mu_);
-  RegisterAsAddressable(PARAM_SIGMA_L, &sigma_l_);
-  RegisterAsAddressable(PARAM_SIGMA_R, &sigma_r_);
-  RegisterAsAddressable(PARAM_ALPHA, &alpha_);
+  //RegisterAsAddressable(PARAM_MU, &mu_);
+  //RegisterAsAddressable(PARAM_SIGMA_L, &sigma_l_);
+  //RegisterAsAddressable(PARAM_SIGMA_R, &sigma_r_);
+  //RegisterAsAddressable(PARAM_ALPHA, &alpha_);
 }
 
 /**
@@ -68,7 +68,7 @@ void DoubleNormal::DoValidate() {
 void DoubleNormal::RebuildCache() {
   if (not length_based_) {
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
-      Double temp = (Double)age;
+      float temp = (float)age;
       if (temp < mu_)
         values_[age - min_index_] = pow(2.0, -((temp - mu_) / sigma_l_ * (temp - mu_) / sigma_l_)) * alpha_;
       else
@@ -77,7 +77,7 @@ void DoubleNormal::RebuildCache() {
   } else {
     vector<unsigned> length_bins = model_->length_bins();
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index) {
-      Double temp = (Double)length_bins[length_bin_index];
+      float temp = (float)length_bins[length_bin_index];
       if (temp < mu_)
         length_values_[length_bin_index] = pow(2.0, -((temp - mu_) / sigma_l_ * (temp - mu_) / sigma_l_)) * alpha_;
       else

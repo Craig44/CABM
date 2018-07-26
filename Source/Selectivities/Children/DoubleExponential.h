@@ -39,13 +39,13 @@ protected:
 
 private:
   // Members
-  Double                      x0_;
-  Double                      x1_;
-  Double                      x2_;
-  Double                      y0_;
-  Double                      y1_;
-  Double                      y2_;
-  Double                      alpha_;
+  float                      x0_;
+  float                      x1_;
+  float                      x2_;
+  float                      y0_;
+  float                      y1_;
+  float                      y2_;
+  float                      alpha_;
 };
 
 } /* namespace selectivities */

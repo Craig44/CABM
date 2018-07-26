@@ -1,5 +1,5 @@
 /**
- * @file DoubleNormal.h
+ * @file floatNormal.h
  * @author  Scott Rasmussen (scott.rasmussen@zaita.com)
  * @version 1.0
  * @date 14/01/2013
@@ -39,10 +39,10 @@ protected:
 
 private:
   // Members
-  Double                      mu_;
-  Double                      sigma_l_;
-  Double                      sigma_r_;
-  Double                      alpha_;
+  float                      mu_;
+  float                      sigma_l_;
+  float                      sigma_r_;
+  float                      alpha_;
 };
 
 } /* namespace selectivities */

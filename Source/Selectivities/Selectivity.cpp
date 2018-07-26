@@ -29,9 +29,6 @@ Selectivity::Selectivity(Model* model)
   parameters_.Bind<string>(PARAM_LABEL, &label_, "The label for this selectivity", "");
   parameters_.Bind<string>(PARAM_TYPE, &type_, "The type of selectivity", "");
   parameters_.Bind<bool>(PARAM_LENGTH_BASED, &length_based_, "Is the selectivity length based", "", false);
-
-  RegisterAsAddressable(PARAM_VALUES, &values_, addressable::kLookup);
-  RegisterAsAddressable(PARAM_LENGTH_VALUES, &length_values_, addressable::kLookup);
 }
 
 /**
@@ -66,8 +63,11 @@ void Selectivity::Reset() {
  * @return The value stored in the map or 0.0 as default
  */
 
-Double Selectivity::GetResult(unsigned age_or_length) {
+float Selectivity::GetResult(unsigned age_or_length) {
+  if (not length_based_)
     return values_[age_or_length - min_index_];
+  else
+    return length_values_[age_or_length];
 }
 
 

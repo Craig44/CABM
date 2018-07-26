@@ -30,9 +30,9 @@ AllValuesBounded::AllValuesBounded(Model* model)
 
   parameters_.Bind<unsigned>(PARAM_L, &low_, "L", "");
   parameters_.Bind<unsigned>(PARAM_H, &high_, "H", "");
-  parameters_.Bind<Double>(PARAM_V, &v_, "V", "");
+  parameters_.Bind<float>(PARAM_V, &v_, "V", "");
 
-  RegisterAsAddressable(PARAM_V, &v_);
+  //RegisterAsAddressable(PARAM_V, &v_);
 }
 
 /**

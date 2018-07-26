@@ -32,14 +32,14 @@ public:
   explicit Constant(Model* model);
   virtual                     ~Constant() = default;
   void                        DoValidate() override final { };
-  Double                      GetResult(unsigned age_or_length) override final;
+  float                      GetResult(unsigned age_or_length) override final;
 
 protected:
   //Methods
 
 private:
   // Members
-  Double                      c_;
+  float                      c_;
 };
 
 } /* namespace selectivities */

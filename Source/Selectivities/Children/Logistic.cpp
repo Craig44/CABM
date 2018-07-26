@@ -29,13 +29,13 @@ namespace selectivities {
 Logistic::Logistic(Model* model)
 : Selectivity(model) {
 
-  parameters_.Bind<Double>(PARAM_A50, &a50_, "A50", "");
-  parameters_.Bind<Double>(PARAM_ATO95, &ato95_, "Ato95", "");
-  parameters_.Bind<Double>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
+  parameters_.Bind<float>(PARAM_A50, &a50_, "A50", "");
+  parameters_.Bind<float>(PARAM_ATO95, &ato95_, "Ato95", "");
+  parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
 
-  RegisterAsAddressable(PARAM_A50, &a50_);
-  RegisterAsAddressable(PARAM_ATO95, &ato95_);
-  RegisterAsAddressable(PARAM_ALPHA, &alpha_);
+  //RegisterAsAddressable(PARAM_A50, &a50_);
+  //RegisterAsAddressable(PARAM_ATO95, &ato95_);
+  //RegisterAsAddressable(PARAM_ALPHA, &alpha_);
 }
 
 /**
@@ -49,9 +49,9 @@ Logistic::Logistic(Model* model)
  */
 void Logistic::DoValidate() {
   if (alpha_ <= 0.0)
-    LOG_ERROR_P(PARAM_ALPHA) << ": alpha (" << AS_DOUBLE(alpha_) << ") cannot be less than or equal to 0.0";
+    LOG_ERROR_P(PARAM_ALPHA) << ": alpha (" << alpha_ << ") cannot be less than or equal to 0.0";
   if (ato95_ <= 0.0)
-    LOG_ERROR_P(PARAM_ATO95) << ": ato95 (" << AS_DOUBLE(ato95_) << ") cannot be less than or equal to 0.0";
+    LOG_ERROR_P(PARAM_ATO95) << ": ato95 (" << ato95_ << ") cannot be less than or equal to 0.0";
 }
 
 /**
@@ -63,10 +63,10 @@ void Logistic::DoValidate() {
  */
 void Logistic::RebuildCache() {
   if (not length_based_) {
-    Double threshold = 0.0;
+    float threshold = 0.0;
 
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
-      threshold = (a50_ - (Double)age) / ato95_;
+      threshold = (a50_ - (float)age) / ato95_;
 
       if (threshold > 5.0)
         values_[age - min_index_] = 0.0;
@@ -76,12 +76,12 @@ void Logistic::RebuildCache() {
         values_[age - min_index_] = alpha_ / (1.0 + pow(19.0, threshold));
     }
   } else {
-    Double threshold = 0.0;
+    float threshold = 0.0;
     vector<unsigned> length_bins = model_->length_bins();
 
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index) {
-      Double temp = (Double)length_bins[length_bin_index];
-      threshold = (Double)(a50_ - temp) / ato95_;
+      float temp = (float)length_bins[length_bin_index];
+      threshold = (float)(a50_ - temp) / ato95_;
       if (threshold > 5.0)
         length_values_[length_bin_index] = 0.0;
       else if (threshold < -5.0)
