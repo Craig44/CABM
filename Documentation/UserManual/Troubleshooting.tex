@@ -1,7 +1,7 @@
 \section{Troubleshooting\label{sec:trouble-shooting}}
 
 \subsection{Introduction}
-This section is to aid users in debugging models, if you cannot resolve an issue using these guidelines then don't hesitate to contact the development team. To report an issue please follow the format described in Section~\ref{sec:error-guidelines}. We are hoping that most user errors will be well documented and that \IBM\ will produce informative error messages. In the case where this doesn't happen, there are some quick and easy tactics that users can do to attempt to resolve or at least isolate an error/bug. Using \IBM's internal logging out system, this is invoked at the command line with by the \argument{--loglevel} parameter followed by one of these arguments; \argument{trace}, \argument{finest}, \argument{fine}, \argument{medium}. An example of implementing logging with trace level at the command line is,
+This section is to aid users in debugging models, if you cannot resolve an issue using these guidelines then don't hesitate to contact the development team. To report an issue please follow the format described in Section~\ref{sec:error-guidelines}. We are hoping that most user errors will be well documented and that \IBM\ will produce informative error messages. In the case where this doesn't happen, there are some quick and easy tactics that users can do to attempt to resolve or at least isolate an error/bug. Using \IBM's internal logging out system, this is invoked at the command line with the \argument{--loglevel} parameter followed by one of these arguments; \argument{trace}, \argument{finest}, \argument{fine}, \argument{medium}. An example of implementing logging with trace level at the command line is,
 
 \argument{ibm -r --loglevel trace > output.log 2> log.out}
 
@@ -10,7 +10,7 @@ The above command will output \IBM\ normal reports into the file "output.log" wh
 
 \argument{LOG\_FINE() << "Model: State change to Execute";}
 
-taken from line 379.
+taken from line 349, of \texttt{Model.cpp}
 
 
 \subsection{Reporting errors\label{sec:reporting-errors}}

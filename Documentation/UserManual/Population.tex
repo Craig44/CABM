@@ -228,8 +228,13 @@ A mortality block is defined as a consecutive sequence of mortality processes wi
 
 \IBM\ requires that each time step has exactly one mortality block. To achieve this, either all the mortality processes in a time step must be sequential (i.e., there can not be a non-mortality process between any two mortality processes within any one time step); or if no mortality processes occur in a time step then the mortality block is defined to occur at the end of the time step. 
 
-\IBM\ will error out if more than one mortality block occurs in a single time step. 
+\IBM\ will error out if more than one mortality block occurs in a single time step. The consequence of a mortality block is derived quantities and observations that wrap mortality blocks get executed before and after. This can be a costly exercise, if it is important that the model attributes accounts for some mortality then this is a cost that must be taken, but if, there will usually be a parameter that you could set to 0 or one and so \IBM\ will only calculate the quantity once (either before or after). For example the parameter in the derived quantities class \subcommand{proportion\_through\_mortality}.
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.5]{Figures/annual_cycle.jpg}
+	\caption{A visual representation of a hypothetical sequence for an annual cycle.}\label{Fig:annual}
+\end{figure}
 
 \subsubsection{\I{Initialisation}}\label{subsec:initialisation}
 Initialisation is the process of determining the world's state just before \subcommand{start\_year}, whether it be equilibrium/steady state or some other initial state for the model (e.g exploited), prior to the start year of the model. This can be computationally expensive if a plus group is present in the partition.
