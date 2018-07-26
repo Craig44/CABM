@@ -15,7 +15,7 @@
 #include "Model/Model.h"
 #include "Model/Managers.h"
 #include "Asserts/Manager.h"
-#include "Asserts/Children/Addressable.h"
+//#include "Asserts/Children/Addressable.h"
 
 // namespaces
 namespace niwa {
@@ -33,8 +33,8 @@ Assert* Factory::Create(Model* model, const string& object_type, const string& s
   Assert* result = nullptr;
 
   if (object_type == PARAM_ASSERT) {
-    if (sub_type == PARAM_ADDRESSABLE)
-      result = new Addressable(model);
+    //if (sub_type == PARAM_ADDRESSABLE)
+    //  result = new Addressable(model);
     if (result)
       model->managers().assertx()->AddObject(result);
   }
