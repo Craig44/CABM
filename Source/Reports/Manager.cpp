@@ -38,7 +38,7 @@ Manager::~Manager() noexcept(true) {
  */
 void Manager::Build() {
   if (objects_.size() == 0)
-    LOG_WARNING() << "No reports have been specified for this model run";
+    LOG_ERROR() << "No reports have been specified for this model run, this is highly unlikely you want this, The IBM does not print any information unless there are reports.";
 
   LOG_FINEST() << "objects_.size(): " << objects_.size();
   for (auto report : objects_) {

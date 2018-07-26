@@ -2,10 +2,9 @@
  * @file ProcessRemovalsByAge.cpp
  * @author  C Marsh
  * @version 1.0
- * @date 25/08/15
+ * @date 25/07/18
  * @section LICENSE
  *
- * Copyright NIWA Science 2016 - www.niwa.co.nz
  */
 
 // Headers
