@@ -57,10 +57,11 @@
 \defSub{min\_age} {Minimum age}
 \defSub{max\_age} {Maximum age}
 \defSub{plus\_group} {Use age plus group}
-\defSub{time\_step} {The label of time-step that the observation occurs in}
 \defSub{years} {Years for which there are observations}
 \defSub{ageing\_error} {Label of ageing error to use}
-\defSub{process\_label} {The label of the mortality process for the observation}
+\defSub{process\_label} {Label of of removal process}
+\defSub{cell\_layer} {The layer that indicates what area to summarise observations over.}
+\defSub{cells} {The cells we want to generate observations for from the layer of cells supplied}
 \defComLab{process}{Define an object of type \emph{process}}\par\par
 \defSub{label} {The label of the process}
 \defSub{type} {The type of process}
@@ -97,6 +98,8 @@
 \par\textbf{\commandlabsubarg{report}{type}{derived\_quantity}}\par
 \par\textbf{\commandlabsubarg{report}{type}{initialisation\_partition}}\par
 \par\textbf{\commandlabsubarg{report}{type}{model\_attributes}}\par
+\par\textbf{\commandlabsubarg{report}{type}{observation}}\par
+\defSub{observation} {Observation label}
 \par\textbf{\commandlabsubarg{report}{type}{process}}\par
 \defSub{process} {Process label that is reported}
 \par\textbf{\commandlabsubarg{report}{type}{standard\_header}}\par

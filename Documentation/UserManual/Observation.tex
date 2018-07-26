@@ -1,3 +1,280 @@
 \section{The observation section\label{sec:observation-section}}
-
+This section describes the observations that \IBM\ can generate during run time. \IBM\ calculates expectations of all the agents that are user defined, and then adds observation error via simulating through a distribution with a user defined observation error value.
 \subsection{\I{Observations}\label{sec:Observations}\index{Observations}}
+
+\subsubsection{\I{Process Removals By Age}\label{subsubsec:catch_at_age}}
+This observation class aggregates age frequency over a user defined spatial are from a \subcommand{mortality\_event\_biomass} process. This class can add ageing error onto the expectation, to account for ageing error which is a source of uncertainty in ageing fish. An example of how you would set this observation up and show some of the flexibilities in the spatial resolution see the syntax below for a 6 area model.
+
+{\small{\begin{verbatim}
+@process fishing
+type mortality_event_biomass
+years 2000
+catch_layers catch_2000
+selectivity fishing_selectivity
+
+@layer catch_2000
+type numeric
+table_layer
+600 500 400
+1034 601 200
+903 450 100
+end_table
+
+@layer cells
+type categorical
+table_layer
+r1-c1 r1-c2 r1-c3
+r2-c1 r2-c2 r2-c3
+r3-c1 r3-c2 r3-c3
+end_table
+
+@observation fishery_age
+type process_removals_by_age
+cell_layer cells
+cells r1-c1 r1-c2 r1-c3 r2-c1 r2-c2 r2-c3 r3-c1 r3-c2 r3-c3
+simulation_likelihood multinomial
+process_label fishing
+years 2000
+min_age 0
+max_age 28
+plus_group true
+table error_values
+2000 10000
+end_table
+\end{verbatim}}}
+
+The above syntax asks for an age frequency for each cell in the spatial domain through the link to the categorical layer. You could easily summarise the age frequency over the whole spatial domain by changing the categorical layer as shown below
+
+{\small{\begin{verbatim}
+@layer cells
+type categorical
+table_layer
+single_cell single_cell single_cell
+single_cell single_cell single_cell
+single_cell single_cell single_cell
+end_table
+
+@observation fishery_age
+type process_removals_by_age
+cell_layer cells
+cells single_cell
+simulation_likelihood multinomial
+process_label fishing
+years 2000
+min_age 0
+max_age 28
+plus_group true
+table error_values
+2000 10000
+end_table
+\end{verbatim}}}
+
+Hopefully the above example illustrates how much control the user has in specifying what information they want to extract.
+
+
+\subsection{\I{Likelihoods}\label{sec:likelihood-observations}\index{Likelihoods}}
+
+\subsubsection{Likelihoods for proportions-at-age observations}
+\IBM\ implements three likelihoods for proportions-at-age observations, the multinomial likelihood, dirichlet, and the lognormal likelihood. 
+
+\subsubsection*{The multinomial likelihood\index{Multinomial likelihood}}
+For the observed proportions at age $O_i$ for age classes $i$, with sample size $N$, and the expected proportions at the same age classes $E_i$, the negative log-likelihood is defined as; 
+
+\begin{equation}
+-\log \left(L \right) =  -\log \left(N! \right) + \sum\limits_i \log \left( \left(NO_i \right)! \right) - NO_i \log \left(Z \left(E_i,\delta \right) \right)
+\end{equation}
+
+where $\sum\limits_i O_i = 1$ and $\sum\limits_i E_i = 1$. $Z \left(\theta,\delta \right)$ is a robustifying function to prevent division by zero errors, with parameter $\delta>0$. $Z \left(\theta,\delta \right)$ is defined as,
+
+\begin{equation}
+Z \left(\theta,\delta \right) = \begin{cases}
+\theta, & \text{where $\theta \ge r$} \\
+\delta/\left( 2-\theta/\delta \right), & \text{otherwise} \\  
+\end{cases}
+\end{equation}
+
+The default value of $\delta$ is $1 \times 10^{-11}$.
+\subsubsection*{The dirichlet likelihood\index{Dirichlet likelihood}}
+
+For the observed proportions at age $O_i$ for age classes $i$, with sample size $N$, and the expected proportions at the same age classes $E_i$, the negative log-likelihood is defined as; 
+
+\begin{equation}
+-\log \left(L \right) = -\log(\Gamma \sum\limits_i (\alpha_i)) + \sum\limits_i \log(\Gamma (\alpha_i)) - \sum\limits_i (\alpha_i-1) \log(Z(O_i,\delta))
+\end{equation}
+
+where $\alpha_i = Z \left(N E_i,\delta \right)$, $\sum\limits_i O_i = 1$, and $\sum\limits_i E_i = 1$. $Z \left(\theta,\delta \right)$ is a robustifying function to prevent division by zero errors, with parameter $\delta>0$. $Z \left(\theta,\delta \right)$ is defined as,
+
+\begin{equation}
+Z \left(\theta,\delta \right) = \begin{cases}
+\theta, & \text{where $\theta \ge r$} \\
+\delta/\left( 2-\theta/\delta \right), & \text{otherwise} \\  
+\end{cases}
+\end{equation}
+
+The default value of $\delta$ is $1 \times 10^{-11}$.
+
+\subsubsection*{The lognormal likelihood\index{Lognormal likelihood}}
+
+For the observed proportions at age $O_i$ for age classes $i$, with c.v. $c_i$, and the expected proportions at the same age classes $E_i$, the negative log-likelihood is defined as; 
+
+\begin{equation}
+- \log \left(L \right) = \sum\limits_i \left( \log \left( \sigma _i \right) + 0.5\left( \frac{\log \left(O_i / Z \left(E_i,\delta \right) \right)}{\sigma_i} + 0.5 \sigma_i \right)^2 \right)
+\end{equation}
+
+where 
+
+\begin{equation}
+\sigma_i  = \sqrt{\log \left(1+c_i^2 \right)}
+\end{equation}
+
+and the $c_i$'s are the c.v.s for each age class $i$, and $Z \left(\theta,\delta \right)$ is a robustifying function to prevent division by zero errors, with parameter $\delta>0$. $Z \left(\theta,\delta \right)$ is defined as,
+
+\begin{equation}
+Z \left(\theta,\delta \right) = \begin{cases}
+\theta, & \text{where $\theta \ge r$} \\
+\delta/\left( 2-\theta/\delta \right), & \text{otherwise} \\  
+\end{cases}
+\end{equation}
+
+The default value of $\delta$ is $1 \times 10^{-11}$.
+
+\subsubsection{Likelihoods for abundance and biomass observations}\label{Obs:biomass}
+Abundance and biomass observations are expected as an annual time series in \IBM, where they select the same categories over that time series. The parameters and inputs needed to use this observation class are: a observation $O_i$, c.v. $c_i$, catchability coefficient $q$, where $i$ indexed the year. \IBM\ calculates an expectation $E_i$ and scales it by $q$ before comparing it to $O_i$. This means that the value chosen for $q$ will determine whether the observation is relative ($q\neq 1$) or absolute $q = 1$. Before we describe each of the likelihoods we will discuss the methods available to handle $q's$:
+
+\begin{enumerate}
+	\item The $q's$ can be treated as ‘nuisance’ parameters. For each set of values of the free parameters, the model uses the values of the $q's$which minimise the objective function. These optimal $q's$ are calculated algebraically (see Section~\ref{subsec:nuisance}). If one of the $q's$ falls outside the bounds specified by the user, it is set equal to the closest bound. This approach reduces the size of the parameter vector and hence should improve the performance of the estimation method. However, it is not correct when calculating a sample from the posterior in a Bayesian analysis (except asymptotically, see \cite{Walters_ludwig_94}) and we offer the following alternative;
+	
+	\item The $q's$ can be treated as ordinary free parameters.
+\end{enumerate}	
+
+For both options, it is necessary to evaluate the contribution of $O_i$ to the negative loglikelihood for a given value of $q$. Each observation $O_i$ varies about $qE_i$ — express the variability of $O_i$ in terms of its c.v. $c_i$ (or in one case, its standard deviation si). Here are the likelihoods, which are expressed on the objective-function scale of -log(L):
+
+
+\subsubsection*{The lognormal likelihood\index{Lognormal likelihood}\index{Lognormal likelihood}}
+
+The negative log likelihood for a the lognormal is as follows,
+
+\begin{equation}
+- \log \left(L \right) = \sum\limits_i \left( \log \left( \sigma _i \right) + 0.5\left( \frac{\log \left(O_i / q Z \left(E_i,\delta \right) \right)}{\sigma_i} + 0.5 \sigma_i \right)^2 \right)
+\end{equation}
+
+where 
+
+\begin{equation}
+\sigma_i  = \sqrt{\log \left(1+c_i^2 \right)}
+\end{equation}
+
+and $Z \left(\theta,\delta \right)$ is a robustifying function to prevent division by zero errors, with parameter $\delta>0$. $Z \left(\theta,\delta \right)$ is defined as,
+
+This reflects the distributional assumptions that  $O_i$ has the lognormal distribution, that the mean of $O_i$ is $qE_i$  and the c.v. of $O_i$ is $c_i$.
+
+\begin{equation}
+Z \left(\theta,\delta \right) = \begin{cases}
+\theta, & \text{where $\theta \ge r$} \\
+\delta/\left( 2-\theta/\delta \right), & \text{otherwise} \\  
+\end{cases}
+\end{equation}
+
+The default value of $\delta$ is $1 \times 10^{-11}$.
+
+\subsubsection*{The normal likelihood\index{Normal likelihood}\index{Normal likelihood}}
+
+For observations $O_i$, c.v. $c_i$, and expected values $qE_i$, the negative log-likelihood is defined as;
+
+\begin{equation}
+- \log \left(L \right) = \sum\limits_i \left( \log \left( c_i E_i \right) +0.5 \left( \frac{O_i-E_i}{Z\left(c_i E_i,\delta \right)}\right)^2\right)
+\end{equation}
+
+and $Z \left(\theta,\delta \right)$ is a robustifying function to prevent division by zero errors, with parameter $\delta>0$. $Z \left(\theta,\delta \right)$ is defined as,
+
+\begin{equation}
+Z \left(\theta,\delta \right) = \begin{cases}
+\theta, & \text{where $\theta \ge r$} \\
+\delta/\left( 2-\theta/\delta \right), & \text{otherwise} \\  
+\end{cases}
+\end{equation}
+
+The default value of $\delta$ is $1 \times 10^{-11}$.
+
+This reflects the distributional assumptions that  $O_i$ has the normal distribution, that the mean of $O_i$ is $qE_i$  and the c.v. of $O_i$ is $c_i$.
+
+\subsubsection{Likelihoods for tag recapture by age and length observations}
+\paragraph*{The binomial likelihood\index{Binomial likelihood ! tag-recapture-by-length}}
+Designed for situations where the size frequencies or age frequencies of the recaptured tagged fish and of the scanned fish are known. Available in both age or size based models.
+\\\\
+Here we define the likelihood as a binomial, but based on sizes, rather than ages,
+\begin{equation}
+\begin{split}
+-\log \left(L \right)'= -\sum\limits_i & \left[ \right. \log \left(n_i! \right) - \log \left(\left(n_i - m_i \right)! \right) - \log \left(\left(m_i \right)! \right) + m_i \log \left(Z\left(\frac{M_i}{N_i},\delta \right) \right) \\
+&+  \left(n_i - m_i \right)\log \left(Z\left(1 - \frac{M_i}{N_i},\delta\right) \right) \left. \right]
+\end{split}
+\end{equation}
+where 
+\\
+$n_i$ = number of fish at size or age $i$ that were scanned
+\\
+$m_i$ = number of fish at size or age $i$ that were recaptured
+\\
+$N_i$ = number of fish at size or age $i$ in the available population (tagged and untagged)
+\\
+$M_i$ = number of fish at size or age $i$ in the available population that have the tag after a detection probability $p_d$ has been applied, $M_i = M_i'p_d$, where $M_i'$ is the expected available population that have the tag.
+\\\\
+where $Z(x,\delta)$ is a robustifying function with parameter $r > 0$ (to prevent division by zero errors), defined as
+
+
+\[ Z(x,\delta) =
+\begin{cases}
+x       & \text{where } x \geq \delta\\
+\frac{\delta}{(2 - x / \delta)}  & \text{otherwise}\\
+\end{cases}
+\]
+
+Finally if a dispersion parameter ($\tau$) is described in the observation then the final negative log likelihood $-log(L)$ contribution is,
+
+$$-log(L) = -log(L)' / \tau$$
+
+
+\subsubsection{Likelihoods for proportions-by-category observations}
+\IBM\ implements two likelihoods for proportions-by-category observations, the binomial likelihood, and the normal approximation to the binomial (binomial-approx). 
+
+\subsubsection*{The binomial likelihood\index{Binomial likelihood ! proportions-by-category}}
+
+For observed proportions $O_i$ for age class $i$, where $E_i$ are the expected proportions for age class $i$, and $N_i$ is the effective sample size for age class $i$, then the negative log-likelihood is defined as;  
+
+\begin{equation}
+\begin{split}
+-\log \left(L \right)= -\sum\limits_i & \left[ \right. \log \left(N_i! \right) - \log \left(\left(N_i \left(1 - O_i \right) \right)! \right) - \log \left(\left(N_i O_i \right)! \right) + N_i O_i \log \left(Z\left(E_i,\delta \right) \right) \\
+&+ N_i \left(1 - O_i \right)\log \left(Z\left(1 - E_i,\delta\right) \right) \left. \right]
+\end{split}
+\end{equation}
+
+
+where $Z \left(\theta,\delta \right)$ is a robustifying function to prevent division by zero errors, with parameter $\delta>0$. $Z \left(\theta,\delta \right)$ is defined as,
+
+\begin{equation}
+Z \left(\theta,\delta \right) = \begin{cases}
+\theta, & \text{where $\theta \ge r$} \\
+\delta/\left( 2-\theta/\delta \right), & \text{otherwise} \\  
+\end{cases}
+\end{equation}
+
+The default value of $\delta$ is $1 \times 10^{-11}$.
+
+\subsubsection*{The normal approximation to the binomial likelihood\index{Binomial likelihood (normal approximation) ! proportions-by-category}}
+
+For observed proportions $O_i$ for age class $i$, where $E_i$ are the expected proportions for age class $i$, and $N_i$ is the effective sample size for age class $i$, then the negative log-likelihood is defined as;  
+
+\begin{equation}
+-\log \left(L \right)= \sum\limits_i \log \left( \sqrt{Z\left(E_i,\delta \right)Z\left(1-E_i,\delta\right)/N_i} \right)     + \frac{1}{2} \left( \frac{O_i-E_i}{\sqrt{Z\left(E_i,\delta\right)Z\left(1-E_i,\delta \right)/N_i}} \right)^2
+\end{equation}
+
+where $Z \left(\theta,\delta \right)$ is a robustifying function to prevent division by zero errors, with parameter $\delta>0$. $Z \left(\theta,\delta \right)$ is defined as,
+
+\begin{equation}
+Z \left(\theta,\delta \right) = \begin{cases}
+\theta, & \text{where $\theta \ge r$} \\
+\delta/\left( 2-\theta/\delta \right), & \text{otherwise} \\  
+\end{cases}
+\end{equation}
+
+The default value of $\delta$ is $1 \times 10^{-11}$.
