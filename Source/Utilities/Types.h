@@ -81,7 +81,7 @@ typedef CppAD::AD<double> Double;
 #endif
 
 #define AS_DOUBLE(x) x
-typedef double Double;
+typedef float Double;
 #endif
 
 typedef std::vector<std::vector<std::vector<std::vector<Double>>>> Vector4;
