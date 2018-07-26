@@ -56,11 +56,32 @@ void MortalityConstantRate::DoBuild() {
       }
     }
   }
+  LOG_FINEST() << "selectivities supplied = " << selectivity_label_.size();
+  // Build selectivity links
+  if (selectivity_label_.size() == 1)
+    selectivity_label_.assign(2, selectivity_label_[0]);
 
-  selectivity_ = model_->managers().selectivity()->GetSelectivity(selectivity_label_);
-  if (!selectivity_)
-    LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << ": selectivity " << selectivity_label_ << " does not exist. Have you defined it?";
+  if (selectivity_label_.size() > 2) {
+    LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << "You suppled " << selectivity_label_.size()  << " Selectiviites, you can only have one for each sex max = 2";
+  }
+  LOG_FINEST() << "selectivities supplied = " << selectivity_label_.size();
 
+  bool first = true;
+  for (auto label : selectivity_label_) {
+    Selectivity* temp_selectivity = model_->managers().selectivity()->GetSelectivity(label);
+    if (!temp_selectivity)
+      LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << ": selectivity " << label << " does not exist. Have you defined it?";
+
+    selectivity_.push_back(temp_selectivity);
+    if (first) {
+      first = false;
+      selectivity_length_based_ = temp_selectivity->is_length_based();
+    } else {
+      if (selectivity_length_based_ != temp_selectivity->is_length_based()) {
+        LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << "The selectivity  " << label << " was not the same type (age or length based) as the previous selectivity label";
+      }
+    }
+  }
   model_->set_m(m_);
 }
 
@@ -70,26 +91,51 @@ void MortalityConstantRate::DoBuild() {
  */
 void MortalityConstantRate::DoExecute() {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-  float selectivity_at_age;
   unsigned agents_removed = 0;
-  #pragma omp parallel for collapse(2)
-  for (unsigned row = 0; row < model_->get_height(); ++row) {
-    for (unsigned col = 0; col < model_->get_width(); ++col) {
-      WorldCell* cell = world_->get_base_square(row, col);
-      if (cell->is_enabled()) {
-        unsigned initial_size = cell->agents_.size();
-        LOG_FINEST() << initial_size << " initial agents";
-        for (auto iter = cell->agents_.begin(); iter != cell->agents_.end();) {
-          selectivity_at_age = selectivity_->GetResult((*iter).get_age());
-          //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
-          if (rng.chance() <= (1 - std::exp(-(*iter).get_m() * selectivity_at_age))) {
-            iter = cell->agents_.erase(iter);
-            initial_size--;
-            agents_removed++;
-          } else
-            ++iter;
+  if (selectivity_length_based_) {
+    float selectivity_at_length;
+    #pragma omp parallel for collapse(2)
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        WorldCell* cell = world_->get_base_square(row, col);
+        if (cell->is_enabled()) {
+          unsigned initial_size = cell->agents_.size();
+          LOG_FINEST() << initial_size << " initial agents";
+          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end();) {
+            selectivity_at_length = selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index());
+            //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
+            if (rng.chance() <= (1 - std::exp(-(*iter).get_m() * selectivity_at_length))) {
+              iter = cell->agents_.erase(iter);
+              initial_size--;
+              agents_removed++;
+            } else
+              ++iter;
+          }
+          LOG_FINEST() << initial_size << " after mortality";
         }
-        LOG_FINEST() << initial_size << " after mortality";
+      }
+    }
+  } else {
+    float selectivity_at_age;
+    #pragma omp parallel for collapse(2)
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        WorldCell* cell = world_->get_base_square(row, col);
+        if (cell->is_enabled()) {
+          unsigned initial_size = cell->agents_.size();
+          LOG_FINEST() << initial_size << " initial agents";
+          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end();) {
+            selectivity_at_age = selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age());
+            //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
+            if (rng.chance() <= (1 - std::exp(-(*iter).get_m() * selectivity_at_age))) {
+              iter = cell->agents_.erase(iter);
+              initial_size--;
+              agents_removed++;
+            } else
+              ++iter;
+          }
+          LOG_FINEST() << initial_size << " after mortality";
+        }
       }
     }
   }

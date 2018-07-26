@@ -41,9 +41,11 @@ public:
 protected:
   vector<string>                      catch_layer_label_;
   vector<layers::NumericLayer*>       catch_layer_;
-  string                              selectivity_label_;
-  Selectivity*                        selectivity_ = nullptr;
+  vector<string>                      selectivity_label_;
+  vector<Selectivity*>                selectivity_;
   vector<unsigned>                    years_;
+  bool                                selectivity_length_based_ = false;
+
   // For reporting
   map<unsigned, float>                actual_removals_by_year_;
   map<unsigned, float>                removals_by_year_;

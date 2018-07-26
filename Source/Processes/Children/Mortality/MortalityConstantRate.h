@@ -41,13 +41,13 @@ public:
 protected:
   string                              m_layer_label_;
   layers::NumericLayer*               m_layer_ = nullptr;
-  string                              selectivity_label_;
-  Selectivity*                        selectivity_ = nullptr;
+  vector<string>                      selectivity_label_;
+  vector<Selectivity*>                selectivity_;
   float                               m_;
   vector<float>                       time_step_proportions_;
   float                               cv_;
   string                              distribution_;
-
+  bool                                selectivity_length_based_;
   // For reporting
   map<unsigned, unsigned>             removals_by_year_;
 
