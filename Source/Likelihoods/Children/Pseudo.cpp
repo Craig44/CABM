@@ -23,12 +23,15 @@ namespace likelihoods {
  *
  * @param comparisons A collection of comparisons passed by the observation
  */
-void Pseudo::SimulateObserved(map<unsigned, vector<observations::Comparison> >& comparisons) {
+void Pseudo::SimulateObserved(map<unsigned, map<string, vector<observations::Comparison> > >& comparisons) {
   auto iterator = comparisons.begin();
   for (; iterator != comparisons.end(); ++iterator) {
     LOG_FINE() << "Simulating values for year: " << iterator->first;
-    for (observations::Comparison& comparison : iterator->second) {
-      comparison.simulated_ = 0.0;
+    for (auto second_iter = iterator->second.begin(); second_iter != iterator->second.end(); ++second_iter) {
+      LOG_FINE() << "Simulating values for cell: " << second_iter->first;
+      for (observations::Comparison& comparison : second_iter->second) {
+        comparison.simulated_ = 0.0;
+      }
     }
   }
 }

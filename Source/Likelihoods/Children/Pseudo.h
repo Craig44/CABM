@@ -32,7 +32,7 @@ public:
   Pseudo(Model* model) : Likelihood(model) { };
   virtual                     ~Pseudo() = default;
   void                        DoValidate() override final { };
-  void                        SimulateObserved(map<unsigned, vector<observations::Comparison> >& comparisons) override final;
+  void                        SimulateObserved(map<unsigned, map<string, vector<observations::Comparison> > >& comparisons) override final;
 };
 
 } /* namespace likelihoods */

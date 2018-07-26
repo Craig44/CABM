@@ -86,14 +86,14 @@ void Observation::Reset() {
  * @param observed The value passed in from the configuration file
  * @param error_value The error value for this comparison
  */
-void Observation::SaveComparison(unsigned age, float length, float expected, float simulated, float error_value, unsigned year){
+void Observation::SaveComparison(unsigned age, float length, string row_col, float expected, float simulated, float error_value, unsigned year){
   observations::Comparison new_comparison;
   new_comparison.age_ = age;
   new_comparison.length_ = length;
   new_comparison.expected_ = expected;
   new_comparison.simulated_ = simulated;
   new_comparison.error_value_ = error_value;
-  comparisons_[year].push_back(new_comparison);
+  comparisons_[year][row_col].push_back(new_comparison);
 }
 
 } /* namespace niwa */

@@ -51,19 +51,18 @@ public:
 
   // accessors
   string&                       likelihood() { return simulation_likelihood_label_; }
-  vector<obs::Comparison>&      comparisons(unsigned year) { return comparisons_[year]; }
-  map<unsigned, vector<obs::Comparison> >& comparisons() { return comparisons_; }
+  map<unsigned,map<string,vector<obs::Comparison> > > & comparisons() { return comparisons_; }
 
 protected:
   // methods
-  void                        SaveComparison(unsigned age, float length, float expected, float simulated, float error_value, unsigned year);
+  void                        SaveComparison(unsigned age, float length, string row_col, float expected, float simulated, float error_value, unsigned year);
   // members
   Model*                      model_ = nullptr;
   float                       proportion_of_time_ = 0;
   string                      simulation_likelihood_label_ = "";
   Likelihood*                 likelihood_ = nullptr;
   vector<string>              allowed_likelihood_types_;
-  map<unsigned, vector<obs::Comparison> > comparisons_;
+  map<unsigned,map<string,vector<obs::Comparison> > > comparisons_;
 
 };
 } /* namespace niwa */

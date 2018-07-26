@@ -36,7 +36,7 @@ public:
   void                        Validate();
   void                        Build() { };
   void                        Reset() override final { };
-  virtual void                SimulateObserved(map<unsigned, vector<observations::Comparison> >& comparisons) { };
+  virtual void                SimulateObserved(map<unsigned, map<string, vector<observations::Comparison> > >& comparisons) { };
   virtual void                DoValidate() { };
 
   // accessors

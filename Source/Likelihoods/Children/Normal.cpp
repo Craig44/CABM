@@ -24,20 +24,23 @@ namespace likelihoods {
  *
  * @param comparisons A collection of comparisons passed by the observation
  */
-void Normal::SimulateObserved(map<unsigned, vector<observations::Comparison> >& comparisons) {
+void Normal::SimulateObserved(map<unsigned, map<string, vector<observations::Comparison> > >& comparisons) {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
 
   float error_value = 0.0;
   auto iterator = comparisons.begin();
   for (; iterator != comparisons.end(); ++iterator) {
     LOG_FINE() << "Simulating values for year: " << iterator->first;
-    for (observations::Comparison& comparison : iterator->second) {
-      error_value = comparison.error_value_;
+    for (auto second_iter = iterator->second.begin(); second_iter != iterator->second.end(); ++second_iter) {
+      LOG_FINE() << "Simulating values for cell: " << second_iter->first;
+      for (observations::Comparison& comparison : second_iter->second) {
+        error_value = comparison.error_value_;
 
-      if (comparison.expected_ <= 0.0 || error_value <= 0.0)
-        comparison.simulated_ = 0.0;
-      else
-        comparison.simulated_ = rng.normal(comparison.expected_, (comparison.expected_ * error_value));
+        if (comparison.expected_ <= 0.0 || error_value <= 0.0)
+          comparison.simulated_ = 0.0;
+        else
+          comparison.simulated_ = rng.normal(comparison.expected_, (comparison.expected_ * error_value));
+      }
     }
   }
 }

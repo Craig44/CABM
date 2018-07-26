@@ -28,22 +28,25 @@ namespace likelihoods {
  *
  * @param comparisons A collection of comparisons passed by the observation
  */
-void LogNormal::SimulateObserved(map<unsigned, vector<observations::Comparison> >& comparisons) {
+void LogNormal::SimulateObserved(map<unsigned, map<string, vector<observations::Comparison> > >& comparisons) {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
 
   auto iterator = comparisons.begin();
   for (; iterator != comparisons.end(); ++iterator) {
     LOG_FINE() << "Simulating values for year: " << iterator->first;
-    for (observations::Comparison& comparison : iterator->second) {
-      float error_value = comparison.error_value_;
+    for (auto second_iter = iterator->second.begin(); second_iter != iterator->second.end(); ++second_iter) {
+      LOG_FINE() << "Simulating values for cell: " << second_iter->first;
+      for (observations::Comparison& comparison : second_iter->second) {
+        float error_value = comparison.error_value_;
 
-      if (comparison.expected_ <= 0.0 || error_value <= 0.0)
-        comparison.simulated_ = 0.0;
-      else {
-        LOG_FINEST() << "expected = " << comparison.expected_;
-        comparison.simulated_ = rng.lognormal(comparison.expected_, error_value);
-        LOG_FINEST() << "Simulated = " << comparison.simulated_;
+        if (comparison.expected_ <= 0.0 || error_value <= 0.0)
+          comparison.simulated_ = 0.0;
+        else {
+          LOG_FINEST() << "expected = " << comparison.expected_;
+          comparison.simulated_ = rng.lognormal(comparison.expected_, error_value);
+          LOG_FINEST() << "Simulated = " << comparison.simulated_;
 
+        }
       }
     }
   }

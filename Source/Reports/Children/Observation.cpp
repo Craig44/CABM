@@ -52,12 +52,14 @@ void Observation::DoExecute() {
   cache_ << "observation_type: " << observation_->type() << "\n";
   cache_ << "likelihood: " << observation_->likelihood() << "\n";
   cache_ << "Values " <<REPORT_R_DATAFRAME <<"\n";
-  map<unsigned, vector<obs::Comparison>>& comparisons = observation_->comparisons();
+  map<unsigned,map<string,vector<obs::Comparison> > >& comparisons = observation_->comparisons();
   // report raw residuals
-  cache_ << "year age length expected simulated error_value\n";
+  cache_ << "year cell age length expected simulated error_value\n";
   for (auto iter = comparisons.begin(); iter != comparisons.end(); ++iter) {
-    for (obs::Comparison comparison : iter->second) {
-      cache_ << iter->first << " " << comparison.age_ << " " << comparison.length_ << " " << comparison.expected_ << " " << comparison.simulated_ << " " << comparison.error_value_ << "\n";
+    for (auto second_iter = iter->second.begin(); second_iter != iter->second.end(); ++second_iter) {
+      for (obs::Comparison comparison : second_iter->second) {
+        cache_ << iter->first << " " << second_iter->first << " " << comparison.age_ << " " << comparison.length_ << " " << comparison.expected_ << " " << comparison.simulated_ << " " << comparison.error_value_ << "\n";
+      }
     }
   }
   ready_for_writing_ = true;
