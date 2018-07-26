@@ -114,7 +114,7 @@ unsigned Object::GetAddressableSize(const string& label) const {
  * @param label The label of the addressable to find
  * @return A pointer to the addressable to be used by the Estimate object
  */
-Double* Object::GetAddressable(const string& label) {
+float* Object::GetAddressable(const string& label) {
   for(auto addressables : addressable_types_)
     LOG_FINEST() << addressables.first;
 
@@ -123,7 +123,7 @@ Double* Object::GetAddressable(const string& label) {
   return addressables_[label];
 }
 
-Double* Object::GetAddressable(const string& label, const string& index) {
+float* Object::GetAddressable(const string& label, const string& index) {
   if (addressable_types_.find(label) == addressable_types_.end())
     LOG_CODE_ERROR() << "addressable_types_.find(" << label << ") == addressable_types_.end()";
 
@@ -171,9 +171,9 @@ Double* Object::GetAddressable(const string& label, const string& index) {
  *
  * @param The absolute label for this (e.g ycs_years{1973:2014}
  * @param A vector of the indexes to find (already exploded with utilities::string::explode()
- * @return a Pointer to a vector of Double pointers
+ * @return a Pointer to a vector of float pointers
  */
-vector<Double*>* Object::GetAddressables(const string& absolute_label, const vector<string> indexes) {
+vector<float*>* Object::GetAddressables(const string& absolute_label, const vector<string> indexes) {
   if (addressable_custom_vectors_.find(absolute_label) != addressable_custom_vectors_.end())
     return &addressable_custom_vectors_[absolute_label];
 
@@ -194,12 +194,12 @@ vector<Double*>* Object::GetAddressables(const string& absolute_label, const vec
  * @param label The label of the addressable to find
  * @return a pointer to the map to use
  */
-map<unsigned, Double>* Object::GetAddressableUMap(const string& label) {
+map<unsigned, float>* Object::GetAddressableUMap(const string& label) {
   bool dummy =  false;
   return GetAddressableUMap(label, dummy);
 }
 
-map<unsigned, Double>* Object::GetAddressableUMap(const string& label, bool& create_missing) {
+map<unsigned, float>* Object::GetAddressableUMap(const string& label, bool& create_missing) {
   if (addressable_types_.find(label) == addressable_types_.end())
     LOG_CODE_ERROR() << "addressable_types_.find(" << label << ") == addressable_types_.end()";
   if (addressable_types_[label] != addressable::kUnsignedMap)
@@ -210,12 +210,12 @@ map<unsigned, Double>* Object::GetAddressableUMap(const string& label, bool& cre
 }
 
 /**
- * Get the addressable as that is a string/double map
+ * Get the addressable as that is a string/float map
  *
  * @param label of the addressable
  * @return An ordered map of addressables
  */
-OrderedMap<string, Double>* Object::GetAddressableSMap(const string& label) {
+OrderedMap<string, float>* Object::GetAddressableSMap(const string& label) {
   if (addressable_types_.find(label) == addressable_types_.end())
     LOG_CODE_ERROR() << "addressable_types_.find(" << label << ") == addressable_types_.end()";
   if (addressable_types_[label] != addressable::kStringMap)
@@ -230,7 +230,7 @@ OrderedMap<string, Double>* Object::GetAddressableSMap(const string& label) {
  * @param label The label of the addressable we want
  * @return vector pointer of addressables
  */
-vector<Double>* Object::GetAddressableVector(const string& label) {
+vector<float>* Object::GetAddressableVector(const string& label) {
   LOG_FINEST() << "finding object with label " << label;
   if (addressable_types_.find(label) == addressable_types_.end()) {
     /**
@@ -273,7 +273,7 @@ addressable::Type Object::GetAddressableType(const string& label) const {
  * @param label The label to register the addressable under
  * @param variable The variable to register as an addressable
  */
-void Object::RegisterAsAddressable(const string& label, Double* variable, addressable::Usage usage) {
+void Object::RegisterAsAddressable(const string& label, float* variable, addressable::Usage usage) {
   addressables_[label]      = variable;
   addressable_types_[label] = addressable::kSingle;
   addressable_usage_[label] = usage;
@@ -287,7 +287,7 @@ void Object::RegisterAsAddressable(const string& label, Double* variable, addres
  * @param label The label to register the addressable under
  * @param variables Vector containing all the elements to register
  */
-void Object::RegisterAsAddressable(const string& label, vector<Double>* variables, addressable::Usage usage) {
+void Object::RegisterAsAddressable(const string& label, vector<float>* variables, addressable::Usage usage) {
   addressable_vectors_[label] = variables;
   addressable_types_[label]   = addressable::kVector;
   addressable_usage_[label] = usage;
@@ -300,14 +300,14 @@ void Object::RegisterAsAddressable(const string& label, vector<Double>* variable
  * process_label.variable(map.string)
  *
  * @param label The label for the process
- * @param variables Map containing index and double values to store
+ * @param variables Map containing index and float values to store
  */
-void Object::RegisterAsAddressable(const string& label, OrderedMap<string, Double>* variables, addressable::Usage usage) {
+void Object::RegisterAsAddressable(const string& label, OrderedMap<string, float>* variables, addressable::Usage usage) {
   addressable_s_maps_[label]  = variables;
   addressable_types_[label]   = addressable::kStringMap;
   addressable_usage_[label] = usage;
 }
-void Object::RegisterAsAddressable(const string& label, map<unsigned, Double>* variables, addressable::Usage usage) {
+void Object::RegisterAsAddressable(const string& label, map<unsigned, float>* variables, addressable::Usage usage) {
   addressable_u_maps_[label]  = variables;
   addressable_types_[label]   = addressable::kUnsignedMap;
   addressable_usage_[label] = usage;
@@ -316,7 +316,7 @@ void Object::RegisterAsAddressable(const string& label, map<unsigned, Double>* v
 /**
  *
  */
-void Object::RegisterAsAddressable(map<string, vector<Double>>* variables) {
+void Object::RegisterAsAddressable(map<string, vector<float>>* variables) {
   unnamed_addressable_s_map_vector_.push_back(variables);
 }
 

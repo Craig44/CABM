@@ -30,7 +30,6 @@
 #include "Utilities/NoCopy.h"
 #include "Utilities/Types.h"
 
-using niwa::utilities::Double;
 
 // Namespaces
 namespace niwa {
@@ -77,13 +76,13 @@ public:
   bool                            HasAddressableUsage(const string& label, const addressable::Usage&) const;
   bool                            IsAddressableAVector(const string& label) const;
   unsigned                        GetAddressableSize(const string& label) const;
-  Double*                         GetAddressable(const string& label);
-  virtual Double*                 GetAddressable(const string& label, const string& index);
-  vector<Double*>*                GetAddressables(const string& absolute_label, const vector<string> indexes);
-  map<unsigned, Double>*          GetAddressableUMap(const string& label);
-  map<unsigned, Double>*          GetAddressableUMap(const string& label, bool& create_missing);
-  OrderedMap<string, Double>*     GetAddressableSMap(const string& label);
-  vector<Double>*                 GetAddressableVector(const string& label);
+  float*                         GetAddressable(const string& label);
+  virtual float*                 GetAddressable(const string& label, const string& index);
+  vector<float*>*                GetAddressables(const string& absolute_label, const vector<string> indexes);
+  map<unsigned, float>*          GetAddressableUMap(const string& label);
+  map<unsigned, float>*          GetAddressableUMap(const string& label, bool& create_missing);
+  OrderedMap<string, float>*     GetAddressableSMap(const string& label);
+  vector<float>*                 GetAddressableVector(const string& label);
   addressable::Type               GetAddressableType(const string& label) const;
   void                            PrintParameterQueryInfo();
   virtual void                    RebuildCache() { };
@@ -107,11 +106,11 @@ public:
 
 protected:
   // Methods
-  void                        RegisterAsAddressable(const string& label, Double* variable, addressable::Usage usage = addressable::kAll);
-  void                        RegisterAsAddressable(const string& label, vector<Double>* variables, addressable::Usage usage = addressable::kAll);
-  void                        RegisterAsAddressable(const string& label, OrderedMap<string, Double>* variables, addressable::Usage usage = addressable::kAll);
-  void                        RegisterAsAddressable(const string& label, map<unsigned, Double>* variables, addressable::Usage usage = addressable::kAll);
-  void                        RegisterAsAddressable(map<string, vector<Double>>* variables);
+  void                        RegisterAsAddressable(const string& label, float* variable, addressable::Usage usage = addressable::kAll);
+  void                        RegisterAsAddressable(const string& label, vector<float>* variables, addressable::Usage usage = addressable::kAll);
+  void                        RegisterAsAddressable(const string& label, OrderedMap<string, float>* variables, addressable::Usage usage = addressable::kAll);
+  void                        RegisterAsAddressable(const string& label, map<unsigned, float>* variables, addressable::Usage usage = addressable::kAll);
+  void                        RegisterAsAddressable(map<string, vector<float>>* variables);
 
   // Members
   string                          block_type_           = "";
@@ -119,16 +118,16 @@ protected:
   string                          type_                 = "";
   bool                            is_time_varying_      = false;
   ParameterList                   parameters_;
-  map<string, Double*>            addressables_;
+  map<string, float*>            addressables_;
   map<string, bool>               create_missing_addressables_;
-  map<string, vector<Double>* >   addressable_vectors_;
-  map<string, vector<Double*> >   addressable_custom_vectors_;
+  map<string, vector<float>* >   addressable_vectors_;
+  map<string, vector<float*> >   addressable_custom_vectors_;
   map<string, addressable::Type>  addressable_types_;
   map<string, addressable::Usage> addressable_usage_;
 
-  map<string, map<unsigned, Double>* >      addressable_u_maps_;
-  map<string, OrderedMap<string, Double>* > addressable_s_maps_;
-  vector<map<string, vector<Double>>* >     unnamed_addressable_s_map_vector_;
+  map<string, map<unsigned, float>* >      addressable_u_maps_;
+  map<string, OrderedMap<string, float>* > addressable_s_maps_;
+  vector<map<string, vector<float>>* >     unnamed_addressable_s_map_vector_;
 
   DISALLOW_COPY_AND_ASSIGN(Object);
 };
