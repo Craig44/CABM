@@ -20,6 +20,7 @@
 #include "Layers/Manager.h"
 #include "Likelihoods/Manager.h"
 #include "Observations/Manager.h"
+#include "PreferenceFunctions/Manager.h"
 #include "Processes/Manager.h"
 #include "Reports/Manager.h"
 #include "Selectivities/Manager.h"
@@ -44,6 +45,7 @@ Managers::Managers(Model* model) {
   layer_                  = new layers::Manager();
   likelihood_             = new likelihoods::Manager();
   observation_            = new observations::Manager();
+  preference_function_    = new preference_functions::Manager();
   process_                = new processes::Manager();
   report_                 = new reports::Manager(model_);
   selectivity_            = new selectivities::Manager();
@@ -62,6 +64,7 @@ Managers::~Managers() {
   delete layer_;
   delete likelihood_;
   delete observation_;
+  delete preference_function_;
   delete process_;
   delete report_;
   delete selectivity_;
@@ -81,6 +84,7 @@ void Managers::Validate() {
   observation_->Validate();
   report_->Validate();
   selectivity_->Validate();
+  preference_function_->Validate();
   process_->Validate(model_);
   time_varying_->Validate();
 }
@@ -95,6 +99,7 @@ void Managers::Build() {
   observation_->Build();
   time_varying_->Build();
   process_->BuildRemainingProcesses();
+  preference_function_->Build();
   report_->Build();
   initialisation_phase_->Build(model_);  // This calls report and process() so needs to be built after them
 }
@@ -118,6 +123,7 @@ void Managers::Reset() {
   layer_->Reset();
   likelihood_->Reset();
   observation_->Reset();
+  preference_function_->Reset();
   process_->Reset();
   report_->Reset();
   selectivity_->Reset();

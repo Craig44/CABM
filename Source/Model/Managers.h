@@ -27,6 +27,7 @@ namespace initialisationphases { class Manager; }
 namespace layers { class Manager; }
 namespace likelihoods { class Manager; }
 namespace observations { class Manager; }
+namespace preference_functions { class Manager; }
 namespace processes { class Manager; }
 namespace reports { class Manager; }
 namespace selectivities { class Manager; }
@@ -49,6 +50,7 @@ public:
   virtual layers::Manager*                layer() { return layer_; }
   virtual likelihoods::Manager*           likelihood() { return likelihood_; }
   virtual observations::Manager*          observation() { return observation_; }
+  virtual preference_functions::Manager*  preference_function() { return preference_function_; }
   virtual processes::Manager*             process() { return process_; }
   virtual reports::Manager*               report() { return report_; }
   virtual selectivities::Manager*         selectivity() { return selectivity_; }
@@ -74,6 +76,7 @@ protected:
   layers::Manager*                    layer_;
   likelihoods::Manager*               likelihood_;
   observations::Manager*              observation_;
+  preference_functions::Manager*      preference_function_;
   processes::Manager*                 process_;
   reports::Manager*                   report_;
   selectivities::Manager*             selectivity_;

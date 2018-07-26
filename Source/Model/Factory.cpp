@@ -22,6 +22,7 @@
 #include "Likelihoods/Factory.h"
 #include "Model/Model.h"
 #include "Observations/Factory.h"
+#include "PreferenceFunctions/Factory.h"
 #include "Processes/Factory.h"
 #include "Reports/Factory.h"
 #include "Selectivities/Factory.h"
@@ -76,6 +77,8 @@ base::Object* Factory::CreateObject(const string& object_type, const string& sub
     return observations::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_PROCESS || lwr_object_type == PARAM_PROCESSES)
     return processes::Factory::Create(model_, lwr_object_type, lwr_sub_type);
+  else if (lwr_object_type == PARAM_PREFERENCE_FUNCTION || lwr_object_type == PARAM_PREFERENCE_FUNCTIONS)
+    return preference_functions::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_STATE || lwr_object_type == PARAM_TAG || lwr_object_type == PARAM_TRANSITION) // @process specialisation
     return processes::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_REPORT)
