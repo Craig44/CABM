@@ -17,6 +17,7 @@
 #include "Model/Managers.h"
 #include "Observations/Manager.h"
 #include "Observations/Children/ProcessRemovalsByAge.h"
+#include "Observations/Children/ProcessRemovalsByLength.h"
 
 
 
@@ -37,8 +38,9 @@ Observation* Factory::Create(Model* model, const string& object_type, const stri
   if (object_type == PARAM_OBSERVATION) {
 
     if (sub_type == PARAM_PROCESS_REMOVALS_BY_AGE)
-          result = new ProcessRemovalsByAge(model);
-
+      result = new ProcessRemovalsByAge(model);
+    else if (sub_type == PARAM_PROCESS_REMOVALS_BY_LENGTH)
+          result = new ProcessRemovalsByLength(model);
 
     if (result)
       model->managers().observation()->AddObject(result);

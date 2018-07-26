@@ -1,5 +1,5 @@
 /**
- * @file ProcessRemovalsByAge.h
+ * @file ProcessRemovalsByLength.h
  * @author  C Marsh
  * @version 1.0
  * @date 25/08/15
@@ -10,18 +10,15 @@
  * @section DESCRIPTION
  *
  * This observation is a specific process observation class. It is associated with the process type mortality_instantaneous.
- * It calls a catch at object that is created from the process which represents the numbers at age halfway trough the mortality process
- * This class then applies ageing error and converts to a proportion which then gets sent to a likelihood for evaluation.
  *
  */
-#ifndef OBSERVATIONS_REMOVEALS_BY_AGE_H_
-#define OBSERVATIONS_REMOVEALS_BY_AGE_H_
+#ifndef OBSERVATIONS_REMOVEALS_BY_LENGTH_H_
+#define OBSERVATIONS_REMOVEALS_BY_LENGTH_H_
 
 // Headers
 #include "Observations/Observation.h"
 
 #include "Processes/Children/Mortality.h"
-#include "AgeingErrors/AgeingError.h"
 #include "Layers/Children/CategoricalLayer.h"
 
 // Namespace
@@ -33,11 +30,11 @@ using processes::Mortality;
 /**
  * Class Definition
  */
-class ProcessRemovalsByAge : public niwa::Observation {
+class ProcessRemovalsByLength : public niwa::Observation {
 public:
   // Methods
-  explicit ProcessRemovalsByAge(Model* model);
-  virtual                     ~ProcessRemovalsByAge();
+  explicit ProcessRemovalsByLength(Model* model);
+  virtual                     ~ProcessRemovalsByLength();
   void                        DoValidate() override final;
   void                        DoBuild() override final;
   void                        DoReset() override final { };
@@ -49,22 +46,15 @@ public:
 protected:
   // Members
   vector<unsigned>              years_;
-  unsigned                      min_age_ = 0;
-  unsigned                      max_age_ = 0;
-  bool                          plus_group_ = false;
-  unsigned                      age_spread_ = 0;
   parameters::Table*            error_values_table_ = nullptr;
-  AgeingError*                  ageing_error_ = nullptr;
-  string                        ageing_error_label_;
   Mortality*                    mortality_process_ = nullptr;
-  vector<float>                 age_results_;
   string                        process_label_;
 
-  unsigned                      time_step_to_execute_;
   map<unsigned, vector<float>>  error_values_by_year_;
-  map<unsigned,vector<float>>   proportions_;
   map<unsigned, vector<float>>  error_values_;
   vector<string>                cells_;
+  vector<unsigned>              cell_rows_;
+  vector<unsigned>              cell_cols_;
   layers::CategoricalLayer*     layer_ = nullptr;
   string                        layer_label_;
 
@@ -74,4 +64,4 @@ protected:
 } /* namespace observations */
 } /* namespace niwa */
 
-#endif /* OBSERVATIONS_REMOVEALS_BY_AGE_H_ */
+#endif /* OBSERVATIONS_REMOVEALS_BY_LENGTH_H_ */
