@@ -16,7 +16,6 @@
 
 // Namespaces
 namespace niwa {
-
 // Using
 using std::map;
 
@@ -32,6 +31,7 @@ public:
   void                        Validate();
   virtual void                Build();
   void                        Reset();
+  virtual float               get_result(float value) = 0;
 
 protected:
   // pure methods
@@ -39,6 +39,10 @@ protected:
   virtual void                DoBuild() = 0;
   // Members
   Model*                      model_ = nullptr;
+  float                       alpha_;
+  float                       return_value_;
+
 };
 } /* namespace niwa */
+
 #endif /* PREFERENCE_FUNCTION_H_ */

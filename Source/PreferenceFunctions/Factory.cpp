@@ -20,6 +20,9 @@
 #include "Model/Model.h"
 #include "Model/Managers.h"
 #include "PreferenceFunctions/Manager.h"
+#include "PreferenceFunctions/Children/Logistic.h"
+#include "PreferenceFunctions/Children/DoubleNormal.h"
+#include "PreferenceFunctions/Children/Normal.h"
 
 
 // Namespaces
@@ -38,6 +41,12 @@ PreferenceFunction* Factory::Create(Model* model, const string& object_type, con
   PreferenceFunction* result = nullptr;
 
   if (object_type == PARAM_PREFERENCE_FUNCTION || object_type == PARAM_PREFERENCE_FUNCTIONS) {
+    if (sub_type == PARAM_LOGISTIC)
+      result = new Logistic(model);
+    else if (sub_type == PARAM_DOUBLE_NORMAL)
+      result = new DoubleNormal(model);
+    else if (sub_type == PARAM_NORMAL)
+      result = new Normal(model);
 
     if (result)
       model->managers().preference_function()->AddObject(result);
