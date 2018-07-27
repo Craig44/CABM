@@ -77,6 +77,13 @@ float NumericMetaLayer::get_value(unsigned RowIndex, unsigned ColIndex) {
   return value;
 }
 
+float NumericMetaLayer::get_value(unsigned RowIndex, unsigned ColIndex, unsigned year) {
+  float value = 0.0;
+  if (year == 0)
+    return default_layer_->get_value(RowIndex, ColIndex);
+  value = years_layer_[year]->get_value(RowIndex, ColIndex);
+  return value;
+}
 
 } /* namespace layers */
 } /* namespace niwa */

@@ -23,6 +23,7 @@ public:
   virtual                     ~NumericLayer();
   virtual void                set_value(unsigned RowIndex, unsigned ColIndex, float Value);  // TODO once we have children make this pure virtual
   virtual float               get_value(unsigned RowIndex, unsigned ColIndex);
+  virtual float               get_value(unsigned RowIndex, unsigned ColIndex, unsigned year);
 
 
 protected:

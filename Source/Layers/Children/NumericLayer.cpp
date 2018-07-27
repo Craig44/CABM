@@ -78,8 +78,8 @@ void NumericLayer::DoBuild() {
   }
 
   if (proportion_) {
-    if (!utilities::doublecompare::IsOne(total))
-      LOG_ERROR_P(PARAM_LAYER) << "you have signaled that this is a proportion layer so the values should sum to equal 1, but they equal '" << total << " please sort this out";
+    if (fabs(total - 1.0) > 0.0001)
+      LOG_ERROR_P(PARAM_LAYER) << "you have signaled that this is a proportion layer so the values should sum to equal 1, but they equal '" << total << " please sort this out, it must be within 0.0001 of the value 1.0";
   }
 }
 
@@ -87,6 +87,17 @@ void NumericLayer::DoBuild() {
  * get_value
 */
 float NumericLayer::get_value(unsigned RowIndex, unsigned ColIndex) {
+  //LOG_TRACE();
+#ifndef OPTIMIZE
+// TODO do some error catching for debugging purposes
+#endif
+  return grid_[RowIndex][ColIndex];
+}
+
+/*
+ * get_value
+*/
+float NumericLayer::get_value(unsigned RowIndex, unsigned ColIndex, unsigned year) {
   //LOG_TRACE();
 #ifndef OPTIMIZE
 // TODO do some error catching for debugging purposes
