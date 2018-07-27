@@ -24,6 +24,8 @@
 #include "Children/Mortality/MortalityConstantRate.h"
 #include "Children/Mortality/MortalityEventBiomass.h"
 #include "Children/MovementBoxTransfer.h"
+#include "Children/MovementPreference.h"
+#include "Children/Tagging.h"
 #include "Children/Maturity.h"
 
 // Namespaces
@@ -76,8 +78,12 @@ Process* Factory::Create(Model* model, const string& object_type, const string& 
       result = new MortalityEventBiomass(model);
     else if (sub == PARAM_MOVEMENT_BOX_TRANSFER)
       result = new MovementBoxTransfer(model);
+    else if (sub == PARAM_PREFERENCE_MOVEMENT)
+      result = new MovementPreference(model);
     else if (sub == PARAM_MATURATION)
       result = new Maturity(model);
+    else if (sub == PARAM_TAGGING)
+      result = new Tagging(model);
     if (result)
       model->managers().process()->AddObject(result);
   }
