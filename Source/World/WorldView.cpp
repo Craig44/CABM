@@ -89,12 +89,19 @@ void WorldView::Build() {
 
   // Set Variables (Can't do it above. Stupid blah ISO C++)
   float lat = 0.0, lon = 0.0;
+  lat_by_cell_.resize(height_);
+  lon_by_cell_.resize(width_);
+
   for (unsigned i = 0; i < height_; ++i) {
     for (unsigned j = 0; j < width_; ++j) {
       if (lat_layer_)
         lat = lat_layer_->get_value(i,j);
       if (long_layer_)
         lon = long_layer_->get_value(i,j);
+
+      lon_by_cell_[j] = lon;
+      lat_by_cell_[i] = lat; // A bit inefficient 'shrugs shoulder' TODO should check somewhere that all lats are teh same for all longitudes, and vice versa with longs
+
       base_grid_[i][j].Build(i, j, lat, lon, model_);
       cached_grid_[i][j].Build(i, j, lat, lon, model_);
     }
@@ -144,6 +151,27 @@ void WorldView::MergeCachedGrid() {
     }
   }
 }
+
+
+/*
+ * fil the row and col parameter with the cell index that contains the lat and lon given
+ *
+*/
+void WorldView::get_cell_element(unsigned& row, unsigned& col, const float lat, const float lon) {
+  for (unsigned i = 1; i < height_; ++i) {
+    if (lat < lat_by_cell_[i]) {
+      row = i;
+      break;
+    }
+  }
+  for (unsigned j = 1; j < width_; ++j) {
+    if (lon < lon_by_cell_[j]) {
+      col = j;
+      break;
+    }
+  }
+}
+
 
 /*
  * This method gets the age frequencey of the world, this is called in intialisation to see if we have meet an equilibrium state

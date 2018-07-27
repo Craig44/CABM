@@ -120,6 +120,10 @@ public:
   float                       get_male_proportions() const {return proportion_male_;};
   unsigned                    get_max_threads() const {return max_threads_;}
 
+  virtual const float&        min_lat() const {return min_lat_;}
+  virtual const float&        max_lat() const {return max_lat_;}
+  virtual const float&        min_lon() const {return min_lon_;}
+  virtual const float&        max_lon() const {return max_lon_;}
 
   // manager accessors
   virtual Managers&           managers();
@@ -158,6 +162,12 @@ protected:
   bool                        sexed_ = false;
   string                      base_layer_;
   string                      lat_layer_label_; // make it optional
+  vector<float>               lats_;
+  vector<float>               lons_;
+  float                       min_lat_;
+  float                       max_lat_;
+  float                       min_lon_;
+  float                       max_lon_;
   string                      lon_layer_label_; // make it optional
   unsigned                    world_height_;
   unsigned                    world_width_;

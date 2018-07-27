@@ -92,8 +92,6 @@ int main(int argc, char * argv[]) {
 
        // Thread off the reports
        reports::Manager* report_manager = model.managers().report();
-
-       // TODO address the threading of reports
        std::thread report_thread([&report_manager]() { report_manager->FlushReports(); });
 
        // Run the model

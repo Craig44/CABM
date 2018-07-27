@@ -71,9 +71,9 @@ void AgeFrequencyByCell::DoExecute() {
         cell->get_age_frequency(age_freq);
         for(auto& age : age_freq)
           cache_ << " " << age;
+        cache_ << "\n";
       }
     }
-    cache_ << "\n";
   }
   ready_for_writing_ = true;
   call_number_ = false;

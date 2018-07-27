@@ -69,7 +69,6 @@ double RandomNumberGenerator::uniform(double min, double max) {
  */
 double RandomNumberGenerator::chance() {
  boost::variate_generator<boost::mt19937&, boost::uniform_01<> > generator(generator_, chance_);
-
  return generator();
 }
 

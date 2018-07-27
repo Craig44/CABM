@@ -31,9 +31,8 @@ MortalityEventBiomass::MortalityEventBiomass(Model* model) : Mortality(model) {
   parameters_.Bind<string>(PARAM_SELECTIVITY, &selectivity_label_, "Selectivity label", "");
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "years to apply the process", "");
   parameters_.Bind<string>(PARAM_CATCH_LAYERS, &catch_layer_label_, "Spatial layer describing catch by cell for each year, there is a one to one link with the year specified, so make sure the order is right", "");
-  // TODO add length based selectivity
-  // TODO add MLS following the ABM model
-  // TODO add discard mortality
+  parameters_.Bind<float>(PARAM_MINIMUM_LEGAL_LENGTH, &mls_, "The minimum legal length for this fishery, any individual less than this will be returned using some discard mortality", "");
+  parameters_.Bind<float>(PARAM_HANDLING_MORTALITY, &discard_mortality_, "if discarded due to being under the minimum legal length, what is the probability the individual will die when released", "");
   // TODO Tagging events
 }
 
@@ -132,12 +131,18 @@ void MortalityEventBiomass::DoExecute() {
                   advance(iter, random_agent);
                   // See if this agent is unlucky
                   if (rng.chance() <= selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())) {
-                    catch_taken -= (*iter).get_weight() * (*iter).get_scalar();
-                    actual_catch_taken += (*iter).get_weight() * (*iter).get_scalar();
-                    age_freq.frequency_[(*iter).get_age() - model_->min_age()]++;
-                    length_freq.frequency_[(*iter).get_length_bin_index()]++;
-                    global_age_freq[(*iter).get_age() - model_->min_age()]++;
-                    cell->agents_.erase(iter); // erase agent from memory
+                    if ((*iter).get_length() < mls_) {
+                      if (rng.chance() <= discard_mortality_) {
+                        cell->agents_.erase(iter); // erase agent from discard mortality
+                      }
+                    } else {
+                      catch_taken -= (*iter).get_weight() * (*iter).get_scalar();
+                      actual_catch_taken += (*iter).get_weight() * (*iter).get_scalar();
+                      age_freq.frequency_[(*iter).get_age() - model_->min_age()]++;
+                      length_freq.frequency_[(*iter).get_length_bin_index()]++;
+                      global_age_freq[(*iter).get_age() - model_->min_age()]++;
+                      cell->agents_.erase(iter); // erase agent from memory
+                    }
                   }
                   // Make sure we don't end up fishing for infinity
                   if (catch_attempts >= catch_max) {
@@ -184,12 +189,18 @@ void MortalityEventBiomass::DoExecute() {
                   advance(iter, random_agent);
                   // See if this agent is unlucky
                   if (rng.chance() <= selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age())) {
-                    catch_taken -= (*iter).get_weight() * (*iter).get_scalar();
-                    actual_catch_taken += (*iter).get_weight() * (*iter).get_scalar();
-                    age_freq.frequency_[(*iter).get_age() - model_->min_age()]++;
-                    length_freq.frequency_[(*iter).get_length_bin_index()]++;
-                    global_age_freq[(*iter).get_age() - model_->min_age()]++;
-                    cell->agents_.erase(iter); // erase agent from memory
+                    if ((*iter).get_length() < mls_) {
+                      if (rng.chance() <= discard_mortality_) {
+                        cell->agents_.erase(iter); // erase agent from discard mortality
+                      }
+                    } else {
+                      catch_taken -= (*iter).get_weight() * (*iter).get_scalar();
+                      actual_catch_taken += (*iter).get_weight() * (*iter).get_scalar();
+                      age_freq.frequency_[(*iter).get_age() - model_->min_age()]++;
+                      length_freq.frequency_[(*iter).get_length_bin_index()]++;
+                      global_age_freq[(*iter).get_age() - model_->min_age()]++;
+                      cell->agents_.erase(iter); // erase agent from memory
+                    }
                   }
                   // Make sure we don't end up fishing for infinity
                   if (catch_attempts >= catch_max) {

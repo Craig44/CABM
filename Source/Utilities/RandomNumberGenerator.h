@@ -52,7 +52,6 @@ private:
   // Members
   boost::mt19937                generator_;
   boost::uniform_01<>           chance_;
-
 };
 
 } /* namespace utilities */

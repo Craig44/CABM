@@ -23,35 +23,6 @@
 #include <string>
 #include <vector>
 
-#ifdef USE_ADOLC
-#include <adolc/adolc.h>
-
-adub acos(const badouble&);
-adub asin(const badouble&);
-adub atan(const badouble&);
-adub ceil(const badouble&);
-adub cos(const badouble&);
-adub cosh(const badouble&);
-adub exp(const badouble&);
-adub fabs(const badouble&);
-adub floor(const badouble&);
-adub log(const badouble&);
-adub log10(const badouble&);
-adub sin(const badouble&);
-adub sinh(const badouble&);
-adub sqrt(const badouble&);
-adub tan(const badouble&);
-adub tanh(const badouble&);
-#endif
-
-#ifdef USE_BETADIFF
-#include <ADOLC18/SRC/adolc.h>
-#endif
-
-#ifdef USE_CPPAD
-# include <cppad/cppad.hpp>
-#include <cppad/ipopt/solve.hpp>
-#endif
 
 // Namespaces
 namespace niwa {
@@ -60,25 +31,8 @@ namespace utilities {
 /**
  * double conditional depending on if we're using auto differentiation or not
  */
-#ifdef USE_ADOLC
-typedef adouble Double;
-#define AS_DOUBLE(x) x.value()
-#endif
-
-#ifdef USE_BETADIFF
-typedef adouble Double;
-#define AS_DOUBLE(x) x.toDouble()
-#endif
-
-#ifdef USE_CPPAD
-typedef CppAD::AD<double> Double;
-#define AS_DOUBLE(x) x.getValue()
-#endif
 
 #ifndef USE_AUTODIFF
-#ifdef Double
-#error "Compiler flags are incorrect. USE_AUTODIFF has not been defined, but an auto-differentiation system has been"
-#endif
 
 #define AS_DOUBLE(x) x
 typedef float Double;

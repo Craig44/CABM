@@ -45,6 +45,8 @@ protected:
   vector<Selectivity*>                selectivity_;
   vector<unsigned>                    years_;
   bool                                selectivity_length_based_ = false;
+  float                               discard_mortality_;
+  float                               mls_;
 
   // For reporting
   map<unsigned, float>                actual_removals_by_year_;

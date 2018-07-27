@@ -287,7 +287,7 @@ void Model::Build() {
   }
 
   // Check thread logic
-  unsigned procs = (omp_get_num_procs() * 2) - 1; // Default to number of cores less one
+  unsigned procs = omp_get_max_threads() - 2; // Default to number availble threads less two one for other stuff and another for reports
   if ( max_threads_ > 0 && max_threads_ < procs )
     procs = max_threads_;
   if ( procs < 1)
