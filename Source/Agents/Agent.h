@@ -44,6 +44,8 @@ public:
   virtual const float&         get_second_length_weight_par() const {return second_length_weight_par_;};
   virtual const unsigned&      get_home_row() const {return home_row_ ;};
   virtual const unsigned&      get_home_col() const {return home_col_ ;};
+  virtual const float&         get_lat() const {return lat_;};
+  virtual const float&         get_lon() const {return lon_;};
 
   void                         set_length(float new_length) {length_ = new_length;}
   void                         set_weight(float new_weight) {weight_ = new_weight;}
@@ -55,6 +57,8 @@ public:
   void                         set_first_length_weight_par(float value) {first_length_weight_par_ = value;}
   void                         set_second_length_weight_par(float value) {second_length_weight_par_ = value;}
   void                         set_m(float value) {M_ = value;}
+  void                         set_lat(float new_lat) {lat_ = new_lat;}
+  void                         set_lon(float new_lon) {lon_ = new_lon;}
 
 
 
