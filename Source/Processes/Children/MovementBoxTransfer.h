@@ -62,6 +62,7 @@ public:
   void                        DoExecute() override final;
   void                        FillReportCache(ostringstream& cache);
 protected:
+  void                        break_function();
   vector<unsigned>            years_;
 //  string                      selectivity_label_;
 //  Selectivity*                selectivity_ = nullptr;

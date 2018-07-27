@@ -145,7 +145,7 @@ void MovementBoxTransfer::DoExecute() {
                   ++iter;
                   break;
                 }
-                // We are moving 'splice' this agent to the destination cache cell
+                // Make a synchronisation point don't want multiple threads accessing the same pointer simultaneously and splicing to it
                 #pragma omp critical
                 {
                   destination_cell = world_->get_cached_square(possible_rows_[potential_destination], possible_cols_[potential_destination]);
@@ -248,10 +248,13 @@ void MovementBoxTransfer::DoExecute() {
     }
   } // if (movement_type_ == MovementType::kNatal_homing)
   // merge destination agents into the actual grid
+  break_function();
   world_->MergeCachedGrid();
   LOG_TRACE();
 }
-
+void  MovementBoxTransfer::break_function() {
+  LOG_TRACE() << "a function for debugging"; //TODO remove
+}
 // FillReportCache, called in the report class, it will print out additional information that is stored in
 // containers in this class.
 void  MovementBoxTransfer::FillReportCache(ostringstream& cache) {
