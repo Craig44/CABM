@@ -9,16 +9,16 @@ The population section consists of several components, including:
   \item Model initialisation (i.e., the state of the partition at the start of the first year)\index{Initialisation}\index{Model ! initialisation};
   \item The years over which the model runs (i.e., the start and end years of the model)
   \item The annual cycle (time-steps and processes that are applied in each time-step)\index{Annual cycle};
-  \item The specification and parameters of the population processes (i.e., processes that add, remove individuals to or from the partition, or shift numbers between ages and categories in the partition);
+  \item The specification and parameters of the population processes (i.e., processes that add, remove individuals to or from the partition, or shift numbers between ages areas);
   \item Selectivities;
   \item Layers (used by processes, observations and reports) and their definitions
   \item Parameter values and their definitions; and
-  \item Derived IBM, required as parameters for some processes (e.g. mature biomass to resolve any density dependent processes, such as the spawner-recruit relationship in a recruitment process).
+  \item Derived quantities, required as parameters for some processes (e.g. mature biomass to resolve any density dependent processes, such as the spawner-recruit relationship in a recruitment process).
 \end{itemize}
 
 \subsection{\I{Spatial structure}\label{sec:spatial-structure}}
 
-The spatial structure of \IBM\ is represented by an $n_{rows} \times n_{cols}$ grid, with rows $i=1 \dots n_{rows}$ and columns $j=1 \ldots n_{cols}$. Each cell of this matrix records the population structure at that point in space, where the population structure is represented by an $n_{categories} \times n_{ages}$ rectangular matrix (with categories $k=1 \ldots n_{categories}$ and ages $l=1 \ldots n_{ages} = age_{min} \ldots age_{max}$. Hence we can describe any spatial and population element of the model as element$(i,j,k,l)$. We define, within the spatial grid ($n_{rows} \times n_{cols}$), locations where the population can and cannot potentially be present using a \emph{layer}. 
+The spatial structure of \IBM\ is represented by an $n_{rows} \times n_{cols}$ grid, with rows $i=1 \dots n_{rows}$ and columns $j=1 \ldots n_{cols}$. Each cell of this matrix records the population structure at that point in space, where the population structure is represented by a list of individuals. Locations where individuals can and cannot potentially be present using a \emph{layer}. 
 
 \IBM\ implements a single spatial structure, a grid of \emph{square} cells (Figure \ref{fig:SquareSpatialStructure}). The spatial grid can be of an arbitrary size, but must be rectangular. 
 
@@ -49,7 +49,7 @@ For example, to specify a model with 3 rows and 4 columns (i.e., 12 spatial cell
 		layer base
 		\end{verbatim}}}
 
-See below for how to define a layer using \texttt{@layer}. 
+See below for how to define a layer using \command{layer}. 
 
 
 \subsection{\I{Population structure}}\label{sub:sec:pop_sec}
@@ -78,6 +78,10 @@ An example, to specify a model with 2 categories (male and female) with ages 1-2
 		initialisation_phases iphase
 		time_steps step1 step2 step3
 \end{verbatim}}}
+
+
+\subsection{\I{Individuals}\label{sec:individuals}}
+
 
 \subsection{\I{Layers}\label{sec:layers}}
 
@@ -405,6 +409,41 @@ The above assumes that the probability of movement from one cell to another does
 
 You can see from the above example that the movement from cell 1 to all other cells has different probabilities from before 2000 and after 2000. The above example could be generalised furthur having a different probability matrix for every year, I kept it simple for illustration.
 
+
+\paragraph{\I{Preference Based movement}}\label{subsubsec:pref_movement}
+
+The preference in cell $i$ for preference variable $x$ can be described as,
+\begin{equation}
+P_i^x = f(x_i; \theta)
+\end{equation}
+
+where $f(x_i; \theta)$ is a preference function (see Section~\ref{sec:preference_functions}). The overall preference in cell $i$ can be denoted as the accumulation of all these preference functions.
+
+\begin{equation}
+   P_i = \left(\prod_{n}^{i = 1}P_i^x\right)^{1/n}
+\end{equation}
+
+where $n$ is the number of preference variables that you want to include in the movement process. Once we have the preference for all cells in the spatial domain, we need to calculate the gradient or velocity field in both the $\textbf{X}$ and $\textbf{Y}$ axis. Currently \IBM\ uses the forward, backwards, and central difference approximation. This obviously sucks as coarse resolution but as we get fine scale models the approximation more accurately will describe the change in preference in each direction. The central approximation has been used in other habitat based preference calculations \citep{phillips2018individual} and is applied like this
+
+\begin{equation}
+u_i = \frac{P_{j, i + h} - P_{j, i - h}}{2}
+\end{equation}
+
+where $h$ is some distance or neighbour cell, this yields us gradient or velocity in both directions then we use a bias random walk to move individuals in space.
+
+\begin{equation}
+x_j \sim N(u_i, D_{i})
+\end{equation}
+
+Where $u_i$ is the gradient in the $\textbf{X}$ direction, $D_{i}$ is the diffusion parameter that is scaled based on the habitat preference and $x_j$ is the future location on the X axis of the individual. $D_{i}$ inversely relates to the quality of the preference habitat and a parameter $D_{max}$.
+
+\begin{equation}
+D_i = D_{max}\left(1 - \frac{P_i}{\zeta + P_i}\right)
+\end{equation}
+where $\zeta$ is an arbitrary constant controlling the curvature of the function, following \cite{Bertignac1998}.
+
+
+
 \subsection{\I{Derived Quantities}\label{sec:derived-quantities}}
 Derived quantities surround a mortality block and so the value of the derived quantity is calculated twice, once before the mortality block (Pre-Execute), and once after (Execute). The final value is an interpolation based on how much mortality the user wants to take into account when calculating derived quantities. If users set the \subcommand{proportion\_through\_mortality\_block} parameter equal to one or zero then only one calculation is taken, and can reduce the run time of some models, so it is worth exploring.
 \paragraph*{Biomass}
@@ -445,7 +484,7 @@ When an agent is created (either in initialisation or through a recruitment proc
 		natural_mortality_process_label natural_mort
 \end{verbatim}}}
 
-
+\subsection{\I{Preference Functions}\label{sec:preference_functions}}\textsl{}
 
 \subsection{\I{Selectivities}\label{sec:selectivities}}
 A selectivity is a function that can have a different value for each age class. Selectivities are used throughout \IBM\ to interpret observations (Section \ref{sec:estimation-section}) or to modify the effects of processes on each age class (Section \ref{sec:population-section}). \IBM\ implements a number of different parametric forms, including logistic, knife edge, and double normal selectivities. Selectivities are defined in there own command block (\command{selectivity}), where the unique label is used by observations or processes to identify which selectivity to apply.
