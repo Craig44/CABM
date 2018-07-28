@@ -62,6 +62,11 @@ protected:
   float                       time_step_proportion_;
   bool                        mean_proportion_method_;
 
+  // objects for thread safety of rng
+  vector<float>                       random_numbers_;
+  unsigned                            n_agents_;
+  vector<vector<unsigned>>            cell_offset_;
+
 
 };
 } /* namespace niwa */

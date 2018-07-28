@@ -9,6 +9,7 @@
  * @section DESCRIPTION
  *
  * This process is responsible for seeding new recruits into the world
+ * TODO you could make this a random process, but perhaps it doesn't matter, that is randomly seed an individual in one of the areas
  */
 #ifndef SOURCE_PROCESSES_CHILDREN_RECRUITMENT_CONSTANT_H_
 #define SOURCE_PROCESSES_CHILDREN_RECRUITMENT_CONSTANT_H_

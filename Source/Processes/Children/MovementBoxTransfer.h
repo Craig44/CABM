@@ -17,6 +17,7 @@
 // headers
 #include "Processes/Process.h"
 #include "Layers/Children/NumericLayer.h"
+#include <omp.h>
 
 // namespaces
 namespace niwa {
@@ -62,7 +63,6 @@ public:
   void                        DoExecute() override final;
   void                        FillReportCache(ostringstream& cache);
 protected:
-  void                        break_function();
   vector<unsigned>            years_;
 //  string                      selectivity_label_;
 //  Selectivity*                selectivity_ = nullptr;
@@ -76,6 +76,11 @@ protected:
   vector<unsigned>            possible_cols_;
   string                      movement_type_string_;
   MovementType                movement_type_ = MovementType::kUnknown;
+
+  // objects for thread safety of rng
+  vector<float>                       random_numbers_;
+  unsigned                            n_agents_;
+  vector<vector<unsigned>>            cell_offset_;
 
   // Report containers
   vector<MovementData>        moved_agents_by_year_;

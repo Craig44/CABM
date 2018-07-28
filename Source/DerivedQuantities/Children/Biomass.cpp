@@ -54,6 +54,9 @@ void Biomass::DoBuild() {
   if (!selectivity_) {
     LOG_ERROR_P(PARAM_SELECTIVITY) << "Could not find the selectivity '" << selectivity_label_ << "', please check it exists";
   }
+  cell_offset_.resize(model_->get_height());
+  for (unsigned i = 0; i < model_->get_height(); ++i)
+    cell_offset_[i].resize(model_->get_width());
 }
 
 /**
@@ -66,6 +69,23 @@ void Biomass::PreExecute() {
     return;
 
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+
+  // Pre-calculate agents in the world to set aside our random numbers needed for the operation
+  n_agents_ = 0;
+  for (unsigned row = 0; row < model_->get_height(); ++row) {
+    for (unsigned col = 0; col < model_->get_width(); ++col) {
+      WorldCell* cell = world_->get_base_square(row, col);
+      if (cell->is_enabled()) {
+        cell_offset_[row][col] = n_agents_;
+        n_agents_ += cell->agents_.size();
+      }
+    }
+  }
+  // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
+  random_numbers_.resize(n_agents_);
+  for (unsigned i = 0; i < n_agents_; ++i)
+    random_numbers_[i] = rng.chance();
+
   cache_value_ = 0.0;
   float probability_mature_at_age;
   unsigned time_step_index = model_->managers().time_step()->current_time_step();
@@ -77,11 +97,13 @@ void Biomass::PreExecute() {
         continue;
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
+        unsigned counter = 0;
         for (Agent& agent : cell->agents_) {
           probability_mature_at_age = selectivity_->GetResult(agent.get_age());
-          if (rng.chance() <= probability_mature_at_age) {
+          if (random_numbers_[cell_offset_[row][col] + counter] <= probability_mature_at_age) {
             cache_value_ += agent.get_weight() * agent.get_scalar();
           }
+          ++counter;
         }
       }
     }
@@ -105,6 +127,22 @@ void Biomass::Execute() {
   if (!utilities::doublecompare::IsZero(time_step_proportion_)) {
 
     utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+    // Pre-calculate agents in the world to set aside our random numbers needed for the operation
+    n_agents_ = 0;
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        WorldCell* cell = world_->get_base_square(row, col);
+        if (cell->is_enabled()) {
+          cell_offset_[row][col] = n_agents_;
+          n_agents_ += cell->agents_.size();
+        }
+      }
+    }
+    // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
+    random_numbers_.resize(n_agents_);
+    for (unsigned i = 0; i < n_agents_; ++i)
+      random_numbers_[i] = rng.chance();
+
     float probability_mature_at_age;
 
     unsigned time_step_index = model_->managers().time_step()->current_time_step();
@@ -117,11 +155,13 @@ void Biomass::Execute() {
           continue;
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
+          unsigned counter = 0;
           for (Agent& agent : cell->agents_) {
             probability_mature_at_age = selectivity_->GetResult(agent.get_age());
-            if (rng.chance() <= probability_mature_at_age) {
+            if (random_numbers_[cell_offset_[row][col] + counter] <= probability_mature_at_age) {
               value += agent.get_weight() * agent.get_scalar();
             }
+            ++counter;
           }
         }
       }

@@ -17,6 +17,7 @@
 #include "Processes/Children/Growth.h"
 
 #include "Layers/Children/NumericLayer.h"
+
 // namespaces
 namespace niwa {
 namespace processes {

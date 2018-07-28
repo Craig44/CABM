@@ -18,7 +18,6 @@
 #include "Utilities/RandomNumberGenerator.h"
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
-#include <omp.h>
 // namespaces
 namespace niwa {
 namespace processes {
@@ -83,6 +82,10 @@ void MortalityConstantRate::DoBuild() {
     }
   }
   model_->set_m(m_);
+
+  cell_offset_.resize(model_->get_height());
+  for (unsigned i = 0; i < model_->get_height(); ++i)
+    cell_offset_[i].resize(model_->get_width());
 }
 
 
@@ -90,7 +93,24 @@ void MortalityConstantRate::DoBuild() {
  * DoExecute
  */
 void MortalityConstantRate::DoExecute() {
+  LOG_TRACE();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+  // Pre-calculate agents in the world to set aside our random numbers needed for the operation
+  n_agents_ = 0;
+  for (unsigned row = 0; row < model_->get_height(); ++row) {
+    for (unsigned col = 0; col < model_->get_width(); ++col) {
+      WorldCell* cell = world_->get_base_square(row, col);
+      if (cell->is_enabled()) {
+        cell_offset_[row][col] = n_agents_;
+        n_agents_ += cell->agents_.size();
+      }
+    }
+  }
+  // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
+  random_numbers_.resize(n_agents_);
+  for (unsigned i = 0; i < n_agents_; ++i)
+    random_numbers_[i] = rng.chance();
+
   unsigned agents_removed = 0;
   if (selectivity_length_based_) {
     float selectivity_at_length;
@@ -99,12 +119,13 @@ void MortalityConstantRate::DoExecute() {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
+          unsigned counter = 0;
           unsigned initial_size = cell->agents_.size();
           LOG_FINEST() << initial_size << " initial agents";
-          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end();) {
+          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter) {
             selectivity_at_length = selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index());
             //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
-            if (rng.chance() <= (1 - std::exp(-(*iter).get_m() * selectivity_at_length))) {
+            if (random_numbers_[cell_offset_[row][col] + counter] <= (1 - std::exp(-(*iter).get_m() * selectivity_at_length))) {
               iter = cell->agents_.erase(iter);
               initial_size--;
               agents_removed++;
@@ -122,12 +143,14 @@ void MortalityConstantRate::DoExecute() {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
+          // need thread safe access to rng
+          unsigned counter = 0;
           unsigned initial_size = cell->agents_.size();
           LOG_FINEST() << initial_size << " initial agents";
-          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end();) {
+          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter) {
             selectivity_at_age = selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age());
             //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
-            if (rng.chance() <= (1 - std::exp(-(*iter).get_m() * selectivity_at_age))) {
+            if (random_numbers_[cell_offset_[row][col] + counter] <= (1 - std::exp(-(*iter).get_m() * selectivity_at_age))) {
               iter = cell->agents_.erase(iter);
               initial_size--;
               agents_removed++;

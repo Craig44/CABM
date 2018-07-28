@@ -15,6 +15,7 @@
 
 // headers
 #include "Processes/Process.h"
+#include <omp.h>
 
 // namespaces
 namespace niwa {
@@ -39,6 +40,11 @@ protected:
   vector<string>             selectivity_label_;
   vector<Selectivity*>       selectivity_;
   map<unsigned, unsigned>    mature_individuals_by_year_;
+
+  // objects for thread safety of rng
+  vector<float>                       random_numbers_;
+  unsigned                            n_agents_;
+  vector<vector<unsigned>>            cell_offset_;
 };
 
 } /* namespace processes */

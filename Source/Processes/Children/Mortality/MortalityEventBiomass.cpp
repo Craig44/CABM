@@ -18,7 +18,6 @@
 #include "Utilities/RandomNumberGenerator.h"
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
-#include <omp.h>
 
 // namespaces
 namespace niwa {
@@ -86,6 +85,11 @@ void MortalityEventBiomass::DoBuild() {
       }
     }
   }
+
+
+  cell_offset_.resize(model_->get_height());
+  for (unsigned i = 0; i < model_->get_height(); ++i)
+    cell_offset_[i].resize(model_->get_width());
 }
 
 
@@ -101,8 +105,29 @@ void MortalityEventBiomass::DoExecute() {
       iter = find(years_.begin(), years_.end(), model_->current_year());
       unsigned catch_ndx = distance(years_.begin(), iter);
       LOG_FINEST() << "applying F in year " << model_->current_year() << " catch index = " << catch_ndx;
-      // Get the pointer to the right catch layer
+      // Pre-calculate agents in the world to set aside our random numbers needed for the operation
+      n_agents_ = 0;
+      for (unsigned row = 0; row < model_->get_height(); ++row) {
+        for (unsigned col = 0; col < model_->get_width(); ++col) {
+          WorldCell* cell = world_->get_base_square(row, col);
+          if (cell->is_enabled()) {
+            cell_offset_[row][col] = n_agents_;
+            n_agents_ += cell->agents_.size();
+          }
+        }
+      }
+      // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
+      random_numbers_.resize(n_agents_);
+      discard_random_numbers_.resize(n_agents_);
+      selectivity_random_numbers_.resize(n_agents_);
       utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+      for (unsigned i = 0; i < n_agents_; ++i) {
+        random_numbers_[i] = rng.chance();
+        discard_random_numbers_[i] = rng.chance();
+        selectivity_random_numbers_[i] = rng.chance();
+      }
+
+
       float actual_catch_taken = 0;;
       float world_catch_to_take = 0;;
       if (selectivity_length_based_) {
@@ -118,6 +143,7 @@ void MortalityEventBiomass::DoExecute() {
             WorldCell* cell = world_->get_base_square(row, col);
             if (cell->is_enabled()) {
               float catch_taken = catch_layer_[catch_ndx]->get_value(row, col);
+              unsigned counter = 0;
               if (catch_taken > 0) {
                 LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << catch_taken;
                 catch_attempts = 1;
@@ -127,12 +153,12 @@ void MortalityEventBiomass::DoExecute() {
                   // Random access bullshit for lists
                   ++catch_attempts;
                   auto iter = cell->agents_.begin();
-                  random_agent = rng.chance() * cell->agents_.size();
+                  random_agent = random_numbers_[cell_offset_[row][col] + counter] * cell->agents_.size();
                   advance(iter, random_agent);
                   // See if this agent is unlucky
-                  if (rng.chance() <= selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())) {
+                  if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())) {
                     if ((*iter).get_length() < mls_) {
-                      if (rng.chance() <= discard_mortality_) {
+                      if (discard_random_numbers_[cell_offset_[row][col] + counter] <= discard_mortality_) {
                         cell->agents_.erase(iter); // erase agent from discard mortality
                       }
                     } else {
@@ -150,6 +176,7 @@ void MortalityEventBiomass::DoExecute() {
                        " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation";
                   }
                 }
+                ++counter;
               }
               removals_by_length_and_area_.push_back(length_freq);
               removals_by_age_and_area_.push_back(age_freq);
@@ -161,7 +188,6 @@ void MortalityEventBiomass::DoExecute() {
         unsigned catch_ndx = distance(years_.begin(), iter);
         LOG_FINEST() << "applying F in year " << model_->current_year() << " catch index = " << catch_ndx;
         // Get the pointer to the right catch layer
-        utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
         float actual_catch_taken = 0;;
         float world_catch_to_take = 0;;
         // Thread out each loop
@@ -176,6 +202,8 @@ void MortalityEventBiomass::DoExecute() {
             WorldCell* cell = world_->get_base_square(row, col);
             if (cell->is_enabled()) {
               float catch_taken = catch_layer_[catch_ndx]->get_value(row, col);
+              unsigned counter = 0;
+
               if (catch_taken > 0) {
                 LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << catch_taken;
                 catch_attempts = 1;
@@ -185,12 +213,12 @@ void MortalityEventBiomass::DoExecute() {
                   // Random access bullshit for lists
                   ++catch_attempts;
                   auto iter = cell->agents_.begin();
-                  random_agent = rng.chance() * cell->agents_.size();
+                  random_agent = random_numbers_[cell_offset_[row][col] + counter] * cell->agents_.size();
                   advance(iter, random_agent);
                   // See if this agent is unlucky
-                  if (rng.chance() <= selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age())) {
+                  if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age())) {
                     if ((*iter).get_length() < mls_) {
-                      if (rng.chance() <= discard_mortality_) {
+                      if (discard_random_numbers_[cell_offset_[row][col] + counter] <= discard_mortality_) {
                         cell->agents_.erase(iter); // erase agent from discard mortality
                       }
                     } else {
@@ -208,6 +236,7 @@ void MortalityEventBiomass::DoExecute() {
                        " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation";
                   }
                 }
+                ++counter;
               }
               removals_by_length_and_area_.push_back(length_freq);
               removals_by_age_and_area_.push_back(age_freq);

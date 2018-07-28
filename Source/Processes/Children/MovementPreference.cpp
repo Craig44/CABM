@@ -81,7 +81,9 @@ void MovementPreference::DoBuild() {
 
   calculate_gradients();
 
-
+  cell_offset_.resize(model_->get_height());
+  for (unsigned i = 0; i < model_->get_height(); ++i)
+    cell_offset_[i].resize(model_->get_width());
 
 }
 
@@ -92,6 +94,27 @@ void MovementPreference::DoBuild() {
 void MovementPreference::DoExecute() {
   LOG_TRACE();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+
+  // Pre-calculate agents in the world to set aside our random numbers needed for the operation
+  n_agents_ = 0;
+  for (unsigned row = 0; row < model_->get_height(); ++row) {
+    for (unsigned col = 0; col < model_->get_width(); ++col) {
+      WorldCell* cell = world_->get_base_square(row, col);
+      if (cell->is_enabled()) {
+        cell_offset_[row][col] = n_agents_;
+        n_agents_ += cell->agents_.size();
+      }
+    }
+  }
+  // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
+  lon_random_numbers_.resize(n_agents_);
+  lat_random_numbers_.resize(n_agents_);
+  for (unsigned i = 0; i < n_agents_; ++i) {
+    lat_random_numbers_[i] = rng.normal();
+    lon_random_numbers_[i] = rng.normal();
+  }
+
+
   // Iterate over origin cells
   #pragma omp parallel for collapse(2)
   for (unsigned row = 0; row < model_->get_height(); ++row) {
@@ -120,8 +143,8 @@ void MovementPreference::DoExecute() {
         unsigned counter = 0;
         for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++counter) {
           // Iterate over possible cells compare to chance()
-          lat_distance = u + rng.normal() * diffusion_parameter_;
-          lon_distance = v + rng.normal() * diffusion_parameter_;
+          lat_distance = u + lat_random_numbers_[cell_offset_[row][col] + counter] * diffusion_parameter_;
+          lon_distance = v + lon_random_numbers_[cell_offset_[row][col] + counter] * diffusion_parameter_;
           // Check bounds and find cell destination
           if (((*iter).get_lat() + lat_distance <= model_->max_lat()) && ((*iter).get_lat() - lat_distance >= model_->min_lat())) {
             (*iter).set_lat((*iter).get_lat() + lat_distance);

@@ -17,7 +17,6 @@
 #include "World/WorldView.h"
 #include "Selectivities/Manager.h"
 #include "Utilities/RandomNumberGenerator.h"
-#include <omp.h>
 
 // namespaces
 namespace niwa {
@@ -44,6 +43,10 @@ void Maturity::DoBuild() {
       LOG_CODE_ERROR()<< "this should have been checked on the ModelDoBuild please check out";
     selectivity_.push_back(temp_selectivity);
   }
+
+  cell_offset_.resize(model_->get_height());
+  for (unsigned i = 0; i < model_->get_height(); ++i)
+    cell_offset_[i].resize(model_->get_width());
 }
 
 
@@ -52,8 +55,24 @@ void Maturity::DoBuild() {
  */
 void Maturity::DoExecute() {
   LOG_TRACE();
-  unsigned mature_conversion = 0;
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+  // Pre-calculate agents in the world to set aside our random numbers needed for the operation
+  n_agents_ = 0;
+  for (unsigned row = 0; row < model_->get_height(); ++row) {
+    for (unsigned col = 0; col < model_->get_width(); ++col) {
+      WorldCell* cell = world_->get_base_square(row, col);
+      if (cell->is_enabled()) {
+        cell_offset_[row][col] = n_agents_;
+        n_agents_ += cell->agents_.size();
+      }
+    }
+  }
+  // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
+  random_numbers_.resize(n_agents_);
+  for (unsigned i = 0; i < n_agents_; ++i)
+    random_numbers_[i] = rng.chance();
+
+  unsigned mature_conversion = 0;
   // Iterate over all cells
   float probability_mature_at_age;
   #pragma omp parallel for collapse(2)
@@ -62,15 +81,16 @@ void Maturity::DoExecute() {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
         LOG_FINEST() << "about to convert " << cell->agents_.size() << " through the maturity process";
-        //unsigned counter = 1;
+        unsigned counter = 0;
         for (Agent& agent : cell->agents_) {
           if (not agent.get_maturity()) {
             probability_mature_at_age = selectivity_[agent.get_sex()]->GetResult(agent.get_age());
-            if (rng.chance() <= probability_mature_at_age) {
+            if (random_numbers_[cell_offset_[row][col] + counter] <= probability_mature_at_age) {
               agent.set_maturity(true);
               ++mature_conversion;
             }
           }
+          ++counter;
         }
       }
     }

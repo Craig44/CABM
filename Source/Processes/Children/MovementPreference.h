@@ -77,6 +77,12 @@ protected:
   vector<vector<float>>                initialisation_zonal_gradient_;
   vector<vector<float>>                initialisation_preference_value_;
 
+  // objects for thread safety of rng
+  vector<float>                       lat_random_numbers_;
+  vector<float>                       lon_random_numbers_;
+  unsigned                            n_agents_;
+  vector<vector<unsigned>>            cell_offset_;
+
 };
 
 } /* namespace processes */

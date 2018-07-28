@@ -17,6 +17,8 @@
 #include "Processes/Children/Mortality.h"
 
 #include "Layers/Children/NumericLayer.h"
+#include <omp.h>
+
 
 // namespaces
 namespace niwa {
@@ -47,6 +49,13 @@ protected:
   bool                                selectivity_length_based_ = false;
   float                               discard_mortality_;
   float                               mls_;
+  // objects for thread safety of rng
+  vector<float>                       random_numbers_;
+  vector<float>                       discard_random_numbers_;
+  vector<float>                       selectivity_random_numbers_;
+
+  unsigned                            n_agents_;
+  vector<vector<unsigned>>            cell_offset_;
 
   // For reporting
   map<unsigned, float>                actual_removals_by_year_;

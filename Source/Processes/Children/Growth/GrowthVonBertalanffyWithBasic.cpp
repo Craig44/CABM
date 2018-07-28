@@ -18,6 +18,7 @@
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
 #include <omp.h>
+
 // namespaces
 namespace niwa {
 namespace processes {

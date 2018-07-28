@@ -78,8 +78,8 @@ void Iterative::Execute() {
     LOG_FATAL() << "Could not get a sensible M value from the mortality process defined this is unusual you want to check everything is okay in the mortality process or contact a developer";
 
   // Calculate the R0 values for the recruitment processes this is a bit crude but will do for now
-  //unsigned large_age = model_->max_age() * 4;
-  unsigned large_age = 200;
+  unsigned large_age = model_->max_age() * 4;
+  //unsigned large_age = 200;
   float number = 0;
   float m = model_->get_m();
   for (unsigned age = 0; age < large_age; ++age)

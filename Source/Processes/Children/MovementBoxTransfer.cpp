@@ -26,7 +26,6 @@
 #include <boost/algorithm/string/trim_all.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/join.hpp>
-#include <omp.h>
 // namespaces
 namespace niwa {
 namespace processes {
@@ -97,6 +96,10 @@ void MovementBoxTransfer::DoBuild() {
   possible_rows_ = world_->get_enabled_rows();
   possible_cols_ = world_->get_enabled_cols();
 
+
+  cell_offset_.resize(model_->get_height());
+  for (unsigned i = 0; i < model_->get_height(); ++i)
+    cell_offset_[i].resize(model_->get_width());
 }
 
 
@@ -106,6 +109,22 @@ void MovementBoxTransfer::DoBuild() {
 void MovementBoxTransfer::DoExecute() {
   LOG_TRACE();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+  // Pre-calculate agents in the world to set aside our random numbers needed for the operation
+  n_agents_ = 0;
+  for (unsigned row = 0; row < model_->get_height(); ++row) {
+    for (unsigned col = 0; col < model_->get_width(); ++col) {
+      WorldCell* cell = world_->get_base_square(row, col);
+      if (cell->is_enabled()) {
+        cell_offset_[row][col] = n_agents_;
+        n_agents_ += cell->agents_.size();
+      }
+    }
+  }
+  // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
+  random_numbers_.resize(n_agents_);
+  for (unsigned i = 0; i < n_agents_; ++i)
+    random_numbers_[i] = rng.chance();
+
 
   if (movement_type_ == MovementType::kMarkovian) {
     // Iterate over origin cells
@@ -124,19 +143,18 @@ void MovementBoxTransfer::DoExecute() {
         if (origin_cell->is_enabled()) {
           LOG_FINEST() << "number of agents in this cell = " << origin_cell->agents_.size();
           MovementData store_infor(model_->get_height(), model_->get_width(), origin_cell_[origin_element], model_->current_year());
-          float temp_sum, random;
+          float temp_sum;
           unsigned counter = 0;
           unsigned counter_jump = 0;
           for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++counter) {
             // Iterate over possible cells compare to chance()
             temp_sum = 0;
-            random = rng.chance();
             // Calcualte a multinomial via the following algorithm
             // compare a random standard uniform value to the cumulative sums of the probabilities and return the first index for which
             // the cumulative sum is greater than the random uniform
             for (unsigned potential_destination = 0; potential_destination < possible_rows_.size(); ++potential_destination) {
               temp_sum += probability_layers_[origin_element]->get_value(possible_rows_[potential_destination], possible_cols_[potential_destination]);
-              if (temp_sum > random) {
+              if (temp_sum > random_numbers_[cell_offset_[row][col] + counter]) {
                 ++counter_jump;
                 //LOG_FINEST() << counter <<  " iter distance = " << distance(origin_cell->agents_.begin(), iter) << " cum prob = " << temp_sum << " random = " << random << " current row = " << row << " current col = " << col << "destination row = " << possible_rows_[potential_destination] << " destination col = " << possible_cols_[potential_destination];
                 store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]]++;
@@ -191,7 +209,7 @@ void MovementBoxTransfer::DoExecute() {
           MovementData store_infor(model_->get_height(), model_->get_width(), origin_cell_[current_cell], model_->current_year());
           LOG_FINEST() << "number of agents in this cell = " << origin_cell->agents_.size();
           //
-          float temp_sum, random;
+          float temp_sum;
           unsigned counter = 0;
           unsigned counter_jump = 0;
           unsigned origin_element;
@@ -205,13 +223,12 @@ void MovementBoxTransfer::DoExecute() {
             }
             // Iterate over possible cells compare to chance()
             temp_sum = 0;
-            random = rng.chance();
             // Calcualte a multinomial via the following algorithm
             // compare a random standard uniform value to the cumulative sums of the probabilities and return the first index for which
             // the cumulative sum is greater than the random uniform
             for (unsigned potential_destination = 0; potential_destination < possible_rows_.size(); ++potential_destination) {
               temp_sum += probability_layers_[origin_element]->get_value(possible_rows_[potential_destination], possible_cols_[potential_destination]);
-              if (temp_sum > random) {
+              if (temp_sum > random_numbers_[cell_offset_[row][col] + counter]) {
                 ++counter_jump;
                 //LOG_FINEST() << counter <<  " iter distance = " << distance(origin_cell->agents_.begin(), iter) << " cum prob = " << temp_sum << " random = " << random << " current row = " << row << " current col = " << col << "destination row = " << possible_rows_[potential_destination] << " destination col = " << possible_cols_[potential_destination];
                 store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]]++;
@@ -248,13 +265,11 @@ void MovementBoxTransfer::DoExecute() {
     }
   } // if (movement_type_ == MovementType::kNatal_homing)
   // merge destination agents into the actual grid
-  break_function();
   world_->MergeCachedGrid();
   LOG_TRACE();
 }
-void  MovementBoxTransfer::break_function() {
-  LOG_TRACE() << "a function for debugging"; //TODO remove
-}
+
+
 // FillReportCache, called in the report class, it will print out additional information that is stored in
 // containers in this class.
 void  MovementBoxTransfer::FillReportCache(ostringstream& cache) {
