@@ -36,15 +36,14 @@ namespace processes {
 /**
  *  constructor
  */
-MovementPreference::MovementPreference(Model* model) : Process(model) {
+MovementPreference::MovementPreference(Model* model) : Movement(model) {
   process_type_ = ProcessType::kTransition;
   //parameters_.Bind<string>(PARAM_SELECTIVITY, &selectivity_label_, "Selectivity label", "");
   parameters_.Bind<float>(PARAM_D_MAX, &d_max_, "The maxiumu diffusion value", "")->set_lower_bound(0.0, false);
-  parameters_.Bind<float>(PARAM_ZETA, &zeta_, "An arbiituary parameter that controls curvature between preference and diffusion", "")->set_lower_bound(0.0, false);
+  parameters_.Bind<float>(PARAM_ZETA, &zeta_, "An arbiituary parameter that controls curvature between preference and diffusion", "", 1.0)->set_lower_bound(0.0, false);
   parameters_.Bind<bool>(PARAM_BROWNIAN_MOTION, &brownian_motion_, "Just apply random movement, undirected movement", "", false);
-
-  parameters_.Bind<string>(PARAM_PREFERENCE_FUNCTIONS, &preference_function_labels_, "The preference functions to apply", "");
-  parameters_.Bind<string>(PARAM_PREFERENCE_LAYERS, &preference_layer_labels_, "The preference functions to apply", "");
+  parameters_.Bind<string>(PARAM_PREFERENCE_FUNCTIONS, &preference_function_labels_, "The preference functions to apply", "", true);
+  parameters_.Bind<string>(PARAM_PREFERENCE_LAYERS, &preference_layer_labels_, "The preference functions to apply", "", true);
 }
 
 /*
@@ -59,7 +58,7 @@ void MovementPreference::DoValidate() {
  *  Build relationships with other classes
  */
 void MovementPreference::DoBuild() {
-  LOG_TRACE();
+  LOG_FINE();
   // Get the preference functions
   for (auto& label : preference_function_labels_) {
     PreferenceFunction* temp_func = nullptr;
@@ -97,7 +96,7 @@ void MovementPreference::DoBuild() {
  *  Execute process
  */
 void MovementPreference::DoExecute() {
-  LOG_TRACE();
+  LOG_FINE();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
 
   // Pre-calculate agents in the world to set aside our random numbers needed for the operation
@@ -107,18 +106,19 @@ void MovementPreference::DoExecute() {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
         cell_offset_[row][col] = n_agents_;
+        LOG_FINEST() << "row = " << row << " col = " << col << " offset = " << n_agents_ << " n-agents in this cell = " << cell->agents_.size();
         n_agents_ += cell->agents_.size();
       }
     }
   }
   // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
-  lon_random_numbers_.resize(n_agents_);
-  lat_random_numbers_.resize(n_agents_);
-  for (unsigned i = 0; i < n_agents_; ++i) {
+  lon_random_numbers_.resize(n_agents_ + 1);
+  lat_random_numbers_.resize(n_agents_ + 1);
+  for (unsigned i = 0; i <= n_agents_; ++i) {
     lat_random_numbers_[i] = rng.normal();
     lon_random_numbers_[i] = rng.normal();
   }
-
+  LOG_FINEST() << "random numbers generatored = " << lat_random_numbers_.size();
 
   // Iterate over origin cells
   #pragma omp parallel for collapse(2)
@@ -129,27 +129,40 @@ void MovementPreference::DoExecute() {
       WorldCell* destination_cell;
       if (origin_cell->is_enabled()) {
         LOG_FINEST() << "number of agents in this cell = " << origin_cell->agents_.size();
+        MovementData store_infor(model_->get_height(), model_->get_width(), origin_cell->get_cell_label(), model_->current_year());
         float u, v, lat_distance, lon_distance;
         unsigned destination_row, destination_col;
         // get gradients for current cells
         if (brownian_motion_) {
           u = 0;
           v = 0;
+          standard_deviation_ = sqrt(2 * d_max_ * 1);  // TODO if you apply this many times, will need to change the temporal multiplier
         } else if (model_->state() == State::kInitialise) {
           v = initialisation_meridonal_gradient_[row][col];
           u = initialisation_zonal_gradient_[row][col];
-          calculate_diffusion_parameter(initialisation_preference_value_[row][col], diffusion_parameter_);
+          #pragma omp critical
+          {
+            calculate_diffusion_parameter(initialisation_preference_value_[row][col], standard_deviation_);
+          }
         } else  {
           v = meridonal_gradient_[model_->current_year()][row][col];
           u = zonal_gradient_[model_->current_year()][row][col];
-          calculate_diffusion_parameter(preference_by_year_[model_->current_year()][row][col], diffusion_parameter_);
+          #pragma omp critical
+          {
+            calculate_diffusion_parameter(preference_by_year_[model_->current_year()][row][col], standard_deviation_);
+          }
         }
+
+        LOG_FINE() << "n agents in this cell = " <<  origin_cell->agents_.size();
+        store_infor.initial_numbers_ = origin_cell->agents_.size();
 
         unsigned counter = 0;
         for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++counter) {
           // Iterate over possible cells compare to chance()
-          lat_distance = u + lat_random_numbers_[cell_offset_[row][col] + counter] * diffusion_parameter_;
-          lon_distance = v + lon_random_numbers_[cell_offset_[row][col] + counter] * diffusion_parameter_;
+
+          lat_distance = u + lat_random_numbers_[cell_offset_[row][col] + counter] * standard_deviation_;
+          lon_distance = v + lon_random_numbers_[cell_offset_[row][col] + counter] * standard_deviation_;
+          LOG_FINEST() << counter<< " " << (*iter).get_lat() << " distance = " << lat_distance << " lon = " << (*iter).get_lon() << " distance = " << lon_distance << " Z = " << lon_random_numbers_[cell_offset_[row][col] + counter] << " sigma = " << standard_deviation_;
           // Check bounds and find cell destination
           if (((*iter).get_lat() + lat_distance <= model_->max_lat()) && ((*iter).get_lat() - lat_distance >= model_->min_lat())) {
             (*iter).set_lat((*iter).get_lat() + lat_distance);
@@ -158,29 +171,42 @@ void MovementPreference::DoExecute() {
           if (((*iter).get_lon() + lon_distance <= model_->max_lon()) && ((*iter).get_lon() - lat_distance >= model_->min_lon())) {
             (*iter).set_lon((*iter).get_lon() + lon_distance);
           } // else they stay as it would be jumping out of bounds
-          // find desination row and col to move in memory
 
           world_->get_cell_element(destination_row, destination_col, (*iter).get_lat(), (*iter).get_lon());
+
+          LOG_FINEST() << (*iter).get_lat() << " " << (*iter).get_lon() << " " << destination_row << " " << destination_col << " " << row << " " << col;
+
           if (destination_row == row && destination_col == col) {
+            store_infor.destination_of_agents_moved_[destination_row][destination_col]++;
             ++iter;
             continue;
           } else {
-            destination_cell = world_->get_base_square(destination_row, destination_col);
+            destination_cell = world_->get_cached_square(destination_row, destination_col);
             if (destination_cell->is_enabled()) {
               // We are moving 'splice' this agent to the destination cache cell
+              auto nx = next(iter); // Need to next the iter else we iter changes scope to cached agents, an annoying stl thing
+              store_infor.destination_of_agents_moved_[destination_row][destination_col]++;
               #pragma omp critical
               {
-                auto nx = next(iter); // Need to next the iter else we iter changes scope to cached agents, an annoying stl thing
                 destination_cell->agents_.splice(destination_cell->agents_.end(), origin_cell->agents_, iter);
-                iter = nx;
               }
+              iter = nx;
+            } else {
+              ++iter;
             }
+          }
+        }
+        if (model_->state() != State::kInitialise) {
+          #pragma omp critical
+          {
+            moved_agents_by_year_.push_back(store_infor);
           }
         }
       }
     }
   }
   // merge destination agents into the actual grid
+  LOG_FINE() << "Mergind cached world";
   world_->MergeCachedGrid();
   LOG_TRACE();
 }
@@ -189,7 +215,7 @@ void MovementPreference::DoExecute() {
  * Calculate gradient using the difference method, for each year and initialisation
 */
 void  MovementPreference::calculate_gradients() {
-  LOG_TRACE();
+  LOG_FINE();
   if (brownian_motion_)
     return void();
   // Start with setting the initialisation sets
@@ -287,26 +313,26 @@ void  MovementPreference::calculate_gradients() {
 /*
  * This function just recalculates the random component of the random walk around the preference space, which depends on habitat quality
 */
-void  MovementPreference::calculate_diffusion_parameter(float& preference_value, float& diffusion_parameter) {
-  diffusion_parameter = d_max_ * (1 - (preference_value / (zeta_ + preference_value)));
-
+void  MovementPreference::calculate_diffusion_parameter(float& preference_value, float& standard_deviation) {
+  diffusion_parameter_ = d_max_ * (1 - (preference_value / (zeta_ + preference_value)));
   if (brownian_motion_)
-    diffusion_parameter = d_max_;
+    diffusion_parameter_ = d_max_;
+  standard_deviation = sqrt(2 * diffusion_parameter_ * 1);  // TODO if you apply this many times, will need to change the temporal multiplier
 }
 
 // FillReportCache, called in the report class, it will print out additional information that is stored in
 // containers in this class.
 void  MovementPreference::FillReportCache(ostringstream& cache) {
   LOG_TRACE();
-/*  for (auto& values : moved_agents_by_year_) {
+  for (auto& values : moved_agents_by_year_) {
     cache << "initial_numbers_in_cell: " << values.initial_numbers_ << "\n";
-    cache << values.year_ << "_destination " << REPORT_R_MATRIX << "\n";
+    cache << values.year_ << "_" << values.origin_cell_ << "_destination " << REPORT_R_MATRIX << "\n";
     for (unsigned i = 0; i < values.destination_of_agents_moved_.size(); ++i) {
       for (unsigned j = 0; j < values.destination_of_agents_moved_[i].size(); ++j )
         cache << values.destination_of_agents_moved_[i][j] << " ";
       cache << "\n";
     }
-  }*/
+  }
 }
 } /* namespace processes */
 } /* namespace niwa */

@@ -15,7 +15,7 @@
 #define SOURCE_PROCESSES_CHILDREN_MOVEMENT_PREFERENCE_H_
 
 // headers
-#include "Processes/Process.h"
+#include "Processes/Children/Movement.h"
 
 #include "PreferenceFunctions/PreferenceFunction.h"
 #include "Layers/Children/NumericLayer.h"
@@ -33,7 +33,7 @@ namespace processes {
 /**
  * Class definition
  */
-class MovementPreference : public Process {
+class MovementPreference : public Movement {
 public:
   // methods
   explicit MovementPreference(Model* model);
@@ -42,26 +42,18 @@ public:
   void                        DoBuild() override final;
   void                        DoReset() override final { };
   void                        DoExecute() override final;
-  void                        FillReportCache(ostringstream& cache);
+  void                        FillReportCache(ostringstream& cache) override final;
 protected:
   // Methods
   void                        calculate_gradients();
-  void                        calculate_diffusion_parameter(float& preference_value, float& diffusion_parameter);  // zeta and d_max are assumed to be available to this function
+  void                        calculate_diffusion_parameter(float& preference_value, float& standard_deviation);  // zeta and d_max and diffusion_paraemter_ are assumed to be available to this function
 
   //Members
-  vector<unsigned>            years_;
-//  string                      selectivity_label_;
-//  Selectivity*                selectivity_ = nullptr;
-  vector<string>              origin_cell_;
-  vector<unsigned>            origin_rows_;
-  vector<unsigned>            origin_cols_;
-
-  vector<unsigned>            possible_rows_;
-  vector<unsigned>            possible_cols_;
   bool                        brownian_motion_;
 
   // Report containers
   float                       diffusion_parameter_;
+  float                       standard_deviation_;
   float                       d_max_;
   float                       zeta_;
   vector<string>              preference_function_labels_;

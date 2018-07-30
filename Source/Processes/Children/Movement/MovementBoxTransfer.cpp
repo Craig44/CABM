@@ -33,7 +33,7 @@ namespace processes {
 /**
  *  constructor
  */
-MovementBoxTransfer::MovementBoxTransfer(Model* model) : Process(model) {
+MovementBoxTransfer::MovementBoxTransfer(Model* model) : Movement(model) {
   process_type_ = ProcessType::kTransition;
   //parameters_.Bind<string>(PARAM_SELECTIVITY, &selectivity_label_, "Selectivity label", "");
   parameters_.Bind<string>(PARAM_ORIGIN_CELL, &origin_cell_, "The origin cell associated with each spatial layer (should have a one to one relationship with specified layers), format follows row-col (1-2)", "");
@@ -56,7 +56,7 @@ void MovementBoxTransfer::DoValidate() {
  *  Build relationships with other classes
  */
 void MovementBoxTransfer::DoBuild() {
-  LOG_TRACE();
+  LOG_FINE();
   // Get the layers
   for (auto& label : probability_layer_labels_) {
     layers::NumericLayer* temp_layer = nullptr;
@@ -100,8 +100,7 @@ void MovementBoxTransfer::DoBuild() {
  *  Execute process
  */
 void MovementBoxTransfer::DoExecute() {
-  LOG_TRACE();
-  LOG_MEDIUM();
+  LOG_FINE();
 
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   // Pre-calculate agents in the world to set aside our random numbers needed for the operation
@@ -236,7 +235,6 @@ void MovementBoxTransfer::DoExecute() {
                 auto nx = next(iter); // Need to next the iter else we iter changes scope to cached agents, an annoying stl thing
                 destination_cell->agents_.splice(destination_cell->agents_.end(), origin_cell->agents_, iter);
                 iter = nx;
-
                 break;
 
               }
@@ -261,7 +259,7 @@ void MovementBoxTransfer::DoExecute() {
   } // if (movement_type_ == MovementType::kNatal_homing)
   // merge destination agents into the actual grid
   world_->MergeCachedGrid();
-  LOG_TRACE();
+  LOG_FINE();
 }
 
 
@@ -271,7 +269,7 @@ void  MovementBoxTransfer::FillReportCache(ostringstream& cache) {
   LOG_TRACE();
   for (auto& values : moved_agents_by_year_) {
     cache << "initial_numbers_in_cell: " << values.initial_numbers_ << "\n";
-    cache << values.year_ << "_destination " << REPORT_R_MATRIX << "\n";
+    cache << values.year_ << "_" << values.origin_cell_ << "_destination " << REPORT_R_MATRIX << "\n";
     for (unsigned i = 0; i < values.destination_of_agents_moved_.size(); ++i) {
       for (unsigned j = 0; j < values.destination_of_agents_moved_[i].size(); ++j )
         cache << values.destination_of_agents_moved_[i][j] << " ";

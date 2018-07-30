@@ -15,7 +15,7 @@
 #define SOURCE_PROCESSES_CHILDREN_MOVEMENT_BOX_TRANSFER_H_
 
 // headers
-#include "Processes/Process.h"
+#include "Processes/Children/Movement.h"
 #include "Layers/Children/NumericLayer.h"
 #include <omp.h>
 
@@ -32,27 +32,11 @@ enum class MovementType {
 };
 
 
-/**
- * A movement struct that stores movement information
- */
-struct MovementData {
-  string origin_cell_;
-  unsigned year_;
-  unsigned initial_numbers_ = 0;
-  vector<vector<unsigned>> destination_of_agents_moved_;
-  MovementData(unsigned rows, unsigned cols, string origin_cell, unsigned year) : origin_cell_(origin_cell), year_(year)
-  {
-    // set up matrix in constructor, save some sloppy run time code
-    destination_of_agents_moved_.resize(rows);
-    for (unsigned i = 0; i < rows; ++i)
-      destination_of_agents_moved_[i].resize(cols);
-  }
-};
 
 /**
  * Class definition
  */
-class MovementBoxTransfer : public Process {
+class MovementBoxTransfer : public Movement {
 public:
   // methods
   explicit MovementBoxTransfer(Model* model);
@@ -61,11 +45,8 @@ public:
   void                        DoBuild() override final;
   void                        DoReset() override final { };
   void                        DoExecute() override final;
-  void                        FillReportCache(ostringstream& cache);
+  void                        FillReportCache(ostringstream& cache)  override final;
 protected:
-  vector<unsigned>            years_;
-//  string                      selectivity_label_;
-//  Selectivity*                selectivity_ = nullptr;
   vector<string>              origin_cell_;
   vector<string>              probability_layer_labels_;
   vector<layers::NumericLayer*>  probability_layers_;
@@ -82,8 +63,7 @@ protected:
   unsigned                            n_agents_;
   vector<vector<unsigned>>            cell_offset_;
 
-  // Report containers
-  vector<MovementData>        moved_agents_by_year_;
+
 
 };
 

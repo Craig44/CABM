@@ -131,6 +131,55 @@ float DerivedQuantity::GetValue(unsigned year) {
   return result;
 }
 
+float DerivedQuantity::GetValue(unsigned year, unsigned row, unsigned col) {
+  LOG_FINEST() << "get value for year: " << year;
+  if (not spatial_)
+    LOG_CODE_ERROR() << "not spatial_";
+
+  if (values_by_space_.find(year) != values_by_space_.end())
+    return values_by_space_[year][row][col];
+  if (initialisation_values_by_space_.size() == 0)
+    return 0.0;
+
+  // Calculate how many years to go back. At this point
+  // either we're in the init phases or we're going back
+  // in to the init phases.
+  unsigned years_to_go_back = model_->start_year() - year;
+
+  float result = 0.0;
+  if (years_to_go_back == 0) {
+    result = (*(*initialisation_values_by_space_.rbegin())[row][col].rbegin());
+  } else if ((*initialisation_values_by_space_.rbegin())[row][col].size() > years_to_go_back) {
+    result =(*initialisation_values_by_space_.rbegin())[row][col].at((*initialisation_values_by_space_.rbegin())[row][col].size() - years_to_go_back);
+  } else if (initialisation_values_by_space_.size() == 1) {
+    result = (*(*initialisation_values_by_space_.rbegin())[row][col].begin()); // first value of last init phase
+  } else {
+    result = (*(*(initialisation_values_by_space_.rbegin() + 1))[row][col].begin()); // first value of last init phase
+  }
+
+  LOG_FINEST() << "years_to_go_back: " << years_to_go_back
+      << "; year: " << year
+      << "; result: " << result;
+  return result;
+}
+
+/**
+ * Return the last value stored for the target initialisation phase
+ *
+ * @param phase The index of the phase
+ * @return The derived quantity value
+ */
+float DerivedQuantity::GetLastValueFromInitialisation(unsigned phase, unsigned row, unsigned col) {
+  LOG_TRACE();
+  if (initialisation_values_by_space_.size() <= phase)
+    LOG_ERROR() << "No values have been calculated for the initialisation value in phase: " << phase;
+  if (initialisation_values_by_space_[phase][row][col].size() == 0)
+    LOG_ERROR() << "No values have been calculated for the initialisation value in phase: " << phase;
+
+  LOG_FINE() << "returning value = " << *initialisation_values_by_space_[phase][row][col].rbegin();
+  return *initialisation_values_by_space_[phase][row][col].rbegin();
+}
+
 /**
  * Return the last value stored for the target initialisation phase
  *
@@ -180,4 +229,25 @@ float DerivedQuantity::GetInitialisationValue(unsigned phase, unsigned index) {
   return 0.0;
 }
 
+float DerivedQuantity::GetInitialisationValue(unsigned row, unsigned col, unsigned phase, unsigned index) {
+  LOG_FINEST() << "phase = " << phase << "; index = " << index << "; initialisation_values_.size() = " << initialisation_values_by_space_.size();
+  if (initialisation_values_by_space_.size() <= phase) {
+    if (initialisation_values_by_space_.size() == 0)
+      return 0.0;
+
+    return (*(*initialisation_values_by_space_.rbegin())[row][col].rbegin());
+  }
+
+  LOG_FINEST() << "initialisation_values_[" << phase << "].size() = " << initialisation_values_by_space_[phase][row][col].size();
+  if (initialisation_values_by_space_[phase][row][col].size() <= index) {
+    if (initialisation_values_by_space_[phase][row][col].size() == 0)
+      return 0.0;
+    else
+      return *initialisation_values_by_space_[phase][row][col].rbegin();
+  }
+
+  return initialisation_values_by_space_[phase][row][col][index];
+
+  return 0.0;
+}
 } /* namespace niwa */

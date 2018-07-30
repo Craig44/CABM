@@ -88,7 +88,7 @@ void Abundance::DoBuild() {
  * for any interpolation
  */
 void Abundance::PreExecute() {
-  LOG_TRACE();
+  LOG_FINE();
   if (utilities::doublecompare::IsOne(time_step_proportion_))
     return;
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
@@ -161,7 +161,7 @@ void Abundance::PreExecute() {
  *
  */
 void Abundance::Execute() {
-  LOG_TRACE();
+  LOG_FINE();
   float value = 0.0;
 
   if (!utilities::doublecompare::IsZero(time_step_proportion_)) {
@@ -240,11 +240,8 @@ void Abundance::Execute() {
     } else if (utilities::doublecompare::IsOne(time_step_proportion_)) {
       b0_value = value;
       initialisation_values_[initialisation_phase].push_back(b0_value);
-    } else if (mean_proportion_method_) {
-      b0_value = cache_value_ + ((value - cache_value_) * time_step_proportion_);
-      initialisation_values_[initialisation_phase].push_back(b0_value);
     } else {
-      b0_value = pow(cache_value_, 1 - time_step_proportion_) * pow(value ,time_step_proportion_);
+      b0_value = cache_value_ + ((value - cache_value_) * time_step_proportion_);
       initialisation_values_[initialisation_phase].push_back(b0_value);
     }
   } else {
@@ -252,10 +249,9 @@ void Abundance::Execute() {
       values_[model_->current_year()] = cache_value_;
     else if (utilities::doublecompare::IsOne(time_step_proportion_))
       values_[model_->current_year()] = value;
-    if (mean_proportion_method_)
-      values_[model_->current_year()] = cache_value_ + ((value - cache_value_) * time_step_proportion_);
     else
-      values_[model_->current_year()] = pow(cache_value_, 1 - time_step_proportion_) * pow(value ,time_step_proportion_);
+      values_[model_->current_year()] = cache_value_ + ((value - cache_value_) * time_step_proportion_);
+
     LOG_FINEST() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value << " Final value ";
   }
 }

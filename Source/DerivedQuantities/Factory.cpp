@@ -17,6 +17,7 @@
 
 #include "DerivedQuantities/Children/Abundance.h"
 #include "DerivedQuantities/Children/Biomass.h"
+#include "DerivedQuantities/Children/BiomassByCell.h"
 #include "DerivedQuantities/Children/MatureBiomass.h"
 
 // namespaces
@@ -41,6 +42,8 @@ DerivedQuantity* Factory::Create(Model* model, const string& object_type, const 
       result = new Abundance(model);
     else if (sub_type == PARAM_BIOMASS)
       result = new Biomass(model);
+    else if (sub_type == PARAM_BIOMASS_BY_CELL)
+      result = new BiomassByCell(model);
     if (result)
       model->managers().derived_quantity()->AddObject(result);
   }

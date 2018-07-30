@@ -35,23 +35,26 @@ void DerivedQuantity::DoExecute() {
     string label =  dq->label();
     cache_ << label << " " << REPORT_R_LIST <<" \n";
     cache_ << "type: " << dq->type() << " \n";
-    vector<vector<float>> init_values = dq->initialisation_values();
-    for (unsigned i = 0; i < init_values.size(); ++i) {
-      cache_ << "initialisation_phase["<< i + 1 << "]: ";
-      cache_ << init_values[i].back() << " ";
-      cache_ << "\n";
+    if (not dq->is_spatial()) {
+      vector<vector<float>> init_values = dq->initialisation_values();
+      for (unsigned i = 0; i < init_values.size(); ++i) {
+        cache_ << "initialisation_phase["<< i + 1 << "]: ";
+        cache_ << init_values[i].back() << " ";
+        cache_ << "\n";
+      }
+
+
+      const map<unsigned, float> values = dq->values();
+      cache_ << "values " << REPORT_R_VECTOR <<"\n";
+      for (auto iter = values.begin(); iter != values.end(); ++iter) {
+          float weight = iter->second;
+          cache_ << iter->first << " " << weight << "\n";
+      }
+      //cache_ <<"\n";
+      cache_ << REPORT_R_LIST_END <<"\n";
+    } else {
+
     }
-
-
-    const map<unsigned, float> values = dq->values();
-    cache_ << "values " << REPORT_R_VECTOR <<"\n";
-    for (auto iter = values.begin(); iter != values.end(); ++iter) {
-        float weight = iter->second;
-        cache_ << iter->first << " " << weight << "\n";
-    }
-    //cache_ <<"\n";
-    cache_ << REPORT_R_LIST_END <<"\n";
-
   }
   ready_for_writing_ = true;
 }

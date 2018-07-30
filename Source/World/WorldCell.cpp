@@ -15,6 +15,7 @@
 #include "Utilities/RandomNumberGenerator.h"
 #include "Processes/Manager.h"
 #include "Selectivities/Manager.h"
+#include <sstream>
 
 // Namespaces
 namespace niwa {
@@ -62,6 +63,12 @@ void WorldCell::Build(unsigned row, unsigned col, float lat, float lon, Model* m
       LOG_CODE_ERROR()<< "this should have been checked on the ModelDoBuild please check out, issue with " << label << " selectivity";
     selectivity_.push_back(temp_selectivity);
   }
+
+  // Give each cell a label for reporting
+  std::stringstream label;
+  label << row_ << "-" << col_;
+  cell_label_ = label.str();
+  LOG_FINEST() << "cell_label = " << cell_label_;
 }
 
 /**

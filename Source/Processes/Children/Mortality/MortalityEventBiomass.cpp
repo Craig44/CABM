@@ -48,7 +48,7 @@ void MortalityEventBiomass::DoValidate() {
  * DoBuild
  */
 void MortalityEventBiomass::DoBuild() {
-  LOG_TRACE();
+  LOG_FINE();
   // Get the layers
   for (auto& label : catch_layer_label_) {
     layers::NumericLayer* temp_layer = nullptr;
@@ -119,12 +119,11 @@ void MortalityEventBiomass::DoBuild() {
  * DoExecute
  */
 void MortalityEventBiomass::DoExecute() {
-  LOG_TRACE();
+  LOG_FINE();
   vector<unsigned> global_age_freq(model_->age_spread());
   auto iter = years_.begin();
   if (model_->state() != State::kInitialise) {
     if (find(iter, years_.end(), model_->current_year()) != years_.end()) {
-      LOG_MEDIUM();
       iter = find(years_.begin(), years_.end(), model_->current_year());
       unsigned catch_ndx = distance(years_.begin(), iter);
       LOG_FINEST() << "applying F in year " << model_->current_year() << " catch index = " << catch_ndx;
@@ -139,7 +138,6 @@ void MortalityEventBiomass::DoExecute() {
           }
         }
       }
-      LOG_MEDIUM();
 
       // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
       random_numbers_.resize(n_agents_ + 1);
@@ -151,7 +149,6 @@ void MortalityEventBiomass::DoExecute() {
         discard_random_numbers_[i] = rng.chance();
         selectivity_random_numbers_[i] = rng.chance();
       }
-      LOG_MEDIUM();
 
 
       float actual_catch_taken = 0;;
@@ -178,13 +175,10 @@ void MortalityEventBiomass::DoExecute() {
                 while (catch_taken > 0) {
                   ++catch_attempts;
                   auto iter = cell->agents_.begin();
-                  LOG_MEDIUM();
                   random_agent = random_numbers_[cell_offset_[row][col] + counter] * cell->agents_.size();
                   advance(iter, random_agent);
-                  LOG_MEDIUM();
                   // See if this agent is unlucky
                   if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]) {
-                    LOG_MEDIUM();
                     if ((*iter).get_length() < mls_) {
                       if (discard_random_numbers_[cell_offset_[row][col] + counter] <= discard_mortality_) {
                         LOG_MEDIUM();
@@ -234,7 +228,6 @@ void MortalityEventBiomass::DoExecute() {
               unsigned counter = 0;
 
               if (catch_taken > 0) {
-                LOG_MEDIUM();
                 LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << catch_taken;
                 // create reporting class
                 composition_data age_freq(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
@@ -245,19 +238,14 @@ void MortalityEventBiomass::DoExecute() {
                 catch_max = cell->agents_.size();
                 while (catch_taken > 0) {
                   // Random access bullshit for lists
-                  LOG_MEDIUM();
                   ++catch_attempts;
                   auto iter = cell->agents_.begin();
                   random_agent = random_numbers_[cell_offset_[row][col] + counter] * cell->agents_.size();
                   advance(iter, random_agent);
                   // See if this agent is unlucky
                   if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->length_bins().size() + (*iter).get_length_bin_index()]) {
-                    LOG_MEDIUM();
-
                     if ((*iter).get_length() < mls_) {
                       if (discard_random_numbers_[cell_offset_[row][col] + counter] <= discard_mortality_) {
-                        LOG_MEDIUM();
-
                         cell->agents_.erase(iter); // erase agent from discard mortality
                       }
                     } else {

@@ -93,6 +93,8 @@ void WorldView::Build() {
         lat = 0.0;
         lon = 0.0;
       }
+
+      LOG_FINE() << "Building cell " << i << "-" << j << " lat = " << lat << " long = " << lon;
       base_grid_[i][j].Build(i, j, lat, lon, model_);
       cached_grid_[i][j].Build(i, j, lat, lon, model_);
     }
@@ -153,13 +155,13 @@ void WorldView::MergeCachedGrid() {
 void WorldView::get_cell_element(unsigned& row, unsigned& col, const float lat, const float lon) {
   for (unsigned i = 1; i <= height_; ++i) {
     if (lat < lat_bounds_[i]) {
-      row = i;
+      row = i - 1;
       break;
     }
   }
   for (unsigned j = 1; j <= width_; ++j) {
     if (lon < lon_bounds_[j]) {
-      col = j;
+      col = j - 1;
       break;
     }
   }

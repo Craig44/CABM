@@ -1,56 +1,47 @@
 /**
- * @file Biomass.cpp
+ * @file BiomassByCell.cpp
  * @author  C.Marsh
- * @date 18/07/2018
+ * @date 30/07/2018
  * @section LICENSE
- *
+ * @description
  *
  */
+// Local headers
+#include "BiomassByCell.h"
 
-// headers
-#include "Biomass.h"
-
-#include "InitialisationPhases/Manager.h"
-#include "TimeSteps/Manager.h"
-#include "Layers/Manager.h"
 #include "Selectivities/Manager.h"
+#include "InitialisationPhases/Manager.h"
+
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
 #include "Utilities/RandomNumberGenerator.h"
 #include "Utilities/DoubleCompare.h"
 #include "omp.h"
 
-// namespaces
 namespace niwa {
 namespace derivedquantities {
 
-/**
- * Usual constructor
- */
-Biomass::Biomass(Model* model) : DerivedQuantity(model) {
+// Constructor
+BiomassByCell::BiomassByCell(Model* model) : DerivedQuantity(model) {
+  // Default Variables
   parameters_.Bind<string>(PARAM_SELECTIVITY, &selectivity_label_, "A label for the selectivity", "");
-  parameters_.Bind<string>(PARAM_BIOMASS_LAYER_LABEL, &biomass_layer_label_, "A label for the layer that indicates which cells to calculate biomass over", "");
-}
-
-/**
- * Validate class
- */
-void Biomass::DoValidate() {
-
+  spatial_ = true;
 }
 
 
-/**
- * Build pointers class
- */
-void Biomass::DoBuild() {
-  // Build Layers
+/*
+ * DoValidate
+*/
+void BiomassByCell::DoValidate() {
+
+
+}
+
+/*
+ * DoBuild
+*/
+void BiomassByCell::DoBuild() {
   LOG_TRACE();
-  biomass_layer_ = model_->managers().layer()->GetIntLayer(biomass_layer_label_);
-  if (!biomass_layer_) {
-    LOG_ERROR_P(PARAM_BIOMASS_LAYER_LABEL) << "Could not find the layer '" << biomass_layer_label_ << "', please check there is a @layer defined for this layer and that it is type = 'integer'";
-  }
-
   selectivity_ = model_->managers().selectivity()->GetSelectivity(selectivity_label_);
   if (!selectivity_) {
     LOG_ERROR_P(PARAM_SELECTIVITY) << "Could not find the selectivity '" << selectivity_label_ << "', please check it exists";
@@ -59,7 +50,11 @@ void Biomass::DoBuild() {
   // create offset contianers to help with threading
   cell_offset_for_selectivity_.resize(model_->get_height());
   cell_offset_.resize(model_->get_height());
+  cache_in_space_.resize(model_->get_height());
+  value_in_space_.resize(model_->get_height());
   for (unsigned i = 0; i < model_->get_height(); ++i) {
+    cache_in_space_[i].resize(model_->get_width());
+    value_in_space_[i].resize(model_->get_width());
     cell_offset_[i].resize(model_->get_width());
     cell_offset_for_selectivity_[i].resize(model_->get_width());
   }
@@ -80,14 +75,13 @@ void Biomass::DoBuild() {
       }
     }
   }
-
 }
 
-/**
- * Calculate the cached value to use
- * for any interpolation
- */
-void Biomass::PreExecute() {
+
+/*
+ * PreExecute
+*/
+void BiomassByCell::PreExecute() {
   LOG_FINE();
   if (utilities::doublecompare::IsOne(time_step_proportion_))
     return;
@@ -110,23 +104,17 @@ void Biomass::PreExecute() {
   for (unsigned i = 0; i < n_agents_; ++i)
     random_numbers_[i] = rng.chance();
 
-  unsigned time_step_index = model_->managers().time_step()->current_time_step();
-  LOG_FINE() << "Time step for calculating biomass = " << time_step_index;
-
-  cache_value_ = 0.0;
   if (not length_based_selectivity_) {
     #pragma omp parallel for collapse(2)
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
-        unsigned val = biomass_layer_->get_value(row, col);
-        if (val <= 0)
-          continue;
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
           unsigned counter = 0;
+          cache_in_space_[row][col] = 0.0;
           for (Agent& agent : cell->agents_) {
             if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_age() - model_->min_age()]) {
-              cache_value_ += agent.get_weight() * agent.get_scalar();
+              cache_in_space_[row][col] += agent.get_weight() * agent.get_scalar();
             }
             ++counter;
           }
@@ -137,15 +125,13 @@ void Biomass::PreExecute() {
     #pragma omp parallel for collapse(2)
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
-        unsigned val = biomass_layer_->get_value(row, col);
-        if (val <= 0)
-          continue;
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
           unsigned counter = 0;
+          cache_in_space_[row][col] = 0.0;
           for (Agent& agent : cell->agents_) {
             if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_length_bin_index()]) {
-              cache_value_ += agent.get_weight() * agent.get_scalar();
+              cache_in_space_[row][col] += agent.get_weight() * agent.get_scalar();
             }
             ++counter;
           }
@@ -155,22 +141,12 @@ void Biomass::PreExecute() {
   }
   LOG_TRACE();
 }
-
-/**
- * Calculate the derived quantity value for the
- * state of the model.
- *
- * This class will calculate a value that is the sum total
- * of the population in the model filtered by category and
- * multiplied by the selectivities.
- *
- */
-void Biomass::Execute() {
+/*
+ * PreExecute
+*/
+void BiomassByCell::Execute() {
   LOG_FINE();
-  float value = 0.0;
-
   if (!utilities::doublecompare::IsZero(time_step_proportion_)) {
-
     utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
     // Pre-calculate agents in the world to set aside our random numbers needed for the operation
     n_agents_ = 0;
@@ -188,22 +164,17 @@ void Biomass::Execute() {
     for (unsigned i = 0; i < n_agents_; ++i)
       random_numbers_[i] = rng.chance();
 
-    unsigned time_step_index = model_->managers().time_step()->current_time_step();
-    LOG_FINE() << "Time step for calculating biomass = " << time_step_index;
-
     if (not length_based_selectivity_) {
       #pragma omp parallel for collapse(2)
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
-          unsigned val = biomass_layer_->get_value(row, col);
-          if (val <= 0)
-            continue;
           WorldCell* cell = world_->get_base_square(row, col);
           if (cell->is_enabled()) {
             unsigned counter = 0;
+            value_in_space_[row][col] = 0.0;
             for (Agent& agent : cell->agents_) {
               if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_age() - model_->min_age()]) {
-                value += agent.get_weight() * agent.get_scalar();
+                value_in_space_[row][col] += agent.get_weight() * agent.get_scalar();
               }
               ++counter;
             }
@@ -214,15 +185,13 @@ void Biomass::Execute() {
       #pragma omp parallel for collapse(2)
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
-          unsigned val = biomass_layer_->get_value(row, col);
-          if (val <= 0)
-            continue;
           WorldCell* cell = world_->get_base_square(row, col);
           if (cell->is_enabled()) {
             unsigned counter = 0;
+            value_in_space_[row][col] = 0.0;
             for (Agent& agent : cell->agents_) {
               if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_length_bin_index()]) {
-                value += agent.get_weight() * agent.get_scalar();
+                value_in_space_[row][col] += agent.get_weight() * agent.get_scalar();
               }
               ++counter;
             }
@@ -234,32 +203,45 @@ void Biomass::Execute() {
 
   if (model_->state() == State::kInitialise) {
     unsigned initialisation_phase = model_->managers().initialisation_phase()->current_initialisation_phase();
-    if (initialisation_values_.size() <= initialisation_phase)
-      initialisation_values_.resize(initialisation_phase + 1);
+    float value;
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        if (initialisation_values_by_space_.size() <= initialisation_phase) {
+          initialisation_values_by_space_.resize(initialisation_phase + 1);
+          initialisation_values_by_space_[initialisation_phase].resize(model_->get_height());
+          for (unsigned row = 0; row < model_->get_height(); ++row)
+            initialisation_values_by_space_[initialisation_phase][row].resize(model_->get_width());
+        }
 
-    float b0_value = 0;
-
-    if (utilities::doublecompare::IsZero(time_step_proportion_)) {
-      b0_value = cache_value_;
-      initialisation_values_[initialisation_phase].push_back(b0_value);
-    } else if (utilities::doublecompare::IsOne(time_step_proportion_)) {
-      b0_value = value;
-      initialisation_values_[initialisation_phase].push_back(b0_value);
-    } else  {
-      b0_value = cache_value_ + ((value - cache_value_) * time_step_proportion_);
-      initialisation_values_[initialisation_phase].push_back(b0_value);
+        if (utilities::doublecompare::IsZero(time_step_proportion_)) {
+          value = cache_in_space_[row][col];
+          initialisation_values_by_space_[initialisation_phase][row][col].push_back(value);
+        } else if (utilities::doublecompare::IsOne(time_step_proportion_)) {
+          value = value_in_space_[row][col];
+          initialisation_values_by_space_[initialisation_phase][row][col].push_back(value);
+        } else {
+          value = cache_in_space_[row][col] + ((value_in_space_[row][col] - cache_in_space_[row][col]) * time_step_proportion_);
+          initialisation_values_by_space_[initialisation_phase][row][col].push_back(value);
+        }
+      }
     }
   } else {
     if (utilities::doublecompare::IsZero(time_step_proportion_))
-      values_[model_->current_year()] = cache_value_;
+      values_by_space_[model_->current_year()] = cache_in_space_;
     else if (utilities::doublecompare::IsOne(time_step_proportion_))
-      values_[model_->current_year()] = value;
-    else
-      values_[model_->current_year()] = cache_value_ + ((value - cache_value_) * time_step_proportion_);
-
-    LOG_FINEST() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value << " Final value ";
+      values_by_space_[model_->current_year()] = value_in_space_;
+    else {
+      vector<vector<float>> temp(model_->get_height());
+      for (unsigned row = 0; row < model_->get_height(); ++row) {
+        temp[row].resize(model_->get_width());
+        for (unsigned col = 0; col < model_->get_width(); ++col) {
+          temp[row][col] = cache_in_space_[row][col] + ((value_in_space_[row][col] - cache_in_space_[row][col]) * time_step_proportion_);
+        }
+      }
+      values_by_space_[model_->current_year()] = temp;
+    }
   }
-}
 
+}
 } /* namespace derivedquantities */
 } /* namespace niwa */

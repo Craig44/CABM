@@ -117,6 +117,7 @@
 #define PARAM_BINOMIAL_APPROX                     "binomial_approx"
 #define PARAM_BIN_LABELS                          "bin_labels"
 #define PARAM_BIOMASS                             "biomass"
+#define PARAM_BIOMASS_BY_CELL                     "biomass_by_cell"
 #define PARAM_BIOMASS_DENSITY                     "biomass_density"
 #define PARAM_BIOMASS_EVENT_MORTALITY             "biomass_event_mortality"
 #define PARAM_BIOMASS_LAYER_LABEL                 "biomass_layer_label"

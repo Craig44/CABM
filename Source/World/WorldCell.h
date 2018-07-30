@@ -56,6 +56,7 @@ public:
   float                       get_mature_biomass();
   void                        update_agent_parameters();
   list<Agent>                 agents_;
+  string                      get_cell_label() {return cell_label_;};
 
 
 protected:
@@ -74,6 +75,7 @@ protected:
   processes::Mortality*        mortality_ = nullptr;
   processes::Growth*           growth_ = nullptr;
   vector<Selectivity*>         selectivity_;
+  string                       cell_label_;
 };
 
 } /* namespace niwa */

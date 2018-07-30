@@ -23,8 +23,8 @@
 #include "Children/Growth/GrowthVonBertalanffyWithBasic.h"
 #include "Children/Mortality/MortalityConstantRate.h"
 #include "Children/Mortality/MortalityEventBiomass.h"
-#include "Children/MovementBoxTransfer.h"
-#include "Children/MovementPreference.h"
+#include "Children/Movement/MovementBoxTransfer.h"
+#include "Children/Movement/MovementPreference.h"
 #include "Children/Tagging.h"
 #include "Children/Maturity.h"
 
