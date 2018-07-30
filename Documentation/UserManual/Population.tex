@@ -49,7 +49,7 @@ For example, to specify a model with 3 rows and 4 columns (i.e., 12 spatial cell
 		layer base
 		\end{verbatim}}}
 
-See below for how to define a layer using \command{layer}. 
+See below for how to define a layer using \command{layer}. Some processes reports require the user to define latitude and longitude bounds for cells. As they are cell bounds the model expects one more bound than rows or columns. The format of latitude and longitude are 0-180 and 0-360, respectively.
 
 
 \subsection{\I{Population structure}}\label{sub:sec:pop_sec}
@@ -81,7 +81,31 @@ An example, to specify a model with 2 categories (male and female) with ages 1-2
 
 
 \subsection{\I{Individuals}\label{sec:individuals}}
+An individual is the core object in the state that everything manipulates or summarises. An individual is has a list of predefined attributes that the user can choose to incorporate in the model or ignore, the list is below.
 
+\begin{itemize}
+	\item age
+	\item length
+	\item weight
+	\item sex
+	\item maturity
+	\item current area, birth area
+	\item lat and long
+	\item \I{population scalar} how many other individuals does this represent (weight scalar)
+	\item natural mortality parameter
+	\item growth parameters
+\end{itemize}
+
+Maturity is an attribute that is activated by the maturity process (see Section~\ref{subsubsec:maturity}), it is tied to some specific derived quantities such as the type \subcommand{mature\_biomass}. You could also calculate the mature biomass on the fly, using the other derived quantities and selectivities, an example of this is shown in the maturity process section.
+
+Sex is hard coded into the model and at this point the only way that sex effects model outcomes is through selectivities. So sex can have different maturation by age or length, and different vulnerability to mortality processes. The next additions are to have sex specific growth, which is a common occurrence in fish populations.
+
+The other attributes don't need any explanations are usually modified by processes, such as growth, movement and mortality. The attribute that I will spend a bit of time discussing is the method on how we initially set scalars on Individuals.
+
+\begin{equation}
+	S = \frac{\sum_{s = 1}^{n_s}B0_s}{\sum_{s = 1}^{n_s}SSB_s}
+\end{equation}
+Where $S$ is the global scalar that is associated to all new individuals in the system, $B0_s$ is the $B_0$ parameter for stock $s$ $SSB_s$ is the related spawning stock biomass. There are processes that do modify this, and that usually consists of processes or observations that truly involve a single entity such as tagging, when this occurs adjustments are made to this scalar.
 
 \subsection{\I{Layers}\label{sec:layers}}
 
@@ -289,7 +313,56 @@ Ageing is an implicit process in the model, Each agent that is created or recrui
 
 This means every fish automatically ages by one at the end of the year, or you could think of ageing a fish at the very beginning of the year (tomayto, tomahto), just be aware that you don't  have control over that, but if you want to account for growth in between annual increments that is possible via time step proportion increments, see growth processes for more information.
 
+\subsubsection{\I{Maturity}}\label{subsubsec:maturity}
+The process of converting an individual from immature to mature, only should be used if you link it to a mature-biomass derived quantity (Section~\ref{para:mature_biomass}). An alternative way and perhaps more efficient method for capturing a snap shot of the mature biomass or abundance of all individuals in the population is by using the generic biomass or abundance derived quantities (Section~\ref{para:biomass}~\ref{para:abundance}). Where we calculate what is mature at the time of the derived quantity, rather than having an explicit process that allows users to separate the maturation process from the summarising of abundance of biomass of the mature component. Examples of how you would set up the two methods in \IBM\ are below, firstly with maturity as an explicit process and secondly as it being implicit.
+
+{\small{\begin{verbatim}
+@model
+...
+maturity_ogive_label mature_ogive // define maturity selectivity: male female (order is important)
+
+@time_step Annual
+processes  Maturation 
+
+@time_step Spawn
+processes  no_process 
+
+@process Maturation  // This will use the maturity ogive on the @model
+type maturation
+
+@derived_quantitiy SSB  // get a snap shot of mature biomass
+type mature_biomass
+time_step Spawn
+biomass_layer_label SSB_areas
+proportion_through_mortality_block 0.0
+\end{verbatim}}}
+
+The above model setup will have individuals in the system that are mature and immature and we can call the specialised \subcommand{mature\_biomass} derived quantity to get a snap shot at any point in the system to view the biomass or abundance. The other way of dealing with maturity is implicitly as shown below.
+
+{\small{\begin{verbatim}
+@model
+...
+maturity_ogive_label One // define a constant selectivity here, just to keep the model happy
+
+@time_step Annual
+processes  Other_processes
+
+@time_step Spawn
+processes  no_process 	
+	
+@derived_quantitiy SSB  // get a snap shot of mature biomass
+type biomass
+time_step Spawn
+selectivity mature_ogive  // Define mature selectivity here
+biomass_layer_label SSB_areas
+proportion_through_mortality_block 0.0
+\end{verbatim}}}
+
+So just to re-iterate the difference, you can have an explicit maturing process that is not associated with a derived quantity, or you could purely associate a derived quantity to the maturing process. This brings up a useful point in that, given there generality of the program there are more than one way to approximate dynamics and some will be more computationally quicker than others. So have a play around but try and keep the number of times we iterate over the state as small as possible, as you will get significant time saving.
+
+
 \subsubsection{\I{Recruitment}}
+Recruitment is the process where new individuals are created in the system. It is also the process that defines stock structure in the model. Stocks are not an explicit attribute of \IBM\ so consideration on this process is important. How the stock is defined using the recruitment dynamic surrounds where we calculate Spawning Stock Biomass ($SSB$) and where the resulting recruits are first seeded. This means that for all recruitment types you will need to specify a $B_0$ parameter and an associated derived quantity that represents the $SSB$ for that event.
 
 \paragraph{\I{Constant recruitment}}\label{subsubsec:constant-recruitment}
 
@@ -432,7 +505,7 @@ u_i = \frac{P_{j, i + h} - P_{j, i - h}}{2}
 where $h$ is some distance or neighbour cell, this yields us gradient or velocity in both directions then we use a bias random walk to move individuals in space.
 
 \begin{equation}
-x_j \sim N(u_i, D_{i})
+x_j \sim N(u_i, \sigma_i)
 \end{equation}
 
 Where $u_i$ is the gradient in the $\textbf{X}$ direction, $D_{i}$ is the diffusion parameter that is scaled based on the habitat preference and $x_j$ is the future location on the X axis of the individual. $D_{i}$ inversely relates to the quality of the preference habitat and a parameter $D_{max}$.
@@ -442,15 +515,19 @@ D_i = D_{max}\left(1 - \frac{P_i}{\zeta + P_i}\right)
 \end{equation}
 where $\zeta$ is an arbitrary constant controlling the curvature of the function, following \cite{Bertignac1998}.
 
+\begin{equation}
+\sigma_i = \sqrt{2 * D_i * t}
+\end{equation}
 
+Where $t$ is the time steps we have applied the preference movement in annual cycle.
 
 \subsection{\I{Derived Quantities}\label{sec:derived-quantities}}
 Derived quantities surround a mortality block and so the value of the derived quantity is calculated twice, once before the mortality block (Pre-Execute), and once after (Execute). The final value is an interpolation based on how much mortality the user wants to take into account when calculating derived quantities. If users set the \subcommand{proportion\_through\_mortality\_block} parameter equal to one or zero then only one calculation is taken, and can reduce the run time of some models, so it is worth exploring.
-\paragraph*{Biomass}
+\paragraph*{Biomass}\label{para:biomass}
 
-\paragraph*{Mature Biomass}
+\paragraph*{Mature Biomass}\label{para:mature_biomass}
 
-\paragraph*{Abundance}
+\paragraph*{Abundance}\label{para:abundance}
 
 \subsection{\I{Growth}\label{sec:age-at-age}}
 Growth currently means updating length and weight for an agent, if the Von Bertalanffy formula currently is used (currently the default in agent class for initialising length) it follows the following formula
@@ -487,7 +564,7 @@ When an agent is created (either in initialisation or through a recruitment proc
 \subsection{\I{Preference Functions}\label{sec:preference_functions}}\textsl{}
 
 \subsection{\I{Selectivities}\label{sec:selectivities}}
-A selectivity is a function that can have a different value for each age class. Selectivities are used throughout \IBM\ to interpret observations (Section \ref{sec:estimation-section}) or to modify the effects of processes on each age class (Section \ref{sec:population-section}). \IBM\ implements a number of different parametric forms, including logistic, knife edge, and double normal selectivities. Selectivities are defined in there own command block (\command{selectivity}), where the unique label is used by observations or processes to identify which selectivity to apply.
+A selectivity is a function that can have a different value for each age class. Selectivities are used throughout \IBM\ to interpret observations or to modify the effects of processes on each age class (Section \ref{sec:population-section}). \IBM\ implements a number of different parametric forms, including logistic, knife edge, and double normal selectivities. Selectivities are defined in there own command block (\command{selectivity}), where the unique label is used by observations or processes to identify which selectivity to apply.
 
 Selectivities are indexed by age, with indices from \argument{min\_age} to \argument{max\_age}. For example, for a logistic age-based selectivity with $50\%$ selected at age $5$ and $95\%$ selected at age $7$, would be defined by the \subcommand{type}=\argument{logistic} with parameters $a_{50}=5$ and $a_{to95}=(7-5)=2$. The value of the selectivity at age $x=7$ is $0.95$, and the value at age $x=3$ is $0.05$. Note, while selectivities can be length based, use with caution as more testing is needed for this functionality.
 
@@ -637,7 +714,7 @@ Selectivities \subcommand{all\_values} and \subcommand{all\_values\_bounded} can
 \IBM\ can take a while if you have a complex spatial model and complex life history. So there are some tips and tricks that I have come found can be useful when setting up configuration files.
 
 \subsubsection*{The initialisation Phase}
-The first thing you wont to nail down before getting gun hoe on the configuration and complex dynamics you want to get a model that reaches an appropriate initialisation state \emph{quickly!}. So my suggestion is to not worry about fishing in the first instance, set the \subcommand{start\_year} and \subcommand{final\_year} one year apart and play with the initialisation phase commands to see how to efficiently reach a desired initial state. The parameters I am talking about are the subcommands \subcommand{years} and \subcommand{layer\_label}. The \subcommand{years} parameter sets how many annual cycles to run through to set your initialisation state, you want this as small as possible. So my advice is run the model with a range of \subcommand{years} say 5, 10, 20, 30, 40, 50 and 100 to find out how sensitive your initial state is to this. You find that you have to make a compromise between speed and accuracy, unfortunately life is full of such compromises.
+The first thing you wont to nail down before getting gun hoe on the configuration and complex dynamics you want to get a model that reaches an appropriate initialisation state \emph{quickly!}. So my suggestion is to not worry about fishing in the first instance, set the \subcommand{start\_year} and \subcommand{final\_year} one year apart and play with the initialisation phase commands to see how to efficiently reach a desired initial state. The parameters I am talking about are the subcommands \subcommand{years} and \subcommand{layer\_label}. The \subcommand{years} parameter sets how many annual cycles to run through to set your initialisation state, you want this as small as possible. So my advice is run the model with a range of \subcommand{years} say 5, 10, 20, 30, 40, 50 and 100 to find out how sensitive your initial state is to this. You find that you have to make a compromise between speed and accuracy, unfortunately life is full of such compromises. To see some example \R\ code on how I compare initialisation see Section~\ref{sec:post-processing}.
 
 Along with the \subcommand{years} parameter you can also set the spatial distribution of the initial seeding of agents through the \subcommand{layer\_label}, if you have a spatial model with movement this would be an interesting one to play with. So pretty much my advice is tweak these initialisation parameters as much as you can before you move onto fishing and generate observations, it will be well worth your while if you treasure time.
 
@@ -647,5 +724,5 @@ This one should be obvious and we suggest that you play with the initialisation 
 \subsubsection*{The number of threads available} 
 \IBM\ is threaded using the OpenMP C++ library, by default \IBM\ will set the number threads available equal to number available on your machine minus 1. You can set this through the \command{model} parameter \subcommand{max\_threads\_to\_use}, we suggest you set this to the number of spatial cells in the system, there might be more overheads with making more threads available than the model will ever use (disclaimer I haven't tested this). 
 
-
-
+\subsubsection*{more ways than one to skin a cat} 
+Hopefully throughout the process and derived quantities I have discussed alternative ways to set up a similar model. Given there generality of the program there are more than one way to approximate dynamics and some will be more computationally quicker than others. So have a play around but try and keep the number of times we iterate over the state as small as possible, as you will get significant time saving.

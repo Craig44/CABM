@@ -36,3 +36,16 @@ For both 64-bit Linux and Microsoft Windows, only the binary executable \texttt{
 
 The random number generator\index{Random number generator} used by \IBM\ uses an implementation of the Mersenne twister random number generator \citep{796}. This, the command line functionality, matrix operations, and a number of other functions use the \href{http://www.boost.org/}{BOOST} C++ library (Version 1.58.0)\index{BOOST C++ library}. The threading capabilities are done using \href{https://www.openmp.org/}[OpenMP library]
 
+
+\subsection{\I{The future for \IBM}}
+I still have 2.5 years of my PhD to go so I am hoping to maintain and continue development during that period. Things that are not in the Beta version that would be great to add one day (The dream-list)
+
+\begin{itemize}
+	\item Make it faster...
+	\item Add multiple fisheries at the same time, often we have multiple fleets fishing e.g trawler and long-liners, currently we can have multiple fishing events but they do not occur simultaneously. This would have issues on data generation because the order of operations would be important and would get a bit nigly.
+	\item test on a high performance computer (HPC) to see the capabilities if a user has access to this. how spatial can we go if we have threads of cores available, it would be cool to have 1000x1000 model. or alternatively use the threads in another space such as run multiple species in parallel and synchronise threads when they interact.	
+	\item see used in practice I am hoping that this could be used as an leading management strategy evaluation (MSE) tool. This has the ability to test management actions on a large scale such as test structural uncertainty in our models for MSE. Include the possible effects of climate change in the future.
+\end{itemize}
+
+
+

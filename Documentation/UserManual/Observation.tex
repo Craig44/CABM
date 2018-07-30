@@ -141,15 +141,6 @@ The default value of $\delta$ is $1 \times 10^{-11}$.
 \subsubsection{Likelihoods for abundance and biomass observations}\label{Obs:biomass}
 Abundance and biomass observations are expected as an annual time series in \IBM, where they select the same categories over that time series. The parameters and inputs needed to use this observation class are: a observation $O_i$, c.v. $c_i$, catchability coefficient $q$, where $i$ indexed the year. \IBM\ calculates an expectation $E_i$ and scales it by $q$ before comparing it to $O_i$. This means that the value chosen for $q$ will determine whether the observation is relative ($q\neq 1$) or absolute $q = 1$. Before we describe each of the likelihoods we will discuss the methods available to handle $q's$:
 
-\begin{enumerate}
-	\item The $q's$ can be treated as ‘nuisance’ parameters. For each set of values of the free parameters, the model uses the values of the $q's$which minimise the objective function. These optimal $q's$ are calculated algebraically (see Section~\ref{subsec:nuisance}). If one of the $q's$ falls outside the bounds specified by the user, it is set equal to the closest bound. This approach reduces the size of the parameter vector and hence should improve the performance of the estimation method. However, it is not correct when calculating a sample from the posterior in a Bayesian analysis (except asymptotically, see \cite{Walters_ludwig_94}) and we offer the following alternative;
-	
-	\item The $q's$ can be treated as ordinary free parameters.
-\end{enumerate}	
-
-For both options, it is necessary to evaluate the contribution of $O_i$ to the negative loglikelihood for a given value of $q$. Each observation $O_i$ varies about $qE_i$ — express the variability of $O_i$ in terms of its c.v. $c_i$ (or in one case, its standard deviation si). Here are the likelihoods, which are expressed on the objective-function scale of -log(L):
-
-
 \subsubsection*{The lognormal likelihood\index{Lognormal likelihood}\index{Lognormal likelihood}}
 
 The negative log likelihood for a the lognormal is as follows,
