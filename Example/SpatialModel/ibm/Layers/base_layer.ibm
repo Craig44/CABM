@@ -1,0 +1,10 @@
+@layer Base
+type numeric
+## cells could be areas if we wanted densities
+table layer
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+end_table

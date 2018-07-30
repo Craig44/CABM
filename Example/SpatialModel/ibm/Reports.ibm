@@ -1,0 +1,54 @@
+# --------------
+# Define Reports
+# --------------
+# print process properties
+@report M_report
+type process
+process natural_mort
+
+@report mature_report
+type process
+process Maturation
+
+@report agents
+type summarise_agents
+number_of_agents 20
+time_step Annual
+
+
+/*
+@report fishing
+type process
+process fishing
+*/
+
+@report Movement
+type process
+process Movement
+
+@report Rec
+type process
+process Recruitment
+
+/*
+@report fisher_age_freq
+type observation
+observation fishery_age
+*/
+# print initail state of agents
+@report init
+type initialisation_partition
+
+# print age frequency
+@report age_freq
+type age_frequency_by_cell
+#years 1990:2018 ## defaults to model years
+time_step Annual
+
+# print SSB's
+@report derived_quants
+type derived_quantity
+
+# print SSB's
+@report model_attributes
+type model_attributes

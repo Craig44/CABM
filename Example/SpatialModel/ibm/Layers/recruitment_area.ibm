@@ -1,0 +1,10 @@
+@layer Recruitment_area
+type numeric
+proportions true
+table layer
+0.2 0 0 0 0
+0.2 0 0 0 0
+0.2 0 0 0 0
+0.2 0 0 0 0
+0.2 0 0 0 0
+end_table

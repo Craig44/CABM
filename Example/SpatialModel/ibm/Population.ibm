@@ -1,0 +1,163 @@
+## Model description, a hypothetical life cycle
+# Single stock
+# 25 spatial cells
+# 30 year annual cycle
+# not sexed
+# 3 time steps
+# A single growth curve (could make it spatial TODO)
+# spatially explicit recruitment
+@model
+start_year 1990
+final_year 2018
+min_age 0
+max_age 30
+age_plus true # other acceptable inputs for bool are '1' and 'yes'
+initialisation_phase_labels Iterative #label to an @initialisation block
+time_steps Spawn Annual Fishing 
+length_bins 0 5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 # assumed cm's
+length_plus true ## is the last bin a plus group
+base_layer_label Base #
+growth_process_label von_bert
+natural_mortality_process_label natural_mort
+#sexed false
+maturity_ogive_label mature_ogive
+max_threads_to_use 8 ## no need to go more than that as threading is based on number of cells 
+## a single area model
+nrows 5
+ncols 5
+
+# --------------
+# Init Phase
+# --------------
+@initialisation_phase Iterative
+type iterative
+years 40
+#convergence_years 20 40
+#lambda 1
+number_of_agents 1000000 ## initial number of agents
+layer_label Base
+
+# --------------
+# Time Sequence
+# --------------
+# - Ageing (Implicit)
+# - Spawning
+# - Recruitment
+# - M
+# - Growth
+# - Maturation
+# - Movement
+# - fishing
+
+@time_step Spawn
+processes Nop
+
+@time_step Annual
+processes  Recruitment  natural_mort von_bert Maturation Movement
+
+@time_step Fishing
+processes fishing
+
+
+# --------------
+# Process definitions
+# --------------
+@process Nop 
+type nop
+# Growth
+@process von_bert
+type growth_von_bertalanffy_with_basic_weight
+#linf_layer_label L_inf_layer
+linf 101.8
+#k_layer_label k_layer
+k 0.161
+a 2.0e-6 
+b 3.288
+update_growth_parameters false
+distribution lognormal
+cv 0.0001
+time_step_proportions 1
+
+# Maturity
+@process Maturation
+type maturation
+
+# Natural Mortality
+@process natural_mort
+type mortality_constant_rate
+m_multiplier_layer_label M_layer
+m 0.15
+update_mortality_parameters false
+distribution lognormal
+cv 0.0001
+selectivity_label One_length One_length
+
+
+# Fishing Mortality
+@process fishing
+type mortality_event_biomass
+years 1990:2010
+catch_layers catch_1990 catch_1991 catch_1992 catch_1993 catch_1994 catch_1995 catch_1996 catch_1997 catch_1998 catch_1999 catch_2000 catch_2001 catch_2002 catch_2003 catch_2004 catch_2005 catch_2006 catch_2007 catch_2008 catch_2009 catch_2010
+selectivity trawl_selectivity
+minimum_legel_length 20
+handling_mortality 0.0
+
+# Movement
+@process Movement
+type movement_box_transfer
+origin_cell 1-1 2-1 3-1 4-1 5-1 1-2 2-2 3-2 4-2 5-2 1-3 2-3 3-3 4-3 5-3 1-4 2-4 3-4 4-4 5-4 1-5 2-5 3-5 4-5 5-5
+probability_layers 1_1 2_1 3_1 4_1 5_1 1_2 2_2 3_2 4_2 5_2 1_3 2_3 3_3 4_3 5_3 1_4 2_4 3_4 4_4 5_4 1_5 2_5 3_5 4_5 5_5
+
+/*
+@process preferenceMovement
+type preference_movement
+d_max 0.4
+brownian true
+*/
+
+# Recruitment Constant
+@process Recruitment
+type recruitment_constant
+recruitment_layer_label Recruitment_area
+b0 100000
+ssb SSB
+
+# --------------
+# Define selectivities
+# --------------
+@selectivity natural_mortality_by_age
+type double_exponential
+x1 0
+x0 6
+x2 30
+y1 0.6
+y0 0.1
+y2 0.4
+
+@selectivity One
+type constant
+c 1
+
+@selectivity One_length
+type constant
+length_based true
+c 1
+
+@selectivity mature_ogive
+type logistic
+a50 4
+ato95 4
+
+@selectivity trawl_selectivity
+type logistic
+a50 4.5
+ato95 8
+
+# --------------
+# Derived Quantities
+# --------------
+@derived_quantity SSB
+type mature_biomass
+biomass_layer_label SSB_areas
+time_step Spawn
+proportion_through_mortality_block 0.0
