@@ -72,6 +72,7 @@ void Iterative::DoBuild() {
  */
 void Iterative::Execute() {
   LOG_TRACE();
+  LOG_MEDIUM();
 
   // Check we get a sensible estimate of M
   if (model_->get_m() <= 0.0)
@@ -154,6 +155,7 @@ void Iterative::Execute() {
       }
     }
   }
+  LOG_MEDIUM();
 }
 
 

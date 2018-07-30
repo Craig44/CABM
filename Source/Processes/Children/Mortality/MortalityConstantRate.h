@@ -53,6 +53,8 @@ protected:
   vector<float>                       random_numbers_;
   unsigned                            n_agents_;
   vector<vector<unsigned>>            cell_offset_;
+  vector<vector<vector<float>>>       cell_offset_for_selectivity_;
+
 
 
   // For reporting

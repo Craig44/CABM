@@ -142,7 +142,10 @@ void RecruitmentBevertonHolt::DoExecute() {
           float value = recruitment_layer_->get_value(row, col);
           unsigned new_agents = (unsigned)(initial_recruits_ * value);
           LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " initial agents = " << initial_recruits_ << " new agents = " << new_agents;
-          cell->birth_agents(new_agents);
+          #pragma omp critical  // single thread entry as birth_agents() has many shared resources across cells, mortality, growth and random number generators.
+          {
+            cell->birth_agents(new_agents);
+          }
         }
       }
     }
@@ -165,7 +168,10 @@ void RecruitmentBevertonHolt::DoExecute() {
           float value = recruitment_layer_->get_value(row, col);
           unsigned new_agents = (unsigned)(amount_per * value);
           LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " new agents = " << amount_per << " new agents = " << new_agents;
-          cell->birth_agents(new_agents);
+          #pragma omp critical  // single thread entry as birth_agents() has many shared resources across cells, mortality, growth and random number generators.
+          {
+            cell->birth_agents(new_agents);
+          }
         }
       }
     }

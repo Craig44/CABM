@@ -83,9 +83,33 @@ void MortalityConstantRate::DoBuild() {
   }
   model_->set_m(m_);
 
+  cell_offset_for_selectivity_.resize(model_->get_height());
   cell_offset_.resize(model_->get_height());
-  for (unsigned i = 0; i < model_->get_height(); ++i)
+  for (unsigned i = 0; i < model_->get_height(); ++i) {
     cell_offset_[i].resize(model_->get_width());
+    cell_offset_for_selectivity_[i].resize(model_->get_width());
+  }
+
+  if (selectivity_length_based_) {
+    for (unsigned i = 0; i < model_->get_height(); ++i) {
+      for (unsigned j = 0; j < model_->get_width(); ++j) {
+        for (unsigned ogive = 0; ogive < selectivity_label_.size(); ++ogive) {
+          for (auto len : model_->length_bins())
+            cell_offset_for_selectivity_[i][j].push_back(selectivity_[ogive]->GetResult(len));
+        }
+      }
+    }
+  } else {
+    for (unsigned i = 0; i < model_->get_height(); ++i) {
+      for (unsigned j = 0; j < model_->get_width(); ++j) {
+        for (unsigned ogive = 0; ogive < selectivity_label_.size(); ++ogive) {
+          for (auto age = model_->min_age(); age <= model_->max_age(); ++age)
+          cell_offset_for_selectivity_[i][j].push_back(selectivity_[ogive]->GetResult(age));
+        }
+      }
+    }
+  }
+
 }
 
 
@@ -94,6 +118,7 @@ void MortalityConstantRate::DoBuild() {
  */
 void MortalityConstantRate::DoExecute() {
   LOG_TRACE();
+  LOG_MEDIUM();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   // Pre-calculate agents in the world to set aside our random numbers needed for the operation
   n_agents_ = 0;
@@ -113,7 +138,6 @@ void MortalityConstantRate::DoExecute() {
 
   unsigned agents_removed = 0;
   if (selectivity_length_based_) {
-    float selectivity_at_length;
     #pragma omp parallel for collapse(2)
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
@@ -123,9 +147,8 @@ void MortalityConstantRate::DoExecute() {
           unsigned initial_size = cell->agents_.size();
           LOG_FINEST() << initial_size << " initial agents";
           for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter) {
-            selectivity_at_length = selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index());
             //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
-            if (random_numbers_[cell_offset_[row][col] + counter] <= (1 - std::exp(-(*iter).get_m() * selectivity_at_length))) {
+            if (random_numbers_[cell_offset_[row][col] + counter] <= (1 - std::exp(-(*iter).get_m() * cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->length_bins().size() + (*iter).get_length_bin_index()]))) {
               iter = cell->agents_.erase(iter);
               initial_size--;
               agents_removed++;
@@ -137,7 +160,6 @@ void MortalityConstantRate::DoExecute() {
       }
     }
   } else {
-    float selectivity_at_age;
     #pragma omp parallel for collapse(2)
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
@@ -148,9 +170,8 @@ void MortalityConstantRate::DoExecute() {
           unsigned initial_size = cell->agents_.size();
           LOG_FINEST() << initial_size << " initial agents";
           for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter) {
-            selectivity_at_age = selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age());
             //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
-            if (random_numbers_[cell_offset_[row][col] + counter] <= (1 - std::exp(-(*iter).get_m() * selectivity_at_age))) {
+            if (random_numbers_[cell_offset_[row][col] + counter] <= (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]))) {
               iter = cell->agents_.erase(iter);
               initial_size--;
               agents_removed++;

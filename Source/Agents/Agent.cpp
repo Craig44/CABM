@@ -54,6 +54,13 @@ unsigned Agent::get_length_bin_index() {
   }
   return lengths.size() - 1;
 }
+
+
+// an index for which length the individual falls in.
+unsigned Agent::get_age_index() {
+  return get_age() - model_->min_age();
+}
+
 /*
  * An internal function to set initial length at age when initially seeding agents in the world,
  * So that we have the equivalent length and weight frequency. Calculate expected length at age assuming von Bert parameters

@@ -59,8 +59,8 @@ Model::Model() {
   parameters_.Bind<unsigned>(PARAM_LENGTH_BINS, &length_bins_, "", "", true);
   parameters_.Bind<bool>(PARAM_LENGTH_PLUS, &length_plus_, "Is the last bin a plus group", "", false);
   parameters_.Bind<string>(PARAM_BASE_LAYER_LABEL, &base_layer_, "Label for the base layer", "");
-  parameters_.Bind<string>(PARAM_LATITUDE_LAYER_LABEL, &lat_layer_label_, "Label for the latitude layer", "", "");
-  parameters_.Bind<string>(PARAM_LONGITUDE_LAYER_LABEL, &lon_layer_label_, "Label for the longitude layer", "", "");
+  parameters_.Bind<float>(PARAM_LATITUDE_BOUNDS, &lat_bounds_, "Label for the latitude layer", "", true);
+  parameters_.Bind<float>(PARAM_LONGITUDE_BOUNDS, &lon_bounds_, "Label for the longitude layer", "", true);
   parameters_.Bind<unsigned>(PARAM_NROWS, &world_height_, "number of rows in spatial domain", "")->set_lower_bound(1,true);
   parameters_.Bind<unsigned>(PARAM_NCOLS, &world_width_, "number of columns in spatial domain", "")->set_lower_bound(1,true);
   parameters_.Bind<bool>(PARAM_SEXED, &sex_, "Is sex an attribute of you agent?", "", false);
@@ -263,6 +263,33 @@ void Model::Validate() {
  */
 void Model::Build() {
   LOG_TRACE();
+  // Build lat long stuff
+  if (parameters_.Get(PARAM_LATITUDE_BOUNDS)->has_been_defined() && parameters_.Get(PARAM_LONGITUDE_BOUNDS)->has_been_defined()) {
+    if (lon_bounds_.size() != (world_width_ + 1)) {
+      LOG_FATAL_P(PARAM_LONGITUDE_BOUNDS) << "longitude bounds must have a minimum and maximum value for each cell, e.g ncol 2 lon_bounds 150 151 152. You supplied '" << lon_bounds_.size() << " but we wanted " << (world_width_ + 1);
+    }
+
+    if (lat_bounds_.size() != (world_height_ + 1)) {
+      LOG_FATAL_P(PARAM_LATITUDE_BOUNDS) << "latitude bounds must have a minimum and maximum value for each cell, e.g ncol 2 lat_bounds -45 -44 -43. You supplied '" << lat_bounds_.size() << " but we wanted " << (world_height_ + 1);
+    }
+    for (unsigned lat_ndx = 1; lat_ndx < lat_bounds_.size(); ++lat_ndx) {
+      lat_mid_points_.push_back((float)(lat_bounds_[lat_ndx] - lat_bounds_[lat_ndx - 1] / 2));
+      if (lat_bounds_[lat_ndx] < lat_bounds_[lat_ndx - 1])
+        LOG_ERROR_P(PARAM_LATITUDE_BOUNDS) << "must be in ascending order";
+    }
+
+    for (unsigned lon_ndx = 1; lon_ndx < lon_bounds_.size(); ++lon_ndx) {
+      lon_mid_points_.push_back((float)(lon_bounds_[lon_ndx] - lon_bounds_[lon_ndx - 1] / 2));
+      if (lon_bounds_[lon_ndx] < lon_bounds_[lon_ndx - 1])
+         LOG_ERROR_P(PARAM_LONGITUDE_BOUNDS) << "must be in ascending order";
+    }
+    min_lon_ = lon_bounds_[0];
+    max_lon_ = lon_bounds_[lon_bounds_.size() - 1];
+    min_lat_ = lat_bounds_[0];
+    max_lat_ = lat_bounds_[lat_bounds_.size() - 1];
+  }
+
+  /// Build everything else in the system
   managers_->BuildPreWorldView();
   world_view_->Build(); // This needs processes to be built, but others want world to be built by DoBuild to do checks, hmmm
   managers_->Build();
@@ -280,10 +307,20 @@ void Model::Build() {
     LOG_ERROR_P(PARAM_NATURAL_MORTALITY_PROCESS_LABEL) << "You have specified '" << maturity_ogives_.size() << "' maturity ogives, we only use one if it is unsexed or two if it is sexed";
   }
   // Check maturity Ogive exists and flag to user
+  bool first = true;
+  bool selectivity_length_based;
   for (unsigned i = 0; i < maturity_ogives_.size(); ++i) {
     Selectivity* selec = managers_->selectivity()->GetSelectivity(maturity_ogives_[i]);
     if (!selec)
-      LOG_ERROR_P(PARAM_NATURAL_MORTALITY_PROCESS_LABEL) << "Could not find maturity ogive (selectivity) '" << maturity_ogives_[i] << "', make sure it is defined";
+      LOG_ERROR_P(PARAM_MATRUITY_OGIVE_LABEL) << "Could not find maturity ogive (selectivity) '" << maturity_ogives_[i] << "', make sure it is defined";
+    if (first) {
+      first = false;
+      selectivity_length_based = selec->is_length_based();
+    } else {
+      if (selectivity_length_based != selec->is_length_based()) {
+        LOG_ERROR_P(PARAM_MATRUITY_OGIVE_LABEL) << "The selectivity  " << maturity_ogives_[i] << " was not the same type (age or length based) as the previous selectivity label";
+      }
+    }
   }
 
   // Check thread logic
@@ -300,7 +337,6 @@ void Model::Build() {
   // Calculate length bin midpoints
   for (unsigned length_ndx = 1; length_ndx < length_bins_.size(); ++length_ndx)
     length_bin_mid_points_.push_back((float)(length_bins_[length_ndx] - length_bins_[length_ndx - 1] / 2));
-
 }
 
 /**
@@ -412,5 +448,12 @@ void Model::Iterate() {
 void Model::FullIteration() {
   Reset();
   Iterate();
+}
+
+bool Model::lat_and_long_supplied() {
+  if (parameters_.Get(PARAM_LATITUDE_BOUNDS)->has_been_defined() && parameters_.Get(PARAM_LONGITUDE_BOUNDS)->has_been_defined())
+    return true;
+  else
+    return false;
 }
 } /* namespace niwa */

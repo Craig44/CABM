@@ -66,13 +66,6 @@ void MovementBoxTransfer::DoBuild() {
     }
     probability_layers_.push_back(temp_layer);
   }
-/*
-
-  selectivity_ = model_->managers().selectivity()->GetSelectivity(selectivity_label_);
-  if (!selectivity_)
-    LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << ": selectivity " << selectivity_label_ << " does not exist. Have you defined it?";
-
-*/
 
   // Split out cell origins for quick look up at execution
   for (auto origin : origin_cell_) {
@@ -108,6 +101,8 @@ void MovementBoxTransfer::DoBuild() {
  */
 void MovementBoxTransfer::DoExecute() {
   LOG_TRACE();
+  LOG_MEDIUM();
+
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   // Pre-calculate agents in the world to set aside our random numbers needed for the operation
   n_agents_ = 0;

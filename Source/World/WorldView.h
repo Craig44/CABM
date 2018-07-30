@@ -77,15 +77,15 @@ protected:
   WorldCell                   **base_grid_;
   WorldCell                   **cached_grid_;
   niwa::layers::NumericLayer*     base_layer_ = nullptr;
-  niwa::layers::NumericLayer*     lat_layer_ = nullptr;
-  niwa::layers::NumericLayer*     long_layer_ = nullptr;
   unsigned                    width_;
   unsigned                    height_;
   unsigned                    enabled_cells_;
   vector<unsigned>            enabled_rows_;
   vector<unsigned>            enabled_cols_;
-  vector<float>                lat_by_cell_;
-  vector<float>               lon_by_cell_;
+  vector<float>               lat_midpoint_by_cell_;
+  vector<float>               lon_midpoint_by_cell_;
+  vector<float>               lat_bounds_;
+  vector<float>               lon_bounds_;
 
 private:
   // members

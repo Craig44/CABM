@@ -15,7 +15,7 @@
 #include "Utilities/To.h"
 #include "Utilities/Types.h"
 #include "WorldCell.h"
-
+#include "omp.h"
 // namespaces
 namespace niwa {
 
@@ -61,19 +61,6 @@ void WorldView::Build() {
     LOG_ERROR() << "The base layer '" << model_->get_base_layer_label() << "' found in the @model block could not be found, please check there is a @layer defined for this layer and that it is type = 'numeric'";
   }
 
-  if (model_->get_lat_layer_label() != "") {
-    lat_layer_ = model_->managers().layer()->GetNumericLayer(model_->get_lat_layer_label());
-    if (!lat_layer_) {
-      LOG_ERROR() << "The lattude layer '" << model_->get_lat_layer_label() << "' found in the @model block could not be found, please check there is a @layer defined for this layer and that it is type = 'numeric'";
-    }
-  }
-
-  if (model_->get_long_layer_label() != "") {
-    long_layer_ = model_->managers().layer()->GetNumericLayer(model_->get_long_layer_label());
-    if (!long_layer_) {
-      LOG_ERROR() << "The longitude layer '" << model_->get_long_layer_label() << "' found in the @model block could not be found, please check there is a @layer defined for this layer and that it is type = 'numeric'";
-    }
-  }
   // Allocate memory for our cells
   // Allocate Space for our X (Height)
   base_grid_ = new WorldCell*[height_];
@@ -87,21 +74,25 @@ void WorldView::Build() {
     cached_grid_[i] = new WorldCell[width_];
   }
 
-  // Set Variables (Can't do it above. Stupid blah ISO C++)
-  float lat = 0.0, lon = 0.0;
-  lat_by_cell_.resize(height_);
-  lon_by_cell_.resize(width_);
+  if (model_->lat_and_long_supplied()) {
+    lat_bounds_ = model_->get_lat_bounds();
+    lon_bounds_ = model_->get_lon_bounds();
 
+    lat_midpoint_by_cell_ = model_->get_lat_mid_points();
+    lon_midpoint_by_cell_ = model_->get_lon_mid_points();
+    LOG_MEDIUM() << "size of lats = " << lat_midpoint_by_cell_.size() << " size of longs = " << lon_midpoint_by_cell_.size() << " heigght = " << height_ << " width = " << width_;
+  }
+
+  float lat, lon;
   for (unsigned i = 0; i < height_; ++i) {
     for (unsigned j = 0; j < width_; ++j) {
-      if (lat_layer_)
-        lat = lat_layer_->get_value(i,j);
-      if (long_layer_)
-        lon = long_layer_->get_value(i,j);
-
-      lon_by_cell_[j] = lon;
-      lat_by_cell_[i] = lat; // A bit inefficient 'shrugs shoulder' TODO should check somewhere that all lats are teh same for all longitudes, and vice versa with longs
-
+      if (model_->lat_and_long_supplied()) {
+        lat = lat_midpoint_by_cell_[i];
+        lon = lon_midpoint_by_cell_[j];
+      } else {
+        lat = 0.0;
+        lon = 0.0;
+      }
       base_grid_[i][j].Build(i, j, lat, lon, model_);
       cached_grid_[i][j].Build(i, j, lat, lon, model_);
     }
@@ -139,7 +130,7 @@ void WorldView::Build() {
 */
 void WorldView::MergeCachedGrid() {
   LOG_TRACE();
-  for (unsigned i = 0; i < height_; ++i) {
+  for (unsigned i = 0; i < height_; ++i) {  // Can't thread this, each cell has a pointer to growth and mortality for update agent, so there is a hidden shared resouce
     for (unsigned j = 0; j < width_; ++j) {
       if (base_grid_[i][j].is_enabled()) {
         // Are we updateing agents parameters
@@ -154,18 +145,20 @@ void WorldView::MergeCachedGrid() {
 
 
 /*
- * fil the row and col parameter with the cell index that contains the lat and lon given
+ * fill the row and col parameter with the cell index that contains the lat and lon given
+ * Make sure that anything that calls this checks the model that lat and longs have been provided else this will cause
+ * a SegFault
  *
 */
 void WorldView::get_cell_element(unsigned& row, unsigned& col, const float lat, const float lon) {
-  for (unsigned i = 1; i < height_; ++i) {
-    if (lat < lat_by_cell_[i]) {
+  for (unsigned i = 1; i <= height_; ++i) {
+    if (lat < lat_bounds_[i]) {
       row = i;
       break;
     }
   }
-  for (unsigned j = 1; j < width_; ++j) {
-    if (lon < lon_by_cell_[j]) {
+  for (unsigned j = 1; j <= width_; ++j) {
+    if (lon < lon_bounds_[j]) {
       col = j;
       break;
     }

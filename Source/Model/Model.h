@@ -109,8 +109,10 @@ public:
 
   virtual bool                length_plus() const { return length_plus_; }
   string&                     get_base_layer_label() {return base_layer_;}
-  string&                     get_lat_layer_label() {return lat_layer_label_;}
-  string&                     get_long_layer_label() {return lon_layer_label_;}
+  vector<float>               get_lat_mid_points() {return lat_mid_points_;}
+  vector<float>               get_lon_mid_points() {return lon_mid_points_;}
+  vector<float>               get_lat_bounds() {return lat_bounds_;}
+  vector<float>               get_lon_bounds() {return lon_bounds_;}
   unsigned                    get_height() {return world_height_;}
   unsigned                    get_width() {return world_width_;}
   string                      get_mortality_process() {return natural_mortality_label_;}
@@ -119,7 +121,7 @@ public:
   bool                        get_sexed() const {return sex_;};
   float                       get_male_proportions() const {return proportion_male_;};
   unsigned                    get_max_threads() const {return max_threads_;}
-
+  bool                        lat_and_long_supplied();
   virtual const float&        min_lat() const {return min_lat_;}
   virtual const float&        max_lat() const {return max_lat_;}
   virtual const float&        min_lon() const {return min_lon_;}
@@ -161,14 +163,15 @@ protected:
   unsigned                    adressable_values_count_ = 1;
   bool                        sexed_ = false;
   string                      base_layer_;
-  string                      lat_layer_label_; // make it optional
-  vector<float>               lats_;
-  vector<float>               lons_;
+  vector<float>               lat_bounds_;
+  vector<float>               lon_bounds_;
+  vector<float>               lat_mid_points_;
+  vector<float>               lon_mid_points_;
+  // store these instead of doint std::min() they may be needed often
   float                       min_lat_;
   float                       max_lat_;
   float                       min_lon_;
   float                       max_lon_;
-  string                      lon_layer_label_; // make it optional
   unsigned                    world_height_;
   unsigned                    world_width_;
   map<string, float>          b0_;

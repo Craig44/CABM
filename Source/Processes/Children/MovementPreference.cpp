@@ -81,6 +81,11 @@ void MovementPreference::DoBuild() {
 
   calculate_gradients();
 
+  // check that lat and long layers have been supplied
+  if (!model_->lat_and_long_supplied()) {
+    LOG_ERROR_P(PARAM_LABEL) << "in order to apply the preference movement function, you need to specify lat and long bounds on the @model block";
+  }
+
   cell_offset_.resize(model_->get_height());
   for (unsigned i = 0; i < model_->get_height(); ++i)
     cell_offset_[i].resize(model_->get_width());
@@ -127,7 +132,10 @@ void MovementPreference::DoExecute() {
         float u, v, lat_distance, lon_distance;
         unsigned destination_row, destination_col;
         // get gradients for current cells
-        if (model_->state() == State::kInitialise) {
+        if (brownian_motion_) {
+          u = 0;
+          v = 0;
+        } else if (model_->state() == State::kInitialise) {
           v = initialisation_meridonal_gradient_[row][col];
           u = initialisation_zonal_gradient_[row][col];
           calculate_diffusion_parameter(initialisation_preference_value_[row][col], diffusion_parameter_);
@@ -136,10 +144,7 @@ void MovementPreference::DoExecute() {
           u = zonal_gradient_[model_->current_year()][row][col];
           calculate_diffusion_parameter(preference_by_year_[model_->current_year()][row][col], diffusion_parameter_);
         }
-        if (brownian_motion_) {
-          u = 0;
-          v = 0;
-        }
+
         unsigned counter = 0;
         for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++counter) {
           // Iterate over possible cells compare to chance()
@@ -185,6 +190,8 @@ void MovementPreference::DoExecute() {
 */
 void  MovementPreference::calculate_gradients() {
   LOG_TRACE();
+  if (brownian_motion_)
+    return void();
   // Start with setting the initialisation sets
   initialisation_meridonal_gradient_.resize(model_->get_height());
   initialisation_zonal_gradient_.resize(model_->get_height());

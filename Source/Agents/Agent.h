@@ -31,6 +31,7 @@ public:
   virtual void                  Reset() {};
   // Accessors
   unsigned                     get_age();
+  unsigned                     get_age_index();
   unsigned                     get_length_bin_index();
   virtual const bool&          get_maturity() const {return mature_ ;};
   virtual const unsigned&      get_sex() const {return sex_ ;};
