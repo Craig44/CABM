@@ -34,7 +34,6 @@
 #include "Reports/Manager.h"
 #include "Processes/Manager.h"
 #include "TimeSteps/Manager.h"
-#include "TimeVarying/Manager.h"
 #include "Utilities/RandomNumberGenerator.h"
 #include "Utilities/To.h"
 
@@ -387,10 +386,8 @@ void Model::RunBasic() {
     state_ = State::kExecute;
 
     timesteps::Manager& time_step_manager = *managers_->time_step();
-    timevarying::Manager& time_varying_manager = *managers_->time_varying();
     for (current_year_ = start_year_; current_year_ <= final_year_; ++current_year_) {
       LOG_FINE() << "Iteration year: " << current_year_;
-      time_varying_manager.Update(current_year_);
       time_step_manager.Execute(current_year_);
     }
 
@@ -425,12 +422,8 @@ void Model::Iterate() {
 
   state_ = State::kExecute;
   timesteps::Manager& time_step_manager = *managers_->time_step();
-  timevarying::Manager& time_varying_manager = *managers_->time_varying();
   for (current_year_ = start_year_; current_year_ <= final_year_; ++current_year_) {
     LOG_FINE() << "Iteration year: " << current_year_;
-    time_varying_manager.Update(current_year_);
-    // Iterate over all partition members and UpDate Mean Weight for the inital weight calculations
-
     time_step_manager.Execute(current_year_);
   }
 

@@ -25,7 +25,6 @@
 #include "Reports/Manager.h"
 #include "Selectivities/Manager.h"
 #include "TimeSteps/Manager.h"
-#include "TimeVarying/Manager.h"
 
 // namespaces
 namespace niwa {
@@ -50,7 +49,6 @@ Managers::Managers(Model* model) {
   report_                 = new reports::Manager(model_);
   selectivity_            = new selectivities::Manager();
   time_step_              = new timesteps::Manager();
-  time_varying_           = new timevarying::Manager();
 }
 
 /**
@@ -69,7 +67,6 @@ Managers::~Managers() {
   delete report_;
   delete selectivity_;
   delete time_step_;
-  delete time_varying_;
 }
 
 void Managers::Validate() {
@@ -86,7 +83,6 @@ void Managers::Validate() {
   selectivity_->Validate();
   preference_function_->Validate();
   process_->Validate(model_);
-  time_varying_->Validate();
 }
 
 void Managers::Build() {
@@ -97,7 +93,6 @@ void Managers::Build() {
   derived_quantity_->Build();
   likelihood_->Build();
   observation_->Build();
-  time_varying_->Build();
   layer_->BuildPostWorldLayers();
   process_->BuildRemainingProcesses();
   preference_function_->Build();
@@ -129,7 +124,6 @@ void Managers::Reset() {
   report_->Reset();
   selectivity_->Reset();
   time_step_->Reset();
-  time_varying_->Reset();
 }
 
 } /* namespace niwa */
