@@ -98,6 +98,7 @@ void Managers::Build() {
   likelihood_->Build();
   observation_->Build();
   time_varying_->Build();
+  layer_->BuildPostWorldLayers();
   process_->BuildRemainingProcesses();
   preference_function_->Build();
   report_->Build();
@@ -107,7 +108,7 @@ void Managers::Build() {
 // bit of a hack to get around dependencies
 void Managers::BuildPreWorldView() {
   LOG_TRACE();
-  layer_->Build();
+  layer_->BuildPreWorldLayers();
   selectivity_->Build();
   process_->BuildGrowthAndMortalityProcesses();
 
