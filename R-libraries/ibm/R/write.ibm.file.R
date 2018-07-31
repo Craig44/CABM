@@ -1,9 +1,9 @@
 #' Model configuration write function
 #'
-#' This function will write a Casal2 configuration file based on a list object in R. Ususally this function will be used once a model has been read into R using extract.csl2.file and modified. This function will then print our the configuration to a new file where it can be re run into Casal2
+#' This function will write a ibm configuration file based on a list object in R. Ususally this function will be used once a model has been read into R using extract.ibm.file and modified. This function will then print our the configuration to a new file where it can be re run in the ibm
 #'
 #' @author Craig Marsh
-#' @param object An R list object that follows the same structure that extract.csl2.file would produce
+#' @param object An R list object that follows the same structure that extract.ibm.file would produce
 #' @param file Optionally, the file name
 #' @param path Optionally, the path to ouput the file
 #' @export
