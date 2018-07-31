@@ -302,6 +302,7 @@
 #define PARAM_MATURATION                          "maturation"
 #define PARAM_MATURATION_RATE                     "maturation_rate"
 #define PARAM_MATURE_BIOMASS                      "mature_biomass"
+#define PARAM_MATURE                              "mature"
 #define PARAM_MAX_AGE                             "max_age"
 #define PARAM_MAX_ITER                            "max_iter"
 #define PARAM_MAX_THREADS_TO_USE                  "max_threads_to_use"
