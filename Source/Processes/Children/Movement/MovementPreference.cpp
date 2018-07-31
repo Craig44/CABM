@@ -127,7 +127,7 @@ void MovementPreference::DoExecute() {
   }
   LOG_FINEST() << "random numbers generatored = " << lat_random_numbers_.size();
 
-  if (calculate_on_the_fly_) {
+  if (calculate_on_the_fly_ && not brownian_motion_) {
     // need to do some extra calculation before moveing through the main algorithm
     unsigned current_year = model_->current_year();
     // calculate preference value

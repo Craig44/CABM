@@ -23,6 +23,7 @@
 #include "Reports/Children/Process.h"
 #include "Reports/Children/InitialisationPartition.h"
 #include "Reports/Children/Observation.h"
+#include "Reports/Children/NumericLayer.h"
 #include "Reports/Children/WorldAgeFrequency.h"
 #include "Reports/Children/ModelAttributes.h"
 
@@ -58,6 +59,8 @@ Report* Factory::Create(Model* model, const string& object_type, const string& s
       result = new Observation(model);
     else if (sub_type == PARAM_MODEL_ATTRIBUTES)
       result = new ModelAttributes(model);
+    else if (sub_type == PARAM_NUMERIC_LAYER)
+      result = new NumericLayer(model);
     if (result) {
       LOG_FINE() << "Creating report " << sub_type;
       model->managers().report()->AddObject(result);
