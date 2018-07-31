@@ -1,8 +1,14 @@
 \section{\I{Post processing output using \R} \label{sec:post-processing}}\index{Post processing}\index{Post processing section}
 
-Hopefully when you get the bundle for this program there will be an \R\ package, this section describes how you can use that package to read in and view output from \IBM.
+Hopefully when you get the bundle for this program there will be an \R\ package, this section describes how you can use that package to read in and view output from \IBM.  A list of the \R\ package functions are below.
 
-
+\begin{itemize}
+	\item \texttt{extract.run()} imports the model's output into the \R\ environment.
+	\item \texttt{extract.ibm.file()} imports the model's configuration file into the \R\ environment
+	\item \texttt{write.ibm.file()} prints the a list object (that has the same characteristics as the \texttt{extract.ibm.file()})	to a text file.
+	\item \texttt{reformat.compositional.data()} converts \IBM\ compositional observation reports into a more traditional matrix.
+	\item \texttt{plot.derived\_quantities()} plot or extract derived quantities from a model run.
+\end{itemize}
 
 
 
@@ -47,5 +53,10 @@ for (i in 1:5) {
 }
 \end{lstlisting}
 
+This should generate figures like in Figure~\ref{fig:initial_compare}
 
-
+\vspace*{3mm}
+\begin{figure}[htp]
+	\includegraphics[scale=0.8]{Figures/Initial_age_comp_row_1.jpg}
+	\caption{An example of plot that looks at the age frequency of different initial burn-in periods}\label{fig:initial_compare}
+\end{figure}
