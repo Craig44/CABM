@@ -259,7 +259,7 @@ void MortalityEventBiomass::DoExecute() {
                   }
                   // Make sure we don't end up fishing for infinity if there are not enough fish here
                   if (catch_attempts >= catch_max) {
-                    LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << model_->current_year() << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have\n" <<
+                    LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << model_->current_year() << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have" <<
                        " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation";
                   }
                   ++counter;

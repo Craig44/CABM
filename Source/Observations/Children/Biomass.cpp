@@ -121,6 +121,19 @@ void Biomass::DoBuild() {
       LOG_ERROR_P(PARAM_CELLS) << "could not find the cell '" << cell << "' in the layer " << layer_label_ << " please make sure that you supply cell labels that are consistent with the layer.";
   }
 
+  // Subscribe this observation to the timestep
+  auto time_step = model_->managers().time_step()->GetTimeStep(time_step_label_);
+  if (!time_step) {
+    LOG_ERROR_P(PARAM_TIME_STEP) << time_step_label_ << " could not be found. Have you defined it?";
+  } else {
+    for (unsigned year : years_)
+      time_step->SubscribeToBlock(this, year);
+  }
+
+  for (auto year : years_) {
+    if((year < model_->start_year()) || (year > model_->final_year()))
+      LOG_ERROR_P(PARAM_YEARS) << "Years can't be less than start_year (" << model_->start_year() << "), or greater than final_year (" << model_->final_year() << "). Please fix this.";
+  }
 }
 
 /**

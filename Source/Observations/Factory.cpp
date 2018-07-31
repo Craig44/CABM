@@ -16,6 +16,8 @@
 #include "Model/Model.h"
 #include "Model/Managers.h"
 #include "Observations/Manager.h"
+#include "Observations/Children/AgeLength.h"
+#include "Observations/Children/Biomass.h"
 #include "Observations/Children/ProcessRemovalsByAge.h"
 #include "Observations/Children/ProcessRemovalsByLength.h"
 
@@ -40,7 +42,11 @@ Observation* Factory::Create(Model* model, const string& object_type, const stri
     if (sub_type == PARAM_PROCESS_REMOVALS_BY_AGE)
       result = new ProcessRemovalsByAge(model);
     else if (sub_type == PARAM_PROCESS_REMOVALS_BY_LENGTH)
-          result = new ProcessRemovalsByLength(model);
+      result = new ProcessRemovalsByLength(model);
+    else if (sub_type == PARAM_BIOMASS)
+      result = new Biomass(model);
+    else if (sub_type == PARAM_AGE_LENGTH)
+      result = new AgeLength(model);
 
     if (result)
       model->managers().observation()->AddObject(result);

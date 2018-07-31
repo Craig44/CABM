@@ -34,7 +34,7 @@ SummariseAgents::SummariseAgents(Model* model) : Report(model) {
 
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "Years", "", true);
   parameters_.Bind<string>(PARAM_TIME_STEP, &time_step_, "Time Step label", "");
-  parameters_.Bind<unsigned>(PARAM_NUMBER_OF_AGENTS, &n_agents_, "Number of agents to summarise", "")->set_lower_bound(1,true);
+  parameters_.Bind<unsigned>(PARAM_NUMBER_OF_INDIVIDUALS, &n_agents_, "Number of agents to summarise", "")->set_lower_bound(1,true);
 }
 
 /**
