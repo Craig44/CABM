@@ -69,13 +69,21 @@ void MovementPreference::DoBuild() {
     preference_functions_.push_back(temp_func);
   }
   // Get the layers
+  unsigned layer_ndx = 0;
   for (auto& label : preference_layer_labels_) {
     layers::NumericLayer* temp_layer = nullptr;
     temp_layer = model_->managers().layer()->GetNumericLayer(label);
     if (!temp_layer) {
       LOG_FATAL_P(PARAM_PREFERENCE_LAYERS) << "could not find the layer '" << label << "', please make sure it exists, and if it does exist make sure it is of type 'numeric''";
     }
+
+    if (not temp_layer->is_static()) {
+      non_static_layer_ndx_.push_back(layer_ndx);
+      calculate_on_the_fly_ = true;
+    }
+
     preference_layers_.push_back(temp_layer);
+    ++layer_ndx;
   }
 
   calculate_gradients();
@@ -98,7 +106,6 @@ void MovementPreference::DoBuild() {
 void MovementPreference::DoExecute() {
   LOG_FINE();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-
   // Pre-calculate agents in the world to set aside our random numbers needed for the operation
   n_agents_ = 0;
   for (unsigned row = 0; row < model_->get_height(); ++row) {
@@ -120,6 +127,77 @@ void MovementPreference::DoExecute() {
   }
   LOG_FINEST() << "random numbers generatored = " << lat_random_numbers_.size();
 
+  if (calculate_on_the_fly_) {
+    // need to do some extra calculation before moveing through the main algorithm
+    unsigned current_year = model_->current_year();
+    // calculate preference value
+    for (unsigned layer_ndx = 0; layer_ndx < non_static_layer_ndx_.size(); ++layer_ndx) {
+      for (unsigned row = 0; row < model_->get_height(); ++row) {
+        for (unsigned col = 0; col < model_->get_width(); ++col) {
+          if (model_->state() == State::kInitialise)
+            initialisation_preference_value_[row][col] *= preference_functions_[layer_ndx]->get_result(preference_layers_[layer_ndx]->get_value(row, col));  // the 0 in the layers call will return the default layer
+          else
+            preference_by_year_[current_year][row][col] *= preference_functions_[layer_ndx]->get_result(preference_layers_[layer_ndx]->get_value(row, col));  // the 0 in the layers call will return the default layer
+        }
+      }
+    }
+    // take power
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        if (model_->state() == State::kInitialise)
+          initialisation_preference_value_[row][col] = pow(initialisation_preference_value_[row][col], float(1.0 / preference_functions_.size()));
+        else
+          preference_by_year_[current_year][row][col] = pow(preference_by_year_[current_year][row][col], float(1.0 / preference_functions_.size()));
+      }
+    }
+    // calculate gradient
+    if (model_->state() == State::kInitialise) {
+      for (unsigned row = 0; row < model_->get_height(); ++row) {
+        for (unsigned col = 0; col < model_->get_width(); ++col) {
+          // calcualte meridional gradient
+          if (row == 0) {
+            initialisation_meridonal_gradient_[row][col] = initialisation_preference_value_[row + 1][col] - initialisation_preference_value_[row][col];
+          } else if (row == (model_->get_height() - 1)) {
+            initialisation_meridonal_gradient_[row][col] = initialisation_preference_value_[row][col] - initialisation_preference_value_[row - 1][col];
+          } else {
+            initialisation_meridonal_gradient_[row][col] = (initialisation_preference_value_[row + 1][col] - initialisation_preference_value_[row - 1][col]) / 2.0;
+          }
+          // calcualte zonal gradient
+          if (col == 0) {
+            initialisation_zonal_gradient_[row][col] = initialisation_preference_value_[row][col + 1] - initialisation_preference_value_[row][col];
+          } else if (col == (model_->get_width() - 1)) {
+            initialisation_zonal_gradient_[row][col] = initialisation_preference_value_[row][col] - initialisation_preference_value_[row][col - 1];
+          } else {
+            initialisation_zonal_gradient_[row][col] = (initialisation_preference_value_[row][col + 1] - initialisation_preference_value_[row][col - 1]) / 2.0;
+          }
+        }
+      }
+    } else {
+      for (unsigned row = 0; row < model_->get_height(); ++row) {
+        for (unsigned col = 0; col < model_->get_width(); ++col) {
+          // calcualte meridional gradient
+          if (row == 0) {
+            meridonal_gradient_[current_year][row][col] = preference_by_year_[current_year][row + 1][col] - preference_by_year_[current_year][row][col];
+          } else if (row == (model_->get_height() - 1)) {
+            meridonal_gradient_[current_year][row][col] = preference_by_year_[current_year][row][col] - preference_by_year_[current_year][row - 1][col];
+          } else {
+            meridonal_gradient_[current_year][row][col] = (preference_by_year_[current_year][row + 1][col] - preference_by_year_[current_year][row - 1][col]) / 2.0;
+          }
+          // calcualte zonal gradient
+          if (col == 0) {
+            zonal_gradient_[current_year][row][col] = preference_by_year_[current_year][row][col + 1] - preference_by_year_[current_year][row][col];
+          } else if (col == (model_->get_width() - 1)) {
+            zonal_gradient_[current_year][row][col] = preference_by_year_[current_year][row][col] - preference_by_year_[current_year][row][col - 1];
+          } else {
+            zonal_gradient_[current_year][row][col] = (preference_by_year_[current_year][row][col + 1] - preference_by_year_[current_year][row][col - 1]) / 2.0;
+          }
+        }
+      }
+    }
+  }
+  /*
+   * Main movement algorithm
+*/
   // Iterate over origin cells
   #pragma omp parallel for collapse(2)
   for (unsigned row = 0; row < model_->get_height(); ++row) {
@@ -202,9 +280,9 @@ void MovementPreference::DoExecute() {
             moved_agents_by_year_.push_back(store_infor);
           }
         }
-      }
-    }
-  }
+      } // is enabled
+    } // col
+  } // row
   // merge destination agents into the actual grid
   LOG_FINE() << "Mergind cached world";
   world_->MergeCachedGrid();
@@ -218,6 +296,7 @@ void  MovementPreference::calculate_gradients() {
   LOG_FINE();
   if (brownian_motion_)
     return void();
+
   // Start with setting the initialisation sets
   initialisation_meridonal_gradient_.resize(model_->get_height());
   initialisation_zonal_gradient_.resize(model_->get_height());
@@ -230,7 +309,11 @@ void  MovementPreference::calculate_gradients() {
     initialisation_preference_value_[row].resize(model_->get_height(), 1.0);
   }
 
+  float power_value = 0.0;
   for (unsigned layer_iter = 0; layer_iter < preference_layer_labels_.size(); ++layer_iter) {
+    if (preference_layers_[layer_iter]->is_static())
+      continue; // this should not be called if all preference layers are static thus is shares the same code as on the fly calculation
+    power_value += 1.0;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         preference[row][col] *= preference_functions_[layer_iter]->get_result(preference_layers_[layer_iter]->get_value(row, col, 0));  // the 0 in the layers call will return the default layer
@@ -240,40 +323,15 @@ void  MovementPreference::calculate_gradients() {
   // take the preference to the power
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
-      initialisation_preference_value_[row][col] = pow(preference[row][col], (float)(1 / preference_layer_labels_.size()));
+      initialisation_preference_value_[row][col] = pow(preference[row][col], (1.0 / power_value));
     }
   }
-  // calculate gradient
-  for (unsigned row = 0; row < model_->get_height(); ++row) {
-    for (unsigned col = 0; col < model_->get_width(); ++col) {
-      // calcualte meridional gradient
-      if (row == 0) {
-        initialisation_meridonal_gradient_[row][col] = initialisation_preference_value_[row + 1][col] - initialisation_preference_value_[row][col];
-      } else if (row == (model_->get_height() - 1)) {
-        initialisation_meridonal_gradient_[row][col] = initialisation_preference_value_[row][col] - initialisation_preference_value_[row - 1][col];
-      } else {
-        initialisation_meridonal_gradient_[row][col] = (initialisation_preference_value_[row + 1][col] - initialisation_preference_value_[row - 1][col]) / 2.0;
-      }
-      // calcualte zonal gradient
-      if (col == 0) {
-        initialisation_zonal_gradient_[row][col] = initialisation_preference_value_[row][col + 1] - initialisation_preference_value_[row][col];
-      } else if (col == (model_->get_width() - 1)) {
-        initialisation_zonal_gradient_[row][col] = initialisation_preference_value_[row][col] - initialisation_preference_value_[row][col - 1];
-      } else {
-        initialisation_zonal_gradient_[row][col] = (initialisation_preference_value_[row][col + 1] - initialisation_preference_value_[row][col - 1]) / 2.0;
-      }
-    }
-  }
-  // Now do it for all years
+
   for (auto year : model_->years()) {
     // initialise temporary containers
     vector<vector<float>> preference(model_->get_height());
-    vector<vector<float>> zonal_gradient(model_->get_height());
-    vector<vector<float>> meredional_gradient(model_->get_height());
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       preference[row].resize(model_->get_height());
-      zonal_gradient[row].resize(model_->get_height(), 1.0);
-      meredional_gradient[row].resize(model_->get_height(), 1.0);
     }
 
     for (unsigned layer_iter = 0; layer_iter < preference_layer_labels_.size(); ++layer_iter) {
@@ -283,30 +341,99 @@ void  MovementPreference::calculate_gradients() {
         }
       }
     }
-    preference_by_year_[year] = preference;
-    // calculate gradient
+    // take the preference to the power
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
-        // calcualte meridional gradient
-        if (row == 0) {
-          meredional_gradient[row][col] = preference[row + 1][col] - preference[row][col];
-        } else if (row == (model_->get_height() - 1)) {
-          meredional_gradient[row][col] = preference[row][col] - preference[row - 1][col];
-        } else {
-          meredional_gradient[row][col] = (preference[row + 1][col] - preference[row - 1][col]) / 2.0;
-        }
-        // calcualte zonal gradient
-        if (col == 0) {
-          zonal_gradient[row][col] = preference[row][col + 1] - preference[row][col];
-        } else if (col == (model_->get_width() - 1)) {
-          zonal_gradient[row][col] = preference[row][col] - preference[row][col - 1];
-        } else {
-          zonal_gradient[row][col] = (preference[row][col + 1] - preference[row][col - 1]) / 2.0;
-        }
+        preference[row][col] = pow(preference[row][col], (1.0 / power_value));
       }
     }
-    meridonal_gradient_[year] = meredional_gradient;
-    zonal_gradient_[year] = zonal_gradient;
+    preference_by_year_[year] = preference;
+  }
+  if (calculate_on_the_fly_) {
+    // Some prefernce attributes need to be calculated on the fly, usually associated with biomass or density preferences
+    // For this we will calculate the preference for all the static layers, to reduce run-time calculations
+
+    // We will allocate memory for all containers used at runtime here
+    // Now do it for all years
+    for (auto year : model_->years()) {
+      // initialise temporary containers
+      vector<vector<float>> zonal_gradient(model_->get_height());
+      vector<vector<float>> meredional_gradient(model_->get_height());
+      vector<vector<float>> preference(model_->get_height());
+      for (unsigned row = 0; row < model_->get_height(); ++row) {
+        zonal_gradient[row].resize(model_->get_height(), 1.0);
+        meredional_gradient[row].resize(model_->get_height(), 1.0);
+        preference[row].resize(model_->get_height());
+      }
+
+      for (unsigned layer_iter = 0; layer_iter < preference_layer_labels_.size(); ++layer_iter) {
+        if (preference_layers_[layer_iter]->is_static())
+          continue; // this should not be called if all preference layers are static thus is shares the same code as on the fly calculation
+
+        for (unsigned row = 0; row < model_->get_height(); ++row) {
+          for (unsigned col = 0; col < model_->get_width(); ++col) {
+            preference[row][col] *= preference_functions_[layer_iter]->get_result(preference_layers_[layer_iter]->get_value(row, col, 0));  // the 0 in the layers call will return the default layer
+          }
+        }
+      }
+      // don't calculate the power yet do in Execute
+      preference_by_year_[year] = preference;
+
+      // store empty containers, but have allocated memory
+      meridonal_gradient_[year] = meredional_gradient;
+      zonal_gradient_[year] = zonal_gradient;
+    }
+  } else {
+    // We can calculate gradients now as nothing is unknown to us at this point
+    for (auto year : model_->years()) {
+      // initialise temporary containers
+      vector<vector<float>> zonal_gradient(model_->get_height());
+      vector<vector<float>> meredional_gradient(model_->get_height());
+      vector<vector<float>> preference(model_->get_height());
+      for (unsigned row = 0; row < model_->get_height(); ++row) {
+        zonal_gradient[row].resize(model_->get_height(), 1.0);
+        meredional_gradient[row].resize(model_->get_height(), 1.0);
+        preference[row].resize(model_->get_height());
+      }
+      for (unsigned layer_iter = 0; layer_iter < preference_layer_labels_.size(); ++layer_iter) {
+        for (unsigned row = 0; row < model_->get_height(); ++row) {
+          for (unsigned col = 0; col < model_->get_width(); ++col) {
+            preference[row][col] *= preference_functions_[layer_iter]->get_result(preference_layers_[layer_iter]->get_value(row, col, 0));  // the 0 in the layers call will return the default layer
+          }
+        }
+      }
+      // take the preference to the power
+      for (unsigned row = 0; row < model_->get_height(); ++row) {
+        for (unsigned col = 0; col < model_->get_width(); ++col) {
+          preference[row][col] = pow(preference[row][col], (1.0 / power_value));
+        }
+      }
+      preference_by_year_[year] = preference;
+
+      // calculate gradient
+      for (unsigned row = 0; row < model_->get_height(); ++row) {
+        for (unsigned col = 0; col < model_->get_width(); ++col) {
+          // calcualte meridional gradient
+          if (row == 0) {
+            meredional_gradient[row][col] = preference[row + 1][col] - preference[row][col];
+          } else if (row == (model_->get_height() - 1)) {
+            meredional_gradient[row][col] = preference[row][col] - preference[row - 1][col];
+          } else {
+            meredional_gradient[row][col] = (preference[row + 1][col] - preference[row - 1][col]) / 2.0;
+          }
+          // calcualte zonal gradient
+          if (col == 0) {
+            zonal_gradient[row][col] = preference[row][col + 1] - preference[row][col];
+          } else if (col == (model_->get_width() - 1)) {
+            zonal_gradient[row][col] = preference[row][col] - preference[row][col - 1];
+          } else {
+            zonal_gradient[row][col] = (preference[row][col + 1] - preference[row][col - 1]) / 2.0;
+          }
+        }
+      }
+      meridonal_gradient_[year] = meredional_gradient;
+      zonal_gradient_[year] = zonal_gradient;
+    }
   }
 }
 
