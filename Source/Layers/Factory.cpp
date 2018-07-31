@@ -17,6 +17,7 @@
 #include "Layers/Children/NumericLayer.h"
 #include "Layers/Children/CategoricalLayer.h"
 #include "Layers/Children/Numeric/NumericMetaLayer.h"
+#include "Layers/Children/Numeric/Biomass.h"
 
 
 // namespaces
@@ -42,6 +43,8 @@ Layer* Factory::Create(Model* model, const string& object_type, const string& su
       result = new CategoricalLayer(model);
     else if (sub_type == PARAM_NUMERIC_META)
       result = new NumericMetaLayer(model);
+    else if (sub_type == PARAM_BIOMASS)
+      result = new Biomass(model);
 
     if (result)
       model->managers().layer()->AddObject(result);

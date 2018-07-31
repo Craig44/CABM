@@ -39,6 +39,10 @@ public:
   NumericLayer*               GetNumericLayer(const string& label);
   CategoricalLayer*           GetCategoricalLayer(const string& label);
 
+  void                        Build() override final { };
+  void                        BuildPreWorldLayers();
+  void                        BuildPostWorldLayers();
+
 };
 
 } /* namespace layers */

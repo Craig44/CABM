@@ -61,7 +61,7 @@ public:
 
   // accessors
   LayerType                  layer_type() const { return layer_type_; }
-
+  bool                       is_static() {return static_layer_;};
 
 protected:
   // Members
@@ -69,6 +69,7 @@ protected:
   LayerType                   layer_type_ = LayerType::kUnknown;
   unsigned                    height_;
   unsigned                    width_;
+  bool                        static_layer_ = true; // is this layer pre-defined (user input) or calculated on the fly
 };
 } /* namespace niwa */
 #endif /* LAYER_H_ */

@@ -75,5 +75,35 @@ CategoricalLayer* Manager::GetCategoricalLayer(const string& label) {
   return pPtr;
 }
 
+
+/**
+ * override Base classes and Build all non integer and numeric layers
+ */
+void Manager::BuildPostWorldLayers() {
+  LOG_FINEST() << "Starting Build... with " << objects_.size() << " objects";
+  for(auto stored_object : objects_) {
+    if ((stored_object->layer_type() != LayerType::kInteger) || ((stored_object->layer_type() == LayerType::kNumeric) && (stored_object->type() == PARAM_BIOMASS))) {
+      LOG_FINEST() << "Building process = " << stored_object->label();
+      stored_object->Build();
+    }
+  }
+  LOG_FINEST() << "Build Finished";
+}
+
+/**
+ * override Base classes and Build mortality and growth processes
+ */
+void Manager::BuildPreWorldLayers() {
+  LOG_FINEST() << "Starting Build... with " << objects_.size() << " objects";
+  for(auto stored_object : objects_) {
+    if ((stored_object->layer_type() == LayerType::kInteger) || ((stored_object->layer_type() == LayerType::kNumeric) && (stored_object->type() != PARAM_BIOMASS))) {
+      stored_object->Build();
+      LOG_FINEST() << "Building process = " << stored_object->label();
+    }
+  }
+  LOG_FINEST() << "Build Finished";
+}
+
+
 } /* namespace layers */
 } /* namespace niwa */
