@@ -170,8 +170,9 @@ void MortalityConstantRate::DoExecute() {
           unsigned initial_size = cell->agents_.size();
           LOG_FINEST() << initial_size << " initial agents";
           for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter) {
-            //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
-            if (random_numbers_[cell_offset_[row][col] + counter] <= (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]))) {
+            //LOG_FINEST() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " survivorship = " << (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()])) << " M = " << (*iter).get_m();
+
+            if (random_numbers_[cell_offset_[row][col] + counter] <= (1.0 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]))) {
               iter = cell->agents_.erase(iter);
               initial_size--;
               agents_removed++;
@@ -196,10 +197,11 @@ void  MortalityConstantRate::draw_rate_param(unsigned row, unsigned col, unsigne
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   float mean_m;
   if (m_layer_)
-    mean_m = m_layer_->get_value(row, col);
+    mean_m = m_layer_->get_value(row, col) * m_;
   else
     mean_m = m_;
 
+  LOG_FINE() << "mean M = " << mean_m;
   vector.clear();
   vector.resize(number_of_draws);
 

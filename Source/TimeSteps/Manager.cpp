@@ -46,8 +46,6 @@ TimeStep* Manager::GetTimeStep(const string& label) const {
       break;
     }
   }
-
-  LOG_FINE() << "returning: " << result;
   return result;
 }
 
@@ -205,12 +203,12 @@ void Manager::Execute(unsigned year) {
  * for the current year.
  */
 void Manager::ExecuteInitialisation(const string& phase_label, unsigned years) {
-  LOG_TRACE();
+  LOG_FINE();
   for (unsigned i = 0; i < years; ++i) {
         for (current_time_step_ = 0; current_time_step_ < ordered_time_steps_.size(); ++current_time_step_) {
       ordered_time_steps_[current_time_step_]->ExecuteForInitialisation(phase_label);
     }
-    LOG_FINEST() << "completed intial year = " << model_->current_year();
+    LOG_FINE() << "completed intial year = " << model_->current_year();
     if (i != (years - 1))
       model_->increment_current_year_for_initialisation();
   }

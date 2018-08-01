@@ -121,6 +121,7 @@ void MovementBoxTransfer::DoExecute() {
 
 
   if (movement_type_ == MovementType::kMarkovian) {
+    LOG_FINE() << "applying markovian movement";
     // Iterate over origin cells
     #pragma omp parallel for collapse(2)
     for (unsigned row = 0; row < model_->get_height(); ++row) {
