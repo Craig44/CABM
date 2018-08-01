@@ -14,3 +14,10 @@
 /R-libraries/ibm/NAMESPACE
 /R-libraries/ibm/DESCRIPTION
 /Documentation/UserManual/Syntax
+/TestModels/SteadyStateModel/test.log
+/TestModels/SimpleModel/test.log
+/Example/SpatialModel/ibm/Initial_age_comp_row_2.jpg
+/Example/SpatialModel/ibm/Initial_age_comp_row_3.jpg
+/Example/SpatialModel/ibm/Initial_age_comp_row_4.jpg
+/Example/SpatialModel/ibm/Initial_age_comp_row_5.jpg
+/Example/SpatialModel/ibm/Initial_age_comp_row_1.jpg
