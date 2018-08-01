@@ -131,7 +131,7 @@ void WorldView::Build() {
  *
 */
 void WorldView::MergeCachedGrid() {
-  LOG_TRACE();
+  LOG_FINE();
   for (unsigned i = 0; i < height_; ++i) {  // Can't thread this, each cell has a pointer to growth and mortality for update agent, so there is a hidden shared resouce
     for (unsigned j = 0; j < width_; ++j) {
       if (base_grid_[i][j].is_enabled()) {

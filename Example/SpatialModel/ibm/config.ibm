@@ -5,7 +5,8 @@
 # Include Layers
 # --------------
 !include "Layers/base_layer.ibm"
-#!include "Layers/cell.ibm"
+!include "Layers/cell.ibm"
+!include "Layers/single_cell.ibm"
 
 !include "Layers/SSB_area.ibm"
 !include "Layers/M_layer.ibm"

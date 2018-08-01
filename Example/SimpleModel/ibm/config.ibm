@@ -13,6 +13,7 @@ growth_process_label von_bert
 natural_mortality_process_label natural_mort
 #sexed false
 maturity_ogive_label mature_ogive
+max_threads_to_use 1 ## no need to go more than that as threading is based on number of cells 
 ## a single area model
 nrows 1
 ncols 1 
@@ -25,7 +26,7 @@ type iterative
 years 40
 #convergence_years 20 40
 #lambda 1
-number_of_agents 100000 ## initial number of agents
+number_of_individuals 100000 ## initial number of agents
 layer_label Base
 
 # --------------
@@ -50,6 +51,7 @@ linf 101.8
 k 0.161
 a 2.0e-6 
 b 3.288
+update_growth_parameters false
 distribution lognormal
 cv 0.0001
 time_step_proportions 1
@@ -61,6 +63,7 @@ type maturation
 # Natural Mortality
 @process natural_mort
 type mortality_constant_rate
+update_mortality_parameters false
 m_multiplier_layer_label M_layer
 m 0.2
 distribution lognormal
@@ -184,7 +187,7 @@ type model_attributes
 # summarises a random selection of agents at each time step of each year, useful when debugging new processes
 @report agents
 type summarise_agents
-number_of_agents 10
+number_of_individuals 10
 time_step Annual
 # --------------
 # Include Layers

@@ -32,14 +32,14 @@ ibm_model = as.numeric(ibm$init_2$`1`$values[2:32] / sum(ibm$init_2$`1`$values[2
 new_data = melt(data.frame(casal2_model,ibm_model), variable.name = "model")
 new_data$age = c(0:30,0:30)
 
-#jpeg("initial_age_distribution.jpg")
+jpeg("initial_age_distribution.jpg")
 ggplot(new_data,aes(x=age,y=value,fill=model))+
   geom_bar(stat="identity",position="dodge")+
   scale_fill_discrete(name="Model",
   labels=c("Casal2", "IBM"))+ 
   xlab("Age")+ylab("Proportion") + 
   ggtitle("Initial age distribution")
-#dev.off()
+dev.off()
 
 
 casal2_model = as.numeric(cas2$Annual_part$'53'$values[2:32] / sum(cas2$Annual_part$'53'$values[2:31]))
@@ -47,14 +47,14 @@ ibm_model = as.numeric(ibm$total_age_freq$`53`$values / sum(ibm$total_age_freq$`
 ## reformat for GGPLOT
 new_data = melt(data.frame(casal2_model,ibm_model), variable.name = "model")
 new_data$age = c(0:30,0:30)
-#jpeg("final_age_distribution.jpg")
+jpeg("final_age_distribution.jpg")
 ggplot(new_data,aes(x=age,y=value,fill=model))+
   geom_bar(stat="identity",position="dodge")+
   scale_fill_discrete(name="Model",
   labels=c("Casal2", "IBM"))+ 
   xlab("Age")+ylab("Proportion") + 
   ggtitle("Final age distribution")
-#dev.off()
+dev.off()
 
 
 ## look at the fisher age distribution

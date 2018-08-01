@@ -159,6 +159,7 @@ void ProcessRemovalsByLength::Simulate() {
   // iterate over all the years that we want
   for (unsigned year : years_) {
     for (string cell : cells_) {
+      bool cell_found = false;
       vector<float> accumulated_length_frequency(model_->length_bins().size(), 0.0);
       for (auto length_comp_data : length_frequency) {
         if ((length_comp_data.year_ == year) && (layer_->get_value(length_comp_data.row_,length_comp_data.col_) == cell)) {
@@ -166,8 +167,11 @@ void ProcessRemovalsByLength::Simulate() {
           for(unsigned i = 0; i < length_comp_data.frequency_.size(); ++i) {
             accumulated_length_frequency[i] = (float)length_comp_data.frequency_[i];
           }
+          cell_found = true;
         }
       }
+      if (not cell_found)
+        continue; // to next cell
       /*
        *  Now collapse the number_age into the expected_values for the observation
        */

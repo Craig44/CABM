@@ -56,7 +56,6 @@ void CategoricalLayer::DoBuild() {
    * Build our layer pointer
    */
   vector<vector<string>>& input_data = data_table_->data();
-  float total = 0;
   LOG_FINEST() << "rows = " << input_data.size() << " columns = " << input_data[0].size();
   unsigned row_iter = 0;
   for (vector<string> row : input_data) {
@@ -71,11 +70,6 @@ void CategoricalLayer::DoBuild() {
       grid_[row_iter][i] = row[i];
     }
     ++row_iter;
-  }
-
-  if (proportion_) {
-    if (!utilities::doublecompare::IsOne(total))
-      LOG_ERROR_P(PARAM_LAYER) << "you have signaled that this is a proportion layer so the values should sum to equal 1, but they equal '" << total << " please sort this out";
   }
 }
 

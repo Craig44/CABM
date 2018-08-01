@@ -142,6 +142,11 @@ void Iterative::Execute() {
     ssb += model_->get_ssb(iter.first);
   }
   scalar = b0 / ssb;
+
+  if (scalar < 1.0) {
+    LOG_WARNING() << "the scalar that compares your individual numbers to population numbers is less than 1.0 (" << scalar << "), this means that given your growth model and number of individuals you are modelling more individuals than could/should exist. I think you could get away with modelling less individuals.";
+  }
+
   model_->set_scalar(scalar);
   LOG_FINEST() << "scalar = " << scalar << " SSB = " << ssb << " B0 = " << b0;
   // Set scalar before continuing on

@@ -92,11 +92,11 @@ void Managers::Build() {
   assert_->Build();
   derived_quantity_->Build();
   likelihood_->Build();
-  observation_->Build();
   layer_->BuildPostWorldLayers();
   process_->BuildRemainingProcesses();
   preference_function_->Build();
   report_->Build();
+  observation_->Build(); // this calls categorical layers
   initialisation_phase_->Build(model_);  // This calls report and process() so needs to be built after them
 }
 

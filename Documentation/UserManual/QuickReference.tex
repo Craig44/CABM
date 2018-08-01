@@ -10,6 +10,7 @@
 \par\textbf{\commandlabsubarg{derived\_quantity}{type}{biomass}}\par
 \defSub{selectivity} {A label for the selectivity}
 \defSub{biomass\_layer\_label} {A label for the layer that indicates which cells to calculate biomass over}
+\par\textbf{\commandlabsubarg{derived\_quantity}{type}{biomass\_by\_cell}}\par
 \par\textbf{\commandlabsubarg{derived\_quantity}{type}{mature\_biomass}}\par
 \defSub{biomass\_layer\_label} {A label for the layer that indicates which cells to calculate biomass over}
 \defComLab{initialisationphase}{Define an object of type \emph{initialisationphase}}\par\par
@@ -17,7 +18,7 @@
 \defSub{type} {The type of initialisation}
 \par\textbf{\commandlabsubarg{initialisation\_phase}{type}{iterative}}\par
 \defSub{years} {The number of iterations (years) over which to execute this initialisation phase}
-\defSub{number\_of\_agents} {The number of agents to initially seed in the partition}
+\defSub{number\_of\_individuals} {The number of agents to initially seed in the partition}
 \defSub{layer\_label} {The label of a layer that you want to seed a distribution by.}
 \defComLab{likelihood}{Define an object of type \emph{likelihood}}\par\par
 \par\textbf{\commandlabsubarg{likelihood}{type}{binomial}}\par
@@ -39,8 +40,8 @@
 \defSub{length\_bins} {}
 \defSub{length\_plus} {Is the last bin a plus group}
 \defSub{base\_layer\_label} {Label for the base layer}
-\defSub{latitude\_layer\_label} {Label for the latitude layer}
-\defSub{longitude\_layer\_label} {Label for the longitude layer}
+\defSub{latitude\_bounds} {Label for the latitude layer}
+\defSub{longitude\_bounds} {Label for the longitude layer}
 \defSub{nrows} {number of rows in spatial domain}
 \defSub{ncols} {number of columns in spatial domain}
 \defSub{sexed} {Is sex an attribute of you agent?}
@@ -53,12 +54,33 @@
 \defSub{label} {Label}
 \defSub{type} {Type of observation}
 \defSub{simulation\_likelihood} {Simulation likelihood to use}
+\par\textbf{\commandlabsubarg{observation}{type}{age\_length}}\par
+\defSub{time\_step} {The label of time-step that the observation occurs in}
+\defSub{years} {The years of the observed values}
+\defSub{selectivities} {Labels of the selectivities}
+\defSub{cell\_layer} {The layer that indicates what area to summarise observations over.}
+\defSub{cells} {The cells we want to generate observations for from the layer of cells supplied}
+\defSub{number\_of\_samples} {The number of samples to collect from each cell}
+\par\textbf{\commandlabsubarg{observation}{type}{biomass}}\par
+\defSub{catchability} {The Catchability to use to scale the observation for vulnerability}
+\defSub{time\_step} {The label of time-step that the observation occurs in}
+\defSub{years} {The years of the observed values}
+\defSub{error\_value} {The error values of the observed values (note the units depend on the likelihood}
+\defSub{selectivities} {Labels of the selectivities}
+\defSub{proportion\_through\_mortality\_block} {Proportion through the mortality block of the time step to infer observation with}
+\defSub{cell\_layer} {The layer that indicates what area to summarise observations over.}
+\defSub{cells} {The cells we want to generate observations for from the layer of cells supplied}
 \par\textbf{\commandlabsubarg{observation}{type}{process\_removals\_by\_age}}\par
 \defSub{min\_age} {Minimum age}
 \defSub{max\_age} {Maximum age}
 \defSub{plus\_group} {Use age plus group}
 \defSub{years} {Years for which there are observations}
 \defSub{ageing\_error} {Label of ageing error to use}
+\defSub{process\_label} {Label of of removal process}
+\defSub{cell\_layer} {The layer that indicates what area to summarise observations over.}
+\defSub{cells} {The cells we want to generate observations for from the layer of cells supplied}
+\par\textbf{\commandlabsubarg{observation}{type}{process\_removals\_by\_length}}\par
+\defSub{years} {Years for which there are observations}
 \defSub{process\_label} {Label of of removal process}
 \defSub{cell\_layer} {The layer that indicates what area to summarise observations over.}
 \defSub{cells} {The cells we want to generate observations for from the layer of cells supplied}
@@ -72,10 +94,8 @@
 \par\textbf{\commandlabsubarg{process}{type}{maturity}}\par
 \par\textbf{\commandlabsubarg{process}{type}{mortality\_constant\_rate\_mortality}}\par
 \par\textbf{\commandlabsubarg{process}{type}{mortality\_event\_biomass\_mortality}}\par
-\par\textbf{\commandlabsubarg{process}{type}{movement\_box\_transfer}}\par
-\defSub{origin\_cell} {The origin cell associated with each spatial layer (should have a one to one relationship with specified layers), format follows row-col (1-2}
-\defSub{probability\_layers} {Spatial layers (one layer for each origin cell) describing the probability of moving from an origin cell to all other cells in the spatial domain.}
-\defSub{movement\_type} {What type of movement are you applying?}
+\par\textbf{\commandlabsubarg{process}{type}{movement\_box\_transfer\_movement}}\par
+\par\textbf{\commandlabsubarg{process}{type}{movement\_preference\_movement}}\par
 \par\textbf{\commandlabsubarg{process}{type}{nop}}\par
 \par\textbf{\commandlabsubarg{process}{type}{recruitment\_beverton\_holt}}\par
 \defSub{b0} {B0}
@@ -87,6 +107,9 @@
 \defSub{b0} {B0}
 \defSub{recruitment\_layer\_label} {A label for the recruitment layer}
 \defSub{ssb} {A label for the SSB derived quantity}
+\par\textbf{\commandlabsubarg{process}{type}{tagging}}\par
+\defSub{selectivities} {}
+\defSub{years} {Years to execute the transition in}
 \defComLab{report}{Define an object of type \emph{report}}\par\par
 \defSub{label} {The label for the report}
 \defSub{type} {The type of report}
@@ -98,6 +121,10 @@
 \par\textbf{\commandlabsubarg{report}{type}{derived\_quantity}}\par
 \par\textbf{\commandlabsubarg{report}{type}{initialisation\_partition}}\par
 \par\textbf{\commandlabsubarg{report}{type}{model\_attributes}}\par
+\par\textbf{\commandlabsubarg{report}{type}{numeric\_layer}}\par
+\defSub{layer\_label} {The Numeric Layer label that is reported}
+\defSub{years} {Years}
+\defSub{time\_step} {Time Step label}
 \par\textbf{\commandlabsubarg{report}{type}{observation}}\par
 \defSub{observation} {Observation label}
 \par\textbf{\commandlabsubarg{report}{type}{process}}\par
@@ -106,7 +133,7 @@
 \par\textbf{\commandlabsubarg{report}{type}{summarise\_agents}}\par
 \defSub{years} {Years}
 \defSub{time\_step} {Time Step label}
-\defSub{number\_of\_agents} {Number of agents to summarise}
+\defSub{number\_of\_individuals} {Number of agents to summarise}
 \par\textbf{\commandlabsubarg{report}{type}{world\_age\_frequency}}\par
 \defSub{years} {Years}
 \defSub{time\_step} {Time Step label}
@@ -114,8 +141,6 @@
 \defSub{label} {The label for this selectivity}
 \defSub{type} {The type of selectivity}
 \defSub{length\_based} {Is the selectivity length based}
-\defSub{values} {}
-\defSub{length\_values} {}
 \par\textbf{\commandlabsubarg{selectivity}{type}{all\_values}}\par
 \defSub{v} {V}
 \par\textbf{\commandlabsubarg{selectivity}{type}{all\_values\_bounded}}\par

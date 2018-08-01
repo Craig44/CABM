@@ -43,7 +43,7 @@ void NumericLayer::DoBuild() {
   if (!layer_) {
     LOG_ERROR_P(PARAM_LAYER_LABEL) << "layer " << layer_label_ << " could not be found. Have you defined it? If you have make sure it is of type Numeric";
   }
-  if (not layer_->is_static()) {
+  if (layer_->is_static()) {
     LOG_ERROR_P(PARAM_LAYER_LABEL) << "The point of this report is to print non staic layers, that are not user defined. Are you sure you want this report, go to usermanual for more information";
   }
 }

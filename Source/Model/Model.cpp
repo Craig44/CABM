@@ -67,7 +67,7 @@ Model::Model() {
   parameters_.Bind<string>(PARAM_MATRUITY_OGIVE_LABEL, &maturity_ogives_, "Maturity ogive label for each sex", "", false);
   parameters_.Bind<string>(PARAM_GROWTH_PROCESS_LABEL, &growth_process_label_, "Label for the growth process in the annual cycle", "");
   parameters_.Bind<string>(PARAM_NATURAL_MORTALITY_PROCESS_LABEL, &natural_mortality_label_, "Label for the natural mortality process in the annual cycle", "");
-  parameters_.Bind<unsigned>(PARAM_MAX_THREADS_TO_USE, &max_threads_, "The maxiumum threads you want to give access to this program", "",2);
+  parameters_.Bind<unsigned>(PARAM_MAX_THREADS_TO_USE, &max_threads_, "The maxiumum threads you want to give access to this program", "",1);
 
 
   global_configuration_ = new GlobalConfiguration();
@@ -287,8 +287,9 @@ void Model::Build() {
     min_lat_ = lat_bounds_[0];
     max_lat_ = lat_bounds_[lat_bounds_.size() - 1];
   }
-
-  /// Build everything else in the system
+  /*
+   * An important sequence in the code, if you cannot obtain pointers at build the order of managers will be important
+  */
   managers_->BuildPreWorldView();
   world_view_->Build(); // This needs processes to be built, but others want world to be built by DoBuild to do checks, hmmm
   managers_->Build();

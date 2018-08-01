@@ -81,6 +81,13 @@ void Biomass::DoBuild() {
   //if (!catchability_)
   //  LOG_FATAL_P(PARAM_CATCHABILITY) << ": catchability " << catchability_label_ << " could not be found. Have you defined it?";
 
+
+  // Build and validate layers
+  layer_ = model_->managers().layer()->GetCategoricalLayer(layer_label_);
+  if (!layer_)
+    LOG_FATAL_P(PARAM_LAYER_OF_CELLS) << "could not find layer " << layer_label_ << " does it exist?, if it exists is of type categorical?";
+
+
   if (selectivity_labels_.size() > 2)
     LOG_ERROR_P(PARAM_SELECTIVITIES) << "you supplied " << selectivity_labels_.size() << " you cannot supply over 2 selectivities one for each sex";
 
@@ -104,9 +111,12 @@ void Biomass::DoBuild() {
   if (selectivities_.size() == 1)
     selectivities_.assign(2, selectivities_[0]);
 
+  LOG_FINEST() << "finished building selectivities";
   world_ = model_->world_view();
   if (!world_)
     LOG_CODE_ERROR() << "!world_ could not create pointer to world viw model, something is wrong";
+
+  LOG_FINEST() << "finished building pointer to world";
 
   // Check all the cells supplied are in the layer
   for (auto cell :  cells_) {
@@ -121,6 +131,14 @@ void Biomass::DoBuild() {
       LOG_ERROR_P(PARAM_CELLS) << "could not find the cell '" << cell << "' in the layer " << layer_label_ << " please make sure that you supply cell labels that are consistent with the layer.";
   }
 
+  LOG_FINEST() << "finished checking cells";
+
+
+  for (auto year : years_) {
+    if((year < model_->start_year()) || (year > model_->final_year()))
+      LOG_FATAL_P(PARAM_YEARS) << "Years can't be less than start_year (" << model_->start_year() << "), or greater than final_year (" << model_->final_year() << "). Please fix this.";
+  }
+
   // Subscribe this observation to the timestep
   auto time_step = model_->managers().time_step()->GetTimeStep(time_step_label_);
   if (!time_step) {
@@ -130,10 +148,8 @@ void Biomass::DoBuild() {
       time_step->SubscribeToBlock(this, year);
   }
 
-  for (auto year : years_) {
-    if((year < model_->start_year()) || (year > model_->final_year()))
-      LOG_ERROR_P(PARAM_YEARS) << "Years can't be less than start_year (" << model_->start_year() << "), or greater than final_year (" << model_->final_year() << "). Please fix this.";
-  }
+  LOG_FINEST() << "finished subscribing to time step";
+
 }
 
 /**
@@ -147,7 +163,6 @@ void Biomass::PreExecute() {
     return void();
   } else {
     if (selectivity_length_based_) {
-      #pragma omp parallel for collapse(2)
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
           string cell_label = layer_->get_value(row, col);
@@ -168,7 +183,6 @@ void Biomass::PreExecute() {
         }
       }
     } else {
-      #pragma omp parallel for collapse(2)
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
           string cell_label = layer_->get_value(row, col);
@@ -201,7 +215,6 @@ void Biomass::Execute() {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   if (!utilities::doublecompare::IsZero(time_step_proportion_)) {
     if (selectivity_length_based_) {
-      #pragma omp parallel for collapse(2)
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
           string cell_label = layer_->get_value(row, col);
@@ -222,7 +235,6 @@ void Biomass::Execute() {
         }
       }
     } else {
-      #pragma omp parallel for collapse(2)
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
           string cell_label = layer_->get_value(row, col);

@@ -71,6 +71,12 @@ void AgeLength::DoValidate() {
 void AgeLength::DoBuild() {
   LOG_TRACE();
 
+  // Build and validate layers
+  layer_ = model_->managers().layer()->GetCategoricalLayer(layer_label_);
+  if (!layer_)
+    LOG_FATAL_P(PARAM_LAYER_OF_CELLS) << "could not find layer " << layer_label_ << " does it exist?, if it exists is of type categorical?";
+
+
   if (selectivity_labels_.size() > 2)
     LOG_ERROR_P(PARAM_SELECTIVITIES) << "you supplied " << selectivity_labels_.size() << " you cannot supply over 2 selectivities one for each sex";
 

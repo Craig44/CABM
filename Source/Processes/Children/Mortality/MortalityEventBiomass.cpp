@@ -114,19 +114,20 @@ void MortalityEventBiomass::DoBuild() {
   }
 }
 
-
 /**
  * DoExecute
  */
 void MortalityEventBiomass::DoExecute() {
   LOG_FINE();
-  vector<unsigned> global_age_freq(model_->age_spread());
+  vector<unsigned> global_age_freq(model_->age_spread(), 0);
   auto iter = years_.begin();
   if (model_->state() != State::kInitialise) {
     if (find(iter, years_.end(), model_->current_year()) != years_.end()) {
+
+
       iter = find(years_.begin(), years_.end(), model_->current_year());
       unsigned catch_ndx = distance(years_.begin(), iter);
-      LOG_FINEST() << "applying F in year " << model_->current_year() << " catch index = " << catch_ndx;
+      LOG_FINE() << "applying F in year " << model_->current_year() << " catch index = " << catch_ndx;
       // Pre-calculate agents in the world to set aside our random numbers needed for the operation
       n_agents_ = 0;
       for (unsigned row = 0; row < model_->get_height(); ++row) {
@@ -151,11 +152,11 @@ void MortalityEventBiomass::DoExecute() {
       }
 
 
-      float actual_catch_taken = 0;;
-      float world_catch_to_take = 0;;
+      float actual_catch_taken = 0;
+      float world_catch_to_take = 0;
       if (selectivity_length_based_) {
         // Thread out each loop
-        #pragma omp parallel for collapse(2)
+        #pragma omp parallel for collapse(2) reduction(+:world_catch_to_take) reduction(+:actual_catch_taken)
         for (unsigned row = 0; row < model_->get_height(); ++row) {
           for (unsigned col = 0; col < model_->get_width(); ++col) {
             unsigned catch_attempts = 1;
@@ -171,10 +172,11 @@ void MortalityEventBiomass::DoExecute() {
                 composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->length_bins().size());
                 catch_attempts = 1;
                 world_catch_to_take += catch_taken;
+                auto iter = cell->agents_.begin();
                 catch_max = cell->agents_.size();
                 while (catch_taken > 0) {
                   ++catch_attempts;
-                  auto iter = cell->agents_.begin();
+                  iter = cell->agents_.begin();
                   random_agent = random_numbers_[cell_offset_[row][col] + counter] * cell->agents_.size();
                   advance(iter, random_agent);
                   // See if this agent is unlucky
@@ -189,7 +191,6 @@ void MortalityEventBiomass::DoExecute() {
                       actual_catch_taken += (*iter).get_weight() * (*iter).get_scalar();
                       age_freq.frequency_[(*iter).get_age() - model_->min_age()]++;
                       length_freq.frequency_[(*iter).get_length_bin_index()]++;
-                      global_age_freq[(*iter).get_age() - model_->min_age()]++;
                       cell->agents_.erase(iter); // erase agent from memory
                     }
                   }
@@ -200,8 +201,13 @@ void MortalityEventBiomass::DoExecute() {
                   }
                   ++counter;
                 }
+              #pragma omp critical
+              {
+                for (unsigned i = 0; i < model_->age_spread(); ++i)
+                  global_age_freq[i] += age_freq.frequency_[i];
                 removals_by_length_and_area_.push_back(length_freq);
                 removals_by_age_and_area_.push_back(age_freq);
+              }
               }
 
             }
@@ -210,12 +216,12 @@ void MortalityEventBiomass::DoExecute() {
       } else {
         iter = find(years_.begin(), years_.end(), model_->current_year());
         unsigned catch_ndx = distance(years_.begin(), iter);
-        LOG_FINEST() << "applying F in year " << model_->current_year() << " catch index = " << catch_ndx;
+        LOG_FINE() << "applying F in year " << model_->current_year() << " catch index = " << catch_ndx;
         // Get the pointer to the right catch layer
         float actual_catch_taken = 0;;
         float world_catch_to_take = 0;;
         // Thread out each loop
-        #pragma omp parallel for collapse(2)
+        #pragma omp parallel for collapse(2) reduction(+:world_catch_to_take) reduction(+:actual_catch_taken)
         for (unsigned row = 0; row < model_->get_height(); ++row) {
           for (unsigned col = 0; col < model_->get_width(); ++col) {
             unsigned catch_attempts = 1;
@@ -236,11 +242,12 @@ void MortalityEventBiomass::DoExecute() {
                 catch_attempts = 1;
                 world_catch_to_take += catch_taken;
                 catch_max = cell->agents_.size();
+                auto iter = cell->agents_.begin();
                 while (catch_taken > 0) {
                   // Random access bullshit for lists
                   ++catch_attempts;
-                  auto iter = cell->agents_.begin();
                   random_agent = random_numbers_[cell_offset_[row][col] + counter] * cell->agents_.size();
+                  iter = cell->agents_.begin();
                   advance(iter, random_agent);
                   // See if this agent is unlucky
                   if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->length_bins().size() + (*iter).get_length_bin_index()]) {
@@ -253,7 +260,6 @@ void MortalityEventBiomass::DoExecute() {
                       actual_catch_taken += (*iter).get_weight() * (*iter).get_scalar();
                       age_freq.frequency_[(*iter).get_age() - model_->min_age()]++;
                       length_freq.frequency_[(*iter).get_length_bin_index()]++;
-                      global_age_freq[(*iter).get_age() - model_->min_age()]++;
                       cell->agents_.erase(iter); // erase agent from memory
                     }
                   }
@@ -264,14 +270,20 @@ void MortalityEventBiomass::DoExecute() {
                   }
                   ++counter;
                 }
-                removals_by_length_and_area_.push_back(length_freq);
-                removals_by_age_and_area_.push_back(age_freq);
-              }
 
-            }
-          }
-        }
-      }
+                #pragma omp critical
+                {
+                  removals_by_length_and_area_.push_back(length_freq);
+                  removals_by_age_and_area_.push_back(age_freq);
+                  for (unsigned i = 0; i < model_->age_spread(); ++i)
+                    global_age_freq[i] += age_freq.frequency_[i];
+                }
+              } // if catch > 0
+            } // is enabled
+          } //col
+        } // row
+      } // length_based_selectivity
+      LOG_FINE() << "world catch taken = " << world_catch_to_take << " actual catch taken = " << actual_catch_taken;
       removals_by_year_[model_->current_year()] = world_catch_to_take;
       actual_removals_by_year_[model_->current_year()] = actual_catch_taken;
       removals_by_age_[model_->current_year()] = global_age_freq;
@@ -284,10 +296,6 @@ void MortalityEventBiomass::DoExecute() {
 // FillReportCache, called in the report class, it will print out additional information that is stored in
 // containers in this class.
 void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
-  cache << "year: ";
-  for (auto& year : actual_removals_by_year_)
-    cache << year.first << " ";
-
   cache << "\nbiomass_removed: ";
   for (auto& year : actual_removals_by_year_)
     cache << year.second << " ";

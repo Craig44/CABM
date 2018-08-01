@@ -148,11 +148,15 @@ void ProcessRemovalsByAge::DoBuild() {
 
     // Check all the cells supplied are in the layer
     for (auto cell :  cells_) {
+      LOG_FINEST() << "checking cell " << cell << " exists in layer";
       bool cell_found = false;
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
-          if (layer_->get_value(row,col) == cell)
+          LOG_FINEST() << "checking row = " << row << " col = " << col << " value = " << layer_->get_value(row,col);
+          if (layer_->get_value(row,col) == cell) {
             cell_found = true;
+            break;
+          }
         }
       }
       if (not cell_found)
@@ -189,8 +193,10 @@ void ProcessRemovalsByAge::Simulate() {
   LOG_FINEST() << "number of years for this observation = " << age_frequency.size();
   unsigned age_offset = min_age_ - model_->min_age();
   // iterate over all the years that we want
+  bool cell_found = false;
   for (unsigned year : years_) {
     for (string cell : cells_) {
+      cell_found = false;
       vector<float> accumulated_age_frequency(model_->age_spread(), 0.0);
       for (auto age_comp_data : age_frequency) {
         if ((age_comp_data.year_ == year) && (layer_->get_value(age_comp_data.row_,age_comp_data.col_) == cell)) {
@@ -198,8 +204,11 @@ void ProcessRemovalsByAge::Simulate() {
           for(unsigned i = 0; i < age_comp_data.frequency_.size(); ++i) {
             accumulated_age_frequency[i] = (float)age_comp_data.frequency_[i];
           }
+          cell_found = true;
         }
       }
+      if (not cell_found)
+        continue; // to next cell
       if (ageing_error_) {
         vector<float> temp(model_->age_spread(), 0.0);
         vector<vector<float>> &mis_matrix = ageing_error_->mis_matrix();

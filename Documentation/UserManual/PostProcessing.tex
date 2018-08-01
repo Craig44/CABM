@@ -48,7 +48,7 @@ for (i in 1:5) {
 	temp_data = merged[substring(merged$`cell`,0,1) == as.character(i),]
 	p <- ggplot(temp_data, aes(x = age, y = frequency, color = burnin)) + geom_point()
 	p + facet_grid(cell ~ ., scales="free_y")
-	p
+	print(p)
     Sys.sleep(2);
 }
 \end{lstlisting}
