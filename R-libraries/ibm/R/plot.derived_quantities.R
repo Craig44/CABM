@@ -1,4 +1,4 @@
-#' @title plot.derived_quantities default
+#' @title plot.derived_quantities
 #'
 #' @description
 #' A plotting function to plot Derived Quantities for the 'ibm_output' object.
@@ -22,17 +22,7 @@
 #' SSB = plot.derived_quantities(model = data, report_label = "biomass", plot.it = FALSE)
 #' plot(rownames(SSB),SSB, main = "My SSB", type = "l", ylim = c(0,90000))
 
-"plot.derived_quantities"<-
-function(model, report_label="", type = "number", xlim, ylim, xlab, ylab, main, col,plot.it = T, ...){
-  UseMethod("plot.derived_quantities",model)
-}
-
-#' @return \code{NULL}
-#'
-#' @rdname plot.derived_quantities
-#' @method plot.derived_quantities ibm_output
-#' @export
-"plot.derived_quantities.ibm_output" = function(model, report_label="", type = "number", xlim, ylim, xlab, ylab, main, col,plot.it = T, ...) {
+"plot.derived_quantities" = function(model, report_label="", type = "number", xlim, ylim, xlab, ylab, main, col,plot.it = T, ...) {
   if (!type %in% c("number", "percent")) {
     stop ("the parameter type must be: 'number' or 'percent'")
   }
