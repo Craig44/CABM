@@ -12,6 +12,7 @@ from System import *
 from Globals import *
 from Builder import *
 from Documentation import *
+from ModelRunner import *
 
 """
 Print the usage for this build system
@@ -29,6 +30,7 @@ def print_usage():
   print '  release - Build standalone release executable'
   print '  thirdparty - Build all required third party libraries'
   print '  thirdpartylean - Build minimal third party libraries'
+  print '  modelrunner - Run the test suite of models'
   print '  clean - Remove any previous debug/release build information'
   print '  cleanall - Remove all previous build information'
   print '  check - Do a check of the build system'
@@ -152,6 +154,13 @@ def start():
     cleaner = Cleaner()
     if not cleaner.clean():
       return False
+  elif build_target == "modelrunner":
+    print "*************************************************************************"
+    print "*************************************************************************"
+    print "--> Starting " + Globals.build_target_ + " Build"
+    model_runner = ModelRunner()
+    if not model_runner.start():
+      return False      
   elif build_target == "documentation":
     print "*************************************************************************"
     print "*************************************************************************"

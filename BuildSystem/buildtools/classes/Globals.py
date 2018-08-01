@@ -20,7 +20,7 @@ target_special_lig_path_ = ""
 
 allowed_build_targets_ = [ "debug", "release", "thirdparty", "thirdpartylean",
                             "all", "clean", "cleanall", "help", "documentation",
-                           "check"]
+                           "check", "modelrunner"]
 allowed_build_types_ = [ "debug", "release"]
 allowed_build_parameters_ = [ "" ]
 allowed_library_parameters_ = [ "release"]

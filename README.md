@@ -35,7 +35,7 @@ Open a terminal in the BuildSystem folder, to check you have the right dependenc
 doBuild.bat check
 ```
 
-if you have windows 10 you may have to put a ```.\``` in front of the command, and for linux
+if you have windows 10 and you are building from the power shell you may have to put a ```.\``` in front of the command, and for linux
 
 ```
 .\doBuild.sh check
