@@ -23,9 +23,13 @@ spatial models (single area models) the model could be a bit lousy, But when you
 processes such as fishing. The spatial memory management will benefit massively in efficiency's it also allows easier threading.
 
 
+### Current Status of Repo
+Currently users can have any spatial resolution they desire. I have an example model in found in this [directory](https://github.com/Craig44/IBM/tree/master/Example/SpatialModel) that is 5x5 spatial model,
+with a single fishery. This model can generate a range of age, length compositional data and biomass indicies. The parallelization is not working as well as I had hoped
+so if you run the model use max_threads 1.
 Currently there is no executable to download and use because it is still in development, but if you are interested in the code base
 and want to be a collaborator on the project I recommend you fork the repository and compile the code which is easy to do as shown in the
-following steps. There will be 
+following steps.
 
 ### Compiling the code
 

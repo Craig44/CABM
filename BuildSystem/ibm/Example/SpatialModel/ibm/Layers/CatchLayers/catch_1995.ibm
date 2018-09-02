@@ -1,0 +1,9 @@
+@layer catch_1995
+type numeric
+table layer
+0 0 100 200 300
+0 0 100 200 300
+0 0 50 69 25
+0 0 0 0 0
+0 0 0 0 0
+end_table

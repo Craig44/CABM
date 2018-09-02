@@ -1,0 +1,93 @@
+# --------------
+# Define Reports
+# --------------
+# print process properties
+
+################
+## General model reports
+################
+/*
+@report agents
+type summarise_agents
+number_of_individuals 20
+time_step Annual
+*/
+
+# print initail state of agents
+@report init
+type initialisation_partition
+
+# print age frequency
+@report world_age_freq
+type world_age_frequency
+#years 1990:2018 ## defaults to model years
+time_step Annual
+
+@report age_freq_by_cell
+type age_frequency_by_cell
+#years 1990:2018 ## defaults to model years
+time_step Annual
+
+# print SSB's
+@report derived_quants
+type derived_quantity
+
+# print SSB's
+@report model_attributes
+type model_attributes
+
+
+################
+## Observations
+################
+@report fishery_age_freq_by_cell
+type observation
+observation fishery_age_by_cell
+
+@report survey_biomass
+type observation
+observation biomass_survey_post_fishing_by_cell
+
+/*
+@report age_length
+type observation
+observation biomass_survey_post_fishing_by_cell
+*/
+
+################
+## Processes
+################
+@report Movement
+type process
+process Movement
+
+@report Rec
+type process
+process Recruitment
+
+@report M_report
+type process
+process natural_mort
+
+@report mature_report
+type process
+process Maturation
+
+@report fishing
+type process
+process fishing
+
+/*
+@report preferenceMovement
+type process
+process preferenceMovement
+*/
+
+################
+## Layers
+################
+@report total_biomass_by_cell
+type numeric_layer
+layer_label biomass_by_cell
+years 1990:2018
+time_step Fishing
