@@ -4,5 +4,5 @@ if (!is.element('roxygen2', installed.packages()[,1])) {
 }
   
 require(roxygen2)
-roxygen2::roxygenize("IBM/")
+roxygen2::roxygenize("ibm")
 

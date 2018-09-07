@@ -17,6 +17,12 @@ cat("Description: A set of R functions for extracting and plotting from ibm outp
 cat("Maintainer: Craig Marsh <Craig.Marsh@bigbluedata.co.nz>\n",file=filename,append=TRUE)
 cat("License: GPL v 2. See the IBM User Manual for license details.\n",file=filename,append=TRUE)
 cat("LazyData: true\n",file=filename,append=TRUE)
+cat("Import:\n",file=filename,append=TRUE)
+cat("\t reshape2,\n",file=filename,append=TRUE)
+cat("\t ggplot2,\n",file=filename,append=TRUE)
+cat("\t RColorBrewer\n",file=filename,append=TRUE)
+
+
 cat("BugReports: https://github.com/Craig44/IBM/issues\n",file=filename,append=TRUE)
 
 
