@@ -63,7 +63,7 @@ void RecruitmentConstant::DoBuild() {
       props += value;
     }
   }
-  if (!utilities::doublecompare::IsOne(props))
+  if ((props - 1) > 0.0001)
     LOG_ERROR_P(PARAM_RECRUITMENT_LAYER_LABEL) << "the recuitment layer does not sum to 1.0 it was " << props << ", we don't want leakage of indiviuals please sort this out";
   model_->set_b0(label_, b0_);
 

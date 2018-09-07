@@ -15,6 +15,8 @@
 
 #include "Layers/Manager.h"
 #include "Utilities/RandomNumberGenerator.h"
+#include "TimeSteps/Manager.h"
+
 // namespaces
 namespace niwa {
 namespace processes {
@@ -31,6 +33,20 @@ Growth::Growth(Model* model) : Process(model) {
   parameters_.Bind<float>(PARAM_CV, &cv_, "The cv of the distribution", "");
 }
 
+
+void Growth::DoBuild() {
+  unsigned time_step_count = model_->managers().time_step()->ordered_time_steps().size();
+  if (time_step_proportions_.size() == 0) {
+    time_step_proportions_.assign(time_step_count, 0.0);
+  } else if (time_step_count != time_step_proportions_.size()) {
+    LOG_FATAL_P(PARAM_TIME_STEP_PROPORTIONS) << "size (" << time_step_proportions_.size() << ") must match the number "
+        "of defined time steps for this process (" << time_step_count << ")";
+  }
+  for (auto iter : time_step_proportions_) {
+    if (iter < 0.0 || iter > 1.0)
+      LOG_ERROR_P(PARAM_TIME_STEP_PROPORTIONS) << " value (" << iter << ") must be in the range 0.0-1.0";
+  }
+}
 
 } /* namespace processes */
 } /* namespace niwa */

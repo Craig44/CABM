@@ -18,6 +18,8 @@
 #include "Utilities/RandomNumberGenerator.h"
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
+#include "TimeSteps/Manager.h"
+
 // namespaces
 namespace niwa {
 namespace processes {
@@ -32,6 +34,7 @@ MortalityConstantRate::MortalityConstantRate(Model* model) : Mortality(model) {
   parameters_.Bind<string>(PARAM_SELECTIVITY_LABEL, &selectivity_label_, "Label for the selectivity block", "");
   parameters_.Bind<float>(PARAM_M, &m_, "Natural mortality for the model", "");
   parameters_.Bind<bool>(PARAM_UPDATE_MORTALITY_PARAMETERS, &update_natural_mortality_parameters_, "If an agent/individual moves do you want it to take on the natural mortality parameters of the new spatial cell", "");
+  parameters_.Bind<float>(PARAM_TIME_STEP_RATIO, &ratios_, "Time step ratios for the mortality rates to apply in each time step. See manual for how this is applied", "");
 
 }
 
@@ -81,6 +84,38 @@ void MortalityConstantRate::DoBuild() {
       }
     }
   }
+
+  /**
+   * Organise our time step ratios. Each time step can
+   * apply a different ratio of M so here we want to verify
+   * we have enough and re-scale them to 1.0
+   */
+  vector<TimeStep*> time_steps = model_->managers().time_step()->ordered_time_steps();
+  LOG_FINEST() << "time_steps.size(): " << time_steps.size();
+  vector<unsigned> active_time_steps;
+  for (unsigned i = 0; i < time_steps.size(); ++i) {
+    if (time_steps[i]->HasProcess(label_))
+      active_time_steps.push_back(i);
+  }
+
+  if (ratios_.size() == 0) {
+    for (unsigned i : active_time_steps)
+      time_step_ratios_[i] = 1.0;
+  } else {
+    if (ratios_.size() != active_time_steps.size())
+      LOG_ERROR_P(PARAM_TIME_STEP_RATIO) << " length (" << ratios_.size()
+          << ") does not match the number of time steps this process has been assigned to (" << active_time_steps.size() << ")";
+
+    for (float value : ratios_) {
+      if (value < 0.0 || value > 1.0)
+        LOG_ERROR_P(PARAM_TIME_STEP_RATIO) << " value (" << value << ") must be between 0.0 (exclusive) and 1.0 (inclusive)";
+    }
+
+    for (unsigned i = 0; i < ratios_.size(); ++i)
+      time_step_ratios_[active_time_steps[i]] = ratios_[i];
+  }
+
+
   model_->set_m(m_);
 
   cell_offset_for_selectivity_.resize(model_->get_height());
@@ -138,17 +173,21 @@ void MortalityConstantRate::DoExecute() {
 
   unsigned agents_removed = 0;
   if (selectivity_length_based_) {
-    #pragma omp parallel for collapse(2)
+    //#pragma omp parallel for collapse(2)
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
+        // get the ratio to apply first
+        unsigned time_step = model_->managers().time_step()->current_time_step();
+        float ratio = time_step_ratios_[time_step];
         WorldCell* cell = world_->get_base_square(row, col);
+
         if (cell->is_enabled()) {
           unsigned counter = 0;
           unsigned initial_size = cell->agents_.size();
           LOG_FINEST() << initial_size << " initial agents";
           for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter) {
             //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
-            if (random_numbers_[cell_offset_[row][col] + counter] <= (1 - std::exp(-(*iter).get_m() * cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->length_bins().size() + (*iter).get_length_bin_index()]))) {
+            if (random_numbers_[cell_offset_[row][col] + counter] <= (1 - std::exp(- ratio * (*iter).get_m() * cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->length_bins().size() + (*iter).get_length_bin_index()]))) {
               iter = cell->agents_.erase(iter);
               initial_size--;
               agents_removed++;
@@ -160,19 +199,22 @@ void MortalityConstantRate::DoExecute() {
       }
     }
   } else {
-    #pragma omp parallel for collapse(2)
+    //#pragma omp parallel for collapse(2)
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
           // need thread safe access to rng
+          unsigned time_step = model_->managers().time_step()->current_time_step();
+          float ratio = time_step_ratios_[time_step];
+          WorldCell* cell = world_->get_base_square(row, col);
           unsigned counter = 0;
           unsigned initial_size = cell->agents_.size();
           LOG_FINEST() << initial_size << " initial agents";
           for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter) {
             //LOG_FINEST() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " survivorship = " << (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()])) << " M = " << (*iter).get_m();
 
-            if (random_numbers_[cell_offset_[row][col] + counter] <= (1.0 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]))) {
+            if (random_numbers_[cell_offset_[row][col] + counter] <= (1.0 - std::exp(- ratio * (*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]))) {
               iter = cell->agents_.erase(iter);
               initial_size--;
               agents_removed++;

@@ -17,6 +17,8 @@
 #include "Utilities/RandomNumberGenerator.h"
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
+#include "TimeSteps/Manager.h"
+
 #include <omp.h>
 
 // namespaces
@@ -100,9 +102,10 @@ void GrowthVonBertalanffyWithBasic::DoExecute() {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
+        float length_prop = time_step_proportions_[ model_->managers().time_step()->current_time_step()];
         for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter) {
           //LOG_FINEST() << "length = " << (*iter).get_length() << " weight = " << (*iter).get_weight() << " L-inf " << (*iter).get_first_age_length_par() << " k = " << (*iter).get_second_age_length_par();
-          float new_length = (*iter).get_length() + ((*iter).get_first_age_length_par() - (*iter).get_length()) * (1 - exp(-(*iter).get_second_age_length_par()));
+          float new_length =  (*iter).get_length() + length_prop * ((*iter).get_first_age_length_par() - (*iter).get_length()) * (1 - exp(-(*iter).get_second_age_length_par()));
           float weight = (*iter).get_first_length_weight_par() * pow(new_length, (*iter).get_second_length_weight_par());
           //LOG_FINEST() << "length = " << new_length << " weight = " << weight;
           (*iter).set_length(new_length);

@@ -56,6 +56,7 @@ protected:
   float                       standard_deviation_;
   float                       d_max_;
   float                       zeta_;
+  float                       time_interval_;
   bool                        calculate_on_the_fly_ = false;
   vector<unsigned>            non_static_layer_ndx_;
   vector<string>              preference_function_labels_;

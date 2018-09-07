@@ -30,7 +30,7 @@ public:
   explicit Growth(Model* model);
   virtual                     ~Growth() = default;
   virtual void                        DoValidate(){ };
-  virtual void                        DoBuild() { };
+  virtual void                        DoBuild();
   virtual void                        DoReset() { };
   virtual void                        DoExecute() { };
 

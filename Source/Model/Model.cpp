@@ -58,8 +58,8 @@ Model::Model() {
   parameters_.Bind<unsigned>(PARAM_LENGTH_BINS, &length_bins_, "", "", true);
   parameters_.Bind<bool>(PARAM_LENGTH_PLUS, &length_plus_, "Is the last bin a plus group", "", false);
   parameters_.Bind<string>(PARAM_BASE_LAYER_LABEL, &base_layer_, "Label for the base layer", "");
-  parameters_.Bind<float>(PARAM_LATITUDE_BOUNDS, &lat_bounds_, "Label for the latitude layer", "", true);
-  parameters_.Bind<float>(PARAM_LONGITUDE_BOUNDS, &lon_bounds_, "Label for the longitude layer", "", true);
+  parameters_.Bind<float>(PARAM_LATITUDE_BOUNDS, &lat_bounds_, "Latitude bounds for the spatial domain, should include lower and upper bound, so there should be rows + 1 values", "", true);
+  parameters_.Bind<float>(PARAM_LONGITUDE_BOUNDS, &lon_bounds_, "Longitude bounds for the spatial domain, should include lower and upper bound, so there should be columns + 1 values", "", true);
   parameters_.Bind<unsigned>(PARAM_NROWS, &world_height_, "number of rows in spatial domain", "")->set_lower_bound(1,true);
   parameters_.Bind<unsigned>(PARAM_NCOLS, &world_width_, "number of columns in spatial domain", "")->set_lower_bound(1,true);
   parameters_.Bind<bool>(PARAM_SEXED, &sex_, "Is sex an attribute of you agent?", "", false);
@@ -286,22 +286,28 @@ void Model::Build() {
     max_lon_ = lon_bounds_[lon_bounds_.size() - 1];
     min_lat_ = lat_bounds_[0];
     max_lat_ = lat_bounds_[lat_bounds_.size() - 1];
+
+    LOG_FINEST() << "min lat = " << min_lat_ << " max lat = " << max_lat_ << " min long = " << min_lon_ << " max lon " << max_lon_;
   }
   /*
    * An important sequence in the code, if you cannot obtain pointers at build the order of managers will be important
   */
   managers_->BuildPreWorldView();
-  world_view_->Build(); // This needs processes to be built, but others want world to be built by DoBuild to do checks, hmmm
-  managers_->Build();
 
   // Do a quick check that we can obtain pointers to mortality and growth process
   processes::Manager& process_manager = *managers_->process();
-  if (!process_manager.GetGrowthProcess(growth_process_label_)) {
+  auto growth_ptr = process_manager.GetGrowthProcess(growth_process_label_);
+  if (growth_ptr == nullptr) {
     LOG_FATAL_P(PARAM_GROWTH_PROCESS_LABEL) << "Does the growth process " << growth_process_label_ << " exist? please check that it does, and is a growth process";
   }
   if (!process_manager.GetMortalityProcess(natural_mortality_label_)) {
     LOG_FATAL_P(PARAM_NATURAL_MORTALITY_PROCESS_LABEL) << "Does the mortality process " << natural_mortality_label_ << " exist? please check that it does, and is a mortality process";
   }
+
+
+  world_view_->Build(); // This needs processes to be built, but others want world to be built by DoBuild to do checks, hmmm
+  managers_->Build();
+
 
   if (maturity_ogives_.size() > 2) {
     LOG_ERROR_P(PARAM_NATURAL_MORTALITY_PROCESS_LABEL) << "You have specified '" << maturity_ogives_.size() << "' maturity ogives, we only use one if it is unsexed or two if it is sexed";

@@ -538,6 +538,7 @@
 #define PARAM_THRESHOLD_BIOMASS                   "threshold_biomass"
 #define PARAM_THETA_ONE                           "theta1"
 #define PARAM_THETA_TWO                           "theta2"
+#define PARAM_TIME_INTERVAL                       "time_intervals"
 #define PARAM_TIME_STEP                           "time_step"
 #define PARAM_TIME_STEP_MEASUREMENTS_WERE_MADE    "time_step_measurements_were_made"
 #define PARAM_TIME_STEP_PROPORTION                "time_step_proportion"

@@ -69,7 +69,9 @@ void StandardHeader::DoPrepare() {
     header << commandLine[i] << " ";
   header << endl;
 
-    // Build Date
+  header << "Seed: " << model_->global_configuration().random_seed() << endl;
+  // Build Date
+
   header << "Date: " << ctime(&time_start_);
 
   /**
