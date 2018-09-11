@@ -58,6 +58,8 @@ void NumericLayer::DoBuild() {
    * Build our layer pointer
    */
   vector<vector<string>>& input_data = data_table_->data();
+  if (input_data.size() == 0)
+    LOG_FATAL_P(PARAM_LAYER) << "could not find data, check the matrix.";
   float total = 0;
   LOG_FINEST() << "rows = " << input_data.size() << " columns = " << input_data[0].size();
   unsigned row_iter = 0;

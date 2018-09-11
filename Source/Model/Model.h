@@ -23,6 +23,7 @@
 #include "Utilities/Math.h"
 #include "Utilities/RunMode.h"
 
+
 // Namespaces
 namespace niwa {
 using base::Executor;
@@ -87,7 +88,6 @@ public:
   virtual unsigned            max_age() const { return max_age_; }
   virtual unsigned            age_spread() const { return (max_age_ - min_age_) + 1; }
   virtual bool                age_plus() const { return age_plus_; }
-
   // The following are recruitment specific quantities/accessors these are stock characteristics that are shared around the model
   void                        set_b0(string recruitment_label, float b0) {b0_[recruitment_label] = b0; }
   virtual const map<string, float>&          get_b0s() const {return b0_; }
@@ -187,12 +187,12 @@ protected:
   vector<string>              maturity_ogives_;
   unsigned                    max_threads_;
 
-
   Managers*                   managers_ = nullptr;
   Objects*                    objects_ = nullptr;
   GlobalConfiguration*        global_configuration_ = nullptr;
   Factory*                    factory_ = nullptr;
   WorldView*                  world_view_ = nullptr;
+
   bool                        projection_final_phase_ = false; // this parameter is for the projection classes. most of the methods are in the reset but they don't need to be applied
   // if the model is in the first iteration and storeing values.
   map<State::Type, vector<Executor*>> executors_;

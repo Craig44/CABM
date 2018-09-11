@@ -199,7 +199,13 @@ void MovementPreference::DoExecute() {
   }
   /*
    * Main movement algorithm
-*/
+   */
+  //Model and world information that we need to build and store before we run and execute in threaded mode
+  // - cell pointers in matrix
+  // - heigth and width in matrix
+  // - current_year/Initialisaiton in a matrix form (this is the only one that is dynamic godamit)
+  // - Max-lat/lon in a matrix
+
   // Iterate over origin cells
   #pragma omp parallel for collapse(2)
   for (unsigned row = 0; row < model_->get_height(); ++row) {
@@ -252,7 +258,7 @@ void MovementPreference::DoExecute() {
             (*iter).set_lon((*iter).get_lon() + lon_distance);
           } // else they stay as it would be jumping out of bounds
 
-          world_->get_cell_element(destination_row, destination_col, (*iter).get_lat(), (*iter).get_lon());
+          world_->get_cell_element(destination_row, destination_col, (*iter).get_lat(), (*iter).get_lon()); // very difficult to thread this...
 
           LOG_FINEST() << (*iter).get_lat() << " " << (*iter).get_lon() << " " << destination_row << " " << destination_col << " " << row << " " << col;
 
@@ -472,33 +478,34 @@ void  MovementPreference::FillReportCache(ostringstream& cache) {
   // Print Preference by year
 
   // Print gradient by year.
-  cache << "initialisation_preference " << REPORT_R_MATRIX << "\n";
-  for (unsigned row = 0; row < initialisation_preference_value_.size(); ++row) {
-    for (unsigned col = 0; col < initialisation_preference_value_[row].size(); ++col) {
-      cache << initialisation_preference_value_[row][col] << " ";
+  if (not brownian_motion_) {
+    cache << "initialisation_preference " << REPORT_R_MATRIX << "\n";
+    for (unsigned row = 0; row < initialisation_preference_value_.size(); ++row) {
+      for (unsigned col = 0; col < initialisation_preference_value_[row].size(); ++col) {
+        cache << initialisation_preference_value_[row][col] << " ";
+      }
+      cache << "\n";
     }
-    cache << "\n";
-  }
-  cache << "initialisation_meridional " << REPORT_R_MATRIX << "\n";
-  for (unsigned row = 0; row < initialisation_meridonal_gradient_.size(); ++row) {
-    for (unsigned col = 0; col < initialisation_meridonal_gradient_[row].size(); ++col) {
-      cache << initialisation_meridonal_gradient_[row][col] << " ";
+    cache << "initialisation_meridional " << REPORT_R_MATRIX << "\n";
+    for (unsigned row = 0; row < initialisation_meridonal_gradient_.size(); ++row) {
+      for (unsigned col = 0; col < initialisation_meridonal_gradient_[row].size(); ++col) {
+        cache << initialisation_meridonal_gradient_[row][col] << " ";
+      }
+      cache << "\n";
     }
-    cache << "\n";
-  }
 
-  cache << "initialisation_zonal " << REPORT_R_MATRIX << "\n";
-  for (unsigned row = 0; row < initialisation_zonal_gradient_.size(); ++row) {
-    for (unsigned col = 0; col < initialisation_zonal_gradient_[row].size(); ++col) {
-      cache << initialisation_zonal_gradient_[row][col] << " ";
+    cache << "initialisation_zonal " << REPORT_R_MATRIX << "\n";
+    for (unsigned row = 0; row < initialisation_zonal_gradient_.size(); ++row) {
+      for (unsigned col = 0; col < initialisation_zonal_gradient_[row].size(); ++col) {
+        cache << initialisation_zonal_gradient_[row][col] << " ";
+      }
+      cache << "\n";
     }
-    cache << "\n";
-  }
-  // Preference by year
+    // Preference by year
     for (auto& values : preference_by_year_) {
       cache << "preference_" << values.first << " " << REPORT_R_MATRIX << "\n";
       for (unsigned i = 0; i < values.second.size(); ++i) {
-        for (unsigned j = 0; j < values.second[i].size(); ++j )
+        for (unsigned j = 0; j < values.second[i].size(); ++j)
           cache << values.second[i][j] << " ";
         cache << "\n";
       }
@@ -507,7 +514,7 @@ void  MovementPreference::FillReportCache(ostringstream& cache) {
     for (auto& values : zonal_gradient_) {
       cache << "zonal_" << values.first << " " << REPORT_R_MATRIX << "\n";
       for (unsigned i = 0; i < values.second.size(); ++i) {
-        for (unsigned j = 0; j < values.second[i].size(); ++j )
+        for (unsigned j = 0; j < values.second[i].size(); ++j)
           cache << values.second[i][j] << " ";
         cache << "\n";
       }
@@ -516,11 +523,12 @@ void  MovementPreference::FillReportCache(ostringstream& cache) {
     for (auto& values : meridonal_gradient_) {
       cache << "meridonal_" << values.first << " " << REPORT_R_MATRIX << "\n";
       for (unsigned i = 0; i < values.second.size(); ++i) {
-        for (unsigned j = 0; j < values.second[i].size(); ++j )
+        for (unsigned j = 0; j < values.second[i].size(); ++j)
           cache << values.second[i][j] << " ";
         cache << "\n";
       }
     }
+  }
 /*  for (auto& values : moved_agents_by_year_) {
     cache << "initial_numbers_in_cell: " << values.initial_numbers_ << "\n";
     cache << values.year_ << "_" << values.origin_cell_ << "_destination " << REPORT_R_MATRIX << "\n";

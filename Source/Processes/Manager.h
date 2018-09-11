@@ -22,6 +22,7 @@
 
 #include "Processes/Children/Growth.h"
 #include "Processes/Children/Mortality.h"
+#include "Processes/Children/Mortality/MortalityEffortBasedBaranov.h"
 
 // Namespaces
 namespace niwa {
@@ -46,6 +47,7 @@ public:
   Process*                    GetProcess(const string& label);
   Growth*                     GetGrowthProcess(const string& label);
   Mortality*                  GetMortalityProcess(const string& label);
+  MortalityEffortBasedBaranov*         GetBaranovProcess();
 
 protected:
   // methods

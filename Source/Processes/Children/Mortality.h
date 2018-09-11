@@ -51,13 +51,15 @@ public:
   vector<composition_data>&           get_removals_by_age() {return removals_by_age_and_area_;};
   vector<composition_data>&           get_removals_by_length() {return removals_by_length_and_area_;};
   virtual bool                        update_mortality() {return update_natural_mortality_parameters_;};
-
+  virtual double                      SolveBaranov() { return 1.0;};
+  void                                set_lambda(double lambda) {lambda_ = lambda;};
 protected:
   vector<composition_data>            removals_by_age_and_area_;
   vector<composition_data>            removals_by_length_and_area_;
   map<unsigned, vector<unsigned>>     removals_by_age_;
   map<unsigned, vector<unsigned>>     removals_by_length_;
   bool                                update_natural_mortality_parameters_;
+  double                              lambda_;
 
 
 

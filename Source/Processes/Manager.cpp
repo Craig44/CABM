@@ -127,5 +127,25 @@ Mortality* Manager::GetMortalityProcess(const string& label) {
 
   return mortality_ptr;
 }
+
+/**
+ * Return the baranov process with the name passed in as a parameter.
+ * If no process is found then an empty pointer will
+ * be returned.
+ *
+ * @param label The name of the process to find
+ * @return A pointer to the process or empty pointer
+ */
+MortalityEffortBasedBaranov* Manager::GetBaranovProcess() {
+  LOG_TRACE();
+  MortalityEffortBasedBaranov* mortality_ptr = nullptr;
+  for (auto process : objects_) {
+    if ((process->type() == PARAM_MORTALITY_EFFORT_BASED_BARANOV) && (process->process_type() == ProcessType::kMortality)) {
+      mortality_ptr = dynamic_cast<MortalityEffortBasedBaranov*>(process);
+      return mortality_ptr;
+    }
+  }
+  return mortality_ptr;
+}
 } /* namespace processes */
 } /* namespace niwa */

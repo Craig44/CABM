@@ -18,6 +18,7 @@
 #include "Layers/Children/CategoricalLayer.h"
 #include "Layers/Children/Numeric/NumericMetaLayer.h"
 #include "Layers/Children/Numeric/Biomass.h"
+#include "Layers/Children/Numeric/Abundance.h"
 
 
 // namespaces
@@ -45,6 +46,8 @@ Layer* Factory::Create(Model* model, const string& object_type, const string& su
       result = new NumericMetaLayer(model);
     else if (sub_type == PARAM_BIOMASS)
       result = new Biomass(model);
+    else if (sub_type == PARAM_ABUNDANCE)
+      result = new Abundance(model);
 
     if (result)
       model->managers().layer()->AddObject(result);

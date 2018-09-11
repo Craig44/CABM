@@ -456,4 +456,8 @@ bool Model::lat_and_long_supplied() {
   else
     return false;
 }
+
+
+
+
 } /* namespace niwa */

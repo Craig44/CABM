@@ -23,6 +23,7 @@
 #include "Children/Growth/GrowthVonBertalanffyWithBasic.h"
 #include "Children/Mortality/MortalityConstantRate.h"
 #include "Children/Mortality/MortalityEventBiomass.h"
+#include "Children/Mortality/MortalityEffortBasedBaranov.h"
 #include "Children/Movement/MovementBoxTransfer.h"
 #include "Children/Movement/MovementPreference.h"
 #include "Children/Tagging.h"
@@ -76,6 +77,8 @@ Process* Factory::Create(Model* model, const string& object_type, const string& 
       result = new MortalityConstantRate(model);
     else if (sub == PARAM_MORTALITY_EVENT_BIOMASS)
       result = new MortalityEventBiomass(model);
+    else if (sub == PARAM_MORTALITY_EFFORT_BASED_BARANOV)
+      result = new MortalityEffortBasedBaranov(model);
     else if (sub == PARAM_MOVEMENT_BOX_TRANSFER)
       result = new MovementBoxTransfer(model);
     else if (sub == PARAM_PREFERENCE_MOVEMENT)

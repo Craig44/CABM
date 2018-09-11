@@ -20,6 +20,7 @@
 #include "DerivedQuantities/Factory.h"
 #include "InitialisationPhases/Factory.h"
 #include "Likelihoods/Factory.h"
+#include "Minimisers/Factory.h"
 #include "Model/Model.h"
 #include "Observations/Factory.h"
 #include "PreferenceFunctions/Factory.h"
@@ -72,6 +73,8 @@ base::Object* Factory::CreateObject(const string& object_type, const string& sub
     return likelihoods::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_MODEL)
     return model_;
+  else if (lwr_object_type == PARAM_MINIMIZER)
+    return minimisers::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_OBSERVATION)
     return observations::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_PROCESS || lwr_object_type == PARAM_PROCESSES)

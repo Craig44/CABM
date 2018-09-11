@@ -19,6 +19,7 @@
 #include "InitialisationPhases/Manager.h"
 #include "Layers/Manager.h"
 #include "Likelihoods/Manager.h"
+#include "Minimisers/Manager.h"
 #include "Observations/Manager.h"
 #include "PreferenceFunctions/Manager.h"
 #include "Processes/Manager.h"
@@ -37,6 +38,7 @@ Managers::Managers(Model* model) {
 
   model_ = model;
 
+  minimiser_              = new minimisers::Manager();
   ageing_error_           = new ageingerrors::Manager();
   assert_                 = new asserts::Manager();
   derived_quantity_       = new derivedquantities::Manager();
@@ -49,6 +51,7 @@ Managers::Managers(Model* model) {
   report_                 = new reports::Manager(model_);
   selectivity_            = new selectivities::Manager();
   time_step_              = new timesteps::Manager();
+
 }
 
 /**
@@ -67,6 +70,8 @@ Managers::~Managers() {
   delete report_;
   delete selectivity_;
   delete time_step_;
+  delete minimiser_;
+
 }
 
 void Managers::Validate() {
@@ -83,6 +88,8 @@ void Managers::Validate() {
   selectivity_->Validate();
   preference_function_->Validate();
   process_->Validate(model_);
+  minimiser_->Validate();
+
 }
 
 void Managers::Build() {
@@ -98,6 +105,8 @@ void Managers::Build() {
   report_->Build();
   observation_->Build(); // this calls categorical layers
   initialisation_phase_->Build(model_);  // This calls report and process() so needs to be built after them
+  minimiser_->Build();
+
 }
 
 // bit of a hack to get around dependencies
@@ -124,6 +133,8 @@ void Managers::Reset() {
   report_->Reset();
   selectivity_->Reset();
   time_step_->Reset();
+  minimiser_->Reset();
+
 }
 
 } /* namespace niwa */

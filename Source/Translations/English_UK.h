@@ -54,6 +54,43 @@
 #define REPORT_R_VECTOR                      "{v}"
 #define REPORT_R_STRING_VECTOR               "{s}"    // This will not split a vector: used to read in warnings, see Logging.cpp warnings section
 
+
+
+//**********************************************************************
+// FMM
+//
+//**********************************************************************
+#define FMM_MANY_FUNCTION_EVALUATIONS             "Numerical_differences: Too many function evaluations"
+#define FMM_MANY_LOOPS_LINEAR_SEARCH              "Numerical_differences: Too many loops in this linear search"
+#define FMM_SMALL_LINEAR_STEP_SIZE                "Numerical_differences: Linear step size too small"
+#define FMM_MANY_QUASI_NEWTON_ITERATIONS          "Numerical_differences: Too many quasi-newton iterations"
+#define FMM_ITERATION                             "Numerical_differences: Iteration = "
+#define FMM_FUNCTION_VALUE                        "Numerical_differences: Function value = "
+#define FMM_CURRENT_PARAMETER_ESTIMATES           "Numerical_differences: Current parameter estimates = "
+#define FMM_MAX_NEWTON_STEP_FIVE                  "Numerical_differences: The max newton step has been taken 5 times, see D&S p 348"
+#define FMM_CONVERGENCE_CHECK                     "Numerical_differences: Convergence check value = "
+#define FMM_CONVERGENCE_THRESHOLD                 "Numerical_differences: Convergence tolerance   = "
+#define FMM_CONVERGENCE                           "Numerical_differences: Convergence = "
+#define FMM_FUNCTION_SCORE                        "Numerical_differences: Function score = "
+#define FMM_GRADIENT_VALUE                        "Numerical_differences: Gradient value = "
+#define FMM_SMALL_STEP_SIZE_CONVERGENCE           "Numerical_differences: Step size too small. Indicates successful convergence, but this is not a textbook ideal convergence"
+#define FMM_CONVERGENCE_NOT_TEXTBOOK              "Numerical_differences: "
+
+//**********************************************************************
+// GAMMADIFF
+//
+//**********************************************************************
+#define PARAM_GAMMADIFF                           "numerical_differences"
+#define GAMMADIFF_SIZE_LOWER_BOUND_START_VALUE    "Lower bound vector is not same size as start value"
+#define GAMMADIFF_SIZE_UPPER_BOUND_START_VALUE    "Upper bound vector is not same size as start value"
+#define GAMMADIFF_CONVERGENCE_UNCLEAR             "Unclear convergence, maybe local minimum"
+#define GAMMADIFF_EVALUATIONS_MAX                 "Maximum evaluations/iterations with no convergence"
+#define GAMMADIFF_CONVERGENCE                     "Convergence was successful"
+#define GAMMADIFF_CONVERGENCE_SUCCESSFUL          "Convergence was successful"
+#define GAMMADIFF_RETURN_VALUE_UNKNOWN            "Fatal error, unknown return value = "
+#define GAMMADIFF_LESS_START_LOWER_BOUND          "Start value is less than lower bound"
+#define GAMMADIFF_GREATER_START_UPPER_BOUND       "Start value is greater than upper bound"
+
 //**********************************************************************
 // PARAMETERS
 //
@@ -304,6 +341,7 @@
 #define PARAM_MATURE_BIOMASS                      "mature_biomass"
 #define PARAM_MATURE                              "mature"
 #define PARAM_MAX_AGE                             "max_age"
+#define PARAM_MAX_EVALUATIONS                     "evaluations"
 #define PARAM_MAX_ITER                            "max_iter"
 #define PARAM_MAX_THREADS_TO_USE                  "max_threads_to_use"
 #define PARAM_MAX_ITERATIONS                      "iterations"
@@ -325,6 +363,7 @@
 #define PARAM_MODEL_ATTRIBUTES                    "model_attributes"
 #define PARAM_MORTALITY                           "mortality"
 #define PARAM_MORTALITY_CONSTANT_RATE             "mortality_constant_rate"
+#define PARAM_MORTALITY_EFFORT_BASED_BARANOV      "mortality_effort_based_baranov"
 #define PARAM_MORTALITY_EVENT                     "mortality_event"
 #define PARAM_MORTALITY_EVENT_BIOMASS             "mortality_event_biomass"
 #define PARAM_MORTALITY_INSTANTANEOUS             "mortality_instantaneous"
@@ -502,6 +541,7 @@
 #define PARAM_START                               "start"
 #define PARAM_START_YEAR                          "start_year"
 #define PARAM_STATE                               "state"
+#define PARAM_STEP_SIZE                           "step_size"
 #define PARAM_SQUARE_ROOT                         "sqrt"
 #define PARAM_SQUARE_UNIFORM                      "square_uniform"
 #define PARAM_SSB                                 "ssb"

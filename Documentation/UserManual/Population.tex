@@ -418,7 +418,21 @@ y2 0.4
 \end{verbatim}}}
 
 \paragraph{Event-Biomass}
-This is a removal event such as fishing, where we iterate over a range of cells and remove agents based on some selectivity or spatial vulnerability.
+This is a removal event such as fishing, where we iterate over a range of cells and remove agents based on some selectivity or spatial vulnerability. This is the simplest way to remove individuals from an anthropogenic process, however it is quite annoying to set up for a spatial model with a fine spatial resolution. An example of how this process is set up is specified below, if you want an alternative fishing process that is based in theoretiical spatial fishing distributions see the next section (Section~\ref{para:effort_based_F}).
+
+
+
+
+\paragraph{Effort-Based F}\label{para:effort_based_F}
+A lot of this process was inspired by \cite{truesdell2017effects}, where users can specify some theoretical fishing distribution, currently only Ideal Free Distribution is allowed (but I am hoping to add a weighted ideal free distribution with user defined weights) and a total catch. \IBM\ will then go evaluate the relative effort based on the biomass and soon user defined weighting matrix.
+
+\begin{equation}
+	E_{row,col} = B_{row,col} * col
+\end{equation}
+
+%
+
+
 
 \subsubsection{\I{Movement}}
 \paragraph{\I{Box Transfer}}\label{subsubsec:box_transfer}
@@ -483,6 +497,10 @@ The above assumes that the probability of movement from one cell to another does
 You can see from the above example that the movement from cell 1 to all other cells has different probabilities from before 2000 and after 2000. The above example could be generalised furthur having a different probability matrix for every year, I kept it simple for illustration.
 
 
+
+
+
+
 \paragraph{\I{Preference Based movement}}\label{subsubsec:pref_movement}
 
 The preference in cell $i$ for preference variable $x$ can be described as,
@@ -519,7 +537,18 @@ where $\zeta$ is an arbitrary constant controlling the curvature of the function
 \sigma_i = \sqrt{2 * D_i * t}
 \end{equation}
 
-Where $t$ is the time steps we have applied the preference movement in annual cycle.
+Where $t$ is the time steps we have applied the preference movement in annual cycle. This process works well for stationary preference see (FIgure~\ref{fig:static_pref}) The problem with this implementation is that when an individual is in a cell with low preference and no gradient signal, it will randomly jump in any direction (is this biologically sensible?). For example Tuna
+
+\begin{figure}[htp]%
+	\centering
+	\subfloat[Preference over the spatial domain.]{{\includegraphics[width=5cm]{Figures/static_preference.png} }}%
+	\qquad
+	\subfloat[biomass of population with the preference on the left after 30 time steps]{{\includegraphics[width=5cm]{Figures/1990_total_biomass_by_cell_move.png} }}%
+	\label{fig:static_pref}%
+\end{figure}
+
+
+
 
 \subsection{\I{Derived Quantities}\label{sec:derived-quantities}}
 Derived quantities surround a mortality block and so the value of the derived quantity is calculated twice, once before the mortality block (Pre-Execute), and once after (Execute). The final value is an interpolation based on how much mortality the user wants to take into account when calculating derived quantities. If users set the \subcommand{proportion\_through\_mortality\_block} parameter equal to one or zero then only one calculation is taken, and can reduce the run time of some models, so it is worth exploring.
@@ -533,9 +562,12 @@ Derived quantities surround a mortality block and so the value of the derived qu
 Growth currently means updating length and weight for an agent, if the Von Bertalanffy formula currently is used (currently the default in agent class for initialising length) it follows the following formula
 
 \begin{equation}\label{VB}
-	\Delta L_i = (L_{i,\infty} - L_i)(1 - e^{-k_i})
+	\Delta L_{t,i} = p_t((L_{i,\infty} - L_i)(1 - e^{-k_i}))
 \end{equation}
 
+\begin{equation}\label{actual_growth}
+L_{t+1,i} = L_{t,i} + \Delta L_{t,i}
+\end{equation}
 
 Where $i$ indexes each agents own length and growth parameters. If the basic length weight formulation is used, then an agents weight follows the following formula.
 

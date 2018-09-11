@@ -32,6 +32,7 @@ namespace processes { class Manager; }
 namespace reports { class Manager; }
 namespace selectivities { class Manager; }
 namespace timesteps { class Manager; }
+namespace minimisers { class Manager; }
 
 class Estimables;
 class Model;
@@ -54,6 +55,7 @@ public:
   virtual reports::Manager*               report() { return report_; }
   virtual selectivities::Manager*         selectivity() { return selectivity_; }
   virtual timesteps::Manager*             time_step() { return time_step_; }
+  virtual minimisers::Manager*            minimiser() { return minimiser_; }
 
 protected:
   // methods
@@ -79,6 +81,8 @@ protected:
   reports::Manager*                   report_;
   selectivities::Manager*             selectivity_;
   timesteps::Manager*                 time_step_;
+  minimisers::Manager*                minimiser_;
+
 };
 
 } /* namespace niwa */
