@@ -54,6 +54,10 @@ void Iterative::DoBuild() {
     initial_layer_ = model_->managers().layer()->GetNumericLayer(intial_layer_label_);
     if (!initial_layer_)
       LOG_ERROR_P(PARAM_LAYER_LABEL) << "could not find layer does it exist? if it does exist, is of type numeric? because it needs to be";
+
+    if (!initial_layer_->is_proportion()) {
+      LOG_ERROR_P(PARAM_LAYER_LABEL) << "can you please make sure that the layer has subcommand proportion = true, this means the layer class will check if the layer is acceptable for this class so I don't have to duplicate code. THanks =)";
+    }
   }
 
   // Generate a pointer to the world
@@ -104,10 +108,26 @@ void Iterative::Execute() {
 
   // Move on and seed our n_agents
   unsigned cells = world_->get_enabled_cells();
-  unsigned agents_per_cell = (int)number_agents_ / (int)cells;
-  LOG_FINEST() << "number of cells = " << cells << " number of agents per cell = " << agents_per_cell;
-
-  float seed_z = model_->get_m();
+  vector<vector<unsigned>> agents_per_cell(model_->get_height());
+  for (unsigned row = 0; row < model_->get_width(); ++row) {
+    agents_per_cell[row].resize(model_->get_width());
+  }
+  if (intial_layer_label_ != "") {
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        agents_per_cell[row][col] = (int)number_agents_ / (int)cells;
+        LOG_FINEST() << "number of cells = " << cells << " number of agents per cell = " << agents_per_cell[row][col];
+      }
+    }
+  } else {
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        agents_per_cell[row][col] = (int)number_agents_ * initial_layer_->get_value(row,col);
+        LOG_FINEST() << "number of agents per cell = " << agents_per_cell[row][col];
+      }
+    }
+  }
+  float seed_z = model_->get_m(); //TODO put this at line 122 and give it a cell row and col call and return M if spatially variable
   // This is important to set, otherwise age distribution will get all weird
   unsigned init_year = model_->start_year() - years_ - 1;
   model_->set_current_year_in_initialisation(init_year);
@@ -118,7 +138,7 @@ void Iterative::Execute() {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
-        cell->seed_agents(agents_per_cell, seed_z);
+        cell->seed_agents(agents_per_cell[row][col], seed_z);
         LOG_FINEST() << "row " << row + 1 << " col = " << col + 1 << " seeded " << cell->agents_.size();
       }
     }

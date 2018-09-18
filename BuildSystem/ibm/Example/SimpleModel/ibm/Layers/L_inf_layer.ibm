@@ -1,0 +1,5 @@
+@layer L_inf_layer
+type numeric
+table layer
+64
+end_table

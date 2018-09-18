@@ -13,7 +13,6 @@ growth_process_label von_bert
 natural_mortality_process_label natural_mort
 #sexed false
 maturity_ogive_label mature_ogive
-max_threads_to_use 1 ## no need to go more than that as threading is based on number of cells 
 ## a single area model
 nrows 1
 ncols 1 
@@ -26,7 +25,7 @@ type iterative
 years 40
 #convergence_years 20 40
 #lambda 1
-number_of_individuals 100000 ## initial number of agents
+number_of_individuals 50000 ## initial number of agents
 layer_label Base
 
 # --------------
@@ -53,7 +52,7 @@ a 2.0e-6
 b 3.288
 update_growth_parameters false
 distribution lognormal
-cv 0.0001
+cv 0.2
 time_step_proportions 1
 
 # Maturity
@@ -67,9 +66,9 @@ update_mortality_parameters false
 m_multiplier_layer_label M_layer
 m 0.2
 distribution lognormal
-cv 0.0001
+cv 0.15
 selectivity_label One
-
+time_step_ratio 1
 
 # Fishing Mortality
 @process fishing

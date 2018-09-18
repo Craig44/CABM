@@ -1,4 +1,4 @@
 "Version"<-
 function() {
-return("2018-08-01(bc0688d)")
+return("2018-09-07(b192816)")
 }

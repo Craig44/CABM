@@ -575,22 +575,33 @@ Where $i$ indexes each agents own length and growth parameters. If the basic len
 \bar{w_i} = a_iL_i^{b_i}
 \end{equation}
 
+\IBM\ also allow users to seed variability into agent specific growth, two parameters that are allow to vary based on an underlying \textbf{lognormal} distribution are $L_{i,\infty}$ and $k_i$.\\
+
+$$E[L_{i,\infty}] = \text{configuration value}$$
+
+the same goes with $k_i$ and the variability is defined by the $CV$ note that the same cv gets used for randomly drawing both parameters. Aswell as individual variability you can also seed spatial variability in these two parameters. This is done by specifying a layer in the subcommand \subcommand{k\_layer\_label} or \subcommand{linf\_layer\_label}. Then the expectation of the growth parameter assigned to an individual in cell $j,k$ is 
+
+$$E[L_{i,\infty,j,k}] = \text{configuration value}\times \texttt{linf\_layer\_label}_{j,k}$$
+
+So obviously if the layer pointed to by \subcommand{linf\_layer\_label} are all = 1 then the expectation is the same as in the configuration file.\\
 
 When an agent is created (either in initialisation or through a recruitment process) or moves cell, it gets assigned new growth parameters that relate to that cell. This allows for spatial growth, one could hypothesis that environment may explain growth and so different environments over cells will cause different rates of growth. For the growth process you must specify either a spatial layer for mean values of each growth parameter or a single value (if growth doesn't change through space), a distribution and Coefficient of variation (CV). This randomly generates an agent a parameter from that distribution, an example of the syntax in a four area model,
 
 {\small{\begin{verbatim}
-		@model
-		...
-		initialisation_phases Iterative_initialisation
-		
-		@initialisation_phase Iterative_initialisation
-		type iterative
-		years 50
-		lambda 0.0001
-		convergence_years 20 40
-		layer_label Base
-		growth_process_label von_bert
-		natural_mortality_process_label natural_mort
+@process von_bert
+type growth_von_bertalanffy_with_basic_weight
+#linf_layer_label L_inf_layer
+linf 101.8
+#k_layer_label k_layer
+k 0.161
+a 2.0e-6 
+b 3.288
+distribution lognormal
+cv 0.15
+time_step_proportions 1 ## if growth occurs in multiple 
+#time step how much growth in each time step
+update_growth_parameters false ## if a individual moves area 
+#do we need to update its growth parameters.
 \end{verbatim}}}
 
 \subsection{\I{Preference Functions}\label{sec:preference_functions}}\textsl{}
@@ -753,8 +764,9 @@ Along with the \subcommand{years} parameter you can also set the spatial distrib
 \subsubsection*{The number of agents in the system} 
 This one should be obvious and we suggest that you play with the initialisation parameter \subcommand{number\_of\_agents} to see how sensitive model outputs are to this parameter. The less agents in the system the faster your model run, however the less agents the more coarse you model becomes because then an entity all of a sudden represents 1000 entities, so once again we return to a compromise.
 
-\subsubsection*{The number of threads available} 
-\IBM\ is threaded using the OpenMP C++ library, by default \IBM\ will set the number threads available equal to number available on your machine minus 1. You can set this through the \command{model} parameter \subcommand{max\_threads\_to\_use}, we suggest you set this to the number of spatial cells in the system, there might be more overheads with making more threads available than the model will ever use (disclaimer I haven't tested this). 
+\subsubsection*{The number of threads available}
+\textbf{Disabled} was not implemented correctly the first time, still to many shared resources.. 
+%\IBM\ is threaded using the OpenMP C++ library, by default \IBM\ will set the number threads available equal to number available on your machine minus 1. You can set this through the \command{model} parameter \subcommand{max\_threads\_to\_use}, we suggest you set this to the number of spatial cells in the system, there might be more overheads with making more threads available than the model will ever use (disclaimer I haven't tested this). 
 
 \subsubsection*{more ways than one to skin a cat} 
-Hopefully throughout the process and derived quantities I have discussed alternative ways to set up a similar model. Given there generality of the program there are more than one way to approximate dynamics and some will be more computationally quicker than others. So have a play around but try and keep the number of times we iterate over the state as small as possible, as you will get significant time saving.
+Hopefully throughout the process and derived quantities I have discussed alternative ways to set up a similar model. Given there generality of the program there are more than one way to approximate dynamics and some will be more computationally quicker than others. So have a play around but try and keep the number of times we iterate over the state as small as possible, as you will get significant time saving. It is also possible to make your own specific process that does a range of processes at one time, thus saving a lot of time. This can be easily done by looking over the current processes and taking the functionality that has been tested and copy them in to a new file.

@@ -24,7 +24,8 @@ public:
   virtual void                set_value(unsigned RowIndex, unsigned ColIndex, float Value);  // TODO once we have children make this pure virtual
   virtual float               get_value(unsigned RowIndex, unsigned ColIndex);
   virtual float               get_value(unsigned RowIndex, unsigned ColIndex, unsigned year);
-  bool                       is_static() {return static_layer_;};
+  bool                        is_static() {return static_layer_;};
+  bool                        is_proportion() {return proportion_;};
 
 
 protected:
@@ -36,7 +37,6 @@ protected:
   parameters::Table*          data_table_ = nullptr;
   bool                        proportion_;
   bool                        static_layer_; // is this layer pre-defined (user input) or calculated on the fly
-
 
 };
 

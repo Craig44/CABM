@@ -161,7 +161,7 @@ double Engine::optimise_finite_differences(gammadiff::CallBack& objective, vecto
   LOG_FINE() << "Build scaled values";
 
   // Loop through our Minimiser now
-  while (clMinimiser.getResult() >= 0 || abs(objective(vCurrentValues)) > 10) { // Add an extra condition for Baranov, if SSE <= 10 I am happy with this solution
+  while (clMinimiser.getResult() >= 0) {
     // Do we need to evaluate objective function again?
     if ((clMinimiser.getResult() == 0) || (clMinimiser.getResult() == 2)) {
       // Reset Variables

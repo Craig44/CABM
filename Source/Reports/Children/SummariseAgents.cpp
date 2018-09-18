@@ -70,7 +70,7 @@ void SummariseAgents::DoExecute() {
 
   unsigned temp_n_agents = n_agents_;
 
-  cache_ << "row-col agent_ndx age age_index length length_index weight scalar sex mature\n";
+  cache_ << "row-col agent_ndx age age_index length length_index weight scalar sex mature M L_inf k a b\n";
   while (temp_n_agents != 0) {
     // Randomly select a cell
     unsigned row_index = rng.chance() * rows_.size();
@@ -81,7 +81,8 @@ void SummariseAgents::DoExecute() {
       unsigned agent_ndx = rng.chance() * cell->agents_.size();
       auto agent = cell->agents_.begin();
       advance(agent,agent_ndx);
-      cache_ << row_index + 1 << "-" << col_index + 1 << " " << agent_ndx + 1 <<  " " << (*agent).get_age() <<  " " << (*agent).get_age_index() << " " << (*agent).get_length() << " " << (*agent).get_length_bin_index() << " " << (*agent).get_weight() << " " << (*agent).get_scalar() << " " <<  (*agent).get_sex() << " " << (*agent).get_maturity() << "\n";
+      cache_ << row_index + 1 << "-" << col_index + 1 << " " << agent_ndx + 1 <<  " " << (*agent).get_age() <<  " " << (*agent).get_age_index() << " " << (*agent).get_length() << " " << (*agent).get_length_bin_index() << " " << (*agent).get_weight() << " " << (*agent).get_scalar() << " " <<  (*agent).get_sex() << " " << (*agent).get_maturity()
+          << " " << (*agent).get_m() << " " << (*agent).get_first_age_length_par() << " " << (*agent).get_second_age_length_par() << " " << (*agent).get_first_length_weight_par() << " " << (*agent).get_second_length_weight_par()  << "\n";
       --temp_n_agents;
     }
   }

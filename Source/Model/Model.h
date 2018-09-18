@@ -185,7 +185,7 @@ protected:
   bool                        sex_;
   float                       proportion_male_;
   vector<string>              maturity_ogives_;
-  unsigned                    max_threads_;
+  unsigned                    max_threads_ = 1;
 
   Managers*                   managers_ = nullptr;
   Objects*                    objects_ = nullptr;
