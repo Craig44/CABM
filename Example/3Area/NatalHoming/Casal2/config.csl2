@@ -1,0 +1,412 @@
+#THE MODEL constraints
+@model
+start_year 1900 
+final_year 2013
+min_age 0
+max_age 20
+age_plus true
+base_weight_units tonnes
+initialisation_phases Equilibrium_state
+time_steps time_step_one time_step_two
+
+#CATEGORIES
+@categories 
+format stock.area
+names EN.EN EN.HG EN.BP HG.EN HG.HG HG.BP BP.EN BP.HG BP.BP 
+age_lengths EN_age_size*3 HG_age_size*3 BP_age_size*3
+
+@initialisation_phase Equilibrium_state
+type derived
+
+## Define the processes in the Annual Cycle
+## This is a list of labels that correspond to a process
+# --------------
+# Annual Sequence
+# --------------
+# --- Time step 1
+# - Ageing
+# - Migrate Home
+# - Spawning
+# --- Time step 2
+# - Recruitment
+# - Move around
+# - M + F
+
+@time_step time_step_one 
+processes  Ageing movement_HG_home movement_EN_home movement_BP_home
+
+@time_step time_step_two
+processes  Recruitment_EN Recruitment_HG Recruitment_BP movement_EN_HG movement_EN_BP  movement_HG_EN movement_HG_BP  movement_BP_HG movement_BP_EN instantaneous_mort
+########################
+## Define the Processes
+########################
+## Natal Homing
+@process movement_HG_home
+type transition_category
+from HG.EN HG.BP
+to HG.HG HG.HG
+proportions 1 1
+selectivities One One
+
+@process movement_EN_home
+type transition_category
+from EN.HG EN.BP
+to EN.EN EN.EN
+proportions 1 1
+selectivities One One
+
+@process movement_BP_home
+type transition_category
+from BP.EN BP.HG
+to BP.BP BP.BP
+proportions 1 1
+selectivities One One
+
+## Other Migrations
+@process movement_EN_BP
+type transition_category
+from EN.HG
+to EN.BP
+proportions 0.038
+selectivities One
+
+@process movement_EN_HG
+type transition_category
+from EN.EN
+to EN.HG
+proportions 0.078
+selectivities One
+
+@process movement_HG_EN
+type transition_category
+from HG.HG
+to   HG.EN
+proportions 0.086
+selectivities One
+
+@process movement_HG_BP
+type transition_category
+from HG.EN
+to HG.BP
+proportions 0.024
+selectivities One
+
+@process movement_BP_EN
+type transition_category
+from BP.HG
+to BP.EN
+proportions 0.36
+selectivities One
+
+@process movement_BP_HG
+type transition_category
+from BP.BP
+to BP.HG
+proportions 0.148
+selectivities One
+
+## Recruitment
+@process Recruitment_EN
+type recruitment_beverton_holt
+categories EN.EN
+proportions 1 
+ssb SSB_EN
+b0 113880
+steepness 1
+age 0
+ycs_years 1900:2013
+ycs_values 1*114
+ssb_offset 0
+
+@process Recruitment_HG
+type recruitment_beverton_holt
+categories HG.HG
+proportions 1 
+ssb SSB_HG
+b0 127644
+steepness 1
+age 0
+ycs_years 1900:2013
+ycs_values 1*114
+ssb_offset 0
+
+@process Recruitment_BP
+type recruitment_beverton_holt
+categories BP.BP
+proportions 1 
+ssb SSB_BP
+b0 40000
+steepness 1
+age 0
+ycs_years 1900:2013
+ycs_values 1*114
+ssb_offset 0
+
+## Ageing
+@process Ageing
+type ageing
+categories *
+
+## Mort
+@process instantaneous_mort
+type mortality_instantaneous
+categories *
+m 0.075
+selectivities One*9
+time_step_ratio 1
+table catches
+year	EN_LL	HG_LL	BP_LL
+1900	233	474	211
+1901	311	632	282
+1902	311	632	282
+1903	311	632	282
+1904	311	632	282
+1905	311	632	282
+1906	311	632	282
+1907	311	632	282
+1908	311	632	282
+1909	311	632	282
+1910	311	632	282
+1911	311	632	282
+1912	311	632	282
+1913	311	632	282
+1914	311	632	282
+1915	311	632	282
+1916	372	754	337
+1917	617	1249	558
+1918	551	1118	499
+1919	436	887	396
+1920	508	1030	460
+1921	552	1124	502
+1922	588	1195	533
+1923	703	1428	637
+1924	805	1634	730
+1925	922	1874	837
+1926	704	1431	639
+1927	870	1768	790
+1928	587	1193	532
+1929	715	1451	648
+1930	759	1542	689
+1931	522	1060	473
+1932	532	1079	482
+1933	607	1235	552
+1934	671	1365	609
+1935	838	1703	760
+1936	992	2013	899
+1937	879	1790	799
+1938	956	1942	867
+1939	920	1870	835
+1940	794	1612	720
+1941	744	1514	676
+1942	637	1295	578
+1943	695	1408	629
+1944	765	1551	693
+1945	744	1513	675
+1946	801	1627	726
+1947	865	1758	784
+1948	1007	2044	913
+1949	879	1787	797
+1950	770	1562	698
+1951	649	1318	588
+1952	570	1158	517
+1953	557	1132	506
+1954	650	1321	589
+1955	673	1366	610
+1956	718	1459	652
+1957	798	1621	723
+1958	779	1583	707
+1959	872	1772	791
+1960	1043	1787	930
+1961	1167	1713	1028
+1962	1387	1834	1211
+1963	1583	1908	1374
+1964	1753	1929	1511
+1965	1989	2083	1708
+1966	2233	2254	1912
+1967	2432	2332	2076
+1968	2723	2602	2325
+1969	2769	2981	2383
+1970	2142	3421	2885
+1971	2856	3645	2895
+1972	2593	3221	2525
+1973	2416	2986	2269
+1974	996	536	718
+1975	750	430	530
+1976	601	454	431
+1977	511	555	361
+1978	451	749	321
+1979	658	1062	442
+1980	660	1032	415
+1981	824	1206	489
+1982	890	1291	525
+1983	1714	1702	457
+1984	1357	1576	431
+1985	1324	1970	578
+1986	1202	1391	643
+1987	698	1228	365
+1988	861	1927	288
+1989	963	2103	194
+1990	943	1617	274
+1991	856	1576	392
+1992	876	1978	428
+1993	855	1948	397
+1994	943	1654	422
+1995	1011	1527	496
+1996	1157	1219	482
+1997	1200	1219	423
+1998	976	1205	226
+1999	875	1375	314
+2000	949	1204	351
+2001	915	1305	453
+2002	763	1284	419
+2003	565	1226	413
+2004	680	981	341
+2005	629	878	405
+2006	676	810	383
+2007	771	726	325
+2008	727	800	298
+2009	702	909	199
+2010	727	859	374
+2011	780	900	365
+2012	707	963	367
+2013	707	963	367
+end_table
+
+table method
+method  	category 		selectivity 	u_max 	time_step 		penalty
+EN_LL   	EN.EN	 	Sel_LL 		0.7 	time_step_two 		none
+EN_LL   	HG.EN	 	Sel_LL 		0.7 	time_step_two 		none
+EN_LL   	BP.EN	 	Sel_LL 		0.7 	time_step_two 		none
+
+HG_LL   	HG.HG 	 	Sel_LL 		0.7 	time_step_two 		none
+HG_LL   	EN.HG 	 	Sel_LL 		0.7 	time_step_two 		none
+HG_LL   	BP.HG 	 	Sel_LL 		0.7 	time_step_two 		none
+
+BP_LL   	BP.BP 	 	Sel_LL 		0.7 	time_step_two 		none
+BP_LL   	EN.BP 	 	Sel_LL 		0.7 	time_step_two 		none
+BP_LL   	HG.BP 	 	Sel_LL 		0.7 	time_step_two 		none
+end_table
+
+
+######################
+## Derived Quantities
+######################
+## SSB which gets feed into Recruitment
+@derived_quantity SSB_EN
+type biomass
+time_step time_step_one
+categories area=EN
+time_step_proportion  0.0
+selectivities MaturationSel*3
+
+@derived_quantity SSB_HG
+type biomass
+time_step time_step_one
+categories area=HG
+time_step_proportion  0.0
+selectivities MaturationSel*3
+
+@derived_quantity SSB_BP
+type biomass
+time_step time_step_one
+categories area=BP
+time_step_proportion 0.0
+selectivities MaturationSel*3
+
+#################
+# SELECTIVITIES
+#################
+@selectivity MaturationSel
+type all_values_bounded
+l 3
+h 8
+v 0.00 0.5 1.00 1.00 1.00 1.00
+
+@selectivity Sel_LL
+type double_normal
+mu 7.809513 
+sigma_l 1.861128
+sigma_r 100
+
+@selectivity One
+type constant 
+c 1
+
+#################
+## Length at age
+#################
+@age_length EN_age_size
+type von_bertalanffy
+casal_switch T
+length_weight Length_weight
+k 0.1038159 
+t0 -1.6706344
+linf 51.8467644 
+time_step_proportions 0 0
+
+@age_length HG_age_size
+type von_bertalanffy
+casal_switch T
+length_weight Length_weight
+k 0.07460189
+t0 -1.83048217
+linf 61.78748719 
+time_step_proportions 0 0
+
+@age_length BP_age_size
+type von_bertalanffy
+casal_switch T
+length_weight Length_weight
+k 0.07690299
+t0 -2.17092529
+linf 64.43335456 
+time_step_proportions 0 0
+#################
+## Weigth at Length
+#################
+@length_weight Length_weight
+type basic
+units tonnes 
+a 4.467e-08
+b 2.793
+
+############################
+## Report section for now
+## Print estimate values
+@report Rec_EN
+type process
+process Recruitment_EN
+
+@report Rec_HG
+type process
+process Recruitment_HG
+
+@report Rec_BP
+type process
+process Recruitment_BP
+
+@report instantaneous_mort
+type process
+process instantaneous_mort
+
+## print the partition
+@report Init
+type initialisation_partition
+
+@report mean_weight_1
+type partition_mean_weight
+years 1900
+time_step time_step_one
+
+@report mean_weight_2
+type partition_mean_weight
+years 1900
+time_step time_step_two
+
+@report Sel_LL
+type selectivity
+selectivity Sel_LL
+
+## Derived Quantities
+@report derived_quants
+type derived_quantity

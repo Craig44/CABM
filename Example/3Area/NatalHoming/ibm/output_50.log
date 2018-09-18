@@ -1,0 +1,208 @@
+IBM
+Call: ibm -r 
+Seed: 123
+Date: Tue Sep 18 12:13:19 2018
+Version: 2018-09-07 08:59:53 UTC (rev. b192816)
+Environment: machine:DESKTOP-D3MBM6L, user:Dell User, os:Windows_NT, pid:7532
+
+*initialisation_partition[init_1]
+ewuilibrium_shortcut: 1949
+values {d}
+row-col 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+1-1 24109 22275 20615 19255 17716 16312 15424 14283 13304 12134 11580 10654 9898 9062 8492 7767 7238 6754 6310 5918 74233
+2-1 24135 22151 20796 19384 17942 16419 15328 14293 13368 12072 11371 10644 9840 9121 8398 7984 7338 6655 6094 5801 74199
+3-1 24344 22365 20779 18998 17689 16857 15297 14357 13175 12363 11273 10603 9663 9110 8348 7732 7294 6788 6146 5812 74340
+*end
+
+*initialisation_partition[init_2]
+year: 1999
+values {d}
+row-col 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+1-1 28017 26097 24327 22510 20911 19358 17796 16458 15456 14399 13276 12349 11398 10727 9943 9176 8464 7878 7311 6770 85965
+2-1 31280 28903 26780 24988 23275 21509 19998 18593 17172 15922 14894 13524 12698 11827 11120 10214 9327 8724 8027 7487 95553
+3-1 7833 7370 6716 6090 5767 5232 5029 4575 4265 3920 3659 3483 3155 3006 2671 2538 2291 2172 2023 1893 27988
+*end
+
+*age_frequency_by_cell[age_freq]
+year: 2000
+time_step: half_M
+values {d}
+row-col 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+1-1 27971 25969 24135 22508 20862 19273 17909 16340 15093 14128 13161 12151 11382 10465 9847 9108 8370 7743 7100 6707 84901
+2-1 31518 29062 26972 24944 23148 21557 19700 18370 17143 15770 14604 13729 12421 11640 10840 10153 9446 8549 8090 7387 94726
+3-1 7694 7280 6854 6234 5757 5355 4918 4623 4200 3925 3634 3380 3227 2855 2801 2548 2337 2159 2018 1901 27499
+*end
+
+*age_frequency_by_cell[age_freq]
+year: 2001
+time_step: half_M
+values {d}
+row-col 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+1-1 28135 26080 24153 22410 20988 19236 17825 16362 14968 13943 12986 12017 11212 10425 9702 9014 8352 7699 7136 6548 84020
+2-1 31306 29046 26876 25065 22990 21624 19888 18098 16779 15585 14409 13532 12576 11435 10501 9982 9317 8642 7828 7444 93562
+3-1 7798 7157 6713 6222 5788 5302 4912 4551 4263 3896 3629 3338 3120 2964 2674 2606 2277 2132 1969 1816 27254
+*end
+
+*process[mature_report]
+label: Maturation
+type: maturation
+year: 
+agents_mature: 
+*end
+
+*process[fishing]
+catch_layers: 1900_catch 1901_catch 1902_catch 1903_catch 1904_catch 1905_catch 1906_catch 1907_catch 1908_catch 1909_catch 1910_catch 1911_catch 1912_catch 1913_catch 1914_catch 1915_catch 1916_catch 1917_catch 1918_catch 1919_catch 1920_catch 1921_catch 1922_catch 1923_catch 1924_catch 1925_catch 1926_catch 1927_catch 1928_catch 1929_catch 1930_catch 1931_catch 1932_catch 1933_catch 1934_catch 1935_catch 1936_catch 1937_catch 1938_catch 1939_catch 1940_catch 1941_catch 1942_catch 1943_catch 1944_catch 1945_catch 1946_catch 1947_catch 1948_catch 1949_catch 1950_catch 1951_catch 1952_catch 1953_catch 1954_catch 1955_catch 1956_catch 1957_catch 1958_catch 1959_catch 1960_catch 1961_catch 1962_catch 1963_catch 1964_catch 1965_catch 1966_catch 1967_catch 1968_catch 1969_catch 1970_catch 1971_catch 1972_catch 1973_catch 1974_catch 1975_catch 1976_catch 1977_catch 1978_catch 1979_catch 1980_catch 1981_catch 1982_catch 1983_catch 1984_catch 1985_catch 1986_catch 1987_catch 1988_catch 1989_catch 1990_catch 1991_catch 1992_catch 1993_catch 1994_catch 1995_catch 1996_catch 1997_catch 1998_catch 1999_catch 2000_catch 2001_catch 2002_catch 2003_catch 2004_catch 2005_catch 2006_catch 2007_catch 2008_catch 2009_catch 2010_catch 2011_catch 2012_catch 2013_catch
+handling_mortality: 1
+label: fishing
+minimum_legel_length: 0
+selectivity: Sel_LL Sel_LL
+type: mortality_event_biomass
+years: 1900 1901 1902 1903 1904 1905 1906 1907 1908 1909 1910 1911 1912 1913 1914 1915 1916 1917 1918 1919 1920 1921 1922 1923 1924 1925 1926 1927 1928 1929 1930 1931 1932 1933 1934 1935 1936 1937 1938 1939 1940 1941 1942 1943 1944 1945 1946 1947 1948 1949 1950 1951 1952 1953 1954 1955 1956 1957 1958 1959 1960 1961 1962 1963 1964 1965 1966 1967 1968 1969 1970 1971 1972 1973 1974 1975 1976 1977 1978 1979 1980 1981 1982 1983 1984 1985 1986 1987 1988 1989 1990 1991 1992 1993 1994 1995 1996 1997 1998 1999 2000 2001 2002 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013
+
+biomass_removed: 2563.42 2695.88 
+catch_input_removed: 2504 2673 
+age_frequency {d}
+year 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 
+2000 0 0 0 4 43 116 228 430 411 400 358 315 274 332 260 254 243 221 200 179 2395 
+2001 0 0 0 8 32 98 236 362 394 382 357 293 301 295 253 255 227 220 188 177 2317 
+*end
+
+*process[Jump_One]
+label: Jump_One
+movement_type: markovian
+origin_cell: 1-1 2-1 3-1
+probability_layers: EN_jump_one HG_jump_one BP_jump_one
+type: movement_box_transfer
+initial_numbers_in_cell: 404778
+2000_1-1_destination {m}
+371963 
+31573 
+1242 
+initial_numbers_in_cell: 452070
+2000_2-1_destination {m}
+38539 
+412588 
+943 
+initial_numbers_in_cell: 147663
+2000_3-1_destination {m}
+7884 
+21924 
+117855 
+initial_numbers_in_cell: 401963
+2001_1-1_destination {m}
+369275 
+31477 
+1211 
+initial_numbers_in_cell: 449611
+2001_2-1_destination {m}
+38678 
+410004 
+929 
+initial_numbers_in_cell: 146951
+2001_3-1_destination {m}
+7844 
+21947 
+117160 
+*end
+
+*process[Movement_home]
+label: Movement_home
+movement_type: natal_homing
+origin_cell: 1-1 2-1 3-1
+probability_layers: EN_home HG_home BP_home
+type: movement_box_transfer
+initial_numbers_in_cell: 388586
+2000_1-1_destination {m}
+345170 
+36181 
+7235 
+initial_numbers_in_cell: 431815
+2000_2-1_destination {m}
+29156 
+382167 
+20492 
+initial_numbers_in_cell: 111676
+2000_3-1_destination {m}
+1151 
+880 
+109645 
+initial_numbers_in_cell: 385123
+2001_1-1_destination {m}
+342364 
+35499 
+7260 
+initial_numbers_in_cell: 429769
+2001_2-1_destination {m}
+29145 
+380389 
+20235 
+initial_numbers_in_cell: 111199
+2001_3-1_destination {m}
+1153 
+881 
+109165 
+*end
+
+*process[Rec_EN]
+b0: 113880
+label: Recruitment_EN
+recruitment_layer_label: recruitment_EN
+ssb: SSB_EN
+type: recruitment_constant
+r0: 29301
+years: 2000 2001 
+recruits: 29301 29301 
+*end
+
+*process[Rec_HG]
+b0: 127644
+label: Recruitment_HG
+recruitment_layer_label: recruitment_HG
+ssb: SSB_HG
+type: recruitment_constant
+r0: 32842
+years: 2000 2001 
+recruits: 32842 32842 
+*end
+
+*process[Rec_BP]
+b0: 40000
+label: Recruitment_BP
+recruitment_layer_label: recruitment_BP
+ssb: SSB_BP
+type: recruitment_constant
+r0: 10291
+years: 2000 2001 
+recruits: 10291 10291 
+*end
+
+*derived_quantity[derived_quants]
+SSB_HG {L} 
+type: mature_biomass 
+initialisation_phase[1]: 7.78493 
+values {v}
+2000 92976.6
+2001 85044.2
+end {L}
+SSB_BP {L} 
+type: mature_biomass 
+initialisation_phase[1]: 8.82932 
+values {v}
+2000 105573
+2001 97112.2
+end {L}
+SSB_EN {L} 
+type: mature_biomass 
+initialisation_phase[1]: 7.0129 
+values {v}
+2000 82488.6
+2001 75918.5
+end {L}
+*end
+
+*model_attributes[model_attributes]
+global_scalar: 12796.5
+*end
+
+Total elapsed time: 5.85 minutes
+Completed

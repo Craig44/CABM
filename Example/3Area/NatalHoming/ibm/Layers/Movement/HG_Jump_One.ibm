@@ -1,0 +1,9 @@
+@layer HG_jump_one
+type numeric
+proportions true
+## cells could be areas if we wanted densities
+table layer
+0.086
+0.911936
+0.002064
+end_table

@@ -1,0 +1,31 @@
+# A little experiment on how to move individuals around box's (Box transfer)
+N = 1000000 ## in cell 1
+prob = c(0.333333,0.033333,0.6333333)
+area = c(1,2,3)
+## prob = probabiliity of moving to another cell
+area_freq = area_move2 = area_move = vector(length = 3, mode = "numeric");
+for (i in 1:N) {
+  ## Current implementation
+  possible_area = sample(area,1)
+  area_freq[possible_area] = area_freq[possible_area] + 1;
+  if( runif(1) <= prob[possible_area]) {
+    area_move[possible_area] = area_move[possible_area] + 1;
+  }
+  ## proposed implementation
+  ndx = which(as.numeric(rmultinom(1,size = 1, prob)) > 0)
+  area_move2[ndx] = area_move2[ndx] + 1;
+}
+## Current implementation
+N - sum(area_move) ## individuals that didn't move add them to the cell they were in
+area_move[1] = area_move[1] + N - sum(area_move)
+area_move / sum(area_move)
+
+## proposed implementation
+N - sum(area_move2) ## no need to make an adjustment as they are all moved using the multinomial
+area_move2 / sum(area_move2)
+
+## How do we apply this with a selectivity
+
+
+
+
