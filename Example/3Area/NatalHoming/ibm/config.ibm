@@ -6,8 +6,8 @@
 # A single growth curve (could make it spatial so in effect having two growth curves for each area)
 # spatially explicit recruitment
 @model
-start_year 2000
-final_year 2001
+start_year 1980
+final_year 1991
 min_age 0
 max_age 20
 age_plus true # other acceptable inputs for bool are '1' and 'yes'
@@ -20,8 +20,6 @@ growth_process_label von_bert
 natural_mortality_process_label natural_mort
 #sexed false
 maturity_ogive_label mature_ogive
-#max_threads_to_use 1 ## no need to go more than that as threading is based on number of cells 
-## a single area model
 nrows 3
 ncols 1
 
@@ -30,18 +28,20 @@ ncols 1
 # --------------
 @initialisation_phase Iterative
 type iterative
-years 100
+years 70
 #convergence_years 20 40
 #lambda 1
-number_of_individuals 1000000 ## initial number of agents
-layer_label Base
+number_of_individuals 1500000 ## initial number of agents
+layer_label initial_values
+recruitment_layer_label recruitment_layer
 ## Define the processes in the Annual Cycle
 ## This is a list of labels that correspond to a process
 # --------------
 # Annual Sequence
 # --------------
 # --- Time step 1
-# - Ageing (implicit)
+# - Ageing + growth + maturation (implicit) + (explicit) + explicit
+# - Maturity
 # - Migrate Home
 # - Spawning
 # --- Time step 2
@@ -50,10 +50,10 @@ layer_label Base
 # - 0.5M + F + 0.5M
 
 @time_step time_step_one 
-processes Movement_home
+processes von_bert Maturation Movement_home
 
 @time_step time_step_two
-processes  Recruitment_EN Recruitment_HG Recruitment_BP Jump_One natural_mort fishing
+processes  Recruitment_EN Recruitment_HG Recruitment_BP Jump_One natural_mort #fishing
 
 @time_step half_M
 processes natural_mort
@@ -76,7 +76,7 @@ b 2.793
 update_growth_parameters false ## this means that your growth is that of your birth area.
 distribution lognormal
 cv 0.0001
-time_step_proportions 0
+time_step_proportions 1
 
 # Maturity
 @process Maturation
@@ -96,8 +96,8 @@ time_step_ratio 0.5 0.5
 # Fishing Mortality
 @process fishing
 type mortality_event_biomass
-years 1900:2013
-catch_layers 1900_catch 1901_catch 1902_catch 1903_catch 1904_catch 1905_catch 1906_catch 1907_catch 1908_catch 1909_catch 1910_catch 1911_catch 1912_catch 1913_catch 1914_catch 1915_catch 1916_catch 1917_catch 1918_catch 1919_catch 1920_catch 1921_catch 1922_catch 1923_catch 1924_catch 1925_catch 1926_catch 1927_catch 1928_catch 1929_catch 1930_catch 1931_catch 1932_catch 1933_catch 1934_catch 1935_catch 1936_catch 1937_catch 1938_catch 1939_catch 1940_catch 1941_catch 1942_catch 1943_catch 1944_catch 1945_catch 1946_catch 1947_catch 1948_catch 1949_catch 1950_catch 1951_catch 1952_catch 1953_catch 1954_catch 1955_catch 1956_catch 1957_catch 1958_catch 1959_catch 1960_catch 1961_catch 1962_catch 1963_catch 1964_catch 1965_catch 1966_catch 1967_catch 1968_catch 1969_catch 1970_catch 1971_catch 1972_catch 1973_catch 1974_catch 1975_catch 1976_catch 1977_catch 1978_catch 1979_catch 1980_catch 1981_catch 1982_catch 1983_catch 1984_catch 1985_catch 1986_catch 1987_catch 1988_catch 1989_catch 1990_catch 1991_catch 1992_catch 1993_catch 1994_catch 1995_catch 1996_catch 1997_catch 1998_catch 1999_catch 2000_catch 2001_catch 2002_catch 2003_catch 2004_catch 2005_catch 2006_catch 2007_catch 2008_catch 2009_catch 2010_catch 2011_catch 2012_catch 2013_catch
+years 1990:1991 #1900:2013
+catch_layers /*1900_catch 1901_catch 1902_catch 1903_catch 1904_catch 1905_catch 1906_catch 1907_catch 1908_catch 1909_catch 1910_catch 1911_catch 1912_catch 1913_catch 1914_catch 1915_catch 1916_catch 1917_catch 1918_catch 1919_catch 1920_catch 1921_catch 1922_catch 1923_catch 1924_catch 1925_catch 1926_catch 1927_catch 1928_catch 1929_catch 1930_catch 1931_catch 1932_catch 1933_catch 1934_catch 1935_catch 1936_catch 1937_catch 1938_catch 1939_catch 1940_catch 1941_catch 1942_catch 1943_catch 1944_catch 1945_catch 1946_catch 1947_catch 1948_catch 1949_catch 1950_catch 1951_catch 1952_catch 1953_catch 1954_catch 1955_catch 1956_catch 1957_catch 1958_catch 1959_catch 1960_catch 1961_catch 1962_catch 1963_catch 1964_catch 1965_catch 1966_catch 1967_catch 1968_catch 1969_catch 1970_catch 1971_catch 1972_catch 1973_catch 1974_catch 1975_catch 1976_catch 1977_catch 1978_catch 1979_catch 1980_catch 1981_catch 1982_catch 1983_catch 1984_catch 1985_catch 1986_catch 1987_catch 1988_catch 1989_catch*/ 1990_catch 1991_catch /*1992_catch 1993_catch 1994_catch 1995_catch 1996_catch 1997_catch 1998_catch 1999_catch 2000_catch 2001_catch 2002_catch 2003_catch 2004_catch 2005_catch 2006_catch 2007_catch 2008_catch 2009_catch 2010_catch 2011_catch 2012_catch 2013_catch*/
 selectivity Sel_LL
 #minimum_legel_length 20
 #handling_mortality 0.0
@@ -133,7 +133,7 @@ ssb SSB_EN
 @process Recruitment_BP
 type recruitment_constant
 recruitment_layer_label recruitment_BP
-b0 40000
+b0 38440.8
 ssb SSB_BP
 
 
@@ -166,7 +166,7 @@ v 0.00 0.5 1.00 1.00 1.00 1.00
 
 @selectivity Sel_LL
 type double_normal
-mu 7.809513 
+mu 4.809513 
 sigma_l 1.861128
 sigma_r 100
 
@@ -268,6 +268,11 @@ type derived_quantity
 # print SSB's
 @report model_attributes
 type model_attributes
+
+@report agents
+type summarise_agents
+number_of_individuals 100
+time_step half_M
 /*
 @observation fishery_age
 type process_removals_by_age
@@ -306,6 +311,8 @@ time_step Annual
 !include "Layers/M_layer.ibm"
 !include "Layers/k_layer.ibm"
 !include "Layers/L_inf_layer.ibm"
+!include "Layers/initial_seed_layer.ibm"
+!include "Layers/recruitment_processes.ibm"
 
 !include "Layers/recruitment_HG_area.ibm"
 !include "Layers/recruitment_BP_area.ibm"
