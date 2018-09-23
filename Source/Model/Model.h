@@ -95,11 +95,13 @@ public:
   unsigned                    get_r0(string recruitment_label)  {return r0_[recruitment_label]; }
   void                        set_ssb(string recruitment_label, unsigned ssb) {ssb_[recruitment_label] = ssb; }
   float                       get_ssb(string recruitment_label)  {return ssb_[recruitment_label]; }
-  void                        set_scalar(float value) {global_scalar_ = value; }
-  float                       get_scalar()  {return global_scalar_; }
+  void                        set_scalar(string recruitment_label, float value) {scalar_[recruitment_label] = value; }
+  virtual const map<string, float>&   get_scalars() {return scalar_; }
+  float                       get_scalar(string recruitment_label)  {return scalar_[recruitment_label]; }
   void                        set_m(float value) {m_ = value; }
   float                       get_m()  {return m_; }
   void                        set_n_agents(unsigned value) {n_agents_ = value; }
+
   virtual const unsigned      get_n_agents() const {return n_agents_; }
 
   virtual const vector<string>& time_steps() const { return time_steps_; }
@@ -181,7 +183,7 @@ protected:
   string                      growth_process_label_;
   float                       m_; // natural mortality
   map<string, float>          ssb_;
-  float                       global_scalar_ = 1.0;
+  map<string, float>          scalar_;
   bool                        sex_;
   float                       proportion_male_;
   vector<string>              maturity_ogives_;

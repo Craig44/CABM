@@ -286,8 +286,7 @@ void Model::Build() {
     max_lon_ = lon_bounds_[lon_bounds_.size() - 1];
     min_lat_ = lat_bounds_[0];
     max_lat_ = lat_bounds_[lat_bounds_.size() - 1];
-
-    LOG_FINEST() << "min lat = " << min_lat_ << " max lat = " << max_lat_ << " min long = " << min_lon_ << " max lon " << max_lon_;
+    LOG_FINE() << "min lat = " << min_lat_ << " max lat = " << max_lat_ << " min long = " << min_lon_ << " max lon " << max_lon_;
   }
   /*
    * An important sequence in the code, if you cannot obtain pointers at build the order of managers will be important
