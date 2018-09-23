@@ -83,7 +83,7 @@ void MatureBiomass::PreExecute() {
  *
  */
 void MatureBiomass::Execute() {
-  LOG_FINE();
+  LOG_FINE() << "DQ " << label_;
   float value = 0.0;
   if (!utilities::doublecompare::IsZero(time_step_proportion_)) {
     unsigned time_step_index = model_->managers().time_step()->current_time_step();
@@ -105,8 +105,10 @@ void MatureBiomass::Execute() {
 
   if (model_->state() == State::kInitialise) {
     unsigned initialisation_phase = model_->managers().initialisation_phase()->current_initialisation_phase();
-    if (initialisation_values_.size() <= initialisation_phase)
+    if (initialisation_values_.size() <= initialisation_phase) {
+      LOG_FINE() << "resizing initialisation_values_";
       initialisation_values_.resize(initialisation_phase + 1);
+    }
 
     float b0_value = 0;
 
@@ -120,6 +122,7 @@ void MatureBiomass::Execute() {
       b0_value = cache_value_ + ((value - cache_value_) * time_step_proportion_);
       initialisation_values_[initialisation_phase].push_back(b0_value);
     }
+    LOG_FINEST() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value << " Final value " << *initialisation_values_[initialisation_phase].rbegin();
   } else {
     if (utilities::doublecompare::IsZero(time_step_proportion_))
       values_[model_->current_year()] = cache_value_;
@@ -128,8 +131,9 @@ void MatureBiomass::Execute() {
     else
       values_[model_->current_year()] = cache_value_ + ((value - cache_value_) * time_step_proportion_);
 
+    LOG_FINEST() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value << " Final value " << values_[model_->current_year()];
+
   }
-  LOG_FINEST() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value << " Final value ";
 
 }
 
