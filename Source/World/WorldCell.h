@@ -48,8 +48,8 @@ public:
   bool                        is_enabled() {return enabled_; };
   void                        set_area(float area) {area_ = area;}
   void                        seed_agents(unsigned number_agents_to_seed, const float& seed_z);
-  void                        birth_agents(unsigned number_agents_to_birth);
-  //list<Agent>&                get_agents() {return agents_;};
+  void                        birth_agents(unsigned number_agents_to_birth, float scalar);
+  void                        set_scalar();
   void                        get_age_frequency(vector<unsigned>& age_freq);
   float                       get_abundance();
   float                       get_biomass();

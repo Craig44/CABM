@@ -120,15 +120,15 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
     if (rng.chance() <= probability_mature_at_age)
       mature = true;
     Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], (model_->current_year() - age),
-        growth_pars[agent][2], growth_pars[agent][3], model_, mature, sex, model_->get_scalar(), row_, col_); // seed it with lat long, L_inf, K
-    agents_.push_back(new_agent);
+        growth_pars[agent][2], growth_pars[agent][3], model_, mature, sex, 1.0, row_, col_);
+    agents_.push_back(new_agent); // This doesn't work if there is movement between stocks and areas then we this approximation becomes a bit shit. but I can't think of an alternative.
   }
 }
 
 /**
  * This method is called in Recruitment processes where we create new agents.
  */
-void WorldCell::birth_agents(unsigned birth_agents) {
+void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
   LOG_TRACE();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   vector<float> mort_par;
@@ -146,7 +146,7 @@ void WorldCell::birth_agents(unsigned birth_agents) {
         sex = 1;
     }
     Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], model_->current_year(),
-        growth_pars[agent][2], growth_pars[agent][3], model_, false, sex, model_->get_scalar(), row_, col_); // seed it with lat long, L_inf, K
+        growth_pars[agent][2], growth_pars[agent][3], model_, false, sex, scalar, row_, col_);
     agents_.push_back(new_agent);
   }
 }

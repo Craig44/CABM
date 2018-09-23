@@ -45,9 +45,10 @@ void ModelAttributes::DoBuild() {
 void ModelAttributes::DoExecute() {
   LOG_FINE() <<" printing report " << label_;
 
+  auto scalars = model_->get_scalars();
   cache_ << "*"<< type_ << "[" << label_ << "]" << "\n";
-  cache_ << "global_scalar: " << model_->get_scalar();
-  cache_ << "\n";
+  for (auto scalar : scalars)
+    cache_ << scalar.first << ": " << scalar.second << "\n";
   ready_for_writing_ = true;
 
 }

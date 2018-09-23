@@ -34,6 +34,8 @@ Iterative::Iterative(Model* model)
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "The number of iterations (years) over which to execute this initialisation phase", "");
   parameters_.Bind<unsigned>(PARAM_NUMBER_OF_INDIVIDUALS, &number_agents_, "The number of agents to initially seed in the partition", "");
   parameters_.Bind<string>(PARAM_LAYER_LABEL, &intial_layer_label_, "The label of a layer that you want to seed a distribution by.", "", "");
+  parameters_.Bind<string>(PARAM_RECRUITMENT_LAYER_LABEL, &recruitement_layer_label_, "The label of a layer has a recruitment process label in each cell to see how to set scalars", "");
+
 }
 
 /**
@@ -60,6 +62,24 @@ void Iterative::DoBuild() {
     }
   }
 
+  // Did the user supply a layer
+  recruitement_layer_ = model_->managers().layer()->GetCategoricalLayer(recruitement_layer_label_);
+  if (!recruitement_layer_)
+    LOG_ERROR_P(PARAM_RECRUITMENT_LAYER_LABEL) << "could not find the layer " << recruitement_layer_label_ << " does it exist? if it does exist, is of type numeric? because it needs to be";
+  // Check the entries
+  auto recruit_processes = model_->managers().process()->GetRecruitmentProcesses();
+  vector<string> recruit_labels;
+  for(auto recruit_process : recruit_processes)
+    recruit_labels.push_back(recruit_process->label());
+  for (unsigned row = 0; row < model_->get_height(); ++row) {
+    for (unsigned col = 0; col < model_->get_width(); ++col) {
+      LOG_FINEST() << "in row = " << row + 1 << " col = " << col + 1 << " recruit label = " << recruitement_layer_->get_value(row,col);
+      if (find(recruit_labels.begin(), recruit_labels.end(), recruitement_layer_->get_value(row,col)) == recruit_labels.end())
+        LOG_ERROR_P(PARAM_RECRUITMENT_LAYER_LABEL) << "could not find the recruitment process = " << recruitement_layer_->get_value(row,col) << " check the process exists or that there is not a typo.";
+    }
+  }
+
+
   // Generate a pointer to the world
   world_ = model_->world_view();
   if (!world_)
@@ -77,6 +97,7 @@ void Iterative::DoBuild() {
 void Iterative::Execute() {
   LOG_TRACE();
   LOG_MEDIUM();
+  // Check the recruitment labels in the recruitment layer make sense
 
   // Check we get a sensible estimate of M
   if (model_->get_m() <= 0.0)
@@ -108,12 +129,10 @@ void Iterative::Execute() {
 
   // Move on and seed our n_agents
   unsigned cells = world_->get_enabled_cells();
-  vector<vector<unsigned>> agents_per_cell(model_->get_height());
-  for (unsigned row = 0; row < model_->get_width(); ++row) {
-    agents_per_cell[row].resize(model_->get_width());
-  }
-  if (intial_layer_label_ != "") {
+  vector<vector<int>> agents_per_cell(model_->get_height());
+  if (intial_layer_label_ == "") {
     for (unsigned row = 0; row < model_->get_height(); ++row) {
+      agents_per_cell[row].resize(model_->get_width(),0.0);
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         agents_per_cell[row][col] = (int)number_agents_ / (int)cells;
         LOG_FINEST() << "number of cells = " << cells << " number of agents per cell = " << agents_per_cell[row][col];
@@ -121,8 +140,11 @@ void Iterative::Execute() {
     }
   } else {
     for (unsigned row = 0; row < model_->get_height(); ++row) {
+      agents_per_cell[row].resize(model_->get_width(),0.0);
       for (unsigned col = 0; col < model_->get_width(); ++col) {
-        agents_per_cell[row][col] = (int)number_agents_ * initial_layer_->get_value(row,col);
+        LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " number of agents = " << (int)number_agents_;
+        LOG_FINEST() << "initial_layer value = " << initial_layer_->get_value(row,col) << " value = " << (int)(number_agents_ * initial_layer_->get_value(row,col));;
+        agents_per_cell[row][col] = (int)(number_agents_ * initial_layer_->get_value(row,col));
         LOG_FINEST() << "number of agents per cell = " << agents_per_cell[row][col];
       }
     }
@@ -156,26 +178,32 @@ void Iterative::Execute() {
   // if we cut at 50 years when we thought we might be running for 100 years then this would cause an improper age distribution, So I leave it for the user to define
   // The correct burin in time to reach equilibrium
 
+  // Set scalars which are recruitment based
   float ssb = 0.0, b0 = 0.0, scalar;
   for (auto iter : model_->get_b0s()) {
     b0 += iter.second;
     ssb += model_->get_ssb(iter.first);
+    scalar = iter.second / model_->get_ssb(iter.first);
+    LOG_FINEST() << "stock = " << iter.first << " b0 = " <<  iter.second << " ssb = " << model_->get_ssb(iter.first) << " scalar = " << scalar;
+    model_->set_scalar(iter.first, scalar);
   }
   scalar = b0 / ssb;
 
   if (scalar < 1.0) {
     LOG_WARNING() << "the scalar that compares your individual numbers to population numbers is less than 1.0 (" << scalar << "), this means that given your growth model and number of individuals you are modelling more individuals than could/should exist. I think you could get away with modelling less individuals.";
   }
-
-  model_->set_scalar(scalar);
   LOG_FINEST() << "scalar = " << scalar << " SSB = " << ssb << " B0 = " << b0;
+
+
   // Set scalar before continuing on
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
+      // set scalar for each cell
       if (cell->is_enabled()) {
         for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter) {
-          (*iter).set_scalar(scalar);
+          (*iter).set_scalar(model_->get_scalar(recruitement_layer_->get_value((*iter).get_home_row(),(*iter).get_home_col()))); // set scalar based on an agents home area which is linked to the recruitment layer
+          LOG_FINEST() << "setting scalar, home row = " << (*iter).get_home_row()  << " col = " << (*iter).get_home_col() << " scalar = " << (*iter).get_scalar();
         }
       }
     }

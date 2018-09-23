@@ -18,6 +18,7 @@
 #include "InitialisationPhases/InitialisationPhase.h"
 
 #include "Layers/Children/NumericLayer.h"
+#include "Layers/Children/CategoricalLayer.h"
 #include "World/WorldView.h"
 
 // namespaces
@@ -48,7 +49,10 @@ protected:
   vector<TimeStep*>           time_steps_;
   unsigned                    number_agents_;
   string                      intial_layer_label_;
+  string                      recruitement_layer_label_;
   niwa::layers::NumericLayer* initial_layer_ = nullptr;
+  niwa::layers::CategoricalLayer* recruitement_layer_ = nullptr;
+
   WorldView*                  world_ = nullptr;
   string					            growth_process_label_;
   string					            natural_mortality_label_;

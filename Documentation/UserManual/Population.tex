@@ -81,7 +81,7 @@ An example, to specify a model with 2 categories (male and female) with ages 1-2
 
 
 \subsection{\I{Individuals}\label{sec:individuals}}
-An individual is the core object in the state that everything manipulates or summarises. An individual is has a list of predefined attributes that the user can choose to incorporate in the model or ignore, the list is below.
+An individual is the core object in the state that everything manipulates or summarises. An individual has a list of predefined attributes that the user can choose to incorporate in the model or ignore, the list is below.
 
 \begin{itemize}
 	\item age
@@ -91,10 +91,12 @@ An individual is the core object in the state that everything manipulates or sum
 	\item maturity
 	\item current area, birth area
 	\item lat and long
-	\item \I{population scalar} how many other individuals does this represent (weight scalar)
+	\item \I{population scalar} how many other individuals does this represent (scalar)
 	\item natural mortality parameter
 	\item growth parameters
 \end{itemize}
+
+An important attribute, if the model contains super individuals (agents) where a single agent represents many individuals with the same characteristics is the scalar parameter. This parameter is associated with a recruitment event as we use the scalers to scale up a $SSB$ to $B_0$ for a given recruitment event. This makes the scalar more of a meta-population parameter or a stock parameter in fisheries.
 
 Maturity is an attribute that is activated by the maturity process (see Section~\ref{subsubsec:maturity}), it is tied to some specific derived quantities such as the type \subcommand{mature\_biomass}. You could also calculate the mature biomass on the fly, using the other derived quantities and selectivities, an example of this is shown in the maturity process section.
 
@@ -373,7 +375,7 @@ Recruitment is the process where new individuals are created in the system. It i
 Mortality processes remove individuals from the model domain (and also from memory).
 
 \paragraph{Constant mortality rate}
-Apply an instantaneous mortality rate, and we remove the individual if the following condition is met.
+Apply an instantaneous mortality rate, and we remove the individual if the following condition is met which compares the survivorship ($1 - e^{-M_i * S_a}$) with a draw from a uniform random variable ($uniform()$).
 
 \begin{equation}\label{constan_mort}
 uniform() \leq 1 - e^{-M_i * S_a}
@@ -417,9 +419,32 @@ y0 0.1
 y2 0.4
 \end{verbatim}}}
 
-\paragraph{Event-Biomass}
-This is a removal event such as fishing, where we iterate over a range of cells and remove agents based on some selectivity or spatial vulnerability. This is the simplest way to remove individuals from an anthropogenic process, however it is quite annoying to set up for a spatial model with a fine spatial resolution. An example of how this process is set up is specified below, if you want an alternative fishing process that is based in theoretiical spatial fishing distributions see the next section (Section~\ref{para:effort_based_F}).
+\paragraph{Event-Biomass}\label{para:event_mort}
+This is a removal event such as fishing, where we iterate over a range of cells and remove agents based on some selectivity or spatial vulnerability. This is the simplest way to remove individuals from an anthropogenic process, however it is quite annoying to set up for a spatial model with a fine spatial resolution as you need to specify a catch for each cell. An example of how this process is set up is specified below, if you want an alternative fishing process that is based in theoretiical spatial fishing distributions see the next section (Section~\ref{para:effort_based_F}). Advantages over using this mortality process say over the Baranov method (next paragraph~\ref{para:baranov}) is that it allows for individuals to have multiple encounters with a fishery, but the negatives is that you cannot simply add natural mortality processes.\\
 
+\textbf{The algorithm}
+\begin{itemize}
+	\item randomly select an agent, \textbf{with replacement}
+	\item check to see if this agent is vulnerable to the fishery either age or length based process, by comparing a uniform random draw with a ogive
+	\item if we have minimum legal size (MLS) check to see if the fish will be returned this is a true or false statement, if agent length < MLS return with some handling mortality probability that will be again checked with a uniform random variable
+	\item if not MLS check then we remove this agent from the population and add it to the catch (all agents are removed, this must be remembered)
+	\item repeat the above steps until we have removed a desired biomass or if there are not enough fish to remove we exit with an error.
+\end{itemize}
+The key here is that fish can interact with fishery many times during a fishing event, but there is no natural mortality.
+
+
+\paragraph{Baranov}\label{para:baranov}
+This process applies both natural mortality and fishing mortality
+
+\textbf{The algorithm}
+\begin{itemize}
+	\item iterate over every individual in the partition or spatial cell
+	\item randomly pick either natural mortality or fishing mortality process to apply, \textbf{with replacement}
+	\item check to see if the agent survives this dynamic (compare survivability with a uniform random variable)
+	\item then apply the non-selected dynamic to apply the remaining dynamic  (compare survivability with a uniform random variable)
+	\item if agent makes it through it has survived the mortlaity for this time step.
+\end{itemize}
+So from the algorithm above we can see that agents are exposed to both M and F, however the negative is that this assumes only a single interaction with the fishery which is an unlikely assumption. However I added this process because it both takes M and F simultaneously and may actually be faster than an event biomass dynamic (previous paragraph~\ref{para:event_mort}).
 
 
 
@@ -436,7 +461,7 @@ A lot of this process was inspired by \cite{truesdell2017effects}, where users c
 
 \subsubsection{\I{Movement}}
 \paragraph{\I{Box Transfer}}\label{subsubsec:box_transfer}
-The box transfer movement process is a simple movement process that is commonly applied in stock assessments. It describes a proportion of individuals moving from a cell to all other cells. This is applied by drawing from a multinomial distribution where an individual will end up. There are two types of movement that users can select for this method; \subcommand{markovian} and \subcommand{natal\_homing}. The difference is with markovian movement the \subcommand{origin\_cell} refers to the cell an individual is in, where as if the movement type is natal homing the \subcommand{origin\_cell} refers to the cell that the individual was born in. These are subtle in application but a quite different movement assumptions. A practical note about the two methods natal homing is difficult to thread so may be quite a lot slower (disclaimer I haven't tested it, but I have turned off threading in this process). The probability is not age or length specific and so applies equally to all individuals in a cell. An example of syntax of how you would set this process up for a 3 area model is below.
+The box transfer movement process is a simple movement process that is commonly applied in stock assessments. It describes a proportion of individuals moving from a cell to all other cells. This is applied by drawing from a multinomial distribution where an individual will end up. There are two types of movement that users can select for this method; \subcommand{markovian} and \subcommand{natal\_homing}. The difference is with markovian movement the \subcommand{origin\_cell} refers to the cell an individual is currently in, where as if the movement type is natal homing the \subcommand{origin\_cell} refers to the cell that the individual was born in. These are subtle in application but a quite different movement assumptions. A practical note about the two methods natal homing is difficult to thread so may be quite a lot slower (disclaimer I haven't tested it, but I have turned off threading in this process). The probability is not age or length specific and so applies equally to all individuals in a cell. An example of syntax of how you would set this process up for a 3 area model is below.
 
 
 {\small{\begin{verbatim}
