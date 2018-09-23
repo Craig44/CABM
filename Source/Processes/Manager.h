@@ -22,6 +22,7 @@
 
 #include "Processes/Children/Growth.h"
 #include "Processes/Children/Mortality.h"
+#include "Processes/Children/Recruitment.h"
 #include "Processes/Children/Mortality/MortalityEffortBasedBaranov.h"
 
 // Namespaces
@@ -48,6 +49,7 @@ public:
   Growth*                     GetGrowthProcess(const string& label);
   Mortality*                  GetMortalityProcess(const string& label);
   MortalityEffortBasedBaranov*         GetBaranovProcess();
+  vector<Recruitment*>       GetRecruitmentProcesses();
 
 protected:
   // methods

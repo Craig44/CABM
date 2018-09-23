@@ -18,7 +18,6 @@
 #include "TimeSteps/Manager.h"
 #include "DerivedQuantities/Manager.h"
 #include "InitialisationPhases/Manager.h"
-//#include "Utilities/RandomNumberGenerator.h"
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
 #include "Utilities/DoubleCompare.h"
@@ -30,21 +29,16 @@ namespace processes {
 /**
  * Empty constructor
  */
-RecruitmentConstant::RecruitmentConstant(Model* model) : Process(model) {
+RecruitmentConstant::RecruitmentConstant(Model* model) : Recruitment(model) {
   process_type_ = ProcessType::kRecruitment;
-
-  parameters_.Bind<float>(PARAM_B0, &b0_, "B0", "",false);
-  parameters_.Bind<string>(PARAM_RECRUITMENT_LAYER_LABEL, &recruitment_layer_label_, "A label for the recruitment layer", "");
-  parameters_.Bind<string>(PARAM_SSB, &ssb_label_, "A label for the SSB derived quantity", "");
-
 }
 
 // DoBuild
 void RecruitmentConstant::DoBuild() {
-  LOG_TRACE();
+  LOG_FINE();
   derived_quantity_ = model_->managers().derived_quantity()->GetDerivedQuantity(ssb_label_);
   if (!derived_quantity_)
-    LOG_ERROR_P(PARAM_SSB) << "could not find the @derived_quantity block " << ssb_label_ << ", please make sure it exists";
+    LOG_FATAL_P(PARAM_SSB) << "could not find the @derived_quantity block " << ssb_label_ << ", please make sure it exists";
 
   recruitment_layer_ = model_->managers().layer()->GetNumericLayer(recruitment_layer_label_);
   if (!recruitment_layer_)
@@ -64,7 +58,7 @@ void RecruitmentConstant::DoBuild() {
     }
   }
   if ((props - 1) > 0.0001)
-    LOG_ERROR_P(PARAM_RECRUITMENT_LAYER_LABEL) << "the recuitment layer does not sum to 1.0 it was " << props << ", we don't want leakage of indiviuals please sort this out";
+    LOG_FATAL_P(PARAM_RECRUITMENT_LAYER_LABEL) << "the recuitment layer does not sum to 1.0 it was " << props << ", we don't want leakage of indiviuals please sort this out";
   model_->set_b0(label_, b0_);
 
   /**
@@ -105,14 +99,15 @@ void RecruitmentConstant::DoBuild() {
   if (recruitment_index < derived_quantity_index)
     LOG_ERROR_P(PARAM_SSB) << "it seems the derived quantity " << ssb_label_ << " occurs after the recruitment event, for obvious reasons this can't happen. If this doesn't make much sense look at the usermanual under mortality blocks";
 
+
 }
 
 
 // DoExecute
 void RecruitmentConstant::DoExecute() {
-  LOG_TRACE();
-  LOG_MEDIUM();
+  LOG_FINE() << "Recruitment process = " << label_;
   if (first_enter_execute_) {
+    LOG_FINEST() << "first enter";
     initial_recruits_ = model_->get_r0(label_);
     first_enter_execute_ = false;
   }
@@ -121,8 +116,9 @@ void RecruitmentConstant::DoExecute() {
     LOG_FINEST() << "applying recruitment in initialisation year " << model_->current_year();
     initialisationphases::Manager& init_phase_manager = *model_->managers().initialisation_phase();
     float SSB = derived_quantity_->GetLastValueFromInitialisation(init_phase_manager.last_executed_phase());
+    LOG_FINE() << "setting SSB value in recruitment event = " << label_ << " = " << SSB;
     model_->set_ssb(label_, SSB);
-    #pragma omp parallel for collapse(2)
+    scalar_ = b0_ / SSB;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
@@ -130,11 +126,7 @@ void RecruitmentConstant::DoExecute() {
           float value = recruitment_layer_->get_value(row, col);
           unsigned new_agents = (unsigned)(initial_recruits_ * value);
           LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " initial agents = " << initial_recruits_ << " new agents = " << new_agents;
-
-          #pragma omp critical  // single thread entry as birth_agents() has many shared resources across cells, mortality, growth and random number generators.
-          {
-            cell->birth_agents(new_agents);
-          }
+          cell->birth_agents(new_agents, 1.0);
         }
       }
     }
@@ -144,7 +136,6 @@ void RecruitmentConstant::DoExecute() {
     float amount_per = initial_recruits_;
     recruits_by_year_[model_->current_year()] = amount_per;
     LOG_FINEST() << "applying recruitment in year " << model_->current_year();
-    #pragma omp parallel for collapse(2)
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
@@ -152,10 +143,7 @@ void RecruitmentConstant::DoExecute() {
           float value = recruitment_layer_->get_value(row, col);
           unsigned new_agents = (unsigned)(amount_per * value);
           LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " new agents = " << amount_per << " new agents = " << new_agents;
-          #pragma omp critical  // single thread entry as birth_agents() has many shared resources across cells, mortality, growth and random number generators.
-          {
-            cell->birth_agents(new_agents);
-          }
+          cell->birth_agents(new_agents, scalar_);
         }
       }
     }

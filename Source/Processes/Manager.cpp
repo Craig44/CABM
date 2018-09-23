@@ -129,6 +129,26 @@ Mortality* Manager::GetMortalityProcess(const string& label) {
 }
 
 /**
+ * Return a vector of recruitment processes
+ *
+ * @param label The name of the process to find
+ * @return A pointer to the process or empty pointer
+ */
+vector<Recruitment*> Manager::GetRecruitmentProcesses() {
+  LOG_TRACE();
+  Recruitment* recruit_ptr = nullptr;
+  vector<Recruitment*> recruit_ptrs;
+
+  for (auto process : objects_) {
+    if (process->process_type() == ProcessType::kRecruitment) {
+      recruit_ptr = dynamic_cast<Recruitment*>(process);
+      recruit_ptrs.push_back(recruit_ptr);
+    }
+  }
+
+  return recruit_ptrs;
+}
+/**
  * Return the baranov process with the name passed in as a parameter.
  * If no process is found then an empty pointer will
  * be returned.

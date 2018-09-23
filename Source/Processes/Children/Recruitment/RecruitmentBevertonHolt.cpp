@@ -17,6 +17,7 @@
 #include "DerivedQuantities/Manager.h"
 #include "Layers/Manager.h"
 #include "TimeSteps/Manager.h"
+#include "DerivedQuantities/Manager.h"
 #include "InitialisationPhases/Manager.h"
 //#include "Utilities/RandomNumberGenerator.h"
 #include "World/WorldCell.h"
@@ -30,23 +31,26 @@ namespace processes {
 /**
  * Empty constructor
  */
-RecruitmentBevertonHolt::RecruitmentBevertonHolt(Model* model) : Process(model) {
-  process_type_ = ProcessType::kRecruitment;
-
-  parameters_.Bind<float>(PARAM_B0, &b0_, "B0", "",false);
+RecruitmentBevertonHolt::RecruitmentBevertonHolt(Model* model) : Recruitment(model) {
   parameters_.Bind<float>(PARAM_STEEPNESS, &steepness_, "Steepness", "", 1.0);
   parameters_.Bind<float>(PARAM_YCS_VALUES, &ycs_values_, "YCS (Year-Class-Strength) Values", "");
-  parameters_.Bind<string>(PARAM_RECRUITMENT_LAYER_LABEL, &recruitment_layer_label_, "A label for the recruitment layer", "");
-  parameters_.Bind<string>(PARAM_SSB, &ssb_label_, "A label for the SSB derived quantity", "");
-
 }
 
 // DoBuild
 void RecruitmentBevertonHolt::DoBuild() {
-  LOG_TRACE();
+  LOG_FINE();
+  if (model_->years().size() != ycs_values_.size()) {
+    LOG_ERROR_P(PARAM_YCS_VALUES) << "number of years '" << model_->years().size() <<  "' doesn't match number of ycs values you supplied '" << ycs_values_.size() << "' please make sure these are the same";
+  }
+
+  unsigned iter = 0;
+  for (unsigned year = model_->start_year(); year <= model_->final_year(); ++year, ++iter) {
+    ycs_values_by_year_[year] = ycs_values_[iter];
+  }
+
   derived_quantity_ = model_->managers().derived_quantity()->GetDerivedQuantity(ssb_label_);
   if (!derived_quantity_)
-    LOG_ERROR_P(PARAM_SSB) << "could not find the @derived_quantity block " << ssb_label_ << ", please make sure it exists";
+    LOG_FATAL_P(PARAM_SSB) << "could not find the @derived_quantity block " << ssb_label_ << ", please make sure it exists";
 
   recruitment_layer_ = model_->managers().layer()->GetNumericLayer(recruitment_layer_label_);
   if (!recruitment_layer_)
@@ -65,8 +69,8 @@ void RecruitmentBevertonHolt::DoBuild() {
       props += value;
     }
   }
-  if (!utilities::doublecompare::IsOne(props))
-    LOG_ERROR_P(PARAM_RECRUITMENT_LAYER_LABEL) << "the recuitment layer does not sum to 1.0 it was " << props << ", we don't want leakage of indiviuals please sort this out";
+  if ((props - 1) > 0.0001)
+    LOG_FATAL_P(PARAM_RECRUITMENT_LAYER_LABEL) << "the recuitment layer does not sum to 1.0 it was " << props << ", we don't want leakage of indiviuals please sort this out";
   model_->set_b0(label_, b0_);
 
   /**
@@ -104,17 +108,8 @@ void RecruitmentBevertonHolt::DoBuild() {
   recruitment_index = model_->managers().time_step()->GetProcessIndex(label_);
 
   LOG_FINEST() << "recruitment index = " << recruitment_index << " ssb index = " << derived_quantity_index;
-  if ((recruitment_index < derived_quantity_index) && (model_->min_age() <= 0))
+  if (recruitment_index < derived_quantity_index)
     LOG_ERROR_P(PARAM_SSB) << "it seems the derived quantity " << ssb_label_ << " occurs after the recruitment event, for obvious reasons this can't happen. If this doesn't make much sense look at the usermanual under mortality blocks";
-
-  if (model_->years().size() != ycs_values_.size()) {
-    LOG_ERROR_P(PARAM_YCS_VALUES) << "number of years '" << model_->years().size() <<  "' doesn't match number of ycs values you supplied '" << ycs_values_.size() << "' please make sure these are the same";
-  }
-
-  unsigned iter = 0;
-  for (unsigned year = model_->start_year(); year <= model_->final_year(); ++year, ++iter) {
-    ycs_values_by_year_[year] = ycs_values_[iter];
-  }
 
 
 
@@ -123,7 +118,7 @@ void RecruitmentBevertonHolt::DoBuild() {
 
 // DoExecute
 void RecruitmentBevertonHolt::DoExecute() {
-  LOG_TRACE();
+  LOG_FINE();
 
   if (first_enter_execute_) {
     initial_recruits_ = model_->get_r0(label_);
@@ -135,6 +130,7 @@ void RecruitmentBevertonHolt::DoExecute() {
     initialisationphases::Manager& init_phase_manager = *model_->managers().initialisation_phase();
     float SSB = derived_quantity_->GetLastValueFromInitialisation(init_phase_manager.last_executed_phase());
     model_->set_ssb(label_, SSB);
+    scalar_ = b0_ / SSB;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
@@ -142,10 +138,9 @@ void RecruitmentBevertonHolt::DoExecute() {
           float value = recruitment_layer_->get_value(row, col);
           unsigned new_agents = (unsigned)(initial_recruits_ * value);
           LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " initial agents = " << initial_recruits_ << " new agents = " << new_agents;
-          #pragma omp critical  // single thread entry as birth_agents() has many shared resources across cells, mortality, growth and random number generators.
-          {
-            cell->birth_agents(new_agents);
-          }
+
+            cell->birth_agents(new_agents, 1.0);
+
         }
       }
     }
@@ -168,10 +163,9 @@ void RecruitmentBevertonHolt::DoExecute() {
           float value = recruitment_layer_->get_value(row, col);
           unsigned new_agents = (unsigned)(amount_per * value);
           LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " new agents = " << amount_per << " new agents = " << new_agents;
-          #pragma omp critical  // single thread entry as birth_agents() has many shared resources across cells, mortality, growth and random number generators.
-          {
-            cell->birth_agents(new_agents);
-          }
+
+            cell->birth_agents(new_agents, scalar_);
+
         }
       }
     }

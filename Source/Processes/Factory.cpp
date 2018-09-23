@@ -18,9 +18,10 @@
 #include "Processes/Manager.h"
 
 #include "Children/Nop.h"
-#include "Children/RecruitmentBevertonHolt.h"
-#include "Children/RecruitmentConstant.h"
+#include "Children/Recruitment/RecruitmentBevertonHolt.h"
+#include "Children/Recruitment/RecruitmentConstant.h"
 #include "Children/Growth/GrowthVonBertalanffyWithBasic.h"
+#include "Children/Mortality/MortalityBaranov.h"
 #include "Children/Mortality/MortalityConstantRate.h"
 #include "Children/Mortality/MortalityEventBiomass.h"
 #include "Children/Mortality/MortalityEffortBasedBaranov.h"
@@ -66,13 +67,15 @@ Process* Factory::Create(Model* model, const string& object_type, const string& 
 
   if (object == PARAM_PROCESS || object == PARAM_PROCESSES) {
     if (sub == PARAM_NOP)
-          result = new processes::Nop(model);
+          result = new Nop(model);
     else if (sub == PARAM_RECRUITMENT_BEVERTON_HOLT)
       result = new RecruitmentBevertonHolt(model);
     else if (sub == PARAM_RECRUITMENT_CONSTANT)
       result = new RecruitmentConstant(model);
     else if (sub == PARAM_GROWTH_VON_BERTALANFFY_WITH_BASIC)
       result = new GrowthVonBertalanffyWithBasic(model);
+    else if (sub == PARAM_MORTALITY_BARANOV)
+      result = new MortalityBaranov(model);
     else if (sub == PARAM_MORTALITY_CONSTANT_RATE)
       result = new MortalityConstantRate(model);
     else if (sub == PARAM_MORTALITY_EVENT_BIOMASS)

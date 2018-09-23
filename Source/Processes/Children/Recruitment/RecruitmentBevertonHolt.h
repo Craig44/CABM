@@ -17,7 +17,7 @@
 #define SOURCE_PROCESSES_CHILDREN_RECRUITMENT_BEVERTON_HOLT_H_
 
 // headers
-#include "Processes/Process.h"
+#include "Processes/Children/Recruitment.h"
 #include "Layers/Children/NumericLayer.h"
 #include "DerivedQuantities/DerivedQuantity.h"
 // namespaces
@@ -27,7 +27,7 @@ using std::string;
 /**
  * Class definition
  */
-class RecruitmentBevertonHolt : public Process {
+class RecruitmentBevertonHolt : public Recruitment {
 public:
   // methods
   explicit RecruitmentBevertonHolt(Model* model);
@@ -39,25 +39,14 @@ public:
   void                        FillReportCache(ostringstream& cache) override final;
 
 protected:
-  string                      ssb_label_;
-  string                      recruitment_layer_label_;
   vector<float>               ycs_values_;
-  float                       b0_;
   float                       steepness_;
-  layers::NumericLayer*       recruitment_layer_ = nullptr;
-  DerivedQuantity*            derived_quantity_ = nullptr;
-  float                       initial_scalar_;
 
   // Reporting containers that will be printed in FillReportCache() method
-  map<unsigned, float>        recruits_by_year_;
-  unsigned                    initial_recruits_;
-  bool                        first_enter_execute_ = true;
   map<unsigned, float>        ycs_values_by_year_;
-  map<unsigned, float>        ssb_by_year_;
   map<unsigned, float>        ssb_ratio_;
   map<unsigned, float>        SR_;
   map<unsigned, float>        true_ycs_;
-  float                       scalar_;
 };
 
 } /* namespace processes */

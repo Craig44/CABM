@@ -11,8 +11,8 @@
  * This process is responsible for seeding new recruits into the world
  * TODO you could make this a random process, but perhaps it doesn't matter, that is randomly seed an individual in one of the areas
  */
-#ifndef SOURCE_PROCESSES_CHILDREN_RECRUITMENT_CONSTANT_H_
-#define SOURCE_PROCESSES_CHILDREN_RECRUITMENT_CONSTANT_H_
+#ifndef SOURCE_PROCESSES_CHILDREN_RECRUITMENT_H_
+#define SOURCE_PROCESSES_CHILDREN_RECRUITMENT_H_
 
 // headers
 #include "Processes/Process.h"
@@ -25,16 +25,16 @@ using std::string;
 /**
  * Class definition
  */
-class RecruitmentConstant : public Process {
+class Recruitment : public Process {
 public:
   // methods
-  explicit RecruitmentConstant(Model* model);
-  virtual                     ~RecruitmentConstant() = default;
-  void                        DoValidate() override final { };
-  void                        DoBuild() override final;
-  void                        DoReset() override final { };
-  void                        DoExecute() override final;
-  void                        FillReportCache(ostringstream& cache) override final;
+  explicit Recruitment(Model* model);
+  virtual                     ~Recruitment() = default;
+  virtual void                DoValidate() { };
+  virtual void                DoBuild();
+  virtual void                DoReset()  { };
+  virtual void                DoExecute() { };
+  virtual void                FillReportCache(ostringstream& cache) { };
 
 protected:
   string                      ssb_label_;
@@ -55,4 +55,4 @@ protected:
 } /* namespace processes */
 } /* namespace niwa */
 
-#endif /* SOURCE_PROCESSES_CHILDREN_RECRUITMENT_CONSTANT_H_ */
+#endif /* SOURCE_PROCESSES_CHILDREN_RECRUITMENT_H_ */
