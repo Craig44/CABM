@@ -123,7 +123,6 @@ void MovementBoxTransfer::DoExecute() {
   if (movement_type_ == MovementType::kMarkovian) {
     LOG_FINE() << "applying markovian movement";
     // Iterate over origin cells
-    #pragma omp parallel for collapse(2)
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         // Find the right probability layer for this combo
@@ -151,7 +150,7 @@ void MovementBoxTransfer::DoExecute() {
               temp_sum += probability_layers_[origin_element]->get_value(possible_rows_[potential_destination], possible_cols_[potential_destination]);
               if (temp_sum > random_numbers_[cell_offset_[row][col] + counter]) {
                 ++counter_jump;
-                //LOG_FINEST() << counter <<  " iter distance = " << distance(origin_cell->agents_.begin(), iter) << " cum prob = " << temp_sum << " random = " << random << " current row = " << row << " current col = " << col << "destination row = " << possible_rows_[potential_destination] << " destination col = " << possible_cols_[potential_destination];
+                //LOG_FINEST() << counter << " removals = " << counter_junp <<   " iter distance = " << distance(origin_cell->agents_.begin(), iter) << " cum prob = " << temp_sum << " random = " << random << " current row = " << row << " current col = " << col << "destination row = " << possible_rows_[potential_destination] << " destination col = " << possible_cols_[potential_destination];
                 store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]]++;
                 // if we are moving to this cell lets not move in memory
                 if ((possible_rows_[potential_destination] == row) && (possible_cols_[potential_destination] == col)) {
@@ -159,15 +158,12 @@ void MovementBoxTransfer::DoExecute() {
                   break;
                 }
                 // Make a synchronisation point don't want multiple threads accessing the same pointer simultaneously and splicing to it
-                #pragma omp critical
-                {
-                  destination_cell = world_->get_cached_square(possible_rows_[potential_destination], possible_cols_[potential_destination]);
-                  auto nx = next(iter); // Need to next the iter else we iter changes scope to cached agents, an annoying stl thing
-                  destination_cell->agents_.splice(destination_cell->agents_.end(), origin_cell->agents_, iter);
-                  iter = nx;
-                }
-                break;
 
+                destination_cell = world_->get_cached_square(possible_rows_[potential_destination], possible_cols_[potential_destination]);
+                auto nx = next(iter); // Need to next the iter else we iter changes scope to cached agents, an annoying stl thing
+                destination_cell->agents_.splice(destination_cell->agents_.end(), origin_cell->agents_, iter);
+                iter = nx;
+                break;
               }
             }
           }
@@ -179,15 +175,13 @@ void MovementBoxTransfer::DoExecute() {
           store_infor.initial_numbers_ = counter;
           LOG_FINEST() << "individuals at teh beginning = " << counter << " but we moved " << counter_jump << " total stored = " << total;
           if (model_->state() != State::kInitialise) {
-            #pragma omp critical
-            {
               moved_agents_by_year_.push_back(store_infor);
-            }
           }
         }
       }
     }
   } else if (movement_type_ == MovementType::kNatal_homing) {
+    LOG_FINE() << "applying Natal Homeing movement";
     // Iterate over origin cells
     // #pragma omp parallel for collapse(2) // I am not 100% confident this can be threaded
     for (unsigned row = 0; row < model_->get_height(); ++row) {
@@ -249,10 +243,9 @@ void MovementBoxTransfer::DoExecute() {
           store_infor.initial_numbers_ = counter;
           LOG_FINEST() << "individuals at teh beginning = " << counter << " but we moved " << counter_jump << " total stored = " << total;
           if (model_->state() != State::kInitialise) {
-            #pragma omp critical
-            {
-              moved_agents_by_year_.push_back(store_infor);
-            }
+
+            moved_agents_by_year_.push_back(store_infor);
+
           }
         }
       }

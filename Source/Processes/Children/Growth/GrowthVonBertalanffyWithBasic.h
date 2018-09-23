@@ -51,6 +51,7 @@ protected:
   float                       k_;
   float                       a_;
   float                       b_;
+  float                       t0_;
 
 
 };

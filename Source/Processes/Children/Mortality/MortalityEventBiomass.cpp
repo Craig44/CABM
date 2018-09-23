@@ -174,13 +174,16 @@ void MortalityEventBiomass::DoExecute() {
                 world_catch_to_take += catch_taken;
                 auto iter = cell->agents_.begin();
                 catch_max = cell->agents_.size();
+                LOG_FINEST() << "individuals = " << catch_max;
                 while (catch_taken > 0) {
                   ++catch_attempts;
                   iter = cell->agents_.begin();
                   random_agent = random_numbers_[cell_offset_[row][col] + counter] * cell->agents_.size();
                   advance(iter, random_agent);
+                  LOG_FINEST() << "attempt "<< catch_attempts;// << " catch_taken = " << catch_taken << " age = " << (*iter).get_age_index() << " random number = " << selectivity_random_numbers_[cell_offset_[row][col] + counter]  << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()];
                   // See if this agent is unlucky
                   if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]) {
+                    LOG_FINEST() << "vulnerable to gear catch_taken = " << catch_taken << " age = " << (*iter).get_age_index() << " individual weight = " << (*iter).get_weight() << " scalar = " <<  (*iter).get_scalar();
                     if ((*iter).get_length() < mls_) {
                       if (discard_random_numbers_[cell_offset_[row][col] + counter] <= discard_mortality_) {
                         LOG_MEDIUM();
@@ -201,15 +204,12 @@ void MortalityEventBiomass::DoExecute() {
                   }
                   ++counter;
                 }
-              #pragma omp critical
-              {
                 for (unsigned i = 0; i < model_->age_spread(); ++i)
                   global_age_freq[i] += age_freq.frequency_[i];
                 removals_by_length_and_area_.push_back(length_freq);
                 removals_by_age_and_area_.push_back(age_freq);
               }
-              }
-
+              LOG_FINEST() << "individuals = " << cell->agents_.size();
             }
           }
         }
@@ -295,7 +295,7 @@ void MortalityEventBiomass::DoExecute() {
 // FillReportCache, called in the report class, it will print out additional information that is stored in
 // containers in this class.
 void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
-  cache << "\nbiomass_removed: ";
+  cache << "biomass_removed: ";
   for (auto& year : actual_removals_by_year_)
     cache << year.second << " ";
   cache << "\ncatch_input_removed: ";

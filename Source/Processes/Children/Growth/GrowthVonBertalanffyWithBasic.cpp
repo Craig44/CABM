@@ -31,7 +31,7 @@ namespace processes {
 GrowthVonBertalanffyWithBasic::GrowthVonBertalanffyWithBasic(Model* model) : Growth(model) {
   parameters_.Bind<string>(PARAM_LINF_LAYER_LABEL, &l_inf_layer_label_, "Label for the numeric layer that describes mean L_inf through space", "", "");
   parameters_.Bind<string>(PARAM_K_LAYER_LABEL, &k_layer_label_, "Label for the numeric layer that describes mean k through space", "", "");
-  parameters_.Bind<string>(PARAM_T0, &t0_, "The value for t0 default = 0", "", 0);
+  parameters_.Bind<float>(PARAM_T0, &t0_, "The value for t0 default = 0", "", 0);
   parameters_.Bind<string>(PARAM_A_LAYER_LABEL, &a_layer_label_, "Label for the numeric layer that describes mean a in the weight calcualtion through space", "", "");
   parameters_.Bind<string>(PARAM_B_LAYER_LABEL, &b_layer_label_, "Label for the numeric layer that describes mean b in the weight calcualtion through space", "", "");
   parameters_.Bind<float>(PARAM_LINF, &l_inf_, "Value of mean L_inf multiplied by the layer value if supplied", "", 0);
@@ -95,15 +95,15 @@ void GrowthVonBertalanffyWithBasic::DoBuild() {
 
 // Execute the process
 void GrowthVonBertalanffyWithBasic::DoExecute() {
-  LOG_TRACE();
-  #pragma omp parallel for collapse(2)
+  LOG_FINE();
+ // #pragma omp parallel for collapse(2)
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
         float length_prop = time_step_proportions_[ model_->managers().time_step()->current_time_step()];
         for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter) {
-          //LOG_FINEST() << "length = " << (*iter).get_length() << " weight = " << (*iter).get_weight() << " L-inf " << (*iter).get_first_age_length_par() << " k = " << (*iter).get_second_age_length_par();
+          //LOG_FINEST() << "length = " << (*iter).get_length() << " weight = " << (*iter).get_weight() << " L-inf " << (*iter).get_first_age_length_par() << " k = " << (*iter).get_second_age_length_par() << " prop = " << length_prop;
           float new_length =  (*iter).get_length() + length_prop * ((*iter).get_first_age_length_par() - (*iter).get_length()) * (1 - exp(-(*iter).get_second_age_length_par()));
           float weight = (*iter).get_first_length_weight_par() * pow(new_length, (*iter).get_second_length_weight_par());
           //LOG_FINEST() << "length = " << new_length << " weight = " << weight;
