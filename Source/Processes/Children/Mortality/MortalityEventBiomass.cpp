@@ -88,9 +88,17 @@ void MortalityEventBiomass::DoBuild() {
 
   cell_offset_for_selectivity_.resize(model_->get_height());
   cell_offset_.resize(model_->get_height());
+  model_length_bins_.resize(model_->get_height());
+  model_age_bins_.resize(model_->get_height());
+  mls_by_space_.resize(model_->get_height());
+  current_year_by_space_.resize(model_->get_height());
   for (unsigned i = 0; i < model_->get_height(); ++i) {
     cell_offset_[i].resize(model_->get_width());
     cell_offset_for_selectivity_[i].resize(model_->get_width());
+    model_length_bins_[i].resize(model_->get_width(), model_->length_bins().size());
+    model_age_bins_[i].resize(model_->get_width(), model_->age_spread());
+    mls_by_space_[i].resize(model_->get_width(), mls_);
+    current_year_by_space_[i].resize(model_->get_width());
   }
 
   if (selectivity_length_based_) {
@@ -136,6 +144,7 @@ void MortalityEventBiomass::DoExecute() {
           if (cell->is_enabled()) {
             cell_offset_[row][col] = n_agents_;
             n_agents_ += cell->agents_.size();
+            current_year_by_space_[row][col] = model_->current_year();
           }
         }
       }
@@ -156,22 +165,28 @@ void MortalityEventBiomass::DoExecute() {
       float world_catch_to_take = 0;
       if (not selectivity_length_based_) {
         // Thread out each loop
-        //#pragma omp parallel for collapse(2) reduction(+:world_catch_to_take) reduction(+:actual_catch_taken)
+        #pragma omp parallel for collapse(2)
         for (unsigned row = 0; row < model_->get_height(); ++row) {
           for (unsigned col = 0; col < model_->get_width(); ++col) {
             unsigned catch_attempts = 1;
             unsigned catch_max = 1;
             unsigned random_agent;
-            WorldCell* cell = world_->get_base_square(row, col);
+            WorldCell* cell = nullptr;
+            float catch_taken = 0;
+            float actual_catch_this_cell = 0;
+            #pragma omp critical
+            {
+              cell = world_->get_base_square(row, col); // Shared resource...
+              catch_taken = catch_layer_[catch_ndx]->get_value(row, col);
+              world_catch_to_take += catch_taken;
+            }
             if (cell->is_enabled()) {
-              float catch_taken = catch_layer_[catch_ndx]->get_value(row, col);
               unsigned counter = 0;
               if (catch_taken > 0) {
                 LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << catch_taken;
-                composition_data age_freq(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
-                composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->length_bins().size());
+                composition_data age_freq(PARAM_AGE, current_year_by_space_[row][col], row, col, model_age_bins_[row][col]);
+                //composition_data length_freq(PARAM_LENGTH, current_year_by_space_[row][col], row, col, model_length_bins_[row][col]);
                 catch_attempts = 1;
-                world_catch_to_take += catch_taken;
                 auto iter = cell->agents_.begin();
                 catch_max = cell->agents_.size();
                 LOG_FINEST() << "individuals = " << catch_max;
@@ -182,32 +197,36 @@ void MortalityEventBiomass::DoExecute() {
                   advance(iter, random_agent);
                   LOG_FINEST() << "attempt "<< catch_attempts;// << " catch_taken = " << catch_taken << " age = " << (*iter).get_age_index() << " random number = " << selectivity_random_numbers_[cell_offset_[row][col] + counter]  << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()];
                   // See if this agent is unlucky
-                  if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]) {
-                    LOG_FINEST() << "vulnerable to gear catch_taken = " << catch_taken << " age = " << (*iter).get_age_index() << " individual weight = " << (*iter).get_weight() << " scalar = " <<  (*iter).get_scalar();
-                    if ((*iter).get_length() < mls_) {
+                  if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][(*iter).get_sex() *model_age_bins_[row][col] + (*iter).get_age_index()]) {
+                    //LOG_FINEST() << "vulnerable to gear catch_taken = " << catch_taken << " age = " << (*iter).get_age_index() << " individual weight = " << (*iter).get_weight() << " scalar = " <<  (*iter).get_scalar();
+                    if ((*iter).get_length() < mls_by_space_[row][col]) {
                       if (discard_random_numbers_[cell_offset_[row][col] + counter] <= discard_mortality_) {
                         LOG_MEDIUM();
                         cell->agents_.erase(iter); // erase agent from discard mortality
                       }
                     } else {
                       catch_taken -= (*iter).get_weight() * (*iter).get_scalar();
-                      actual_catch_taken += (*iter).get_weight() * (*iter).get_scalar();
-                      age_freq.frequency_[(*iter).get_age_index()]++;
-                      length_freq.frequency_[(*iter).get_length_bin_index()]++;
+                      actual_catch_this_cell += (*iter).get_weight() * (*iter).get_scalar();
+                      age_freq.frequency_[(*iter).get_age() - model_->min_age()]+= (*iter).get_scalar(); // This catch actually represents many individuals.
+                      //length_freq.frequency_[(*iter).get_length_bin_index()]+= (*iter).get_scalar();
                       cell->agents_.erase(iter); // erase agent from memory
                     }
                   }
                   // Make sure we don't end up fishing for infinity
                   if (catch_attempts >= catch_max) {
-                    LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << model_->current_year() << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have" <<
+                    LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << current_year_by_space_[row][col] << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have" <<
                        " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation, agents in cell = " << catch_max << " attempts made = " << catch_attempts;
                   }
                   ++counter;
                 }
-                for (unsigned i = 0; i < model_->age_spread(); ++i)
-                  global_age_freq[i] += age_freq.frequency_[i];
-                removals_by_length_and_area_.push_back(length_freq);
-                removals_by_age_and_area_.push_back(age_freq);
+                #pragma omp critical
+                {
+                  for (unsigned i = 0; i < model_age_bins_[row][col]; ++i)
+                    global_age_freq[i] += age_freq.frequency_[i];
+                  //removals_by_length_and_area_.push_back(length_freq);
+                  //removals_by_age_and_area_.push_back(age_freq);
+                  world_catch_to_take += actual_catch_this_cell;
+                }
               }
               LOG_FINEST() << "individuals = " << cell->agents_.size();
             }
@@ -217,29 +236,31 @@ void MortalityEventBiomass::DoExecute() {
         iter = find(years_.begin(), years_.end(), model_->current_year());
         unsigned catch_ndx = distance(years_.begin(), iter);
         // Get the pointer to the right catch layer
-        float actual_catch_taken = 0;;
-        float world_catch_to_take = 0;;
         // Thread out each loop
-        //#pragma omp parallel for collapse(2) reduction(+:world_catch_to_take) reduction(+:actual_catch_taken)
+        #pragma omp parallel for collapse(2)
         for (unsigned row = 0; row < model_->get_height(); ++row) {
           for (unsigned col = 0; col < model_->get_width(); ++col) {
             unsigned catch_attempts = 1;
             unsigned catch_max = 1;
             unsigned random_agent;
-            WorldCell* cell = world_->get_base_square(row, col);
+            float actual_catch_this_cell = 0;
+            WorldCell* cell = nullptr;
+            float catch_taken = 0;
+            #pragma omp critical
+            {
+              cell = world_->get_base_square(row, col); // Shared resource...
+              catch_taken = catch_layer_[catch_ndx]->get_value(row, col);
+              world_catch_to_take += catch_taken;
+            }
             if (cell->is_enabled()) {
-
-              float catch_taken = catch_layer_[catch_ndx]->get_value(row, col);
               unsigned counter = 0;
-
               if (catch_taken > 0) {
                 LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << catch_taken;
                 // create reporting class
-                composition_data age_freq(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
-                composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->length_bins().size());
+                composition_data age_freq(PARAM_AGE, current_year_by_space_[row][col], row, col, model_age_bins_[row][col]);
+                composition_data length_freq(PARAM_LENGTH, current_year_by_space_[row][col], row, col, model_length_bins_[row][col]);
 
                 catch_attempts = 1;
-                world_catch_to_take += catch_taken;
                 catch_max = cell->agents_.size();
                 auto iter = cell->agents_.begin();
                 while (catch_taken > 0) {
@@ -249,34 +270,34 @@ void MortalityEventBiomass::DoExecute() {
                   iter = cell->agents_.begin();
                   advance(iter, random_agent);
                   // See if this agent is unlucky
-                  if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->length_bins().size() + (*iter).get_length_bin_index()]) {
-                    if ((*iter).get_length() < mls_) {
+                  if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_length_bins_[row][col] + (*iter).get_length_bin_index()]) {
+                    if ((*iter).get_length() < mls_by_space_[row][col]) {
                       if (discard_random_numbers_[cell_offset_[row][col] + counter] <= discard_mortality_) {
                         cell->agents_.erase(iter); // erase agent from discard mortality
                       }
                     } else {
                       catch_taken -= (*iter).get_weight() * (*iter).get_scalar();
-                      actual_catch_taken += (*iter).get_weight() * (*iter).get_scalar();
-                      age_freq.frequency_[(*iter).get_age() - model_->min_age()]++;
-                      length_freq.frequency_[(*iter).get_length_bin_index()]++;
+                      actual_catch_this_cell += (*iter).get_weight() * (*iter).get_scalar();
+                      age_freq.frequency_[(*iter).get_age_index()]+= (*iter).get_scalar(); // This catch actually represents many individuals.
+                      length_freq.frequency_[(*iter).get_length_bin_index()]+= (*iter).get_scalar();
                       cell->agents_.erase(iter); // erase agent from memory
                     }
                   }
                   // Make sure we don't end up fishing for infinity if there are not enough fish here
                   if (catch_attempts >= catch_max) {
-                    LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << model_->current_year() << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have" <<
+                    LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << current_year_by_space_[row][col] << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have" <<
                        " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation";
                   }
                   ++counter;
                 }
-
-                //#pragma omp critical
-                //{
-                  removals_by_length_and_area_.push_back(length_freq);
-                  removals_by_age_and_area_.push_back(age_freq);
-                  for (unsigned i = 0; i < model_->age_spread(); ++i)
+                #pragma omp critical
+                {
+                  for (unsigned i = 0; i < model_age_bins_[row][col]; ++i)
                     global_age_freq[i] += age_freq.frequency_[i];
-               // }
+                  //removals_by_length_and_area_.push_back(length_freq);
+                  //removals_by_age_and_area_.push_back(age_freq);
+                  world_catch_to_take += actual_catch_this_cell;
+                }
               } // if catch > 0
             } // is enabled
           } //col

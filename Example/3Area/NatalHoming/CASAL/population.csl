@@ -1,11 +1,11 @@
 @initialization ENLD
-B0 113880
+R0 7999990
 
 @initialization HAGU
-B0 127644.0
+R0 7999990
 
 @initialization BOP
-B0 38440.8
+R0 2e+06
 
 @size_based False
 

@@ -94,9 +94,10 @@ An individual is the core object in the state that everything manipulates or sum
 	\item \I{population scalar} how many other individuals does this represent (scalar)
 	\item natural mortality parameter
 	\item growth parameters
+	\item scalar (if > 1 then this individual represents more than one is stock specific.)
 \end{itemize}
 
-An important attribute, if the model contains super individuals (agents) where a single agent represents many individuals with the same characteristics is the scalar parameter. This parameter is associated with a recruitment event as we use the scalers to scale up a $SSB$ to $B_0$ for a given recruitment event. This makes the scalar more of a meta-population parameter or a stock parameter in fisheries.
+An important attribute, if the model contains super individuals (agents) where a single agent represents many individuals with the same characteristics is the scalar parameter. This parameter is associated with a recruitment event as we use the scalers to scale up a $SSB$ to $B_0$ for a given recruitment event. This makes the scalar more of a meta-population parameter or a stock parameter in fisheries. The way a scalar is applied is through the subcommand \subcommand{recruitment\_layer\_label} where you link a cell to a recruitment process (for more information see Section~\ref{subsec:initialisation}). This link says that any individual that was created by that recruitment dynamic gets a stock or recruitment scalar.
 
 Maturity is an attribute that is activated by the maturity process (see Section~\ref{subsubsec:maturity}), it is tied to some specific derived quantities such as the type \subcommand{mature\_biomass}. You could also calculate the mature biomass on the fly, using the other derived quantities and selectivities, an example of this is shown in the maturity process section.
 
@@ -282,9 +283,10 @@ Once \IBM\ has seeded the agents, it iterates over the annual cycle to change an
 Hence, for an iterative initialisation you need to define:
 \begin{itemize}
   \item The initialisation phases,
-  \item The number of years in each phase, and
-  \item the natural mortality process
-  \item the growth process
+  \item The number of years in each phase
+  \item the number of individuals that you want to represent the population
+  \item The initial spatial distribution of seeded agents
+  \item The stock\textbackslash recruitment regions for setting the scalar.
 \end{itemize}
 
 Because the initialisation phase is responsible for seeding the initial agents, users must specify processes that the initialisation phase can seed parameters to agents. To see how parameters are set for each individual agent, users should see the individual processes in this Section~\ref{sec:process}.
@@ -297,13 +299,14 @@ initialisation_phases Iterative_initialisation
 
 @initialisation_phase Iterative_initialisation
 type iterative
+number_of_individuals 1500000
 years 50
-lambda 0.0001
-convergence_years 20 40
-layer_label Base
-growth_process_label von_bert
-natural_mortality_process_label natural_mort
+layer_label initial_values_distribution
+recruitment_layer_label recruitment_layer
 \end{verbatim}}}
+
+For an example of setting an initialisation block with multiple stocks see the 3area example.
+
 
 \subsection{\I{Processes}}\label{sec:process}
 Processes are a set of classes that get access to agents parameters and either modifies them (growth), moves them (to anther cell), adds new agents (recruitment) or removes them (mortality). Some users may not think having an analagous to population processes fits in the Individual based model framework, but it is structured this way for convenience and code maintenance more than anything. The other thing to note is that most proceses are dictated by agent specific parameters such as natural mortality and growth etc.

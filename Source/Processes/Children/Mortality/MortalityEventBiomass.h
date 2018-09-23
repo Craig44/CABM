@@ -57,10 +57,16 @@ protected:
 
   unsigned                            n_agents_;
   vector<vector<unsigned>>            cell_offset_;
+  vector<vector<unsigned>>            model_length_bins_;
+  vector<vector<unsigned>>            model_age_bins_;
+  vector<vector<float>>               mls_by_space_;
+  vector<vector<unsigned>>            current_year_by_space_;
 
   // For reporting
   map<unsigned, float>                actual_removals_by_year_;
   map<unsigned, float>                removals_by_year_;
+
+
 
 };
 

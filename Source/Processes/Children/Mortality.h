@@ -26,7 +26,7 @@ struct composition_data {
   unsigned year_;
   unsigned row_;
   unsigned col_;
-  vector<unsigned> frequency_;
+  vector<float> frequency_;
   composition_data(string type, unsigned year, unsigned row, unsigned col, unsigned size) : type_(type), year_(year),
       row_(row), col_(col)
   {

@@ -9,14 +9,16 @@ library(cyrils)
 library(casal)
 setwd("../CASAL")
 
-cas = extract.mpd("run.log")
+cas = extract.mpd("run_b0.log")
 cas_dq = cas$quantities$SSBs
 
 setwd("../Casal2")
 library(casal2)
 
-cas2 = extract.mpd("run.log")
+cas2 = extract.mpd("run_original.log")
+
 cas2_dq = plot.derived_quantities(cas2, report_label = "derived_quants", plot.it = F)
+
 
 ## compare CASAL with Casal2
 years = rownames(cas2_dq)
@@ -32,7 +34,12 @@ lines(years, cas_dq$BOP, lwd = 2, col = "red",lty = 2)
 
 ## lets look at B0
 cas$quantities$B0
+c(cas2$Rec_EN$`1`$b0, cas2$Rec_HG$`1`$b0,cas2$Rec_BP$`1`$b0)
+
+## lets look at R0
+cas$quantities$R0
 c(cas2$Rec_EN$`1`$r0, cas2$Rec_HG$`1`$r0,cas2$Rec_BP$`1`$r0)
+
 ## lets look at F
 rbind(cas$quantities$fishing_pressures$BP_LL,cas2$instantaneous_mort$`1`$`fishing_pressure[BP_LL]`)
 rbind(cas$quantities$actual_catches$BP_LL,cas2$instantaneous_mort$`1`$`actual_catch[BP_LL]`)
@@ -61,40 +68,28 @@ cbind(cas2$mean_weight_1$`1`$EN.EN$mean_weights$values,cas2$mean_weight_1$`1`$EN
 cbind(cas2$mean_weight_1$`1`$BP.EN$mean_weights$values,cas2$mean_weight_1$`1`$BP.HG$mean_weights$values,cas2$mean_weight_1$`1`$BP.BP$mean_weights$values)
 cbind(cas2$mean_weight_1$`1`$HG.EN$mean_weights$values,cas2$mean_weight_1$`1`$HG.HG$mean_weights$values,cas2$mean_weight_1$`1`$HG.BP$mean_weights$values)
 
+cas2 = extract.mpd("ibm_comparison.out")
+cas2_dq = plot.derived_quantities(cas2, report_label = "derived_quants", plot.it = F)
+
 ## Read in the IBM output
-setwd("../ibm/Layers")
+setwd("../ibm")
 library(ibm)
-## create Inputs for teh IBM especially the catch ones which such
-list.files()
-dir.create("CatchLayers")
-setwd("CatchLayers")
-catch_mat = matrix(0,nrow = 3,ncol = 1)
-for (i in 1:length(cas2$instantaneous_mort$`1`$year)) {
-  year = cas2$instantaneous_mort$`1`$year[i]
-  catch_mat[1,] = cas2$instantaneous_mort$`1`$`actual_catch[EN_LL]`[i]
-  catch_mat[2,] = cas2$instantaneous_mort$`1`$`actual_catch[HG_LL]`[i]
-  catch_mat[3,] = cas2$instantaneous_mort$`1`$`actual_catch[BP_LL]`[i]
-  Filename = make.filename(file = paste0(year,"_catch.ibm"), path = getwd())
-  create_ibm_layer(label = paste0(year,"_catch"), type = "numeric", filename = Filename,catch_mat)
-}
-## now add teh include statements in the config.ibm
-setwd("../..")
-
-for (i in 1:length(cas2$instantaneous_mort$`1`$year)) {
-  year = cas2$instantaneous_mort$`1`$year[i]
-  Line = paste0('!include "Layers/CatchLayers/',year,'_catch.ibm"')
-  write(Line,file="config.ibm",append=TRUE)
-}
 
 
-ibm_30 = extract.run("output_30.log")
+ibm = extract.run("run_100.log")
+
+ibm$Movement_home$`1`$`1950_1-1_destination`
+ibm$Movement_home$`1`$`1950_2-1_destination`
+ibm$Movement_home$`1`$`1950_3-1_destination`
+
+# find proportions of agents among the three regions to short cut it
+rowSums(ibm$init_2$`1`$values[,-1]) /  sum(rowSums(ibm$init_2$`1`$values[,-1]))
+
 ibm_40 = extract.run("output_40.log")
-ibm_50 = extract.run("output_50.log")
+ibm_50 = extract.run("check_100.out")
 
 ## look at initial partition
-prop_30 = ibm_30$init_2$`1`$values[,-1] / rowSums(ibm_30$init_2$`1`$values[,-1])
-prop_40 = ibm_40$init_2$`1`$values[,-1] / rowSums(ibm_40$init_2$`1`$values[,-1])
-prop_50 = ibm_50$init_2$`1`$values[,-1] / rowSums(ibm_50$init_2$`1`$values[,-1])
+prop_init = ibm$init_2$`1`$values[,-c(1,2)] / rowSums(ibm$init_2$`1`$values[,-c(1,2)])
 
 en_init = colSums(cas2$Init$`1`$values[1:3,-1])
 en_prop = en_init / sum(en_init)
@@ -108,29 +103,42 @@ bp_prop = bp_init / sum(bp_init)
 
 ## plot
 par(mfrow = c(1,3))
-plot(0:20,prop_30[1,], type = "l", lwd = 2, xlab = "Ages", ylab = "Initial proportions",ylim = c(0,0.26))
-lines(0:20,en_prop, col = "red", lwd = 2)
-lines(0:20,prop_40[1,], col = "blue", lwd = 2, lty = 2)
-lines(0:20,prop_50[1,], col = "orange", lwd = 2, lty = 2)
+plot(1:20,prop_init[1,], type = "l", lwd = 2, xlab = "Ages", ylab = "Initial proportions",ylim = c(0,0.26))
+lines(1:20,en_prop, col = "red", lwd = 2)
+#lines(0:20,prop_40[1,], col = "blue", lwd = 2, lty = 2)
+#lines(0:20,prop_50[1,], col = "orange", lwd = 2, lty = 2)
 
-plot(0:20,prop_30[2,], type = "l", lwd = 2, xlab = "Ages", ylab = "Initial proportions",ylim = c(0,0.26))
-lines(0:20,hg_prop, col = "red", lwd = 2)
-lines(0:20,prop_40[2,], col = "blue", lwd = 2, lty = 2)
-lines(0:20,prop_50[2,], col = "orange", lwd = 2, lty = 2)
+plot(1:20,prop_init[2,], type = "l", lwd = 2, xlab = "Ages", ylab = "Initial proportions",ylim = c(0,0.26))
+lines(1:20,hg_prop, col = "red", lwd = 2)
+#lines(0:20,prop_40[2,], col = "blue", lwd = 2, lty = 2)
+#lines(0:20,prop_50[2,], col = "orange", lwd = 2, lty = 2)
 
-plot(0:20,prop_30[3,], type = "l", lwd = 2, xlab = "Ages", ylab = "Initial proportions",ylim = c(0,0.26))
-lines(0:20,bp_prop, col = "red", lwd = 2)
-lines(0:20,prop_40[3,], col = "blue", lwd = 2, lty = 2)
-lines(0:20,prop_50[3,], col = "orange", lwd = 2, lty = 2)
+plot(1:20,prop_init[3,], type = "l", lwd = 2, xlab = "Ages", ylab = "Initial proportions",ylim = c(0,0.26))
+lines(1:20,bp_prop, col = "red", lwd = 2)
+#lines(0:20,prop_40[3,], col = "blue", lwd = 2, lty = 2)
+#lines(0:20,prop_50[3,], col = "orange", lwd = 2, lty = 2)
 
 names(ibm)
+ibm$model_attributes$`1`$global_scalar
 
-ibm_50$model_attributes$`1`
-ibm_50$Rec_BP$`1`
-ibm_50$Rec_HG$`1`
-ibm_50$Rec_EN$`1`
+ibm$Rec_BP$`1`$b0
+ibm$Rec_EN$`1`$b0
+ibm$agents$`1`$values$weight
+ibm$agents$`1`$values$length
+ibm$agents$`1`$values$age
+ibm$agents$`1`$values[1:10,]
+ibm$derived_quants$`1`$SSB_EN
 
 ibm_dq = plot.derived_quantities(ibm, report_label = "derived_quants", plot.it = F)
+years = rownames(ibm_dq)
+plot(years,ibm_dq[,c("SSB_HG")], type = "l", ylim = c(120000,140000))
+abline(h =ibm$Rec_HG$`1`$b0, col = "red")
+
+plot(years,ibm_dq[,c("SSB_EN")], type = "l", ylim = c(0000,140000))
+abline(h =ibm$Rec_EN$`1`$b0, col = "red")
+
+plot(years,ibm_dq[,c("SSB_BP")], type = "l", ylim = c(0,140000))
+abline(h =ibm$Rec_BP$`1`$b0, col = "red")
 
 merged = melt(rbind(ibm_dq[,c("SSB_HG",  "SSB_BP",  "SSB_EN")], cas2_dq[,c("SSB_HG",  "SSB_BP",  "SSB_EN")]))
 merged$model = rep(c(rep("ibm", nrow(ibm_dq)), rep("Casal2", nrow(cas2_dq))),3)
@@ -150,7 +158,48 @@ ggplot(merged, aes(x=year, y=SSB, linetype = model, col = region)) +
   ggtitle("with movement")
 #dev.off()
 
+
+
+N1 = 10000
+N2 = N1 * 0.148
+N1 = N1 - N2
+N3 = N2 * 0.36
+N2 =N2 - N3
+
+(c(N1,N2,N3))
+
+N0 = 10000
+N1a = N0 * 0.9220
+N2a = N0 * 0.09472
+N3a = N0 * 0.002964
+c(N1a,N2a,N3a)
+##########################################
+## create Inputs for teh IBM especially the catch ones which such
+##########################################
+list.files()
+dir.create("CatchLayers")
+setwd("CatchLayers")
+catch_mat = matrix(0,nrow = 3,ncol = 1)
+for (i in 1:length(cas2$instantaneous_mort$`1`$year)) {
+  year = cas2$instantaneous_mort$`1`$year[i]
+  catch_mat[1,] = cas2$instantaneous_mort$`1`$`actual_catch[EN_LL]`[i]
+  catch_mat[2,] = cas2$instantaneous_mort$`1`$`actual_catch[HG_LL]`[i]
+  catch_mat[3,] = cas2$instantaneous_mort$`1`$`actual_catch[BP_LL]`[i]
+  Filename = make.filename(file = paste0(year,"_catch.ibm"), path = getwd())
+  create_ibm_layer(label = paste0(year,"_catch"), type = "numeric", filename = Filename,catch_mat)
+}
+## now add teh include statements in the config.ibm
+setwd("../")
+
+for (i in 1:length(cas2$instantaneous_mort$`1`$year)) {
+  year = cas2$instantaneous_mort$`1`$year[i]
+  Line = paste0('!include "Layers/CatchLayers/',year,'_catch.ibm"')
+  write(Line,file="config.ibm",append=TRUE)
+}
+
+##########################################
 # A little experiment on how to move individuals around box's (Box transfer)
+##########################################
 N = 1000000 ## in cell 1
 prob = c(0.333333,0.033333,0.6333333)
 area = c(1,2,3)
@@ -264,3 +313,79 @@ opt_BP$convergence
 opt_BP$par
 
 
+## Some R code to simulate a baranov process F + M in annual time step
+N0 = 1000000
+M = 0.2
+age_freq = c(1)
+for(i in 2:8) {
+  age_freq[i] = age_freq[i - 1] * exp(-M)
+}
+mean_weight = c(0.2,0.4,0.6,0.8,1.2,1.6,2.3,3.0)
+
+
+N1 = round(N0 * age_freq)
+
+F_mort = 0.3#
+sel = d_norm(1:8, 3,1.1,8)
+F_a = F_mort * sel
+Z = F_a + M
+C_baranov = sum((F_a / Z) * (1 - exp(-Z)) * N1)
+  
+N2 = N1 * exp(-Z)
+## now as a individual based model
+catch_by_age = vector();
+catch_by_age1 = vector();
+
+M_by_age = M_by_age1 = vector();
+N2a = vector();
+individual = 1;
+set.seed(127)
+for (a in 1:length(N1)) {
+  catch = 0;
+  catch1 = 0
+  M_this_age = M_this_age1 = 0;
+  N_age = 0;
+  M_or_F = c(M,F_a[a])
+  for (i in 1:(N1[a])) {
+    ## randomly check if it survives M or F
+    if (runif(1) < (1 - exp(-Z[a]))) {
+      if (runif(1) < F_a[a] / (F_a[a] + M)) {
+        catch1 = catch1 + 1;
+     } else {
+        M_this_age1 = M_this_age1 + 1;
+     }
+    }
+    
+    this_m_or_f = sample(c(1,2), 1)
+    if (runif(1) < (1 - exp(-M_or_F[this_m_or_f]))) {
+      if (this_m_or_f == 1) {
+        ## dies of M
+        M_this_age = M_this_age + 1;
+      } else {
+        catch = catch + 1;
+      }
+    } else if (runif(1) < (1 - exp(-(Z[a] - M_or_F[this_m_or_f])))) {
+      ## dies of M
+      if (this_m_or_f == 2) {
+        M_this_age = M_this_age + 1;
+      } else {
+        catch = catch + 1;
+      }
+    } else {
+      ## survives
+      N_age = N_age + 1;
+    }
+    individual = individual + 1;
+  }
+  N2a[a] = N_age;
+  M_by_age[a] = M_this_age
+  catch_by_age[a] = catch
+  M_by_age1[a] = M_this_age1
+  catch_by_age1[a] = catch1
+}
+
+c(sum(catch_by_age), sum(catch_by_age1))
+sum(catch_by_age) - C_baranov
+cbind(N2a, N2)
+
+cbind(M_by_age, M_by_age1)

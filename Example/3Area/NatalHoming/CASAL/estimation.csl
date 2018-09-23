@@ -36,11 +36,11 @@ adaptive_stepsize True
 adapt_at 20000 40000 60000 80000 100000
 
 @estimate 
-parameter initialization[ENLD].B0
+parameter initialization[ENLD].R0
 lower_bound 100.0
 upper_bound 50000000.0
 prior uniform-log
-
+{
 @estimate 
 parameter initialization[HAGU].B0
 lower_bound 100.0
@@ -52,6 +52,7 @@ parameter initialization[BOP].B0
 lower_bound 100.0
 upper_bound 5000000.0
 prior uniform-log
+}
 {
 @estimate 
 parameter recruitment[ENLD].YCS

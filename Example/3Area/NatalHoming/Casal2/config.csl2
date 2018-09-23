@@ -1,8 +1,8 @@
 #THE MODEL constraints
 @model
-start_year 1900 
+start_year 1989 
 final_year 2013
-min_age 0
+min_age 1
 max_age 20
 age_plus true
 base_weight_units tonnes
@@ -16,7 +16,8 @@ names EN.EN EN.HG EN.BP HG.EN HG.HG HG.BP BP.EN BP.HG BP.BP
 age_lengths EN_age_size*3 HG_age_size*3 BP_age_size*3
 
 @initialisation_phase Equilibrium_state
-type derived
+type derived 
+casal_intialisation_switch true
 
 ## Define the processes in the Annual Cycle
 ## This is a list of labels that correspond to a process
@@ -108,39 +109,36 @@ selectivities One
 ## Recruitment
 @process Recruitment_EN
 type recruitment_beverton_holt
-categories EN.EN
-proportions 1 
+categories EN.EN  EN.HG  EN.BP
+proportions 1 0 0 
 ssb SSB_EN
 b0 113880
 steepness 1
-age 0
-ycs_years 1900:2013
-ycs_values 1*114
-ssb_offset 0
+age 1
+ycs_years 1988:2012
+ycs_values 1*25
 
 @process Recruitment_HG
 type recruitment_beverton_holt
-categories HG.HG
-proportions 1 
+categories HG.HG HG.EN HG.BP
+proportions 1 0 0 
 ssb SSB_HG
 b0 127644
 steepness 1
-age 0
-ycs_years 1900:2013
-ycs_values 1*114
-ssb_offset 0
+age 1
+ycs_years 1988:2012
+ycs_values 1*25
 
 @process Recruitment_BP
 type recruitment_beverton_holt
-categories BP.BP
-proportions 1 
+categories BP.BP BP.EN BP.HG
+proportions 1 0 0 
 ssb SSB_BP
-b0 40000
+b0 38440.8
 steepness 1
-age 0
-ycs_years 1900:2013
-ycs_values 1*114
-ssb_offset 0
+age 1
+ycs_years 1988:2012
+ycs_values 1*25
 
 ## Ageing
 @process Ageing
@@ -156,7 +154,7 @@ selectivities One*9
 time_step_ratio 1
 table catches
 year	EN_LL	HG_LL	BP_LL
-1900	233	474	211
+/*1900	233	474	211
 1901	311	632	282
 1902	311	632	282
 1903	311	632	282
@@ -244,8 +242,8 @@ year	EN_LL	HG_LL	BP_LL
 1985	1324	1970	578
 1986	1202	1391	643
 1987	698	1228	365
-1988	861	1927	288
-1989	963	2103	194
+1988	861	1927	288*/
+1989	0	0	0
 1990	943	1617	274
 1991	856	1576	392
 1992	876	1978	428
