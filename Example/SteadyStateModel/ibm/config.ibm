@@ -27,7 +27,7 @@ years 40
 #lambda 1
 number_of_individuals 500000 ## initial number of agents
 layer_label Base
-
+recruitment_layer_label recruitment_labels
 # --------------
 # Annual Time Sequence
 # --------------
@@ -51,7 +51,7 @@ k 0.161
 a 2.0e-6 
 b 3.288
 distribution lognormal
-cv 0.00001
+cv 0.2
 time_step_proportions 1
 update_growth_parameters false
 # Maturity
@@ -64,7 +64,7 @@ type mortality_constant_rate
 m_multiplier_layer_label M_layer
 m 0.2
 distribution lognormal
-cv 0.00001
+cv 0.15
 selectivity_label One
 update_mortality_parameters false
 time_step_ratio 1
@@ -175,7 +175,7 @@ time_step Annual
 #!include "Layers/k_layer.ibm"
 !include "Layers/M_layer.ibm"
 !include "Layers/recruitment_areas.ibm"
-
+!include "Layers/recruitment_labels.ibm"
 
 
 

@@ -16,7 +16,7 @@ setwd("../ibm")
 library(ibm)
 
 ibm = extract.run("output.log")
-ibm2 = extract.run("check.out")
+ibm2 = extract.run("variability.out", fileEncoding = "UTF-16")
 
 names(ibm)
 
@@ -28,7 +28,7 @@ years = as.numeric(rownames(ibm_dq))
 plot(years, ibm_dq[,"SSB"], type = "l", lwd = 2, col = "red", xlab = "years", ylab = "SSB (t)", ylim = c(15000,36000))
 lines(years, cas2_dq[,"SSB"], lwd = 2, col = "blue")
 lines(years, ibm_dq2[,"SSB"], lwd = 2, col = "black", lty = 2)
-
+legend('bottomleft', legend = c("Casal2", "IBM-no variability", "IBM with variability"), col = c("red","blue","black"), lty = c(1,1,2),lwd = 2)
 ## look at age frequencies
 casal2_model = as.numeric(cas2$Init$`1`$values[2:32] / sum(cas2$Init$`1`$values[2:32]))
 ibm_model = as.numeric(ibm$init_2$`1`$values[2:32] / sum(ibm$init_2$`1`$values[2:32]))

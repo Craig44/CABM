@@ -17,24 +17,32 @@ library(ibm)
 
 ibm = extract.run("output.log")
 ibm2 = extract.run("with_variation.out")
+ibm3 = extract.run("with_variation_less_agents.out")
 
 names(ibm)
 
 ibm_dq = plot.derived_quantities(ibm, report_label = "derived_quants", plot.it = F)
 ibm_dq2 = plot.derived_quantities(ibm2, report_label = "derived_quants", plot.it = F)
+ibm_dq3 = plot.derived_quantities(ibm3, report_label = "derived_quants", plot.it = F)
 
 ## compare SSB's
 years = as.numeric(rownames(ibm_dq))
 plot(years, ibm_dq[,"SSB"], type = "l", lwd = 2, col = "red", xlab = "years", ylab = "SSB (t)", ylim = c(0,36000))
 lines(years, cas2_dq[,"SSB"], lwd = 2, col = "blue")
 lines(years, ibm_dq2[,"SSB"], lwd = 2, col = "black")
-legend('bottomleft', legend = c("casal2", "ibm"), col = c("blue", "red"), lwd = 2)
+#lines(years, ibm_dq3[,"SSB"], lwd = 2, lty = 2, col = "orange")
+legend('bottomleft', legend = c("Casal2", "IBM-no variability", "IBM with variability"), col = c("red","blue","black"), lty = c(1,1,1),lwd = 2)
 
 ## lets look at fishing
 ibm_comp = ibm$fishing$`1`$age_frequency
 ibm_comp2 = ibm2$fishing$`1`$age_frequency
 
+## look at age and length relationship
+df = ibm3$agents$`3`$values
+df1 = ibm$agents$`3`$values
 
+plot(df$age, df$length,pch = 19, xlab = "age", ylab = "length", main = "age length of 1000 agents")
+points(df1$age, df1$length,pch = 19, col = "red")
 
 ## look at age frequencies
 casal2_model = as.numeric(cas2$Init$`1`$values[2:32] / sum(cas2$Init$`1`$values[2:32]))

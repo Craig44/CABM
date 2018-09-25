@@ -25,9 +25,9 @@ type iterative
 years 40
 #convergence_years 20 40
 #lambda 1
-number_of_individuals 50000 ## initial number of agents
+number_of_individuals 100000 ## initial number of agents
 layer_label Base
-
+recruitment_layer_label recruitment_labels
 # --------------
 # Annual Time Sequence
 # --------------
@@ -52,7 +52,7 @@ a 2.0e-6
 b 3.288
 update_growth_parameters false
 distribution lognormal
-cv 0.2
+cv 0.0001
 time_step_proportions 1
 
 # Maturity
@@ -66,7 +66,7 @@ update_mortality_parameters false
 m_multiplier_layer_label M_layer
 m 0.2
 distribution lognormal
-cv 0.15
+cv 0.0001
 selectivity_label One
 time_step_ratio 1
 
@@ -186,7 +186,7 @@ type model_attributes
 # summarises a random selection of agents at each time step of each year, useful when debugging new processes
 @report agents
 type summarise_agents
-number_of_individuals 10
+number_of_individuals 1000
 time_step Annual
 # --------------
 # Include Layers
@@ -199,7 +199,7 @@ time_step Annual
 #!include "Layers/k_layer.ibm"
 !include "Layers/M_layer.ibm"
 !include "Layers/recruitment_areas.ibm"
-
+!include "Layers/recruitment_labels.ibm"
 ## Catch layers
 !include "Layers/CatchLayers/catch_1970.ibm"
 !include "Layers/CatchLayers/catch_1981.ibm"

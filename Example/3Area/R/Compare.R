@@ -1,95 +1,32 @@
 ## Read in Casal2 output
 detach("package:casal2", unload=TRUE)
 detach("package:ibm", unload=TRUE)
+detach("package:casal", unload=TRUE)
+setwd("C:/Work/Software/IBM/Example/3Area/NatalHoming")
 
 ## this script is just comparing, steady state models just constant recruitment and M
 library(ggplot2)
 library(reshape2)
 library(cyrils)
-library(casal)
-setwd("../CASAL")
-
-cas = extract.mpd("run_b0.log")
-cas_dq = cas$quantities$SSBs
-
-setwd("../Casal2")
 library(casal2)
-
-cas2 = extract.mpd("run_original.log")
-
-cas2_dq = plot.derived_quantities(cas2, report_label = "derived_quants", plot.it = F)
-
-
-## compare CASAL with Casal2
-years = rownames(cas2_dq)
-par(mfrow = c(1,3))
-plot(years, cas2_dq[,"SSB_EN"], xlab = "years", ylab = "SSB (t)", main = "EN", type = "l", lwd = 2, ylim = c(0,200000))
-lines(years, cas_dq$EN, lwd = 2, col = "red",lty = 2)
-
-plot(years, cas2_dq[,"SSB_HG"], xlab = "years", ylab = "SSB (t)", main = "HG", type = "l", lwd = 2, ylim = c(0,150000))
-lines(years, cas_dq$HAGU, lwd = 2, col = "red",lty = 2)
-
-plot(years, cas2_dq[,"SSB_BP"], xlab = "years", ylab = "SSB (t)", main = "BP", type = "l", lwd = 2, ylim = c(0,60000))
-lines(years, cas_dq$BOP, lwd = 2, col = "red",lty = 2)
-
-## lets look at B0
-cas$quantities$B0
-c(cas2$Rec_EN$`1`$b0, cas2$Rec_HG$`1`$b0,cas2$Rec_BP$`1`$b0)
-
-## lets look at R0
-cas$quantities$R0
-c(cas2$Rec_EN$`1`$r0, cas2$Rec_HG$`1`$r0,cas2$Rec_BP$`1`$r0)
-
-## lets look at F
-rbind(cas$quantities$fishing_pressures$BP_LL,cas2$instantaneous_mort$`1`$`fishing_pressure[BP_LL]`)
-rbind(cas$quantities$actual_catches$BP_LL,cas2$instantaneous_mort$`1`$`actual_catch[BP_LL]`)
-
-rbind(cas$quantities$actual_catches$HG_LL,cas2$instantaneous_mort$`1`$`actual_catch[HG_LL]`)
-rbind(cas$quantities$fishing_pressures$HG_LL,cas2$instantaneous_mort$`1`$`fishing_pressure[HG_LL]`)
-
-rbind(cas$quantities$actual_catches$EN_LL,cas2$instantaneous_mort$`1`$`actual_catch[EN_LL]`)
-rbind(cas$quantities$fishing_pressures$EN_LL,cas2$instantaneous_mort$`1`$`fishing_pressure[EN_LL]`)
-
-
-cbind(cas$quantities$`Ogive parameter values`$`selectivity[Sel_LL].all`, cas2$Sel_LL$`1`$Values)
-
-cas2$mean_weight_1$`1`$EN.EN$mean_weights$values
-cas_en = 4.467e-008 * c(12.55  ,   16.43 ,    19.92   ,  23.07 ,    25.91  ,   28.46  ,   30.77 ,    32.85  ,   34.72 ,    36.41,     37.93,     39.31,     40.54,     41.66,     42.66,     43.57,     44.38,     45.12,     45.78,     46.38)^2.793 
-
-cas_hg = 4.467e-008 * c(11.76,     15.36,     18.7   ,   21.79   ,  24.67    , 27.34   ,  29.81    , 32.11     ,34.25   ,  36.23   ,  38.06   ,  39.77  ,   41.35  ,   42.82  ,   44.18  ,   45.45    , 46.62   ,  47.71   ,  48.73 ,    49.66 )^2.793 
-cas_bp = 4.467e-008 *  c(13.94  ,   17.68  ,   21.14  ,   24.35 ,    27.31  ,   30.06  ,   32.6 ,     34.96 ,    37.14  ,   39.16   ,  41.03 ,    42.77,     44.37,     45.85,     47.23 ,    48.5  ,    49.68  ,   50.77,     51.79,     52.72)^2.793
-cbind(cas2$mean_weight_1$`1`$EN.EN$mean_weights$values, cas_en)
-cbind(cas2$mean_weight_1$`1`$HG.HG$mean_weights$values, cas_hg)
-cbind(cas2$mean_weight_1$`1`$BP.BP$mean_weights$values, cas_bp)
-
-
-
-cbind(cas2$mean_weight_1$`1`$EN.EN$mean_weights$values,cas2$mean_weight_1$`1`$EN.HG$mean_weights$values,cas2$mean_weight_1$`1`$EN.BP$mean_weights$values)
-cbind(cas2$mean_weight_1$`1`$BP.EN$mean_weights$values,cas2$mean_weight_1$`1`$BP.HG$mean_weights$values,cas2$mean_weight_1$`1`$BP.BP$mean_weights$values)
-cbind(cas2$mean_weight_1$`1`$HG.EN$mean_weights$values,cas2$mean_weight_1$`1`$HG.HG$mean_weights$values,cas2$mean_weight_1$`1`$HG.BP$mean_weights$values)
-
-cas2 = extract.mpd("ibm_comparison.out")
-cas2_dq = plot.derived_quantities(cas2, report_label = "derived_quants", plot.it = F)
-
+setwd("Casal2")
+cas2 = extract.mpd("output.log")
+cas2_dq = plot.derived_quantities(cas2, "derived_quants", plot.it = F)
 ## Read in the IBM output
 setwd("../ibm")
 library(ibm)
 
-
-ibm = extract.run("run_100.log")
-
-ibm$Movement_home$`1`$`1950_1-1_destination`
-ibm$Movement_home$`1`$`1950_2-1_destination`
-ibm$Movement_home$`1`$`1950_3-1_destination`
+ibm = extract.run("no_variability.out", fileEncoding = "UTF-8")
+ibm_with_var = extract.run("variability.out", fileEncoding = "UTF-8")
 
 # find proportions of agents among the three regions to short cut it
 rowSums(ibm$init_2$`1`$values[,-1]) /  sum(rowSums(ibm$init_2$`1`$values[,-1]))
+rowSums(ibm_with_var$init_2$`1`$values[,-1]) /  sum(rowSums(ibm_with_var$init_2$`1`$values[,-1]))
 
-ibm_40 = extract.run("output_40.log")
-ibm_50 = extract.run("check_100.out")
 
 ## look at initial partition
 prop_init = ibm$init_2$`1`$values[,-c(1,2)] / rowSums(ibm$init_2$`1`$values[,-c(1,2)])
+prop_init_var = ibm_with_var$init_2$`1`$values[,-c(1,2)] / rowSums(ibm_with_var$init_2$`1`$values[,-c(1,2)])
 
 en_init = colSums(cas2$Init$`1`$values[1:3,-1])
 en_prop = en_init / sum(en_init)
@@ -104,22 +41,27 @@ bp_prop = bp_init / sum(bp_init)
 ## plot
 par(mfrow = c(1,3))
 plot(1:20,prop_init[1,], type = "l", lwd = 2, xlab = "Ages", ylab = "Initial proportions",ylim = c(0,0.26))
+lines(1:20,prop_init_var[1,], col = "purple", lwd = 2, lty = 3)
 lines(1:20,en_prop, col = "red", lwd = 2)
 #lines(0:20,prop_40[1,], col = "blue", lwd = 2, lty = 2)
 #lines(0:20,prop_50[1,], col = "orange", lwd = 2, lty = 2)
 
 plot(1:20,prop_init[2,], type = "l", lwd = 2, xlab = "Ages", ylab = "Initial proportions",ylim = c(0,0.26))
 lines(1:20,hg_prop, col = "red", lwd = 2)
+lines(1:20,prop_init_var[2,], col = "purple", lwd = 2, lty = 3)
+
 #lines(0:20,prop_40[2,], col = "blue", lwd = 2, lty = 2)
 #lines(0:20,prop_50[2,], col = "orange", lwd = 2, lty = 2)
 
 plot(1:20,prop_init[3,], type = "l", lwd = 2, xlab = "Ages", ylab = "Initial proportions",ylim = c(0,0.26))
 lines(1:20,bp_prop, col = "red", lwd = 2)
+lines(1:20,prop_init_var[3,], col = "purple", lwd = 2, lty = 3)
+
 #lines(0:20,prop_40[3,], col = "blue", lwd = 2, lty = 2)
 #lines(0:20,prop_50[3,], col = "orange", lwd = 2, lty = 2)
 
 names(ibm)
-ibm$model_attributes$`1`$global_scalar
+ibm$model_attributes$`1`
 
 ibm$Rec_BP$`1`$b0
 ibm$Rec_EN$`1`$b0
@@ -130,18 +72,11 @@ ibm$agents$`1`$values[1:10,]
 ibm$derived_quants$`1`$SSB_EN
 
 ibm_dq = plot.derived_quantities(ibm, report_label = "derived_quants", plot.it = F)
-years = rownames(ibm_dq)
-plot(years,ibm_dq[,c("SSB_HG")], type = "l", ylim = c(120000,140000))
-abline(h =ibm$Rec_HG$`1`$b0, col = "red")
+ibm_dq_var = plot.derived_quantities(ibm_with_var, report_label = "derived_quants", plot.it = F)
 
-plot(years,ibm_dq[,c("SSB_EN")], type = "l", ylim = c(0000,140000))
-abline(h =ibm$Rec_EN$`1`$b0, col = "red")
 
-plot(years,ibm_dq[,c("SSB_BP")], type = "l", ylim = c(0,140000))
-abline(h =ibm$Rec_BP$`1`$b0, col = "red")
-
-merged = melt(rbind(ibm_dq[,c("SSB_HG",  "SSB_BP",  "SSB_EN")], cas2_dq[,c("SSB_HG",  "SSB_BP",  "SSB_EN")]))
-merged$model = rep(c(rep("ibm", nrow(ibm_dq)), rep("Casal2", nrow(cas2_dq))),3)
+merged = melt(rbind(ibm_dq[,c("SSB_HG",  "SSB_BP",  "SSB_EN")],ibm_dq_var[,c("SSB_HG",  "SSB_BP",  "SSB_EN")], cas2_dq[,c("SSB_HG",  "SSB_BP",  "SSB_EN")]))
+merged$model = rep(c(rep("ibm", nrow(ibm_dq)),rep("ibm with variation", nrow(ibm_dq_var)), rep("Casal2", nrow(cas2_dq))),3)
 colnames(merged) = c("year", "region", "SSB", "model")
 ## melt down the matrices
 #jpeg("Threading_with_movement.jpg")
@@ -157,6 +92,57 @@ ggplot(merged, aes(x=year, y=SSB, linetype = model, col = region)) +
   #                      labels=c("no", "yes")) +
   ggtitle("with movement")
 #dev.off()
+
+
+## Convert observations to Casal2 inputs so we can see if Casal2 will back estimate the population
+## plot catch at age for each fishery over time
+age_freq = ibm$fisher_age_freq$`1`$Values;
+fish_years = unique(age_freq$year)
+
+par(mfrow = c(4,3))
+for (year in 1990:1993) {
+  this_year = age_freq[age_freq$year == year,]
+  first_col = this_year[this_year$cell == "r1-c1",]
+  second_col = this_year[this_year$cell == "r2-c1",]
+  third_col = this_year[this_year$cell == "r3-c1",]
+  barplot(first_col$expected)
+  barplot(second_col$expected)
+  barplot(third_col$expected)
+}
+
+
+## lets look at the samples from a single fishery
+sum(ibm_with_var$fishing$`1`$`census_info-1990-0-0`$scalar)
+dim(ibm_with_var$fishing$`1`$`census_info-1990-0-0`)
+# 760918.1 individuals, expand the data set
+
+#######################################
+## 
+#######################################
+n.times = round(ibm_with_var$fishing$`1`$`census_info-1990-0-0`$scalar);
+expand_df = ibm_with_var$fishing$`1`$`census_info-1990-0-0`[rep(seq_len(nrow(ibm_with_var$fishing$`1`$`census_info-1990-0-0`)), n.times),]
+dim(expand_df)
+expand_df[284:286,]
+
+available_otoliths = 2000;
+## Randomly select 2000 otoliths without replacement
+sample_ndx = sample(1:nrow(expand_df),size = available_otoliths, replace = F);
+Otoliths = expand_df[sample_ndx,]
+
+
+ibm$Movement_home$`1`$`1990_1-1_destination`
+ibm$Movement_home$`1`$`1990_2-1_destination`
+ibm$Movement_home$`1`$`1990_3-1_destination`
+
+ibm$Jump_One$`1`$`1990_1-1_destination`
+ibm$Jump_One$`1`$`1990_2-1_destination`
+ibm$Jump_One$`1`$`1990_3-1_destination`
+
+names(ibm)
+ibm$fishing$`1`$minimum_legel_length
+ibm$fishing$`1`$years
+ibm$fishing$`1`$biomass_removed
+ibm$fishing$`1`$catch_input_removed
 
 
 
@@ -177,8 +163,7 @@ c(N1a,N2a,N3a)
 ## create Inputs for teh IBM especially the catch ones which such
 ##########################################
 list.files()
-dir.create("CatchLayers")
-setwd("CatchLayers")
+setwd("Layers/CatchLayers")
 catch_mat = matrix(0,nrow = 3,ncol = 1)
 for (i in 1:length(cas2$instantaneous_mort$`1`$year)) {
   year = cas2$instantaneous_mort$`1`$year[i]
@@ -189,7 +174,7 @@ for (i in 1:length(cas2$instantaneous_mort$`1`$year)) {
   create_ibm_layer(label = paste0(year,"_catch"), type = "numeric", filename = Filename,catch_mat)
 }
 ## now add teh include statements in the config.ibm
-setwd("../")
+setwd("../../")
 
 for (i in 1:length(cas2$instantaneous_mort$`1`$year)) {
   year = cas2$instantaneous_mort$`1`$year[i]
@@ -279,12 +264,13 @@ cas2$Rec_BP$`1`$r0 / cas2_tot
 
 
 ### Estimating growth
+setwd("C:/Work/Software/IBM/Example/3Area/NatalHoming/CASAL")
 growth_df = read.csv("growth.csv", header = T)
 ## estimate a loose VB for each area based on this data
 fit_VB = function(pars, area = "EN") {
   k = pars[1]
   l_inf = pars[2]
-  t0 = pars[3]
+  t0 = 0
   
   data = growth_df[growth_df$stock == area, -c(1,2)]
   length_hat = VB(1:20,k,l_inf,t0)
@@ -292,7 +278,7 @@ fit_VB = function(pars, area = "EN") {
   return(sum(SSE * SSE))
 }
 
-opt_EN = nlminb(c(0.2,80,1.2), objective = fit_VB, area = "EN")
+opt_EN = nlminb(c(0.2,80), objective = fit_VB, area = "EN")
 opt_EN$convergence
 opt_EN$par
 ## look at fit
@@ -303,12 +289,12 @@ for(i in 2:nrow(en_data))
   points(1:20, en_data[i,], pch = 19, col = "blue")
 lines(1:20, EN_fit, col = "red", lwd = 2)
 
-opt_HG = nlminb(c(0.2,80,1.2), objective = fit_VB, area = "HG")
+opt_HG = nlminb(c(0.2,80), objective = fit_VB, area = "HG")
 opt_HG$convergence
 opt_HG$par
 
 
-opt_BP = nlminb(c(0.2,80,1.2), objective = fit_VB, area = "BP")
+opt_BP = nlminb(c(0.2,80), objective = fit_VB, area = "BP")
 opt_BP$convergence
 opt_BP$par
 
@@ -389,3 +375,71 @@ sum(catch_by_age) - C_baranov
 cbind(N2a, N2)
 
 cbind(M_by_age, M_by_age1)
+
+################################
+## Compareing Casal2 with CASAL
+#################################
+library(casal)
+setwd("CASAL")
+
+cas = extract.mpd("run_b0.log")
+cas_dq = cas$quantities$SSBs
+
+setwd("Casal2")
+library(casal2)
+
+cas2 = extract.mpd("run_original.log")
+
+cas2_dq = plot.derived_quantities(cas2, report_label = "derived_quants", plot.it = F)
+
+
+## compare CASAL with Casal2
+years = rownames(cas2_dq)
+par(mfrow = c(1,3))
+plot(years, cas2_dq[,"SSB_EN"], xlab = "years", ylab = "SSB (t)", main = "EN", type = "l", lwd = 2, ylim = c(0,200000))
+lines(years, cas_dq$EN, lwd = 2, col = "red",lty = 2)
+
+plot(years, cas2_dq[,"SSB_HG"], xlab = "years", ylab = "SSB (t)", main = "HG", type = "l", lwd = 2, ylim = c(0,150000))
+lines(years, cas_dq$HAGU, lwd = 2, col = "red",lty = 2)
+
+plot(years, cas2_dq[,"SSB_BP"], xlab = "years", ylab = "SSB (t)", main = "BP", type = "l", lwd = 2, ylim = c(0,60000))
+lines(years, cas_dq$BOP, lwd = 2, col = "red",lty = 2)
+
+## lets look at B0
+cas$quantities$B0
+c(cas2$Rec_EN$`1`$b0, cas2$Rec_HG$`1`$b0,cas2$Rec_BP$`1`$b0)
+
+## lets look at R0
+cas$quantities$R0
+c(cas2$Rec_EN$`1`$r0, cas2$Rec_HG$`1`$r0,cas2$Rec_BP$`1`$r0)
+
+## lets look at F
+rbind(cas$quantities$fishing_pressures$BP_LL,cas2$instantaneous_mort$`1`$`fishing_pressure[BP_LL]`)
+rbind(cas$quantities$actual_catches$BP_LL,cas2$instantaneous_mort$`1`$`actual_catch[BP_LL]`)
+
+rbind(cas$quantities$actual_catches$HG_LL,cas2$instantaneous_mort$`1`$`actual_catch[HG_LL]`)
+rbind(cas$quantities$fishing_pressures$HG_LL,cas2$instantaneous_mort$`1`$`fishing_pressure[HG_LL]`)
+
+rbind(cas$quantities$actual_catches$EN_LL,cas2$instantaneous_mort$`1`$`actual_catch[EN_LL]`)
+rbind(cas$quantities$fishing_pressures$EN_LL,cas2$instantaneous_mort$`1`$`fishing_pressure[EN_LL]`)
+
+
+cbind(cas$quantities$`Ogive parameter values`$`selectivity[Sel_LL].all`, cas2$Sel_LL$`1`$Values)
+
+cas2$mean_weight_1$`1`$EN.EN$mean_weights$values
+cas_en = 4.467e-008 * c(12.55  ,   16.43 ,    19.92   ,  23.07 ,    25.91  ,   28.46  ,   30.77 ,    32.85  ,   34.72 ,    36.41,     37.93,     39.31,     40.54,     41.66,     42.66,     43.57,     44.38,     45.12,     45.78,     46.38)^2.793 
+
+cas_hg = 4.467e-008 * c(11.76,     15.36,     18.7   ,   21.79   ,  24.67    , 27.34   ,  29.81    , 32.11     ,34.25   ,  36.23   ,  38.06   ,  39.77  ,   41.35  ,   42.82  ,   44.18  ,   45.45    , 46.62   ,  47.71   ,  48.73 ,    49.66 )^2.793 
+cas_bp = 4.467e-008 *  c(13.94  ,   17.68  ,   21.14  ,   24.35 ,    27.31  ,   30.06  ,   32.6 ,     34.96 ,    37.14  ,   39.16   ,  41.03 ,    42.77,     44.37,     45.85,     47.23 ,    48.5  ,    49.68  ,   50.77,     51.79,     52.72)^2.793
+cbind(cas2$mean_weight_1$`1`$EN.EN$mean_weights$values, cas_en)
+cbind(cas2$mean_weight_1$`1`$HG.HG$mean_weights$values, cas_hg)
+cbind(cas2$mean_weight_1$`1`$BP.BP$mean_weights$values, cas_bp)
+
+
+
+cbind(cas2$mean_weight_1$`1`$EN.EN$mean_weights$values,cas2$mean_weight_1$`1`$EN.HG$mean_weights$values,cas2$mean_weight_1$`1`$EN.BP$mean_weights$values)
+cbind(cas2$mean_weight_1$`1`$BP.EN$mean_weights$values,cas2$mean_weight_1$`1`$BP.HG$mean_weights$values,cas2$mean_weight_1$`1`$BP.BP$mean_weights$values)
+cbind(cas2$mean_weight_1$`1`$HG.EN$mean_weights$values,cas2$mean_weight_1$`1`$HG.HG$mean_weights$values,cas2$mean_weight_1$`1`$HG.BP$mean_weights$values)
+
+cas2 = extract.mpd("run.log")
+cas2_dq = plot.derived_quantities(cas2, report_label = "derived_quants", plot.it = F)
