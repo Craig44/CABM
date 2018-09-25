@@ -162,6 +162,10 @@ void ProcessRemovalsByAge::DoBuild() {
       if (not cell_found)
         LOG_ERROR_P(PARAM_CELLS) << "could not find the cell '" << cell << "' in the layer " << layer_label_ << " please make sure that you supply cell labels that are consistent with the layer.";
     }
+
+    if(not mortality_process_->check_years(years_)) {
+      LOG_ERROR_P(PARAM_YEARS) << "there was a year that the mortality process doesn't not execute in, can you please check that the years you have supplied for this observation are years that the mortality process occurs in cheers.";
+    }
 }
 
 /**

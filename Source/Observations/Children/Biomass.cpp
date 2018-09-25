@@ -37,7 +37,7 @@ namespace utils = niwa::utilities;
  * Default constructor
  */
 Biomass::Biomass(Model* model) : Observation(model) {
-  parameters_.Bind<string>(PARAM_CATCHABILITY, &catchability_label_, "The Catchability to use to scale the observation for vulnerability", "");
+  //parameters_.Bind<string>(PARAM_CATCHABILITY, &catchability_label_, "The Catchability to use to scale the observation for vulnerability", ""); // TODO not sure if neccessary
   parameters_.Bind<string>(PARAM_TIME_STEP, &time_step_label_, "The label of time-step that the observation occurs in", "");
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "The years of the observed values", "");
   parameters_.Bind<float>(PARAM_ERROR_VALUE, &error_values_, "The error values of the observed values (note the units depend on the likelihood)", "");
@@ -257,6 +257,7 @@ void Biomass::Execute() {
     }
   }
   for (auto& iter : obs_values_by_year_) {
+    LOG_FINE() << "values by year " << iter.second.size() << " should be = 1";
     for (auto& second_iter : iter.second) {
       if (utilities::doublecompare::IsZero(time_step_proportion_)) {
         SaveComparison(0, 0, second_iter.first, pre_obs_values_by_year_[iter.first][second_iter.first], 0.0, error_values_by_year_[iter.first], iter.first);

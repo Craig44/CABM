@@ -28,6 +28,7 @@
 #include "Reports/Factory.h"
 #include "Selectivities/Factory.h"
 #include "TimeSteps/Factory.h"
+#include "TimeVarying/Factory.h"
 #include "Utilities/To.h"
 
 
@@ -89,7 +90,8 @@ base::Object* Factory::CreateObject(const string& object_type, const string& sub
     return selectivities::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   else if (lwr_object_type == PARAM_TIME_STEP || lwr_object_type == PARAM_TIME_STEPS)
     return timesteps::Factory::Create(model_, lwr_object_type, lwr_sub_type);
-
+  else if (lwr_object_type == PARAM_TIME_VARYING)
+    return timevarying::Factory::Create(model_, lwr_object_type, lwr_sub_type);
   return nullptr;
 }
 

@@ -32,6 +32,7 @@ namespace processes { class Manager; }
 namespace reports { class Manager; }
 namespace selectivities { class Manager; }
 namespace timesteps { class Manager; }
+namespace timevarying { class Manager; }
 namespace minimisers { class Manager; }
 
 class Estimables;
@@ -55,6 +56,7 @@ public:
   virtual reports::Manager*               report() { return report_; }
   virtual selectivities::Manager*         selectivity() { return selectivity_; }
   virtual timesteps::Manager*             time_step() { return time_step_; }
+  virtual timevarying::Manager*           time_varying() { return time_varying_; }
   virtual minimisers::Manager*            minimiser() { return minimiser_; }
 
 protected:
@@ -81,6 +83,7 @@ protected:
   reports::Manager*                   report_;
   selectivities::Manager*             selectivity_;
   timesteps::Manager*                 time_step_;
+  timevarying::Manager*               time_varying_;
   minimisers::Manager*                minimiser_;
 
 };
