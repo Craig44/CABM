@@ -447,7 +447,7 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
     for (auto& tag_recapture : removals_tag_recapture_) {
       cache << "tag_recapture_info-" << tag_recapture.year_ << "-" << tag_recapture.row_ << "-" << tag_recapture.col_ << " " << REPORT_R_LIST << "\n";
       cache << "scanned_fish: " << tag_recapture.scanned_fish_ << "\n";
-      cache << "tag_recapture_info " << REPORT_R_MATRIX << "\n"
+      cache << "values " << REPORT_R_MATRIX << "\n";
       //cache << "age length length-increment time_at_liberty\n";
       for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
         cache << tag_recapture.age_[ndx] << " ";
@@ -460,9 +460,8 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
       cache << "\n";
       for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
         cache << tag_recapture.length_increment_[ndx] << " ";
-      cache << "\n";
+      cache << "\n" << REPORT_R_LIST_END << "\n";
     }
-    cache << REPORT_R_LIST_END << "\n";
   }
 }
 
