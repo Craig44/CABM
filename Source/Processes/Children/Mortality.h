@@ -54,7 +54,7 @@ struct tag_recapture {
   unsigned row_;
   unsigned col_;
   unsigned time_step_;
-  unsigned scanned_fish_;
+  unsigned scanned_fish_ = 0;
   vector<unsigned> age_;
   vector<float> length_;
   vector<unsigned> time_at_liberty_;
@@ -89,7 +89,7 @@ protected:
   vector<composition_data>            removals_by_age_and_area_;
   vector<composition_data>            removals_by_length_and_area_;
   vector<census_data>                 removals_census_;
-
+  vector<tag_recapture>               removals_tag_recapture_;
   map<unsigned, vector<unsigned>>     removals_by_age_;
   map<unsigned, vector<unsigned>>     removals_by_length_;
   bool                                update_natural_mortality_parameters_;

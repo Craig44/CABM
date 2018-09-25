@@ -1,0 +1,389 @@
+## Model description, a hypothetical life cycle
+# 3 stock model
+# 3 spatial cells
+# 30 year annual cycle
+# 4 time steps
+# A single growth curve (could make it spatial so in effect having two growth curves for each area)
+# spatially explicit recruitment
+@model
+start_year 1990
+final_year 2013
+min_age 0
+max_age 20
+age_plus true # other acceptable inputs for bool are '1' and 'yes'
+initialisation_phase_labels Iterative #label to an @initialisation block
+time_steps time_step_one time_step_two half_M
+length_bins 0 5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80# assumed cm's
+length_plus true ## is the last bin a plus group
+base_layer_label Base #
+growth_process_label von_bert
+natural_mortality_process_label natural_mort
+#sexed false
+maturity_ogive_label mature_ogive
+nrows 3
+ncols 1
+max_threads_to_use 3
+# --------------
+# Init Phase
+# --------------
+@initialisation_phase Iterative
+type iterative
+years 70
+number_of_individuals 700000 ## initial number of agents
+layer_label initial_values
+recruitment_layer_label recruitment_layer # stock identification, important for when you are scaling SSB = B0 for an agent model to population model
+# --------------
+# Annual Sequence
+# --------------
+# --- Time step 1
+# - Ageing + growth + maturation (implicit) + (explicit) + explicit
+# - Maturity
+# - Migrate Home
+# - Spawning
+# --- Time step 2
+# - Recruitment
+# - Move around
+# - 0.5M + F + 0.5M
+
+@time_step time_step_one 
+processes von_bert Maturation #Movement_home
+
+@time_step time_step_two
+processes  Recruitment_EN Recruitment_HG Recruitment_BP /*Jump_One*/ Tagging_event natural_mort fishing
+
+@time_step half_M
+processes natural_mort
+
+# --------------
+# Process definitions
+# --------------
+@process Nop 
+type nop
+
+
+@process Tagging_event
+type tagging
+years 1990
+selectivities Sel_LL
+tag_release_layer tag_1990
+
+# Growth
+@process von_bert
+type growth_von_bertalanffy_with_basic_weight
+linf_layer_label L_inf_layer
+#linf 101.8
+k_layer_label k_layer
+#k 0.161
+a 4.467e-08
+b 2.793
+update_growth_parameters false ## this means that your growth is that of your birth area.
+distribution lognormal
+cv 0.2
+time_step_proportions 1
+
+# Maturity
+@process Maturation
+type maturation
+
+# Natural Mortality
+@process natural_mort
+type mortality_constant_rate
+m_multiplier_layer_label M_layer
+m 0.13
+update_mortality_parameters false
+distribution lognormal
+cv 0.15
+selectivity_label One
+time_step_ratio 0.5 0.5
+
+# Fishing Mortality
+@process fishing
+type mortality_event_biomass
+years 1990:1991
+catch_layers  1990_catch 1991_catch #1992_catch 1993_catch 1994_catch #1995_catch 1996_catch 1997_catch 1998_catch 1999_catch 2000_catch 2001_catch 2002_catch 2003_catch 2004_catch 2005_catch 2006_catch 2007_catch 2008_catch 2009_catch 2010_catch 2011_catch 2012_catch 2013_catch
+selectivity Sel_LL
+print_extra_info true
+scanning_years 1990:1991
+scanning_proportion_of_catch 1.0 1.0
+# Movement
+@process Movement_home
+type movement_box_transfer
+movement_type natal_homing
+origin_cell 1-1 2-1 3-1
+probability_layers EN_home HG_home BP_home
+
+# Stage-one movement
+@process Jump_One
+type movement_box_transfer
+#movement_type natal_homing # not sure this matters since they are all home at this point
+origin_cell 1-1 2-1 3-1
+probability_layers EN_jump_one HG_jump_one BP_jump_one
+
+
+# Recruitment Constant
+@process Recruitment_HG
+type recruitment_beverton_holt
+recruitment_layer_label recruitment_HG
+b0 127644
+ssb SSB_HG
+steepness 0.75
+ycs_values 0.9805555 0.2914848 0.6481528 0.4034729 0.9808864 0.6098410 0.3110043 0.5339825 1.3775342 0.5589029 0.8531278 1.2828560 0.5769496 1.0968170 0.7381291 0.1832230 0.5703490 0.4430337 2.4570672 0.4980334 0.6098772 1.2694970 0.6366152 0.4220754
+
+@process Recruitment_EN
+type recruitment_beverton_holt
+recruitment_layer_label recruitment_EN
+b0 113880
+ssb SSB_EN
+steepness 0.75
+ycs_values 3.6897515 0.4730097 1.2082113 1.0075909 1.0497424 0.2492806 1.7327765 1.1972767 0.8851567 1.2673801 0.3528800 0.9109359 0.7795144 2.1537694 0.2228453 0.1597312 0.8252556 0.7630703 1.1238620 0.3420459 1.6116646 3.2901000 0.3873122 0.6454479
+
+@process Recruitment_BP
+type recruitment_beverton_holt
+recruitment_layer_label recruitment_BP
+b0 38440.8
+ssb SSB_BP
+steepness 0.75
+ycs_values 0.9559903 0.6761429 0.3161653 2.3875995 1.6196029 1.0525369 0.8588915 2.4465935 0.6287582 0.9087567 1.0697131 0.7188717 1.0969039 1.1643940 0.9373380 0.8218429 0.3128731 0.7030560 0.3959240 2.0879529 2.5100908 1.8805860 0.8173450 2.3726866
+
+# --------------
+# Define selectivities
+# --------------
+@selectivity natural_mortality_by_age
+type double_exponential
+x1 0
+x0 6
+x2 30
+y1 0.6
+y0 0.1
+y2 0.4
+
+@selectivity One
+type constant
+c 1
+
+@selectivity One_length
+type constant
+length_based true
+c 1
+
+@selectivity mature_ogive
+type all_values_bounded
+l 3
+h 8
+v 0.00 0.5 1.00 1.00 1.00 1.00
+
+@selectivity Sel_LL
+type double_normal
+mu 4.809513 
+sigma_l 1.861128
+sigma_r 100
+
+# --------------
+# Derived Quantities
+# --------------
+@derived_quantity SSB_HG
+type mature_biomass
+biomass_layer_label SSB_HG
+time_step time_step_one
+proportion_through_mortality_block 0.0
+
+@derived_quantity SSB_BP
+type mature_biomass
+biomass_layer_label SSB_BP
+time_step time_step_one
+proportion_through_mortality_block 0.0
+
+@derived_quantity SSB_EN
+type mature_biomass
+biomass_layer_label SSB_EN
+time_step time_step_one
+proportion_through_mortality_block 0.0
+
+
+# --------------
+# Define Reports
+# --------------
+# print process properties
+#@report M_report
+#type process
+#process natural_mort
+
+@report mature_report
+type process
+process Maturation
+
+@report fishing
+type process
+process fishing
+
+@report Jump_One
+type process
+process Jump_One
+
+@report Movement_home
+type process
+process Movement_home
+
+@report Rec_EN
+type process
+process Recruitment_EN
+
+@report Rec_HG
+type process
+process Recruitment_HG
+
+@report Tagging
+type process
+process Tagging_event
+
+@report Rec_BP
+type process
+process Recruitment_BP
+
+/*
+@report fisher_age_freq
+type observation
+observation fishery_age
+
+@report CPUE
+type observation
+observation CPUE
+*/
+# print initail state of agents
+@report init
+type initialisation_partition
+
+# print age frequency
+@report age_freq
+type age_frequency_by_cell
+time_step half_M
+
+# print SSB's
+@report derived_quants
+type derived_quantity
+
+@report model_attributes
+type model_attributes
+/*
+@report agents
+type summarise_agents
+number_of_individuals 100
+time_step half_M
+*/
+
+# --------------
+# Define Observations
+# --------------
+/*
+@observation fishery_age
+type process_removals_by_age
+simulation_likelihood multinomial
+process_label fishing
+years 1990:2013
+min_age 0
+max_age 20
+#plus_group true
+ageing_error None
+table error_values
+1990 300
+1991 300
+1992 300
+1993 300
+1994 300
+1995 300
+1996 300
+1997 300
+1998 300
+1999 300
+2000 300
+2001 300
+2002 300
+2003 300
+2004 300
+2005 300
+2006 300
+2007 300
+2008 300
+2009 300
+2010 300
+2011 300
+2012 300
+2013 300
+end_table
+cell_layer cells
+cells r1-c1 r2-c1 r3-c1
+
+@ageing_error None
+type none
+
+@observation CPUE
+type biomass
+years 1990:2013
+time_step time_step_two
+proportion_through_mortality_block 1.0 ## take snapshot at the end of fishing timestep
+simulation_likelihood lognormal
+error_value 0.2 * 24
+catchability 0.2
+selectivities Sel_LL
+cell_layer cells
+cells r1-c1 r2-c1 r3-c1 
+*/
+# --------------
+# Include Layers
+# --------------
+!include "Layers/base_layer.ibm"
+!include "Layers/cell.ibm"
+
+!include "Layers/SSB_BP_area.ibm"
+!include "Layers/SSB_HG_area.ibm"
+!include "Layers/SSB_EN_area.ibm"
+!include "Layers/M_layer.ibm"
+!include "Layers/k_layer.ibm"
+!include "Layers/L_inf_layer.ibm"
+!include "Layers/initial_seed_layer.ibm"
+!include "Layers/recruitment_processes.ibm"
+!include "Layers/tag_1990.ibm"
+
+!include "Layers/recruitment_HG_area.ibm"
+!include "Layers/recruitment_BP_area.ibm"
+!include "Layers/recruitment_EN_area.ibm"
+## Movement layers
+!include "Layers/Movement/BP_home.ibm"
+!include "Layers/Movement/HG_home.ibm"
+!include "Layers/Movement/EN_home.ibm"
+!include "Layers/Movement/BP_Jump_One.ibm"
+!include "Layers/Movement/HG_Jump_One.ibm"
+!include "Layers/Movement/EN_Jump_One.ibm"
+
+/*
+@layer HG_move
+type numeric_meta_layer
+years 1970:2020
+layer_labels HG_move_pre_2000 * 51
+default_layer HG_move_pre_2000
+*/
+## Catch layers
+!include "Layers/CatchLayers/1990_catch.ibm"
+!include "Layers/CatchLayers/1991_catch.ibm"
+!include "Layers/CatchLayers/1992_catch.ibm"
+!include "Layers/CatchLayers/1993_catch.ibm"
+!include "Layers/CatchLayers/1994_catch.ibm"
+!include "Layers/CatchLayers/1995_catch.ibm"
+!include "Layers/CatchLayers/1996_catch.ibm"
+!include "Layers/CatchLayers/1997_catch.ibm"
+!include "Layers/CatchLayers/1998_catch.ibm"
+!include "Layers/CatchLayers/1999_catch.ibm"
+!include "Layers/CatchLayers/2000_catch.ibm"
+!include "Layers/CatchLayers/2001_catch.ibm"
+!include "Layers/CatchLayers/2002_catch.ibm"
+!include "Layers/CatchLayers/2003_catch.ibm"
+!include "Layers/CatchLayers/2004_catch.ibm"
+!include "Layers/CatchLayers/2005_catch.ibm"
+!include "Layers/CatchLayers/2006_catch.ibm"
+!include "Layers/CatchLayers/2007_catch.ibm"
+!include "Layers/CatchLayers/2008_catch.ibm"
+!include "Layers/CatchLayers/2009_catch.ibm"
+!include "Layers/CatchLayers/2010_catch.ibm"
+!include "Layers/CatchLayers/2011_catch.ibm"
+!include "Layers/CatchLayers/2012_catch.ibm"
+!include "Layers/CatchLayers/2013_catch.ibm"

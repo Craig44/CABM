@@ -1,0 +1,7 @@
+@layer tag_1990
+type integer
+table layer
+1400
+1000
+500
+end_table

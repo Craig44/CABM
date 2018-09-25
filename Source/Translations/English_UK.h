@@ -511,7 +511,7 @@
 #define PARAM_SB                                  "sb"
 #define PARAM_SCALING_YEARS                       "scaling_years"
 #define PARAM_SCANNED                             "scanned"
-#define PARAM_SCANNING_YEARS                      "tag_scan_years"
+#define PARAM_SCANNING_YEARS                      "scanning_years"
 #define PARAM_SCANNING_PROPROTION                 "scanning_proportion_of_catch"
 #define PARAM_SCORES_INDEX                        "scores_index"
 #define PARAM_SCHNUTE                             "schnute"

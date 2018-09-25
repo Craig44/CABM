@@ -157,7 +157,7 @@ void Tagging::DoExecute() {
             unsigned tag_max = cell->agents_.size();
             vector<unsigned>  age_freq(model_age_bins_[row][col],0);
             vector<unsigned>  length_freq(model_length_bins_[row][col],0);
-
+            LOG_FINE() << "row " << row + 1 << " col = " << col + 1 << " tags to release = " << tags_to_release;
             while (tags_to_release > 0) {
               ++tag_attempts;
               // pick a random agent
@@ -176,7 +176,7 @@ void Tagging::DoExecute() {
                 tagged_agent.set_scalar(1.0);
                 age_freq[(*iter).get_age_index()]++;
                 length_freq[(*iter).get_length_bin_index()]++;
-
+                tags_to_release--;
                 // add this tagged fish to the partition
                 cell->agents_.push_back(tagged_agent);
               }
@@ -230,6 +230,7 @@ void  Tagging::FillReportCache(ostringstream& cache) {
     for (unsigned length_ndx = 0; length_ndx < year_value.second.size(); ++length_ndx)
       cache << " " << year_value.second[length_ndx];
   }
+  cache << "\n";
 }
 
 }

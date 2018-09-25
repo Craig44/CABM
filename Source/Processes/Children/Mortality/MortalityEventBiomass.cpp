@@ -171,7 +171,7 @@ void MortalityEventBiomass::DoExecute() {
         scanning = true;
         scanning_ndx = distance(scanning_years_.begin(),scan_iter);
       }
-
+      LOG_FINE() << "scanning index = " << scanning_ndx;
       LOG_FINE() << "applying F in year " << model_->current_year() << " catch index = " << catch_ndx;
       // Pre-calculate agents in the world to set aside our random numbers needed for the operation
       n_agents_ = 0;
@@ -231,7 +231,7 @@ void MortalityEventBiomass::DoExecute() {
                 composition_data age_freq(PARAM_AGE, current_year_by_space_[row][col], row, col, model_age_bins_[row][col]);
                 composition_data length_freq(PARAM_LENGTH, current_year_by_space_[row][col], row, col, model_length_bins_[row][col]);
                 census_data census_fishery(current_year_by_space_[row][col], row, col);
-                tag_recapture tag_recapture_info(current_year_by_space_[row][col], row, col,current_time_step_by_space_[row][col]);
+                tag_recapture tag_recapture_info(current_year_by_space_[row][col], row, col, current_time_step_by_space_[row][col]);
 
                 catch_attempts = 1;
                 auto iter = cell->agents_.begin();
@@ -293,6 +293,7 @@ void MortalityEventBiomass::DoExecute() {
                   removals_by_age_and_area_.push_back(age_freq);
                   actual_catch_taken += actual_catch_this_cell;
                   removals_census_.push_back(census_fishery);
+                  removals_tag_recapture_.push_back(tag_recapture_info);
                 }
               }
               LOG_FINEST() << "individuals = " << cell->agents_.size();
@@ -385,6 +386,7 @@ void MortalityEventBiomass::DoExecute() {
                   removals_by_age_and_area_.push_back(age_freq);
                   actual_catch_taken += actual_catch_this_cell;
                   removals_census_.push_back(census_fishery);
+                  removals_tag_recapture_.push_back(tag_recapture_info);
                 }
               } // if catch > 0
             } // is enabled
@@ -441,6 +443,26 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
         cache << census.scalar_[ndx] << " ";
       cache << "\n";
     }
+
+    for (auto& tag_recapture : removals_tag_recapture_) {
+      cache << "tag_recapture_info-" << tag_recapture.year_ << "-" << tag_recapture.row_ << "-" << tag_recapture.col_ << " " << REPORT_R_LIST << "\n";
+      cache << "scanned_fish: " << tag_recapture.scanned_fish_ << "\n";
+      cache << "tag_recapture_info " << REPORT_R_MATRIX << "\n"
+      //cache << "age length length-increment time_at_liberty\n";
+      for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+        cache << tag_recapture.age_[ndx] << " ";
+      cache << "\n";
+      for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+        cache << tag_recapture.length_[ndx] << " ";
+      cache << "\n";
+      for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+        cache << tag_recapture.time_at_liberty_[ndx] << " ";
+      cache << "\n";
+      for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+        cache << tag_recapture.length_increment_[ndx] << " ";
+      cache << "\n";
+    }
+    cache << REPORT_R_LIST_END << "\n";
   }
 }
 
