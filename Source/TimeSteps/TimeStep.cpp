@@ -112,7 +112,6 @@ void TimeStep::ExecuteForInitialisation(const string& phase_label) {
  */
 void TimeStep::Execute(unsigned year) {
   LOG_TRACE();
-
   for (auto executor : executors_[year])
       executor->PreExecute();
 
@@ -145,6 +144,8 @@ void TimeStep::Execute(unsigned year) {
 
   for (auto executor : executors_[year])
     executor->Execute();
+
+  model_->increment_time_step(); // Moving into another time step
 }
 
 /**

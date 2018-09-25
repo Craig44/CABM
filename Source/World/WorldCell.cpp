@@ -120,7 +120,10 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
     if (rng.chance() <= probability_mature_at_age)
       mature = true;
     Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], (model_->current_year() - age),
-        growth_pars[agent][2], growth_pars[agent][3], model_, mature, sex, 1.0, row_, col_);
+        growth_pars[agent][2], growth_pars[agent][3], model_, mature, sex, 1.0, row_, col_, 0);
+    if (agent == 0) {
+      LOG_MEDIUM() << "number of bytes of an agent class" << sizeof(new_agent);
+    }
     agents_.push_back(new_agent); // This doesn't work if there is movement between stocks and areas then we this approximation becomes a bit shit. but I can't think of an alternative.
   }
 }
@@ -146,7 +149,7 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
         sex = 1;
     }
     Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], model_->current_year(),
-        growth_pars[agent][2], growth_pars[agent][3], model_, false, sex, scalar, row_, col_);
+        growth_pars[agent][2], growth_pars[agent][3], model_, false, sex, scalar, row_, col_, 0);
     agents_.push_back(new_agent);
   }
 }

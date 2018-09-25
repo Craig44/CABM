@@ -128,7 +128,8 @@ public:
   virtual const float&        max_lat() const {return max_lat_;}
   virtual const float&        min_lon() const {return min_lon_;}
   virtual const float&        max_lon() const {return max_lon_;}
-
+  void                        increment_time_step() {++time_step_counter_;}
+  virtual const unsigned      get_time_step_counter() const {return time_step_counter_;}
   // manager accessors
   virtual Managers&           managers();
   virtual Objects&            objects();
@@ -188,6 +189,7 @@ protected:
   float                       proportion_male_;
   vector<string>              maturity_ogives_;
   unsigned                    max_threads_ = 1;
+  unsigned                    time_step_counter_ = 1; // This will keep track of the time steps for things such as tagging it would be helpful if we have multiple time steps in years.
 
   Managers*                   managers_ = nullptr;
   Objects*                    objects_ = nullptr;

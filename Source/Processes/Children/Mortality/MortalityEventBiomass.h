@@ -39,6 +39,7 @@ public:
   virtual void                        DoExecute() override final;
   void                                draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) override final { };
   void                                FillReportCache(ostringstream& cache) override final;
+  virtual bool                        check_years(vector<unsigned> years_to_check_) override final;
 
 protected:
   vector<string>                      catch_layer_label_;
@@ -53,6 +54,7 @@ protected:
   vector<float>                       random_numbers_;
   vector<float>                       discard_random_numbers_;
   vector<float>                       selectivity_random_numbers_;
+  vector<float>                       scanning_random_numbers_;
   vector<vector<vector<float>>>       cell_offset_for_selectivity_;
 
   unsigned                            n_agents_;
@@ -60,11 +62,19 @@ protected:
   vector<vector<unsigned>>            model_length_bins_;
   vector<vector<unsigned>>            model_age_bins_;
   vector<vector<float>>               mls_by_space_;
+  vector<vector<float>>               discard_by_space_;
   vector<vector<unsigned>>            current_year_by_space_;
+  vector<vector<unsigned>>            current_time_step_by_space_;
+  vector<vector<float>>               scanning_prop_year_by_space_;
+
+  // For Tag-recaptures
+  vector<unsigned>                    scanning_years_;
+  vector<float>                       scanning_proportion_;
 
   // For reporting
   map<unsigned, float>                actual_removals_by_year_;
   map<unsigned, float>                removals_by_year_;
+  bool                                print_extra_info_ = false;
 
 
 

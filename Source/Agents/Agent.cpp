@@ -20,7 +20,7 @@ namespace niwa {
 
 Agent::Agent(float lat, float lon, float first_age_length_par, float second_age_length_par, float M, unsigned birth_year,
     float first_length_weight_par, float second_length_weigth_par, Model* model, bool mature, unsigned sex, float scalar,
-    unsigned home_row, unsigned home_col) :
+    unsigned home_row, unsigned home_col, unsigned tag) :
     lat_(lat),
     lon_(lon),
     first_age_length_par_(first_age_length_par),
@@ -34,11 +34,21 @@ Agent::Agent(float lat, float lon, float first_age_length_par, float second_age_
     sex_(sex),
     scalar_(scalar),
     home_row_(home_row),
-    home_col_(home_col)
+    home_col_(home_col),
+    tag_(tag)
 
 {
   growth_init(); // if age = 0 will set length_ = 0; otherwise will set to what ever the length at age dictates.
 }
+
+/*// An overloaded constructor for cloning an agent
+Agent::Agent(Agent& agent_to_copy) {
+  lat_ = agent_to_copy.get_lat();
+  lon_ = agent_to_copy.get_lon();
+  first_age_length_par_ = agent_to_copy.first_age_length_par();
+  second_age_length_par_ = agent_to_copy.first_age_length_par();
+
+}*/
 
 // Return Age this allows for implicit ageing, which is handy as it reduces a process out of the dynamics
 unsigned Agent::get_age() {
@@ -61,6 +71,12 @@ unsigned Agent::get_age_index() {
   return get_age() - model_->min_age();
 }
 
+
+void Agent::apply_tagging_event(unsigned tags) {
+  length_at_tag_ = length_;
+  tag_ = tags;
+  tag_time_step_ = model_->get_time_step_counter();
+}
 /*
  * An internal function to set initial length at age when initially seeding agents in the world,
  * So that we have the equivalent length and weight frequency. Calculate expected length at age assuming von Bert parameters
@@ -68,7 +84,7 @@ unsigned Agent::get_age_index() {
  *
 */
 void Agent::growth_init() {
-  length_ = first_age_length_par_ * (1-std::exp(-second_age_length_par_ * (float)get_age()));
+  length_ = first_age_length_par_ * (1-std::exp(-second_age_length_par_ * ((float)get_age() - third_age_length_par_)));
   weight_ = first_length_weight_par_ * pow(length_, second_length_weight_par_); // Just update weight when ever we update length to save executions
   //LOG_FINEST() << "initialise agent, age = " << age() << " length = " << length_ << " weight = " << weight_;
 }

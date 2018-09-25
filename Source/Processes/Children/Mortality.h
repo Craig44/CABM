@@ -21,6 +21,8 @@
 namespace niwa {
 namespace processes {
 
+
+// Aggregated compositional data
 struct composition_data {
   string type_;
   unsigned year_;
@@ -34,6 +36,32 @@ struct composition_data {
   }
 };
 
+// Census data that links every age and length to one another of every agent caught, may only want this for a few scenerios could be memory\computational hungry
+struct census_data {
+  unsigned year_;
+  unsigned row_;
+  unsigned col_;
+  vector<unsigned> age_;
+  vector<float> length_;
+  vector<float> scalar_;
+  census_data(unsigned year, unsigned row, unsigned col) : year_(year),
+      row_(row), col_(col) {}
+};
+
+// Tag Recapture class
+struct tag_recapture {
+  unsigned year_;
+  unsigned row_;
+  unsigned col_;
+  unsigned time_step_;
+  unsigned scanned_fish_;
+  vector<unsigned> age_;
+  vector<float> length_;
+  vector<unsigned> time_at_liberty_;
+  vector<float> length_increment_;
+  tag_recapture(unsigned year, unsigned row, unsigned col, unsigned time_step) : year_(year),
+      row_(row), col_(col), time_step_(time_step) {}
+};
 /**
  * Class definition
  */
@@ -50,12 +78,18 @@ public:
   virtual void                        draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) = 0;
   vector<composition_data>&           get_removals_by_age() {return removals_by_age_and_area_;};
   vector<composition_data>&           get_removals_by_length() {return removals_by_length_and_area_;};
+  vector<census_data>&                get_census_data() {return removals_census_;};
+
   virtual bool                        update_mortality() {return update_natural_mortality_parameters_;};
   virtual double                      SolveBaranov() { return 1.0;};
   void                                set_lambda(double lambda) {lambda_ = lambda;};
+  virtual bool                        check_years(vector<unsigned> years_to_check_) {return false;};
+
 protected:
   vector<composition_data>            removals_by_age_and_area_;
   vector<composition_data>            removals_by_length_and_area_;
+  vector<census_data>                 removals_census_;
+
   map<unsigned, vector<unsigned>>     removals_by_age_;
   map<unsigned, vector<unsigned>>     removals_by_length_;
   bool                                update_natural_mortality_parameters_;
