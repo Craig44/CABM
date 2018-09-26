@@ -35,7 +35,8 @@ ncols 5
 type iterative
 years 40
 number_of_individuals 1500000 ## initial number of agents
-layer_label Base
+#layer_label Base
+recruitment_layer_label  Recruitment_label
 
 # --------------
 # Time Sequence
@@ -89,7 +90,7 @@ update_mortality_parameters false
 distribution lognormal
 cv 0.0001
 selectivity_label One_length One_length
-
+time_step_ratio 1
 # Fishing Mortality
 @process fishing
 type mortality_event_biomass
@@ -118,7 +119,6 @@ type recruitment_constant
 recruitment_layer_label Recruitment_area
 b0 120000
 ssb SSB
-
 # --------------
 # Define selectivities
 # --------------

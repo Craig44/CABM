@@ -169,34 +169,46 @@ void AgeLength::Execute() {
     for (unsigned cell_ndx = 0; cell_ndx < cells_.size(); ++cell_ndx) {
       samples_to_take = n_samples_[cell_ndx];
       n_cells = col_index_for_each_cell_[cells_[cell_ndx]].size();
-      WorldCell* sample_cell;
+      WorldCell* sample_cell = nullptr;
       while(samples_to_take > 0) {
         // randomly select a cell in this region
         auto sample_index = rng.chance() * n_cells;
-        // get a pointer to the world and select a fish
-        sample_cell = world_->get_base_square(row_index_for_each_cell_[cells_[cell_ndx]][sample_index], col_index_for_each_cell_[cells_[cell_ndx]][sample_index]);
-        // Randomly select an individual and see if it is selective
-        auto agent = sample_cell->agents_.begin();
-        advance(agent, sample_cell->agents_.size() * rng.chance());
-        if (rng.chance() <= selectivities_[(*agent).get_sex()]->GetResult((*agent).get_length_bin_index()))
-          SaveComparison((*agent).get_age(), (*agent).get_length(), sample_cell->get_cell_label(), 0.0, 0.0, 0.0, model_->current_year());
+          // get a pointer to the world and select a fish
+         sample_cell = world_->get_base_square(row_index_for_each_cell_[cells_[cell_ndx]][sample_index], col_index_for_each_cell_[cells_[cell_ndx]][sample_index]);
+         if (sample_cell->is_enabled()) {
+           unsigned agent_ndx = sample_cell->agents_.size() * rng.chance();
+           if (sample_cell->agents_[agent_ndx].is_alive()) {
+            // Randomly select an individual and see if it is selective
+            auto agent = sample_cell->agents_.begin();
+            advance(agent, agent_ndx);
+            if (rng.chance() <= selectivities_[(*agent).get_sex()]->GetResult((*agent).get_length_bin_index()))
+              SaveComparison((*agent).get_age(), (*agent).get_length(), sample_cell->get_cell_label(), 0.0, 0.0, 0.0, model_->current_year());
+            samples_to_take--;
+          }
+        }
       }
     }
   } else {
     for (unsigned cell_ndx = 0; cell_ndx < cells_.size(); ++cell_ndx) {
       samples_to_take = n_samples_[cell_ndx];
       n_cells = col_index_for_each_cell_[cells_[cell_ndx]].size();
-      WorldCell* sample_cell;
+      WorldCell* sample_cell = nullptr;
       while(samples_to_take > 0) {
         // randomly select a cell in this region
         auto sample_index = rng.chance() * n_cells;
-        // get a pointer to the world and select a fish
         sample_cell = world_->get_base_square(row_index_for_each_cell_[cells_[cell_ndx]][sample_index], col_index_for_each_cell_[cells_[cell_ndx]][sample_index]);
-        // Randomly select an individual and see if it is selective
-        auto agent = sample_cell->agents_.begin();
-        advance(agent, sample_cell->agents_.size() * rng.chance());
-        if (rng.chance() <= selectivities_[(*agent).get_sex()]->GetResult((*agent).get_age()))
-          SaveComparison((*agent).get_age(), (*agent).get_length(), sample_cell->get_cell_label(), 0.0, 0.0, 0.0, model_->current_year());
+        if (sample_cell->is_enabled()) {
+          unsigned agent_ndx = sample_cell->agents_.size() * rng.chance();
+          if (sample_cell->agents_[agent_ndx].is_alive()) {
+            // get a pointer to the world and select a fish
+            // Randomly select an individual and see if it is selective
+            auto agent = sample_cell->agents_.begin();
+            advance(agent, agent_ndx);
+            if (rng.chance() <= selectivities_[(*agent).get_sex()]->GetResult((*agent).get_age()))
+              SaveComparison((*agent).get_age(), (*agent).get_length(), sample_cell->get_cell_label(), 0.0, 0.0, 0.0, model_->current_year());
+            samples_to_take--;
+          }
+        }
       }
     }
   }

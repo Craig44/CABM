@@ -151,41 +151,53 @@ void Tagging::DoExecute() {
           }
           if (cell->is_enabled()) {
             unsigned tag_attempts = 1;
-            auto iter = cell->agents_.begin();
             unsigned random_agent;
             unsigned counter = 0;
             unsigned tag_max = cell->agents_.size();
             vector<unsigned>  age_freq(model_age_bins_[row][col],0);
             vector<unsigned>  length_freq(model_length_bins_[row][col],0);
             LOG_FINE() << "row " << row + 1 << " col = " << col + 1 << " tags to release = " << tags_to_release;
+            unsigned tag_slot = 0;
             while (tags_to_release > 0) {
               ++tag_attempts;
               // pick a random agent
-              iter = cell->agents_.begin();
               random_agent = random_numbers_[cell_offset_[row][col] + counter] * cell->agents_.size();
-              advance(iter, random_agent);
-              // See if it is vulnerable to selectivity
-              if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_age_bins_[row][col] + (*iter).get_age_index()]) {
-                if ((*iter).get_number_tags() > 1) // This fish is alread tagged so pretend we didn't catch it
-                  continue;
+              if (cell->agents_[random_agent].is_alive()) {
+                auto& this_agent = cell->agents_[random_agent];
+                // See if it is vulnerable to selectivity
+                if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][this_agent.get_sex() * model_age_bins_[row][col] + this_agent.get_age_index()]) {
+                  if (this_agent.get_number_tags() > 1) // This fish is alread tagged so pretend we didn't catch it
+                    continue;
 
-                // Caught this agent we need to split out a tagged fish and return the two types
-                Agent tagged_agent(*iter);
-                tagged_agent.apply_tagging_event(1); // Any tagging attribute should be bundled into this method
-                (*iter).set_scalar((*iter).get_scalar() - 1.0);
-                tagged_agent.set_scalar(1.0);
-                age_freq[(*iter).get_age_index()]++;
-                length_freq[(*iter).get_length_bin_index()]++;
-                tags_to_release--;
-                // add this tagged fish to the partition
-                cell->agents_.push_back(tagged_agent);
+                  // Caught this agent we need to split out a tagged fish and return the two types
+                  Agent tagged_agent(this_agent);
+                  tagged_agent.apply_tagging_event(1); // Any tagging attribute should be bundled into this method
+                  this_agent.set_scalar(this_agent.get_scalar() - 1.0);
+                  tagged_agent.set_scalar(1.0);
+                  age_freq[this_agent.get_age_index()]++;
+                  length_freq[this_agent.get_length_bin_index()]++;
+                  tags_to_release--;
+                  // find a slot to add this tagged agent back in
+                  while(tag_slot < cell->agents_.size()) {
+                    if (not cell->agents_[tag_slot].is_alive()) {
+                      cell->agents_[tag_slot] = tagged_agent;
+                      break;
+                    } else {
+                      tag_slot++;
+                    }
+                  }
+                  //LOG_FINEST() << "last_agent_ndx " << last_agent_ndx << " size = " << base_grid_[i][j].agents_.size();
+                  if (tag_slot >= cell->agents_.size()) {
+                    cell->agents_.push_back(tagged_agent);
+                  }
+                }
+                // Make sure we don't end up fishing for infinity
+                if (tag_attempts >= tag_max) {
+                  LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << current_year_by_space_[row][col] << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have" <<
+                     " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation, agents in cell = " << tag_max << " attempts made = " << tag_attempts;
+                }
+                ++counter;
               }
-              // Make sure we don't end up fishing for infinity
-              if (tag_attempts >= tag_max) {
-                LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << current_year_by_space_[row][col] << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have" <<
-                   " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation, agents in cell = " << tag_max << " attempts made = " << tag_attempts;
-              }
-              ++counter;
             }
             // Store global information
             #pragma omp critical
@@ -193,7 +205,7 @@ void Tagging::DoExecute() {
               for (unsigned age = 0; age < model_->age_spread(); ++age)
                 age_distribution_of_tagged_fish_by_year_[model_->current_year()][age] += age_freq[age];
               for (unsigned length_ndx = 0; length_ndx < model_->length_bins().size(); ++length_ndx)
-                length_distribution_of_tagged_fish_by_year_[model_->current_year()][length_ndx]+= length_freq[length_ndx];
+                length_distribution_of_tagged_fish_by_year_[model_->current_year()][length_ndx] += length_freq[length_ndx];
             }
 
           }

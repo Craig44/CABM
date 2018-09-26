@@ -207,7 +207,7 @@ void MovementPreference::DoExecute() {
   // - Max-lat/lon in a matrix
 
   // Iterate over origin cells
-  #pragma omp parallel for collapse(2)
+  //#pragma omp parallel for collapse(2)
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       LOG_FINEST() << "row = " << row << " col = " << col  << " thread id = " << omp_get_thread_num();
@@ -243,42 +243,38 @@ void MovementPreference::DoExecute() {
         store_infor.initial_numbers_ = origin_cell->agents_.size();
 
         unsigned counter = 0;
-        for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++counter) {
+        for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++counter, ++iter) {
           // Iterate over possible cells compare to chance()
+          if ((*iter).is_alive()) {
+            lat_distance = v + lat_random_numbers_[cell_offset_[row][col] + counter] * standard_deviation_;
+            lon_distance = u + lon_random_numbers_[cell_offset_[row][col] + counter] * standard_deviation_;
+            LOG_FINEST() << counter<< " " << (*iter).get_lat() << " distance = " << lat_distance << " lon = " << (*iter).get_lon() << " distance = " << lon_distance << " Z = " << lon_random_numbers_[cell_offset_[row][col] + counter] << " sigma = " << standard_deviation_;
+            // Check bounds and find cell destination
+            if ((((*iter).get_lat() + lat_distance) <= model_->max_lat()) && (((*iter).get_lat() + lat_distance) >= model_->min_lat())) {
+              (*iter).set_lat((*iter).get_lat() + lat_distance);
+            } // else they stay as it would be jumping out of bounds
 
-          lat_distance = v + lat_random_numbers_[cell_offset_[row][col] + counter] * standard_deviation_;
-          lon_distance = u + lon_random_numbers_[cell_offset_[row][col] + counter] * standard_deviation_;
-          LOG_FINEST() << counter<< " " << (*iter).get_lat() << " distance = " << lat_distance << " lon = " << (*iter).get_lon() << " distance = " << lon_distance << " Z = " << lon_random_numbers_[cell_offset_[row][col] + counter] << " sigma = " << standard_deviation_;
-          // Check bounds and find cell destination
-          if ((((*iter).get_lat() + lat_distance) <= model_->max_lat()) && (((*iter).get_lat() + lat_distance) >= model_->min_lat())) {
-            (*iter).set_lat((*iter).get_lat() + lat_distance);
-          } // else they stay as it would be jumping out of bounds
+            if ((((*iter).get_lon() + lon_distance) <= model_->max_lon()) && (((*iter).get_lon() + lon_distance) >= model_->min_lon())) {
+              (*iter).set_lon((*iter).get_lon() + lon_distance);
+            } // else they stay as it would be jumping out of bounds
 
-          if ((((*iter).get_lon() + lon_distance) <= model_->max_lon()) && (((*iter).get_lon() + lon_distance) >= model_->min_lon())) {
-            (*iter).set_lon((*iter).get_lon() + lon_distance);
-          } // else they stay as it would be jumping out of bounds
+            world_->get_cell_element(destination_row, destination_col, (*iter).get_lat(), (*iter).get_lon()); // very difficult to thread this...
 
-          world_->get_cell_element(destination_row, destination_col, (*iter).get_lat(), (*iter).get_lon()); // very difficult to thread this...
+            LOG_FINEST() << (*iter).get_lat() << " " << (*iter).get_lon() << " " << destination_row << " " << destination_col << " " << row << " " << col;
 
-          LOG_FINEST() << (*iter).get_lat() << " " << (*iter).get_lon() << " " << destination_row << " " << destination_col << " " << row << " " << col;
-
-          if (destination_row == row && destination_col == col) {
-            store_infor.destination_of_agents_moved_[destination_row][destination_col]++;
-            ++iter;
-            continue;
-          } else {
-            destination_cell = world_->get_cached_square(destination_row, destination_col);
-            if (destination_cell->is_enabled()) {
-              // We are moving 'splice' this agent to the destination cache cell
-              auto nx = next(iter); // Need to next the iter else we iter changes scope to cached agents, an annoying stl thing
+            if (destination_row == row && destination_col == col) {
               store_infor.destination_of_agents_moved_[destination_row][destination_col]++;
-              #pragma omp critical
-              {
-                destination_cell->agents_.push_back(*iter);
-              }
-              iter = nx;
             } else {
-              ++iter;
+              destination_cell = world_->get_cached_square(destination_row, destination_col);
+              if (destination_cell->is_enabled()) {
+                // We are moving 'splice' this agent to the destination cache cell
+                store_infor.destination_of_agents_moved_[destination_row][destination_col]++;
+                //#pragma omp critical
+                {
+                  destination_cell->agents_.push_back(*iter);
+                }
+                (*iter).dies();
+              }
             }
           }
         }
