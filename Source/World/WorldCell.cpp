@@ -238,9 +238,8 @@ float  WorldCell::get_biomass() {
 float  WorldCell::get_mature_biomass() {
   float biomass = 0.0;
   for (auto& agent : agents_) {
-    if (agent.is_alive()) {
-      if (agent.get_maturity())
-        biomass += agent.get_weight() * agent.get_scalar();
+    if (agent.is_alive() & agent.get_maturity()) {
+      biomass += agent.get_weight() * agent.get_scalar();
     }
   }
   return biomass;

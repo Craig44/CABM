@@ -152,7 +152,6 @@ void MortalityConstantRate::DoBuild() {
  * DoExecute
  */
 void MortalityConstantRate::DoExecute() {
-  LOG_TRACE();
   LOG_MEDIUM();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   // Pre-calculate agents in the world to set aside our random numbers needed for the operation
@@ -171,6 +170,7 @@ void MortalityConstantRate::DoExecute() {
   for (unsigned i = 0; i < n_agents_; ++i)
     random_numbers_[i] = rng.chance();
 
+  LOG_FINE() << "number of agents = " << n_agents_;
   unsigned agents_removed = 0;
   if (selectivity_length_based_) {
     //#pragma omp parallel for collapse(2)

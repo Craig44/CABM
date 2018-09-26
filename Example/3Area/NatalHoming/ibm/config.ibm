@@ -304,7 +304,7 @@ time_step time_step_two
 proportion_through_mortality_block 1.0 ## take snapshot at the end of fishing timestep
 simulation_likelihood lognormal
 error_value 0.2 * 24
-catchability 0.2
+#catchability 0.2
 selectivities Sel_LL
 cell_layer cells
 cells r1-c1 r2-c1 r3-c1 

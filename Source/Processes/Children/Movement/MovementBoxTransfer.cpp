@@ -86,9 +86,15 @@ void MovementBoxTransfer::DoBuild() {
   if (world_->get_enabled_cells() != origin_cell_.size())
     LOG_ERROR_P(PARAM_ORIGIN_CELL) << "you haven't supplied an origin cell for all enabled cells in the spatial domain. you have supplied '" << origin_cell_.size() << "' origin cells, but there are '" << world_->get_enabled_cells() << "' enabled cells in the domain, please check this out";
 
-  possible_rows_ = world_->get_enabled_rows();
-  possible_cols_ = world_->get_enabled_cols();
-
+  for (unsigned row = 0; row < model_->get_height(); ++row) {
+    for (unsigned col = 0; col < model_->get_width(); ++col) {
+      WorldCell* cell = world_->get_base_square(row, col);
+      if (cell->is_enabled()) {
+        possible_rows_.push_back(row);
+        possible_cols_.push_back(col);
+      }
+    }
+  }
 
   cell_offset_.resize(model_->get_height());
   for (unsigned i = 0; i < model_->get_height(); ++i)
@@ -140,30 +146,35 @@ void MovementBoxTransfer::DoExecute() {
           float temp_sum;
           unsigned counter = 0;
           unsigned counter_jump = 0;
-          for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++counter) {
-            // Iterate over possible cells compare to chance()
-            temp_sum = 0;
-            // Calcualte a multinomial via the following algorithm
-            // compare a random standard uniform value to the cumulative sums of the probabilities and return the first index for which
-            // the cumulative sum is greater than the random uniform
-            for (unsigned potential_destination = 0; potential_destination < possible_rows_.size(); ++potential_destination) {
-              temp_sum += probability_layers_[origin_element]->get_value(possible_rows_[potential_destination], possible_cols_[potential_destination]);
-              if (temp_sum > random_numbers_[cell_offset_[row][col] + counter]) {
-                ++counter_jump;
-                //LOG_FINEST() << counter << " removals = " << counter_junp <<   " iter distance = " << distance(origin_cell->agents_.begin(), iter) << " cum prob = " << temp_sum << " random = " << random << " current row = " << row << " current col = " << col << "destination row = " << possible_rows_[potential_destination] << " destination col = " << possible_cols_[potential_destination];
-                store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]]++;
-                // if we are moving to this cell lets not move in memory
-                if ((possible_rows_[potential_destination] == row) && (possible_cols_[potential_destination] == col)) {
-                  ++iter;
+          for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++iter) {
+            if ((*iter).is_alive()) {
+              LOG_FINEST() << "row = " << row << " home row = "<< (*iter).get_home_col() << " col = " << col << " home col = " << (*iter).get_home_col();
+              ++counter;
+              // Iterate over possible cells compare to chance()
+              temp_sum = 0;
+              // Calcualte a multinomial via the following algorithm
+              // compare a random standard uniform value to the cumulative sums of the probabilities and return the first index for which
+              // the cumulative sum is greater than the random uniform
+              for (unsigned potential_destination = 0; potential_destination < possible_rows_.size(); ++potential_destination) {
+                temp_sum += probability_layers_[origin_element]->get_value(possible_rows_[potential_destination], possible_cols_[potential_destination]);
+                if (temp_sum > random_numbers_[cell_offset_[row][col] + counter]) {
+                  ++counter_jump;
+                  LOG_FINEST() << counter  << " cum prob = " << temp_sum << " random = " << random_numbers_[cell_offset_[row][col] + counter] << " current row = " << row << " home row = " << (*iter).get_home_row() << " current col = " << col << " home row = " << (*iter).get_home_col() << " destination row = " << possible_rows_[potential_destination] << " destination col = " << possible_cols_[potential_destination];
+                  //LOG_FINEST() << counter << " removals = " << counter_junp <<   " iter distance = " << distance(origin_cell->agents_.begin(), iter) << " cum prob = " << temp_sum << " random = " << random << " current row = " << row << " current col = " << col << "destination row = " << possible_rows_[potential_destination] << " destination col = " << possible_cols_[potential_destination];
+                  store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]]++;
+                  // if we are moving to this cell lets not move in memory
+                  if ((possible_rows_[potential_destination] == row) && (possible_cols_[potential_destination] == col)) {
+
+                    break;
+                  }
+                  // Make a synchronisation point don't want multiple threads accessing the same pointer simultaneously and splicing to it
+
+                  destination_cell = world_->get_cached_square(possible_rows_[potential_destination], possible_cols_[potential_destination]);
+                  destination_cell->agents_.push_back((*iter));
+                  // Essentially we have to kill an individual here as it is gone off to be merged
+                  (*iter).dies();
                   break;
                 }
-                // Make a synchronisation point don't want multiple threads accessing the same pointer simultaneously and splicing to it
-
-                destination_cell = world_->get_cached_square(possible_rows_[potential_destination], possible_cols_[potential_destination]);
-                auto nx = next(iter); // Need to next the iter else we iter changes scope to cached agents, an annoying stl thing
-                destination_cell->agents_.push_back((*iter));
-                iter = nx;
-                break;
               }
             }
           }
@@ -196,42 +207,48 @@ void MovementBoxTransfer::DoExecute() {
               break;
           }
           MovementData store_infor(model_->get_height(), model_->get_width(), origin_cell_[current_cell], model_->current_year());
-          LOG_FINEST() << "number of agents in this cell = " << origin_cell->agents_.size();
+          LOG_FINEST() << "number of 'possible' agents in this cell = " << origin_cell->agents_.size() << " in current cell " << row + 1 << " col = " << col + 1;
           //
           float temp_sum;
           unsigned counter = 0;
           unsigned counter_jump = 0;
           unsigned origin_element;
           // iterate over partition
-          for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++counter) {
-            origin_element = 0;
-            // Find the home origin cell matrix
-            for (; origin_element < origin_rows_.size(); ++origin_element) {
-              if ((origin_rows_[origin_element] == (*iter).get_home_row()) && (origin_cols_[origin_element] == (*iter).get_home_col()))
-                break;
-            }
-            // Iterate over possible cells compare to chance()
-            temp_sum = 0;
-            // Calcualte a multinomial via the following algorithm
-            // compare a random standard uniform value to the cumulative sums of the probabilities and return the first index for which
-            // the cumulative sum is greater than the random uniform
-            for (unsigned potential_destination = 0; potential_destination < possible_rows_.size(); ++potential_destination) {
-              temp_sum += probability_layers_[origin_element]->get_value(possible_rows_[potential_destination], possible_cols_[potential_destination]);
-              if (temp_sum > random_numbers_[cell_offset_[row][col] + counter]) {
-                ++counter_jump;
-                //LOG_FINEST() << counter <<  " iter distance = " << distance(origin_cell->agents_.begin(), iter) << " cum prob = " << temp_sum << " random = " << random << " current row = " << row << " current col = " << col << "destination row = " << possible_rows_[potential_destination] << " destination col = " << possible_cols_[potential_destination];
-                store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]]++;
-                // if we are moving to this cell lets not move in memory
-                if ((possible_rows_[potential_destination] == row) && (possible_cols_[potential_destination] == col)) {
-                  ++iter;
+          for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++iter) {
+            if ((*iter).is_alive()) {
+              ++counter;
+              origin_element = 0;
+              // Find the home origin cell matrix
+              for (; origin_element < origin_rows_.size(); ++origin_element) {
+                LOG_FINEST() << "origin row = " << origin_rows_[origin_element] << " home row = " << (*iter).get_home_row();
+                if ((origin_rows_[origin_element] == (*iter).get_home_row()) && (origin_cols_[origin_element] == (*iter).get_home_col()))
+                  break;
+              }
+              LOG_FINEST() << "original element = " << origin_element << " corresponds to cell = " << origin_cell_[origin_element]<<  " row = " << row << " home row = "<< (*iter).get_home_row() << " row to use = " << origin_rows_[origin_element] << " col = " << col << " home col = " << (*iter).get_home_col() << " col to use = " << origin_cols_[origin_element];
+
+              // Iterate over possible cells compare to chance()
+              temp_sum = 0;
+              // Calcualte a multinomial via the following algorithm
+              // compare a random standard uniform value to the cumulative sums of the probabilities and return the first index for which
+              // the cumulative sum is greater than the random uniform
+              for (unsigned potential_destination = 0; potential_destination < possible_rows_.size(); ++potential_destination) {
+                temp_sum += probability_layers_[origin_element]->get_value(possible_rows_[potential_destination], possible_cols_[potential_destination]);
+                LOG_FINEST() << "temp_sum = " << temp_sum;
+
+                if (temp_sum > random_numbers_[cell_offset_[row][col] + counter]) {
+                  ++counter_jump;
+                  LOG_FINEST() << counter  << " cum prob = " << temp_sum << " random = " << random_numbers_[cell_offset_[row][col] + counter] << " current row = " << row << " current col = " << col << " destination row = " << possible_rows_[potential_destination] << " destination col = " << possible_cols_[potential_destination] << " origin cell = " << origin_cell_[origin_element];
+                  store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]]++;
+                  // if we are moving to this cell lets not just move to the next agent
+                  if ((possible_rows_[potential_destination] == row) && (possible_cols_[potential_destination] == col)) {
+                    break;
+                  }
+                  destination_cell = world_->get_cached_square(possible_rows_[potential_destination], possible_cols_[potential_destination]);
+                  destination_cell->agents_.push_back((*iter));
+                  // Essentially we have to kill an individual here as it is gone off to be merged
+                  (*iter).dies();
                   break;
                 }
-                destination_cell = world_->get_cached_square(possible_rows_[potential_destination], possible_cols_[potential_destination]);
-                auto nx = next(iter); // Need to next the iter else we iter changes scope to cached agents, an annoying stl thing
-                destination_cell->agents_.push_back((*iter));
-                iter = nx;
-                break;
-
               }
             }
           }
@@ -243,9 +260,7 @@ void MovementBoxTransfer::DoExecute() {
           store_infor.initial_numbers_ = counter;
           LOG_FINEST() << "individuals at teh beginning = " << counter << " but we moved " << counter_jump << " total stored = " << total;
           if (model_->state() != State::kInitialise) {
-
             moved_agents_by_year_.push_back(store_infor);
-
           }
         }
       }
@@ -262,13 +277,15 @@ void MovementBoxTransfer::DoExecute() {
 void  MovementBoxTransfer::FillReportCache(ostringstream& cache) {
   LOG_TRACE();
   for (auto& values : moved_agents_by_year_) {
+    cache << "year-area-" << values.year_ << "_" << values.origin_cell_ << " " << REPORT_R_LIST << "\n";
     cache << "initial_numbers_in_cell: " << values.initial_numbers_ << "\n";
-    cache << values.year_ << "_" << values.origin_cell_ << "_destination " << REPORT_R_MATRIX << "\n";
+    cache << "destination_values " << REPORT_R_MATRIX << "\n";
     for (unsigned i = 0; i < values.destination_of_agents_moved_.size(); ++i) {
       for (unsigned j = 0; j < values.destination_of_agents_moved_[i].size(); ++j )
         cache << values.destination_of_agents_moved_[i][j] << " ";
       cache << "\n";
     }
+    cache << REPORT_R_LIST_END << "\n";
   }
 }
 } /* namespace processes */

@@ -95,7 +95,7 @@ void GrowthVonBertalanffyWithBasic::DoBuild() {
 
 // Execute the process
 void GrowthVonBertalanffyWithBasic::DoExecute() {
-  LOG_FINE();
+  LOG_MEDIUM();
  // #pragma omp parallel for collapse(2)
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {

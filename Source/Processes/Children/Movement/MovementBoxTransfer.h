@@ -52,7 +52,6 @@ protected:
   vector<layers::NumericLayer*>  probability_layers_;
   vector<unsigned>            origin_rows_;
   vector<unsigned>            origin_cols_;
-
   vector<unsigned>            possible_rows_;
   vector<unsigned>            possible_cols_;
   string                      movement_type_string_;

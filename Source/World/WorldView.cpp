@@ -132,23 +132,25 @@ void WorldView::Build() {
 */
 void WorldView::MergeCachedGrid() {
   LOG_FINE();
-  for (unsigned i = 0; i < height_; ++i) {  // Can't thread this, each cell has a pointer to growth and mortality for update agent, so there is a hidden shared resouce
+  for (unsigned i = 0; i < height_; ++i) {  // Can't thread this, each cell has a pointer to growth and mortality for update agent, so there is a hidden shared resouce....
     for (unsigned j = 0; j < width_; ++j) {
       if (base_grid_[i][j].is_enabled()) {
+        LOG_FINE() << "agents to merge into row " << i << " col = " << j  << " = " << cached_grid_[i][j].agents_.size();
         // Are we updateing agents parameters
         cached_grid_[i][j].update_agent_parameters();
         // Iterate over all source agents and find dead agents to override
         unsigned last_agent_ndx = 0;
         for (unsigned cache_agent_ndx = 0; cache_agent_ndx < cached_grid_[i][j].agents_.size(); ++cache_agent_ndx) {
-          while(last_agent_ndx < cached_grid_[i][j].agents_.size()) {
+          while(last_agent_ndx < base_grid_[i][j].agents_.size()) {
             if (not base_grid_[i][j].agents_[last_agent_ndx].is_alive()) {
               base_grid_[i][j].agents_[last_agent_ndx] = cached_grid_[i][j].agents_[cache_agent_ndx];
+              break;
             } else {
-              ++last_agent_ndx;
+              last_agent_ndx++;
             }
           }
-
-          if (last_agent_ndx == base_grid_[i][j].agents_.size()) {
+          //LOG_FINEST() << "last_agent_ndx " << last_agent_ndx << " size = " << base_grid_[i][j].agents_.size();
+          if (last_agent_ndx >= base_grid_[i][j].agents_.size()) {
               base_grid_[i][j].agents_.push_back(cached_grid_[i][j].agents_[cache_agent_ndx]);
            }
         }
@@ -156,6 +158,7 @@ void WorldView::MergeCachedGrid() {
       }
     }
   }
+  LOG_FINE() << "finished merging world";
 }
 
 

@@ -18,6 +18,7 @@ library(ibm)
 
 ibm = extract.run("no_variability.out", fileEncoding = "UTF-8")
 ibm_with_var = extract.run("variability.out", fileEncoding = "UTF-8")
+ibm_vec = extract.run("vector.out", fileEncoding = "UTF-8")
 
 # find proportions of agents among the three regions to short cut it
 rowSums(ibm$init_2$`1`$values[,-1]) /  sum(rowSums(ibm$init_2$`1`$values[,-1]))
@@ -73,10 +74,14 @@ ibm$derived_quants$`1`$SSB_EN
 
 ibm_dq = plot.derived_quantities(ibm, report_label = "derived_quants", plot.it = F)
 ibm_dq_var = plot.derived_quantities(ibm_with_var, report_label = "derived_quants", plot.it = F)
+ibm_dq_vec = plot.derived_quantities(ibm_vec, report_label = "derived_quants", plot.it = F)
 
-
-merged = melt(rbind(ibm_dq[,c("SSB_HG",  "SSB_BP",  "SSB_EN")],ibm_dq_var[,c("SSB_HG",  "SSB_BP",  "SSB_EN")], cas2_dq[,c("SSB_HG",  "SSB_BP",  "SSB_EN")]))
-merged$model = rep(c(rep("ibm", nrow(ibm_dq)),rep("ibm with variation", nrow(ibm_dq_var)), rep("Casal2", nrow(cas2_dq))),3)
+## compare IBM's
+merged = melt(rbind(ibm_dq_vec[,c("SSB_HG",  "SSB_BP",  "SSB_EN")],ibm_dq[,c("SSB_HG",  "SSB_BP",  "SSB_EN")]))
+merged$model = rep(c(rep("ibm-vector", nrow(ibm_dq)),rep("ibm", nrow(ibm_dq))),3)
+## all dq's
+#merged = melt(rbind(ibm_dq_vec[,c("SSB_HG",  "SSB_BP",  "SSB_EN")],ibm_dq[,c("SSB_HG",  "SSB_BP",  "SSB_EN")],ibm_dq_var[,c("SSB_HG",  "SSB_BP",  "SSB_EN")], cas2_dq[,c("SSB_HG",  "SSB_BP",  "SSB_EN")]))
+#merged$model = rep(c(rep("ibm-vector", nrow(ibm_dq)),rep("ibm", nrow(ibm_dq)),rep("ibm with variation", nrow(ibm_dq_var)), rep("Casal2", nrow(cas2_dq))),3)
 colnames(merged) = c("year", "region", "SSB", "model")
 ## melt down the matrices
 #jpeg("Threading_with_movement.jpg")
@@ -115,6 +120,21 @@ for (year in 1990:1993) {
 sum(ibm_with_var$fishing$`1`$`census_info-1990-0-0`$scalar)
 dim(ibm_with_var$fishing$`1`$`census_info-1990-0-0`)
 # 760918.1 individuals, expand the data set
+
+
+## look at movements
+ibm_with_var$Movement_home$`1`$`1990_1-1_destination`
+ibm_with_var$Movement_home$`1`$`1990_2-1_destination`
+ibm_with_var$Movement_home$`1`$`1990_3-1_destination`
+
+ibm_vec$Movement_home$`1`$`year-area-1990_1-1`
+ibm_vec$Movement_home$`1`$`year-area-1990_2-1`
+ibm_vec$Movement_home$`1`$`year-area-1990_3-1`
+
+
+ibm_vec$Jump_One$`1`$`year-area-1990_1-1`$destination_values / sum(ibm_vec$Jump_One$`1`$`year-area-1990_1-1`$destination_values)
+ibm_with_var$Jump_One$`1`$`1990_1-1_destination` / sum(ibm_with_var$Jump_One$`1`$`1990_1-1_destination`)
+
 
 #######################################
 ## 

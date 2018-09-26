@@ -125,8 +125,10 @@ void Biomass::PreExecute() {
         if (cell->is_enabled()) {
           unsigned counter = 0;
           for (Agent& agent : cell->agents_) {
-            if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_age() - model_->min_age()]) {
-              cache_value_ += agent.get_weight() * agent.get_scalar();
+            if (agent.is_alive()) {
+              if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_age() - model_->min_age()]) {
+                cache_value_ += agent.get_weight() * agent.get_scalar();
+              }
             }
             ++counter;
           }
@@ -144,8 +146,10 @@ void Biomass::PreExecute() {
         if (cell->is_enabled()) {
           unsigned counter = 0;
           for (Agent& agent : cell->agents_) {
-            if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_length_bin_index()]) {
-              cache_value_ += agent.get_weight() * agent.get_scalar();
+            if (agent.is_alive()) {
+              if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_length_bin_index()]) {
+                cache_value_ += agent.get_weight() * agent.get_scalar();
+              }
             }
             ++counter;
           }
@@ -202,8 +206,10 @@ void Biomass::Execute() {
           if (cell->is_enabled()) {
             unsigned counter = 0;
             for (Agent& agent : cell->agents_) {
-              if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_age() - model_->min_age()]) {
-                value += agent.get_weight() * agent.get_scalar();
+              if (agent.is_alive()) {
+                if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_age() - model_->min_age()]) {
+                  value += agent.get_weight() * agent.get_scalar();
+                }
               }
               ++counter;
             }
@@ -221,8 +227,10 @@ void Biomass::Execute() {
           if (cell->is_enabled()) {
             unsigned counter = 0;
             for (Agent& agent : cell->agents_) {
-              if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_length_bin_index()]) {
-                value += agent.get_weight() * agent.get_scalar();
+              if (agent.is_alive()) {
+                if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_length_bin_index()]) {
+                  value += agent.get_weight() * agent.get_scalar();
+                }
               }
               ++counter;
             }
