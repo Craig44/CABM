@@ -182,7 +182,9 @@ void MortalityEventBiomass::DoExecute() {
             cell_offset_[row][col] = n_agents_;
             n_agents_ += cell->agents_.size();
             current_year_by_space_[row][col] = model_->current_year();
-            scanning_prop_year_by_space_[row][col] = scanning_proportion_[scanning_ndx];
+            if (scanning) {
+              scanning_prop_year_by_space_[row][col] = scanning_proportion_[scanning_ndx];
+            }
             current_time_step_by_space_[row][col] = model_->get_time_step_counter();
           }
         }
