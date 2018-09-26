@@ -274,7 +274,7 @@ void MovementPreference::DoExecute() {
               store_infor.destination_of_agents_moved_[destination_row][destination_col]++;
               #pragma omp critical
               {
-                destination_cell->agents_.splice(destination_cell->agents_.end(), origin_cell->agents_, iter);
+                destination_cell->agents_.push_back(*iter);
               }
               iter = nx;
             } else {

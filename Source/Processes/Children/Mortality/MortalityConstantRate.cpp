@@ -185,14 +185,15 @@ void MortalityConstantRate::DoExecute() {
           unsigned counter = 0;
           unsigned initial_size = cell->agents_.size();
           LOG_FINEST() << initial_size << " initial agents";
-          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter) {
-            //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
-            if (random_numbers_[cell_offset_[row][col] + counter] <= (1 - std::exp(- ratio * (*iter).get_m() * cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->length_bins().size() + (*iter).get_length_bin_index()]))) {
-              iter = cell->agents_.erase(iter);
-              initial_size--;
-              agents_removed++;
-            } else
-              ++iter;
+          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter,++iter) {
+            if ((*iter).is_alive()) {
+              //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
+              if (random_numbers_[cell_offset_[row][col] + counter] <= (1 - std::exp(- ratio * (*iter).get_m() * cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->length_bins().size() + (*iter).get_length_bin_index()]))) {
+                (*iter).dies();
+                initial_size--;
+                agents_removed++;
+              }
+            }
           }
           LOG_FINEST() << initial_size << " after mortality";
         }
@@ -211,14 +212,15 @@ void MortalityConstantRate::DoExecute() {
           unsigned counter = 0;
           unsigned initial_size = cell->agents_.size();
           LOG_FINEST() << initial_size << " initial agents, ratio = " << ratio;
-          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter) {
-            //LOG_FINEST() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " survivorship = " << (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()])) << " M = " << (*iter).get_m();
-            if (random_numbers_[cell_offset_[row][col] + counter] <= (1.0 - std::exp(- ratio * (*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]))) {
-              iter = cell->agents_.erase(iter);
-              initial_size--;
-              agents_removed++;
-            } else
-              ++iter;
+          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter,++iter) {
+            if ((*iter).is_alive()) {
+              //LOG_FINEST() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " survivorship = " << (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()])) << " M = " << (*iter).get_m();
+              if (random_numbers_[cell_offset_[row][col] + counter] <= (1.0 - std::exp(- ratio * (*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]))) {
+                (*iter).dies();
+                initial_size--;
+                agents_removed++;
+              }
+            }
           }
           LOG_FINEST() << initial_size << " after mortality";
         }

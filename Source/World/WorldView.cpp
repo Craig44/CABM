@@ -137,8 +137,21 @@ void WorldView::MergeCachedGrid() {
       if (base_grid_[i][j].is_enabled()) {
         // Are we updateing agents parameters
         cached_grid_[i][j].update_agent_parameters();
-        // Splice agents to real world grid and delete from cache
-        base_grid_[i][j].agents_.splice(base_grid_[i][j].agents_.end(), cached_grid_[i][j].agents_);
+        // Iterate over all source agents and find dead agents to override
+        unsigned last_agent_ndx = 0;
+        for (unsigned cache_agent_ndx = 0; cache_agent_ndx < cached_grid_[i][j].agents_.size(); ++cache_agent_ndx) {
+          while(last_agent_ndx < cached_grid_[i][j].agents_.size()) {
+            if (not base_grid_[i][j].agents_[last_agent_ndx].is_alive()) {
+              base_grid_[i][j].agents_[last_agent_ndx] = cached_grid_[i][j].agents_[cache_agent_ndx];
+            } else {
+              ++last_agent_ndx;
+            }
+          }
+
+          if (last_agent_ndx == base_grid_[i][j].agents_.size()) {
+              base_grid_[i][j].agents_.push_back(cached_grid_[i][j].agents_[cache_agent_ndx]);
+           }
+        }
         cached_grid_[i][j].agents_.clear();
       }
     }

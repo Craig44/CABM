@@ -155,7 +155,7 @@ void MortalityEventBiomass::DoBuild() {
  * DoExecute
  */
 void MortalityEventBiomass::DoExecute() {
-  LOG_FINE();
+  LOG_MEDIUM();
   vector<unsigned> global_age_freq(model_->age_spread(), 0);
   auto iter = years_.begin();
   if (model_->state() != State::kInitialise) {
@@ -179,11 +179,19 @@ void MortalityEventBiomass::DoExecute() {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
           WorldCell* cell = world_->get_base_square(row, col);
           if (cell->is_enabled()) {
+            LOG_FINEST() << "Setting spatial areas, row = " << row + 1 << " col = " << col + 1;
             cell_offset_[row][col] = n_agents_;
+            LOG_FINEST() << "cell_offset done";
             n_agents_ += cell->agents_.size();
             current_year_by_space_[row][col] = model_->current_year();
-            scanning_prop_year_by_space_[row][col] = scanning_proportion_[scanning_ndx];
+            LOG_FINEST() << "year by size done";
+            if (scanning) {
+              scanning_prop_year_by_space_[row][col] = scanning_proportion_[scanning_ndx];
+              LOG_FINEST() << "scanning by size done";
+            }
             current_time_step_by_space_[row][col] = model_->get_time_step_counter();
+            LOG_FINEST() << "time-step by size done";
+
           }
         }
       }
@@ -204,7 +212,7 @@ void MortalityEventBiomass::DoExecute() {
         scanning_random_numbers_[i] = rng.chance();
       }
 
-
+      LOG_FINE() << "about to kick into the gear";
       float actual_catch_taken = 0;
       float world_catch_to_take = 0;
       if (not selectivity_length_based_) {
@@ -214,7 +222,6 @@ void MortalityEventBiomass::DoExecute() {
           for (unsigned col = 0; col < model_->get_width(); ++col) {
             unsigned catch_attempts = 1;
             unsigned catch_max = 1;
-            unsigned random_agent;
             WorldCell* cell = nullptr;
             float catch_taken = 0;
             float actual_catch_this_cell = 0;
@@ -234,54 +241,52 @@ void MortalityEventBiomass::DoExecute() {
                 tag_recapture tag_recapture_info(current_year_by_space_[row][col], row, col, current_time_step_by_space_[row][col]);
 
                 catch_attempts = 1;
-                auto iter = cell->agents_.begin();
                 catch_max = cell->agents_.size();
                 LOG_FINEST() << "individuals = " << catch_max;
                 while (catch_taken > 0) {
                   ++catch_attempts;
-                  iter = cell->agents_.begin();
-                  random_agent = random_numbers_[cell_offset_[row][col] + counter] * cell->agents_.size();
-                  advance(iter, random_agent);
-                  LOG_FINEST() << "attempt "<< catch_attempts;// << " catch_taken = " << catch_taken << " age = " << (*iter).get_age_index() << " random number = " << selectivity_random_numbers_[cell_offset_[row][col] + counter]  << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()];
-                  // See if this agent is unlucky
-                  if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][(*iter).get_sex() *model_age_bins_[row][col] + (*iter).get_age_index()]) {
-                    //LOG_FINEST() << "vulnerable to gear catch_taken = " << catch_taken << " age = " << (*iter).get_age_index() << " individual weight = " << (*iter).get_weight() << " scalar = " <<  (*iter).get_scalar();
-                    if ((*iter).get_length() < mls_by_space_[row][col]) {
-                      if (discard_random_numbers_[cell_offset_[row][col] + counter] <= discard_by_space_[row][col]) {
-                        LOG_MEDIUM();
-                        cell->agents_.erase(iter); // erase agent from discard mortality
-                      }
-                    } else {
-                      // record information
-                      catch_taken -= (*iter).get_weight() * (*iter).get_scalar();
-                      actual_catch_this_cell += (*iter).get_weight() * (*iter).get_scalar();
-                      age_freq.frequency_[(*iter).get_age_index()]+= (*iter).get_scalar(); // This catch actually represents many individuals.
-                      length_freq.frequency_[(*iter).get_length_bin_index()]+= (*iter).get_scalar();
-                      census_fishery.age_.push_back((*iter).get_age());
-                      census_fishery.length_.push_back((*iter).get_length());
-                      census_fishery.scalar_.push_back((*iter).get_scalar());
-                      if (scanning) {
-                        // Probability of scanning agent
-                        if (scanning_random_numbers_[cell_offset_[row][col] + counter] <= scanning_prop_year_by_space_[row][col]) {
-                          // We scanned this agent
-                          tag_recapture_info.scanned_fish_++;
-                          if ((*iter).get_number_tags() > 0) {
-                            // fish has a tag record it
-                            tag_recapture_info.age_.push_back((*iter).get_age());
-                            tag_recapture_info.length_.push_back((*iter).get_length());
-                            tag_recapture_info.time_at_liberty_.push_back((*iter).get_time_at_liberty(current_time_step_by_space_[row][col]));
-                            tag_recapture_info.length_increment_.push_back((*iter).get_length_increment_since_tag());
+                  auto& this_agent = cell->agents_[random_numbers_[cell_offset_[row][col] + counter] * cell->agents_.size()];
+                  if (this_agent.is_alive()) {
+                    LOG_FINEST() << "attempt "<< catch_attempts << " catch_taken = " << catch_taken << " age = " << this_agent.get_age_index() << " random number = " << selectivity_random_numbers_[cell_offset_[row][col] + counter]  << " selectivity = " << cell_offset_for_selectivity_[row][col][this_agent.get_sex() * model_->age_spread() + this_agent.get_age_index()];
+                    // See if this agent is unlucky
+                    if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][this_agent.get_sex() *model_age_bins_[row][col] + this_agent.get_age_index()]) {
+                      //LOG_FINEST() << "vulnerable to gear catch_taken = " << catch_taken << " age = " << this_agent.get_age_index() << " individual weight = " << this_agent.get_weight() << " scalar = " <<  this_agent.get_scalar();
+                      if (this_agent.get_length() < mls_by_space_[row][col]) {
+                        if (discard_random_numbers_[cell_offset_[row][col] + counter] <= discard_by_space_[row][col]) {
+                          this_agent.dies();
+                        }
+                      } else {
+                        // record information
+                        catch_taken -= this_agent.get_weight() * this_agent.get_scalar();
+                        actual_catch_this_cell += this_agent.get_weight() * this_agent.get_scalar();
+                        age_freq.frequency_[this_agent.get_age_index()]+= this_agent.get_scalar(); // This catch actually represents many individuals.
+                        length_freq.frequency_[this_agent.get_length_bin_index()]+= this_agent.get_scalar();
+                        census_fishery.age_.push_back(this_agent.get_age());
+                        census_fishery.length_.push_back(this_agent.get_length());
+                        census_fishery.scalar_.push_back(this_agent.get_scalar());
+                        if (scanning) {
+                          // Probability of scanning agent
+                          if (scanning_random_numbers_[cell_offset_[row][col] + counter] <= scanning_prop_year_by_space_[row][col]) {
+                            // We scanned this agent
+                            tag_recapture_info.scanned_fish_++;
+                            if (this_agent.get_number_tags() > 0) {
+                              // fish has a tag record it
+                              tag_recapture_info.age_.push_back(this_agent.get_age());
+                              tag_recapture_info.length_.push_back(this_agent.get_length());
+                              tag_recapture_info.time_at_liberty_.push_back(this_agent.get_time_at_liberty(current_time_step_by_space_[row][col]));
+                              tag_recapture_info.length_increment_.push_back(this_agent.get_length_increment_since_tag());
+                            }
                           }
                         }
-                      }
 
-                      cell->agents_.erase(iter); // erase agent from memory
+                        this_agent.dies();
+                      }
                     }
-                  }
-                  // Make sure we don't end up fishing for infinity
-                  if (catch_attempts >= catch_max) {
-                    LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << current_year_by_space_[row][col] << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have" <<
-                       " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation, agents in cell = " << catch_max << " attempts made = " << catch_attempts;
+                    // Make sure we don't end up fishing for infinity
+                    if (catch_attempts >= catch_max) {
+                      LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << current_year_by_space_[row][col] << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have" <<
+                         " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation, agents in cell = " << catch_max << " attempts made = " << catch_attempts;
+                    }
                   }
                   ++counter;
                 }
@@ -310,7 +315,6 @@ void MortalityEventBiomass::DoExecute() {
           for (unsigned col = 0; col < model_->get_width(); ++col) {
             unsigned catch_attempts = 1;
             unsigned catch_max = 1;
-            unsigned random_agent;
             float actual_catch_this_cell = 0;
             WorldCell* cell = nullptr;
             float catch_taken = 0;
@@ -332,49 +336,47 @@ void MortalityEventBiomass::DoExecute() {
 
                 catch_attempts = 1;
                 catch_max = cell->agents_.size();
-                auto iter = cell->agents_.begin();
                 while (catch_taken > 0) {
                   // Random access bullshit for lists
                   ++catch_attempts;
-                  random_agent = random_numbers_[cell_offset_[row][col] + counter] * cell->agents_.size();
-                  iter = cell->agents_.begin();
-                  advance(iter, random_agent);
-                  // See if this agent is unlucky
-                  if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_length_bins_[row][col] + (*iter).get_length_bin_index()]) {
-                    if ((*iter).get_length() < mls_by_space_[row][col]) {
-                      if (discard_random_numbers_[cell_offset_[row][col] + counter] <= discard_by_space_[row][col]) {
-                        cell->agents_.erase(iter); // erase agent from discard mortality
-                      }
-                    } else {
-                      catch_taken -= (*iter).get_weight() * (*iter).get_scalar();
-                      actual_catch_this_cell += (*iter).get_weight() * (*iter).get_scalar();
-                      age_freq.frequency_[(*iter).get_age_index()]+= (*iter).get_scalar(); // This catch actually represents many individuals.
-                      length_freq.frequency_[(*iter).get_length_bin_index()]+= (*iter).get_scalar();
-                      census_fishery.age_.push_back((*iter).get_age());
-                      census_fishery.length_.push_back((*iter).get_length());
-                      census_fishery.scalar_.push_back((*iter).get_scalar());
-                      if (scanning) {
-                        // Probability of scanning agent
-                        if (scanning_random_numbers_[cell_offset_[row][col] + counter] <= scanning_prop_year_by_space_[row][col]) {
-                          // We scanned this agent
-                          tag_recapture_info.scanned_fish_++;
-                          if ((*iter).get_number_tags() > 0) {
-                            // fish has a tag record it
-                            tag_recapture_info.age_.push_back((*iter).get_age());
-                            tag_recapture_info.length_.push_back((*iter).get_length());
-                            tag_recapture_info.time_at_liberty_.push_back((*iter).get_time_at_liberty(current_time_step_by_space_[row][col]));
-                            tag_recapture_info.length_increment_.push_back((*iter).get_length_increment_since_tag());
+                  auto& this_agent = cell->agents_[random_numbers_[cell_offset_[row][col] + counter] * cell->agents_.size()];
+                  if (this_agent.is_alive()) {
+                      // See if this agent is unlucky
+                    if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][this_agent.get_sex() * model_length_bins_[row][col] + this_agent.get_length_bin_index()]) {
+                      if (this_agent.get_length() < mls_by_space_[row][col]) {
+                        if (discard_random_numbers_[cell_offset_[row][col] + counter] <= discard_by_space_[row][col]) {
+                          this_agent.dies();
+                        }
+                      } else {
+                        catch_taken -= this_agent.get_weight() * this_agent.get_scalar();
+                        actual_catch_this_cell += this_agent.get_weight() * this_agent.get_scalar();
+                        age_freq.frequency_[this_agent.get_age_index()]+= this_agent.get_scalar(); // This catch actually represents many individuals.
+                        length_freq.frequency_[this_agent.get_length_bin_index()]+= this_agent.get_scalar();
+                        census_fishery.age_.push_back(this_agent.get_age());
+                        census_fishery.length_.push_back(this_agent.get_length());
+                        census_fishery.scalar_.push_back(this_agent.get_scalar());
+                        if (scanning) {
+                          // Probability of scanning agent
+                          if (scanning_random_numbers_[cell_offset_[row][col] + counter] <= scanning_prop_year_by_space_[row][col]) {
+                            // We scanned this agent
+                            tag_recapture_info.scanned_fish_++;
+                            if (this_agent.get_number_tags() > 0) {
+                              // fish has a tag record it
+                              tag_recapture_info.age_.push_back(this_agent.get_age());
+                              tag_recapture_info.length_.push_back(this_agent.get_length());
+                              tag_recapture_info.time_at_liberty_.push_back(this_agent.get_time_at_liberty(current_time_step_by_space_[row][col]));
+                              tag_recapture_info.length_increment_.push_back(this_agent.get_length_increment_since_tag());
+                            }
                           }
                         }
+                        this_agent.dies();
                       }
-                      cell->agents_.erase(iter); // erase agent from memory
-
                     }
-                  }
-                  // Make sure we don't end up fishing for infinity if there are not enough fish here
-                  if (catch_attempts >= catch_max) {
-                    LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << current_year_by_space_[row][col] << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have" <<
-                       " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation";
+                    // Make sure we don't end up fishing for infinity if there are not enough fish here
+                    if (catch_attempts >= catch_max) {
+                      LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << current_year_by_space_[row][col] << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have" <<
+                         " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation";
+                    }
                   }
                   ++counter;
                 }

@@ -55,7 +55,7 @@ public:
   float                       get_biomass();
   float                       get_mature_biomass();
   void                        update_agent_parameters();
-  list<Agent>                 agents_;
+  vector<Agent>               agents_;
   string                      get_cell_label() {return cell_label_;};
 
 

@@ -161,7 +161,7 @@ void MovementBoxTransfer::DoExecute() {
 
                 destination_cell = world_->get_cached_square(possible_rows_[potential_destination], possible_cols_[potential_destination]);
                 auto nx = next(iter); // Need to next the iter else we iter changes scope to cached agents, an annoying stl thing
-                destination_cell->agents_.splice(destination_cell->agents_.end(), origin_cell->agents_, iter);
+                destination_cell->agents_.push_back((*iter));
                 iter = nx;
                 break;
               }
@@ -228,7 +228,7 @@ void MovementBoxTransfer::DoExecute() {
                 }
                 destination_cell = world_->get_cached_square(possible_rows_[potential_destination], possible_cols_[potential_destination]);
                 auto nx = next(iter); // Need to next the iter else we iter changes scope to cached agents, an annoying stl thing
-                destination_cell->agents_.splice(destination_cell->agents_.end(), origin_cell->agents_, iter);
+                destination_cell->agents_.push_back((*iter));
                 iter = nx;
                 break;
 

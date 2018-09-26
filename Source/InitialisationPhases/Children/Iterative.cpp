@@ -203,7 +203,7 @@ void Iterative::Execute() {
       if (cell->is_enabled()) {
         for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter) {
           (*iter).set_scalar(model_->get_scalar(recruitement_layer_->get_value((*iter).get_home_row(),(*iter).get_home_col()))); // set scalar based on an agents home area which is linked to the recruitment layer
-          LOG_FINEST() << "setting scalar, home row = " << (*iter).get_home_row()  << " col = " << (*iter).get_home_col() << " scalar = " << (*iter).get_scalar();
+          //LOG_FINEST() << "setting scalar, home row = " << (*iter).get_home_row()  << " col = " << (*iter).get_home_col() << " scalar = " << (*iter).get_scalar();
         }
       }
     }

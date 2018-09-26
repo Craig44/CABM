@@ -142,6 +142,7 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
   float male_prop = model_->get_male_proportions();
 
   unsigned sex;
+  unsigned agent_bin = 0;
   for (unsigned agent = 0; agent < birth_agents; ++agent) {
     sex = 0;
     if (sexed) {
@@ -150,7 +151,18 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
     }
     Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], model_->current_year(),
         growth_pars[agent][2], growth_pars[agent][3], model_, false, sex, scalar, row_, col_, 0);
-    agents_.push_back(new_agent);
+    // Check to see if
+    while (agent_bin < agents_.size()) {
+      if (not agents_[agent_bin].is_alive()) {
+        agents_[agent_bin] = new_agent;
+        break;
+      } else {
+        agent_bin++;
+      }
+    }
+    if (agent_bin == agents_.size()) {
+      agents_.push_back(new_agent);
+    }
   }
 }
 
@@ -166,25 +178,32 @@ void  WorldCell::update_agent_parameters() {
     mortality_->draw_rate_param(row_, col_, agents_.size(), mort_par);
     growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars);
     for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
-      (*iter).set_first_age_length_par(growth_pars[counter][0]);
-      (*iter).set_second_age_length_par(growth_pars[counter][1]);
-      (*iter).set_first_length_weight_par(growth_pars[counter][2]);
-      (*iter).set_second_length_weight_par(growth_pars[counter][3]);
-      (*iter).set_m(mort_par[counter]);
+      if ( (*iter).is_alive()) {
+        (*iter).set_first_age_length_par(growth_pars[counter][0]);
+        (*iter).set_second_age_length_par(growth_pars[counter][1]);
+        (*iter).set_first_length_weight_par(growth_pars[counter][2]);
+        (*iter).set_second_length_weight_par(growth_pars[counter][3]);
+        (*iter).set_m(mort_par[counter]);
+      }
     }
   } else if (!growth_->update_growth() && mortality_->update_mortality()) {
     vector<float> mort_par;
     mortality_->draw_rate_param(row_, col_, agents_.size(), mort_par);
-    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter)
-      (*iter).set_m(mort_par[counter]);
+    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+      if ( (*iter).is_alive()) {
+        (*iter).set_m(mort_par[counter]);
+      }
+    }
   } else if (growth_->update_growth() && !mortality_->update_mortality()) {
     vector<vector<float>> growth_pars;
     growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars);
     for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
-      (*iter).set_first_age_length_par(growth_pars[counter][0]);
-      (*iter).set_second_age_length_par(growth_pars[counter][1]);
-      (*iter).set_first_length_weight_par(growth_pars[counter][2]);
-      (*iter).set_second_length_weight_par(growth_pars[counter][3]);
+      if ( (*iter).is_alive()) {
+        (*iter).set_first_age_length_par(growth_pars[counter][0]);
+        (*iter).set_second_age_length_par(growth_pars[counter][1]);
+        (*iter).set_first_length_weight_par(growth_pars[counter][2]);
+        (*iter).set_second_length_weight_par(growth_pars[counter][3]);
+      }
     }
   }
 }
@@ -194,8 +213,10 @@ void  WorldCell::update_agent_parameters() {
 */
 float  WorldCell::get_abundance() {
   float abundance = 0.0;
-  for (auto& agent : agents_)
-    abundance += agent.get_scalar();
+  for (auto& agent : agents_) {
+    if (agent.is_alive())
+      abundance += agent.get_scalar();
+  }
   return abundance;
 }
 
@@ -204,8 +225,10 @@ float  WorldCell::get_abundance() {
 */
 float  WorldCell::get_biomass() {
   float biomass = 0.0;
-  for (auto& agent : agents_)
-    biomass += agent.get_weight() * agent.get_scalar();
+  for (auto& agent : agents_) {
+    if (agent.is_alive())
+      biomass += agent.get_weight() * agent.get_scalar();
+  }
   return biomass;
 }
 
@@ -215,8 +238,10 @@ float  WorldCell::get_biomass() {
 float  WorldCell::get_mature_biomass() {
   float biomass = 0.0;
   for (auto& agent : agents_) {
-    if (agent.get_maturity())
-      biomass += agent.get_weight() * agent.get_scalar();
+    if (agent.is_alive()) {
+      if (agent.get_maturity())
+        biomass += agent.get_weight() * agent.get_scalar();
+    }
   }
   return biomass;
 }
@@ -229,7 +254,9 @@ void  WorldCell::get_age_frequency(vector<unsigned>& age_freq) {
   age_freq.clear();
   age_freq.resize(model_->age_spread(),0);
   for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
-    age_freq[(*iter).get_age() - model_->min_age()]++;
+    if ((*iter).is_alive()) {
+      age_freq[(*iter).get_age_index()]++;
+    }
   }
 }
 

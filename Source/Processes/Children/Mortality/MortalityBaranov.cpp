@@ -168,13 +168,15 @@ void MortalityBaranov::DoExecute() {
             unsigned counter = 0;
             unsigned initial_size = cell->agents_.size();
             LOG_FINEST() << initial_size << " initial agents";
-            for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter) {
-              //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
-              if (rng.chance() <= (1 - std::exp(- (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())))) {
-                iter = cell->agents_.erase(iter);
-                initial_size--;
-              } else
-                ++iter;
+            for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter,++iter) {
+              if ((*iter).is_alive()) {
+                //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
+                if (rng.chance() <= (1 - std::exp(- (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())))) {
+                  (*iter).dies();
+                  initial_size--;
+                }
+              }
+
             }
             LOG_FINEST() << initial_size << " after mortality";
           }
@@ -189,12 +191,13 @@ void MortalityBaranov::DoExecute() {
             unsigned counter = 0;
             unsigned initial_size = cell->agents_.size();
             LOG_FINEST() << initial_size << " initial agents";
-            for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter) {
-              if (rng.chance() <= (1 - std::exp(- (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index())))) {
-                iter = cell->agents_.erase(iter);
-                initial_size--;
-              } else
-                ++iter;
+            for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter, ++iter) {
+              if ((*iter).is_alive()) {
+                if (rng.chance() <= (1 - std::exp(- (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index())))) {
+                  (*iter).dies();
+                  initial_size--;
+                }
+              }
             }
             LOG_FINEST() << initial_size << " after mortality";
           }
@@ -225,22 +228,23 @@ void MortalityBaranov::DoExecute() {
 
             float f_l = 0;
             float m_l = 0;
-            for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter) {
-              m_l = (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index());
-              f_l = f_in_this_cell * fishery_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index());
-              if (rng.chance() <= (1 - std::exp(- (m_l + f_l)))) {
-                // Remove this individual but first see if it is a M or F process
-                if (rng.chance() < (f_l / (f_l + m_l))) {
-                  // this individual dies because of F process
-                  catch_by_cell += (*iter).get_weight() * (*iter).get_scalar();
-                  total_catch += (*iter).get_weight() * (*iter).get_scalar();
-                  age_freq.frequency_[(*iter).get_age_index()]++; //TODO do we need to multiple this by scalar for true numbers
-                  length_freq.frequency_[(*iter).get_length_bin_index()]++;
-                } // else it dies from M and we don't care about reporting that
-                iter = cell->agents_.erase(iter);
-                initial_size--;
-              } else
-                ++iter;
+            for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter,++iter) {
+              if ((*iter).is_alive()) {
+                m_l = (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index());
+                f_l = f_in_this_cell * fishery_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index());
+                if (rng.chance() <= (1 - std::exp(- (m_l + f_l)))) {
+                  // Remove this individual but first see if it is a M or F process
+                  if (rng.chance() < (f_l / (f_l + m_l))) {
+                    // this individual dies because of F process
+                    catch_by_cell += (*iter).get_weight() * (*iter).get_scalar();
+                    total_catch += (*iter).get_weight() * (*iter).get_scalar();
+                    age_freq.frequency_[(*iter).get_age_index()]++; //TODO do we need to multiple this by scalar for true numbers
+                    length_freq.frequency_[(*iter).get_length_bin_index()]++;
+                  } // else it dies from M and we don't care about reporting that
+                  (*iter).dies();
+                  initial_size--;
+                }
+              }
             }
             for (unsigned i = 0; i < model_->age_spread(); ++i)
               global_age_freq[i] += age_freq.frequency_[i];
@@ -267,22 +271,23 @@ void MortalityBaranov::DoExecute() {
 
             float f_l = 0;
             float m_a = 0;
-            for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter) {
-              m_a = (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index());
-              f_l = f_in_this_cell * fishery_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index());
-              if (rng.chance() <= (1 - std::exp(- (m_a + f_l)))) {
-                // Remove this individual but first see if it is a M or F process
-                if (rng.chance() < (f_l / (f_l + m_a))) {
-                  // this individual dies because of F process
-                  catch_by_cell += (*iter).get_weight() * (*iter).get_scalar();
-                  total_catch += (*iter).get_weight() * (*iter).get_scalar();
-                  age_freq.frequency_[(*iter).get_age_index()]++; //TODO do we need to multiple this by scalar for true numbers
-                  length_freq.frequency_[(*iter).get_length_bin_index()]++;
-                } // else it dies from M and we don't care about reporting that
-                iter = cell->agents_.erase(iter);
-                initial_size--;
-              } else
-                ++iter;
+            for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter,++iter) {
+              if ((*iter).is_alive()) {
+                m_a = (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index());
+                f_l = f_in_this_cell * fishery_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index());
+                if (rng.chance() <= (1 - std::exp(- (m_a + f_l)))) {
+                  // Remove this individual but first see if it is a M or F process
+                  if (rng.chance() < (f_l / (f_l + m_a))) {
+                    // this individual dies because of F process
+                    catch_by_cell += (*iter).get_weight() * (*iter).get_scalar();
+                    total_catch += (*iter).get_weight() * (*iter).get_scalar();
+                    age_freq.frequency_[(*iter).get_age_index()]++; //TODO do we need to multiple this by scalar for true numbers
+                    length_freq.frequency_[(*iter).get_length_bin_index()]++;
+                  } // else it dies from M and we don't care about reporting that
+                  (*iter).dies();
+                  initial_size--;
+                }
+              }
             }
             for (unsigned i = 0; i < model_->age_spread(); ++i)
               global_age_freq[i] += age_freq.frequency_[i];
@@ -309,22 +314,23 @@ void MortalityBaranov::DoExecute() {
 
             float f_a = 0;
             float m_l = 0;
-            for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter) {
-              m_l = (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index());
-              f_a = f_in_this_cell * fishery_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index());
-              if (rng.chance() <= (1 - std::exp(- (m_l + f_a)))) {
-                // Remove this individual but first see if it is a M or F process
-                if (rng.chance() < (f_a / (f_a + m_l))) {
-                  // this individual dies because of F process
-                  catch_by_cell += (*iter).get_weight() * (*iter).get_scalar();
-                  total_catch += (*iter).get_weight() * (*iter).get_scalar();
-                  age_freq.frequency_[(*iter).get_age_index()]++; //TODO do we need to multiple this by scalar for true numbers
-                  length_freq.frequency_[(*iter).get_length_bin_index()]++;
-                } // else it dies from M and we don't care about reporting that
-                iter = cell->agents_.erase(iter);
-                initial_size--;
-              } else
-                ++iter;
+            for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter,++iter) {
+              if ((*iter).is_alive()) {
+                m_l = (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index());
+                f_a = f_in_this_cell * fishery_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index());
+                if (rng.chance() <= (1 - std::exp(- (m_l + f_a)))) {
+                  // Remove this individual but first see if it is a M or F process
+                  if (rng.chance() < (f_a / (f_a + m_l))) {
+                    // this individual dies because of F process
+                    catch_by_cell += (*iter).get_weight() * (*iter).get_scalar();
+                    total_catch += (*iter).get_weight() * (*iter).get_scalar();
+                    age_freq.frequency_[(*iter).get_age_index()]++; //TODO do we need to multiple this by scalar for true numbers
+                    length_freq.frequency_[(*iter).get_length_bin_index()]++;
+                  } // else it dies from M and we don't care about reporting that
+                  (*iter).dies();
+                  initial_size--;
+                }
+              }
             }
             for (unsigned i = 0; i < model_->age_spread(); ++i)
               global_age_freq[i] += age_freq.frequency_[i];
@@ -351,22 +357,23 @@ void MortalityBaranov::DoExecute() {
 
             float f_a = 0;
             float m_a = 0;
-            for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter) {
-              m_a = (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index());
-              f_a = f_in_this_cell * fishery_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index());
-              if (rng.chance() <= (1 - std::exp(- (m_a + f_a)))) {
-                // Remove this individual but first see if it is a M or F process
-                if (rng.chance() < (f_a / (f_a + m_a))) {
-                  // this individual dies because of F process
-                  catch_by_cell += (*iter).get_weight() * (*iter).get_scalar();
-                  total_catch += (*iter).get_weight() * (*iter).get_scalar();
-                  age_freq.frequency_[(*iter).get_age_index()]++; //TODO do we need to multiple this by scalar for true numbers
-                  length_freq.frequency_[(*iter).get_length_bin_index()]++;
-                } // else it dies from M and we don't care about reporting that
-                iter = cell->agents_.erase(iter);
-                initial_size--;
-              } else
-                ++iter;
+            for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter,++iter) {
+              if ((*iter).is_alive()) {
+                m_a = (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index());
+                f_a = f_in_this_cell * fishery_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index());
+                if (rng.chance() <= (1 - std::exp(- (m_a + f_a)))) {
+                  // Remove this individual but first see if it is a M or F process
+                  if (rng.chance() < (f_a / (f_a + m_a))) {
+                    // this individual dies because of F process
+                    catch_by_cell += (*iter).get_weight() * (*iter).get_scalar();
+                    total_catch += (*iter).get_weight() * (*iter).get_scalar();
+                    age_freq.frequency_[(*iter).get_age_index()]++; //TODO do we need to multiple this by scalar for true numbers
+                    length_freq.frequency_[(*iter).get_length_bin_index()]++;
+                  } // else it dies from M and we don't care about reporting that
+                  (*iter).dies();
+                  initial_size--;
+                }
+              }
             }
             for (unsigned i = 0; i < model_->age_spread(); ++i)
               global_age_freq[i] += age_freq.frequency_[i];

@@ -34,6 +34,7 @@ public:
 
   virtual void                  Reset() {};
   // Accessors
+  bool                         is_alive() const {return alive_;}
   unsigned                     get_age();
   unsigned                     get_age_index();
   unsigned                     get_length_bin_index();
@@ -70,7 +71,7 @@ public:
   void                         set_lat(float new_lat) {lat_ = new_lat;}
   void                         set_lon(float new_lon) {lon_ = new_lon;}
   void                         apply_tagging_event(unsigned tags);
-
+  void                         dies() {alive_ = false;}
 protected:
   // Methods
   void                        growth_init();
@@ -96,6 +97,7 @@ protected:
   unsigned                    tag_ = 0; // number of tags, fish can be double tagged
   float                       length_at_tag_ = 0.0;
   unsigned                    tag_time_step_ = 0; // number of tags, fish can be double tagged
+  bool                        alive_ = true;
 
 private:
 
