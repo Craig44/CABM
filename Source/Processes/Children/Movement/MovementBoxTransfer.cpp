@@ -220,11 +220,10 @@ void MovementBoxTransfer::DoExecute() {
               origin_element = 0;
               // Find the home origin cell matrix
               for (; origin_element < origin_rows_.size(); ++origin_element) {
-                LOG_FINEST() << "origin row = " << origin_rows_[origin_element] << " home row = " << (*iter).get_home_row();
                 if ((origin_rows_[origin_element] == (*iter).get_home_row()) && (origin_cols_[origin_element] == (*iter).get_home_col()))
                   break;
               }
-              LOG_FINEST() << "original element = " << origin_element << " corresponds to cell = " << origin_cell_[origin_element]<<  " row = " << row << " home row = "<< (*iter).get_home_row() << " row to use = " << origin_rows_[origin_element] << " col = " << col << " home col = " << (*iter).get_home_col() << " col to use = " << origin_cols_[origin_element];
+              //LOG_FINEST() << "original element = " << origin_element << " corresponds to cell = " << origin_cell_[origin_element]<<  " row = " << row << " home row = "<< (*iter).get_home_row() << " row to use = " << origin_rows_[origin_element] << " col = " << col << " home col = " << (*iter).get_home_col() << " col to use = " << origin_cols_[origin_element];
 
               // Iterate over possible cells compare to chance()
               temp_sum = 0;

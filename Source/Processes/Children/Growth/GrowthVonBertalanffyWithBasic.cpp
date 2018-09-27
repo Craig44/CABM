@@ -38,6 +38,9 @@ GrowthVonBertalanffyWithBasic::GrowthVonBertalanffyWithBasic(Model* model) : Gro
   parameters_.Bind<float>(PARAM_K, &k_, "Value of mean k multiplied by the layer value if supplied", "", 0);
   parameters_.Bind<float>(PARAM_A, &a_, "alpha value for weight at length function", "", 0);
   parameters_.Bind<float>(PARAM_B, &b_, "beta value for weight at length function", "", 0);
+
+  RegisterAsAddressable(PARAM_LINF, &l_inf_);
+  RegisterAsAddressable(PARAM_K, &k_);
 }
 
 // check users have defined spatial or non_spatial
@@ -156,5 +159,10 @@ void  GrowthVonBertalanffyWithBasic::draw_growth_param(unsigned row, unsigned co
 	}
 }
 
+// A Method for telling the world we need to redistribute Mortality parmaeters
+void GrowthVonBertalanffyWithBasic::RebuildCache() {
+  LOG_FINE();
+  world_->rebuild_growth_params();
+}
 } /* namespace processes */
 } /* namespace niwa */

@@ -442,5 +442,10 @@ void  MortalityBaranov::FillReportCache(ostringstream& cache) {
 
 }
 
+// A Method for telling the world we need to redistribute Mortality parmaeters
+void MortalityBaranov::RebuildCache() {
+  LOG_FINE();
+  world_->rebuild_mort_params();
+}
 } /* namespace processes */
 } /* namespace niwa */

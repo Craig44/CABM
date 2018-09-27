@@ -36,6 +36,8 @@ MortalityConstantRate::MortalityConstantRate(Model* model) : Mortality(model) {
   parameters_.Bind<bool>(PARAM_UPDATE_MORTALITY_PARAMETERS, &update_natural_mortality_parameters_, "If an agent/individual moves do you want it to take on the natural mortality parameters of the new spatial cell", "");
   parameters_.Bind<float>(PARAM_TIME_STEP_RATIO, &ratios_, "Time step ratios for the mortality rates to apply in each time step. See manual for how this is applied", "");
 
+  RegisterAsAddressable(PARAM_M, &m_);
+
 }
 
 /**
@@ -52,9 +54,7 @@ void MortalityConstantRate::DoBuild() {
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         float multiplier = m_layer_->get_value(row, col);
-        LOG_FINEST() << "multiplier = " << multiplier << " m value = " << m_;
-        m_layer_->set_value(row, col, multiplier * m_);
-        LOG_FINEST() << "check we set the right value = " << m_layer_->get_value(row, col);
+        LOG_FINEST() << "multiplier = " << multiplier << " m value = " << m_ <<  " check we set the right value = " << m_layer_->get_value(row, col, multiplier * m_);
       }
     }
   }
@@ -268,7 +268,12 @@ void  MortalityConstantRate::FillReportCache(ostringstream& cache) {
   for (auto& year : removals_by_year_)
     cache << year.second << " ";
   cache << "\n";
+}
 
+// A Method for telling the world we need to redistribute Mortality parmaeters
+void MortalityConstantRate::RebuildCache() {
+  LOG_FINE();
+  world_->rebuild_mort_params();
 }
 
 } /* namespace processes */

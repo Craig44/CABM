@@ -72,10 +72,12 @@ unsigned Agent::get_age_index() {
 }
 
 
-void Agent::apply_tagging_event(unsigned tags) {
+void Agent::apply_tagging_event(unsigned tags, unsigned row, unsigned col) {
   length_at_tag_ = length_;
   tag_ = tags;
   tag_time_step_ = model_->get_time_step_counter();
+  tag_row_ = row;
+  tag_col_ = col;
 }
 /*
  * An internal function to set initial length at age when initially seeding agents in the world,

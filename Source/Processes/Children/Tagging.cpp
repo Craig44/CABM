@@ -108,6 +108,7 @@ void Tagging::DoBuild() {
 }
 
 void Tagging::DoExecute() {
+  LOG_MEDIUM();
   auto year_iter = years_.begin();
   if ((model_->state() != State::kInitialise) & (find(year_iter, years_.end(), model_->current_year()) != years_.end())) {
     utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
@@ -171,7 +172,7 @@ void Tagging::DoExecute() {
 
                   // Caught this agent we need to split out a tagged fish and return the two types
                   Agent tagged_agent(this_agent);
-                  tagged_agent.apply_tagging_event(1); // Any tagging attribute should be bundled into this method
+                  tagged_agent.apply_tagging_event(1, row, col); // Any tagging attribute should be bundled into this method
                   this_agent.set_scalar(this_agent.get_scalar() - 1.0);
                   tagged_agent.set_scalar(1.0);
                   age_freq[this_agent.get_age_index()]++;
@@ -196,8 +197,8 @@ void Tagging::DoExecute() {
                   LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << current_year_by_space_[row][col] << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have" <<
                      " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation, agents in cell = " << tag_max << " attempts made = " << tag_attempts;
                 }
-                ++counter;
               }
+              ++counter;
             }
             // Store global information
             #pragma omp critical

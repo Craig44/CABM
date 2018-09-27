@@ -275,6 +275,9 @@ void MortalityEventBiomass::DoExecute() {
                               tag_recapture_info.length_.push_back(this_agent.get_length());
                               tag_recapture_info.time_at_liberty_.push_back(this_agent.get_time_at_liberty(current_time_step_by_space_[row][col]));
                               tag_recapture_info.length_increment_.push_back(this_agent.get_length_increment_since_tag());
+                              tag_recapture_info.tag_row_.push_back(this_agent.get_tag_row());
+                              tag_recapture_info.tag_col_.push_back(this_agent.get_tag_col());
+
                             }
                           }
                         }
@@ -367,6 +370,8 @@ void MortalityEventBiomass::DoExecute() {
                               tag_recapture_info.length_.push_back(this_agent.get_length());
                               tag_recapture_info.time_at_liberty_.push_back(this_agent.get_time_at_liberty(current_time_step_by_space_[row][col]));
                               tag_recapture_info.length_increment_.push_back(this_agent.get_length_increment_since_tag());
+                              tag_recapture_info.tag_row_.push_back(this_agent.get_tag_row());
+                              tag_recapture_info.tag_col_.push_back(this_agent.get_tag_col());
                             }
                           }
                         }
@@ -434,21 +439,6 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
   }
 
   if (print_extra_info_) {
-    // Print census information
-    for (auto& census : removals_census_) {
-      cache << "census_info-" << census.year_ << "-" << census.row_ << "-" << census.col_ << " " << REPORT_R_MATRIX << "\n";
-      //cache << "age length scalar\n";
-      for (unsigned ndx = 0; ndx < census.age_.size(); ++ndx)
-        cache << census.age_[ndx] << " ";
-      cache << "\n";
-      for (unsigned ndx = 0; ndx < census.age_.size(); ++ndx)
-        cache << census.length_[ndx] << " ";
-      cache << "\n";
-      for (unsigned ndx = 0; ndx < census.age_.size(); ++ndx)
-        cache << census.scalar_[ndx] << " ";
-      cache << "\n";
-    }
-
     if (removals_tag_recapture_.size() > 0) {
       for (auto& tag_recapture : removals_tag_recapture_) {
         cache << "tag_recapture_info-" << tag_recapture.year_ << "-" << tag_recapture.row_ << "-" << tag_recapture.col_ << " " << REPORT_R_LIST << "\n";
@@ -466,8 +456,29 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
         cache << "\n";
         for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
           cache << tag_recapture.length_increment_[ndx] << " ";
+        cache << "\n";
+        for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+          cache << tag_recapture.tag_row_[ndx] << " ";
+        cache << "\n";
+        for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+          cache << tag_recapture.tag_col_[ndx] << " ";
         cache << "\n" << REPORT_R_LIST_END << "\n";
       }
+    }
+
+    // Print census information
+    for (auto& census : removals_census_) {
+      cache << "census_info-" << census.year_ << "-" << census.row_ << "-" << census.col_ << " " << REPORT_R_MATRIX << "\n";
+      //cache << "age length scalar\n";
+      for (unsigned ndx = 0; ndx < census.age_.size(); ++ndx)
+        cache << census.age_[ndx] << " ";
+      cache << "\n";
+      for (unsigned ndx = 0; ndx < census.age_.size(); ++ndx)
+        cache << census.length_[ndx] << " ";
+      cache << "\n";
+      for (unsigned ndx = 0; ndx < census.age_.size(); ++ndx)
+        cache << census.scalar_[ndx] << " ";
+      cache << "\n";
     }
   }
 }

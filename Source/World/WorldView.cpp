@@ -216,5 +216,26 @@ WorldCell* WorldView::get_cached_square(int RowIndex, int ColIndex) {
   return &cached_grid_[RowIndex][ColIndex];
 }
 
+void WorldView::rebuild_agent_time_varying_params() {
+  LOG_FINE();
+  if (update_growth_params_ || update_mortality_params_) {
+    for (unsigned i = 0; i < height_; ++i) {
+      for (unsigned j = 0; j < width_; ++j) {
+        if (base_grid_[i][j].is_enabled()) {
+          if (update_growth_params_) {
+            base_grid_[i][j].update_growth_params();
+          }
+          if (update_mortality_params_)
+            base_grid_[i][j].update_mortality_params();
+
+        }
+      }
+    }
+  } else {
+    LOG_FINE() << "Don't need to update agent values";
+  }
+  update_growth_params_ = false;
+  update_mortality_params_ = false;
+}
 
 } /* namespace niwa */

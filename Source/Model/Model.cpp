@@ -34,6 +34,7 @@
 #include "Reports/Manager.h"
 #include "Processes/Manager.h"
 #include "TimeSteps/Manager.h"
+#include "TimeVarying/Manager.h"
 #include "Utilities/RandomNumberGenerator.h"
 #include "Utilities/To.h"
 
@@ -384,6 +385,8 @@ void Model::RunBasic() {
     // Iterate over all partition members and UpDate Mean Weight for the inital weight calculations
 
     initialisationphases::Manager& init_phase_manager = *managers_->initialisation_phase();
+    timevarying::Manager& time_varying_manager = *managers_->time_varying();
+
     init_phase_manager.Execute();
     managers_->report()->Execute(State::kInitialise);
 
@@ -394,7 +397,13 @@ void Model::RunBasic() {
     timesteps::Manager& time_step_manager = *managers_->time_step();
     for (current_year_ = start_year_; current_year_ <= final_year_; ++current_year_) {
       LOG_FINE() << "Iteration year: " << current_year_;
+      LOG_FINE() << "Update time varying params";
+      time_varying_manager.Update(current_year_);
+      LOG_FINE() << "finishing update time varying now Update Category mean length and weight before beginning annual cycle";
+      world_view_->rebuild_agent_time_varying_params();
+      LOG_FINE() << "rebuild agent values continue to execute the year";
       time_step_manager.Execute(current_year_);
+      LOG_FINE() << "finished year exectution";
     }
 
     managers_->observation()->SimulateData();

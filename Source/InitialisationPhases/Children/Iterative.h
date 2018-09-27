@@ -53,6 +53,8 @@ protected:
   niwa::layers::NumericLayer* initial_layer_ = nullptr;
   niwa::layers::CategoricalLayer* recruitement_layer_ = nullptr;
 
+  string                      recruitment_label_for_single_cases_;
+  bool                        single_recruitment_case_ = false;
   WorldView*                  world_ = nullptr;
   string					            growth_process_label_;
   string					            natural_mortality_label_;

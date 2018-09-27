@@ -58,6 +58,8 @@ struct tag_recapture {
   vector<unsigned> age_;
   vector<float> length_;
   vector<unsigned> time_at_liberty_;
+  vector<unsigned> tag_row_;
+  vector<unsigned> tag_col_;
   vector<float> length_increment_;
   tag_recapture(unsigned year, unsigned row, unsigned col, unsigned time_step) : year_(year),
       row_(row), col_(col), time_step_(time_step) {}

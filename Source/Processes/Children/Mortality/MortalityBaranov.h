@@ -39,6 +39,7 @@ public:
   virtual void                        DoExecute() override final;
   void                                draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) override final;
   void                                FillReportCache(ostringstream& cache) override final;
+  void                                RebuildCache() override final;
 
 protected:
   // F variables

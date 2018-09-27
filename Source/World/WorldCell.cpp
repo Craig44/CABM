@@ -168,6 +168,7 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
 
 /*
  * Called in WorldView usually after a movement process, where agents get assigned new parameters if we have spatial Mortality, or growth
+ * This is for spatial updating
 */
 void  WorldCell::update_agent_parameters() {
   LOG_TRACE();
@@ -204,6 +205,39 @@ void  WorldCell::update_agent_parameters() {
         (*iter).set_first_length_weight_par(growth_pars[counter][2]);
         (*iter).set_second_length_weight_par(growth_pars[counter][3]);
       }
+    }
+  }
+}
+
+/*
+ * Called in WorldView if agents need to be updated with time varying parameters
+*/
+void  WorldCell::update_mortality_params() {
+  LOG_FINE() << "this method assumes the mean values have been changed in the corresponding class, for example the M value has changed";
+  vector<float> mort_par;
+  unsigned counter = 0;
+  mortality_->draw_rate_param(row_, col_, agents_.size(), mort_par);
+  for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+    if ( (*iter).is_alive()) {
+      (*iter).set_m(mort_par[counter]);
+    }
+  }
+}
+
+/*
+ * Called in WorldView if agents need to be updated with time varying parameters
+*/
+void  WorldCell::update_growth_params() {
+  LOG_FINE() << "Updating growth params based on time varying parameters";
+  vector<vector<float>> growth_pars;
+  growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars);
+  unsigned counter = 0;
+  for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+    if ( (*iter).is_alive()) {
+      (*iter).set_first_age_length_par(growth_pars[counter][0]);
+      (*iter).set_second_age_length_par(growth_pars[counter][1]);
+      (*iter).set_first_length_weight_par(growth_pars[counter][2]);
+      (*iter).set_second_length_weight_par(growth_pars[counter][3]);
     }
   }
 }

@@ -54,6 +54,8 @@ public:
   virtual const float&         get_lat() const {return lat_;};
   virtual const float&         get_lon() const {return lon_;};
   virtual const unsigned&      get_number_tags() const {return tag_;};
+  virtual const unsigned&      get_tag_row() const {return tag_row_;};
+  virtual const unsigned&      get_tag_col() const {return tag_col_;};
   float                        get_length_increment_since_tag()  {return length_ - length_at_tag_;};
   unsigned                     get_time_at_liberty(unsigned current_time_step)  {return current_time_step - tag_time_step_;};
 
@@ -70,7 +72,7 @@ public:
   void                         set_m(float value) {M_ = value;}
   void                         set_lat(float new_lat) {lat_ = new_lat;}
   void                         set_lon(float new_lon) {lon_ = new_lon;}
-  void                         apply_tagging_event(unsigned tags);
+  void                         apply_tagging_event(unsigned tags, unsigned row, unsigned col);
   void                         dies() {alive_ = false;}
 protected:
   // Methods
@@ -98,6 +100,8 @@ protected:
   float                       length_at_tag_ = 0.0;
   unsigned                    tag_time_step_ = 0; // number of tags, fish can be double tagged
   bool                        alive_ = true;
+  unsigned                    tag_row_;
+  unsigned                    tag_col_;
 
 private:
 

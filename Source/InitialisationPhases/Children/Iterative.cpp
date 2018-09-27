@@ -34,7 +34,7 @@ Iterative::Iterative(Model* model)
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "The number of iterations (years) over which to execute this initialisation phase", "");
   parameters_.Bind<unsigned>(PARAM_NUMBER_OF_INDIVIDUALS, &number_agents_, "The number of agents to initially seed in the partition", "");
   parameters_.Bind<string>(PARAM_LAYER_LABEL, &intial_layer_label_, "The label of a layer that you want to seed a distribution by.", "", "");
-  parameters_.Bind<string>(PARAM_RECRUITMENT_LAYER_LABEL, &recruitement_layer_label_, "The label of a layer has a recruitment process label in each cell to see how to set scalars", "");
+  parameters_.Bind<string>(PARAM_RECRUITMENT_LAYER_LABEL, &recruitement_layer_label_, "The label of a layer has a recruitment process label in each cell to see how to set scalars", "", "");
 
 }
 
@@ -63,19 +63,28 @@ void Iterative::DoBuild() {
   }
 
   // Did the user supply a layer
-  recruitement_layer_ = model_->managers().layer()->GetCategoricalLayer(recruitement_layer_label_);
-  if (!recruitement_layer_)
-    LOG_ERROR_P(PARAM_RECRUITMENT_LAYER_LABEL) << "could not find the layer " << recruitement_layer_label_ << " does it exist? if it does exist, is of type numeric? because it needs to be";
+  if (parameters_.Get(PARAM_RECRUITMENT_LAYER_LABEL)->has_been_defined()) {
+    recruitement_layer_ = model_->managers().layer()->GetCategoricalLayer(recruitement_layer_label_);
+    if (!recruitement_layer_)
+      LOG_ERROR_P(PARAM_RECRUITMENT_LAYER_LABEL) << "could not find the layer " << recruitement_layer_label_ << " does it exist? if it does exist, is of type numeric? because it needs to be";
+  }
   // Check the entries
   auto recruit_processes = model_->managers().process()->GetRecruitmentProcesses();
-  vector<string> recruit_labels;
-  for(auto recruit_process : recruit_processes)
-    recruit_labels.push_back(recruit_process->label());
-  for (unsigned row = 0; row < model_->get_height(); ++row) {
-    for (unsigned col = 0; col < model_->get_width(); ++col) {
-      LOG_FINEST() << "in row = " << row + 1 << " col = " << col + 1 << " recruit label = " << recruitement_layer_->get_value(row,col);
-      if (find(recruit_labels.begin(), recruit_labels.end(), recruitement_layer_->get_value(row,col)) == recruit_labels.end())
-        LOG_ERROR_P(PARAM_RECRUITMENT_LAYER_LABEL) << "could not find the recruitment process = " << recruitement_layer_->get_value(row,col) << " check the process exists or that there is not a typo.";
+  if (!parameters_.Get(PARAM_RECRUITMENT_LAYER_LABEL)->has_been_defined()) {
+    if (recruit_processes.size() != 1)
+      LOG_FATAL()<< "In the initialisation process " << label_ << " you need to supply the parameter "<< PARAM_RECRUITMENT_LAYER_LABEL << " if there is more that one recruitment process, we found " << recruit_processes.size() << " please include this layer";
+    recruitment_label_for_single_cases_ = recruit_processes[0]->label();
+    single_recruitment_case_ = true;
+  } else {
+    vector<string> recruit_labels;
+    for(auto recruit_process : recruit_processes)
+      recruit_labels.push_back(recruit_process->label());
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        LOG_FINEST() << "in row = " << row + 1 << " col = " << col + 1 << " recruit label = " << recruitement_layer_->get_value(row,col);
+        if (find(recruit_labels.begin(), recruit_labels.end(), recruitement_layer_->get_value(row,col)) == recruit_labels.end())
+          LOG_ERROR_P(PARAM_RECRUITMENT_LAYER_LABEL) << "could not find the recruitment process = " << recruitement_layer_->get_value(row,col) << " check the process exists or that there is not a typo.";
+      }
     }
   }
 
@@ -201,9 +210,16 @@ void Iterative::Execute() {
       WorldCell* cell = world_->get_base_square(row, col);
       // set scalar for each cell
       if (cell->is_enabled()) {
-        for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter) {
-          (*iter).set_scalar(model_->get_scalar(recruitement_layer_->get_value((*iter).get_home_row(),(*iter).get_home_col()))); // set scalar based on an agents home area which is linked to the recruitment layer
-          //LOG_FINEST() << "setting scalar, home row = " << (*iter).get_home_row()  << " col = " << (*iter).get_home_col() << " scalar = " << (*iter).get_scalar();
+        if (single_recruitment_case_) {
+          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter) {
+            (*iter).set_scalar(model_->get_scalar(recruitment_label_for_single_cases_)); // set scalar based on an agents home area which is linked to the recruitment layer
+            //LOG_FINEST() << "setting scalar, home row = " << (*iter).get_home_row()  << " col = " << (*iter).get_home_col() << " scalar = " << (*iter).get_scalar();
+          }
+        } else {
+          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter) {
+            (*iter).set_scalar(model_->get_scalar(recruitement_layer_->get_value((*iter).get_home_row(),(*iter).get_home_col()))); // set scalar based on an agents home area which is linked to the recruitment layer
+            //LOG_FINEST() << "setting scalar, home row = " << (*iter).get_home_row()  << " col = " << (*iter).get_home_col() << " scalar = " << (*iter).get_scalar();
+          }
         }
       }
     }

@@ -69,8 +69,12 @@ public:
 
   void                        MergeCachedGrid();
   void                        get_world_age_frequency(vector<unsigned>& world_age_freq);
-
   void                        get_cell_element(unsigned& row, unsigned& col, const float lat, const float lon);
+  // Used by methods to tell the world that time varying parameters need to be changed
+  void                        rebuild_growth_params() {update_growth_params_ = true;}
+  void                        rebuild_mort_params() {update_mortality_params_ = true;}
+  //Called by the Model in RunBasic after time varying to update agent params if need be
+  void                        rebuild_agent_time_varying_params();
 
 protected:
   // members
@@ -86,6 +90,8 @@ protected:
   vector<float>               lon_midpoint_by_cell_;
   vector<float>               lat_bounds_;
   vector<float>               lon_bounds_;
+  bool                        update_growth_params_ = false;
+  bool                        update_mortality_params_ = false;
 
 private:
   // members

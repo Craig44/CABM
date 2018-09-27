@@ -22,14 +22,14 @@ natural_mortality_process_label natural_mort
 maturity_ogive_label mature_ogive
 nrows 3
 ncols 1
-max_threads_to_use 3
+max_threads_to_use 1
 # --------------
 # Init Phase
 # --------------
 @initialisation_phase Iterative
 type iterative
 years 70
-number_of_individuals 700000 ## initial number of agents
+number_of_individuals 2700000 ## initial number of agents
 layer_label initial_values
 recruitment_layer_label recruitment_layer # stock identification, important for when you are scaling SSB = B0 for an agent model to population model
 # --------------
@@ -99,12 +99,13 @@ time_step_ratio 0.5 0.5
 # Fishing Mortality
 @process fishing
 type mortality_event_biomass
-years 1990:1991
-catch_layers  1990_catch 1991_catch #1992_catch 1993_catch 1994_catch #1995_catch 1996_catch 1997_catch 1998_catch 1999_catch 2000_catch 2001_catch 2002_catch 2003_catch 2004_catch 2005_catch 2006_catch 2007_catch 2008_catch 2009_catch 2010_catch 2011_catch 2012_catch 2013_catch
+years 1990:2013
+catch_layers  1990_catch 1991_catch 1992_catch 1993_catch 1994_catch 1995_catch 1996_catch 1997_catch 1998_catch 1999_catch 2000_catch 2001_catch 2002_catch 2003_catch 2004_catch 2005_catch 2006_catch 2007_catch 2008_catch 2009_catch 2010_catch 2011_catch 2012_catch 2013_catch
 selectivity Sel_LL
 print_extra_info true
-scanning_years 1990:1991
-scanning_proportion_of_catch 1.0 1.0
+scanning_years 1990:1996
+scanning_proportion_of_catch 0.7*7
+
 # Movement
 @process Movement_home
 type movement_box_transfer
@@ -274,7 +275,7 @@ time_step half_M
 # --------------
 # Define Observations
 # --------------
-/*
+
 @observation fishery_age
 type process_removals_by_age
 simulation_likelihood multinomial
@@ -323,11 +324,10 @@ time_step time_step_two
 proportion_through_mortality_block 1.0 ## take snapshot at the end of fishing timestep
 simulation_likelihood lognormal
 error_value 0.2 * 24
-catchability 0.2
 selectivities Sel_LL
 cell_layer cells
 cells r1-c1 r2-c1 r3-c1 
-*/
+
 # --------------
 # Include Layers
 # --------------

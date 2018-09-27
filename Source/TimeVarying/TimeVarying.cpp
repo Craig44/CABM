@@ -84,7 +84,7 @@ void TimeVarying::Build() {
  * UpDate target object
  */
 void TimeVarying::Update(unsigned current_year) {
-  LOG_TRACE();
+  LOG_FINE();
   if (update_function_ == 0)
     LOG_CODE_ERROR() << "DoUpdateFunc_ == 0";
 
