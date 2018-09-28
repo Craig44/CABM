@@ -26,6 +26,15 @@
         cat(Comment, file = filename, sep = "", fill = F, labels = NULL, append = T)
         ## drop next line
         cat("\n", file = filename, sep = "", fill = F, labels = NULL, append = T)
+      } else if (Command == "!include") {
+        ## dealing with an !include statemetn
+        list_of_includes = object[[i]]$values
+        for (includ in 1:length(list_of_includes)) {
+          this_line = paste0(Command, " " , list_of_includes[includ])
+          cat(this_line, file = filename, sep = "", fill = F, labels = NULL, append = T)  
+          cat("\n", file = filename, sep = "", fill = F, labels = NULL, append = T)                           
+        }
+        next; ## quick out of this i as we are done for all the includes
       } else {
         ## the block has a label and we need to deal with it
         index1 = regexpr("\\[", Command);

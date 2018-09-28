@@ -25,8 +25,8 @@
     ## Remove any lines that begin with a #
     file <- file[substring(file, 1, 1) != "#"]
     ## Find and remove any lines that begin or end with { or } which is also a comment
-    index1 <- ifelse(substring(file, 1, 1) == "/*", 1:length(file), 0)
-    index2 <- ifelse(substring(file, 1, 1) == "*/", 1:length(file), 0)
+    index1 <- ifelse(substring(file, 1, 2) == "/*", 1:length(file), 0)
+    index2 <- ifelse(substring(file, 1, 2) == "*/", 1:length(file), 0)
     index1 <- index1[index1 != 0]
     index2 <- index2[index2 != 0]
     if (length(index1) != length(index2)) 
@@ -41,8 +41,8 @@
     ## strip any remaining comments
     file <- ifelse(regexpr("#", file) > 0, substring(file, 1, regexpr("#", file) - 1), file)
     file <- file[file != ""]
-    if (substring(file[1], 1, 1) != "@") 
-        stop(paste("Error in the file ", filename, ". Cannot find a '@' at the begining of the file", sep = ""))
+    #if (substring(file[1], 1, 1) != "@") 
+    #    stop(paste("Error in the file ", filename, ". Cannot find a '@' at the begining of the file", sep = ""))
         
     ## utiltiy function for stripping tabs and spaces out ot input values   
    
@@ -51,6 +51,8 @@
     
  
     blocks = get.lines(file, starts.with = "\\@", fixed = F)
+    includes = get.lines(file, starts.with = "\\!", fixed = F)
+    
     ## create a labels for blocks that do not take a label following the @block statement
     exception_blocks = c("model","categories")
     ## a list of tables that don't have headers    
@@ -91,6 +93,15 @@
                 print(temp[2])
              }
              next; ## if we come across a block we either give it a label and move on or just move on if it is an exception block
+          }
+          ## Check for an include statement
+          if (substring(temp[1], 1, 1) == "!") {  
+            if (length(ans[[temp[1]]]$values) > 0) {
+              ans[[temp[1]]]$values = c(ans[[temp[1]]]$values,temp[2])
+            } else {
+              ans[[temp[1]]]$values = temp[2]
+            }
+            next; ## skip out of this level
           }
           ## only two types of subcommands tables and vectors
           if (in_table || any(ibm_list$command == temp[1])) {
