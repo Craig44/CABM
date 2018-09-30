@@ -539,6 +539,7 @@
 #define PARAM_SINGLE_STEP                         "single_step"
 #define PARAM_SINGLE                              "single"
 #define PARAM_SINK_LAYER                          "sink_layer"
+#define PARAM_SIMULATE_IN_NEW_FILE                "generate_style_simulated"
 #define PARAM_SIZES                               "sizes"
 #define PARAM_SLOPE                               "slope"
 #define PARAM_SKIP_CONFIG_FILE                    "skip_config_file"

@@ -56,6 +56,19 @@ void Manager::Build() {
     }
   }
 }
+/**
+ * locate all observation reports in the system and print them
+ */
+void Manager::PrintObservations() {
+  LOG_FINE();
+  for (auto report : objects_) {
+    if (report->type() == PARAM_OBSERVATION) {
+      LOG_FINE() << "executing observation report " << report->label();
+      report->Execute();
+    }
+  }
+
+}
 
 /**
  * Execute any reports that have the model_state

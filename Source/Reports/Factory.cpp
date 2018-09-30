@@ -24,6 +24,7 @@
 #include "Reports/Children/InitialisationPartition.h"
 #include "Reports/Children/Observation.h"
 #include "Reports/Children/Selectivity.h"
+#include "Reports/Children/SimulatedObservations.h"
 #include "Reports/Children/TimeVarying.h"
 #include "Reports/Children/NumericLayer.h"
 #include "Reports/Children/WorldAgeFrequency.h"
@@ -59,6 +60,8 @@ Report* Factory::Create(Model* model, const string& object_type, const string& s
       result = new DerivedQuantity(model);
     else if (sub_type == PARAM_OBSERVATION)
       result = new Observation(model);
+    else if (sub_type == PARAM_SIMULATED_OBSERVATIONS)
+      result = new SimulatedObservations(model);
     else if (sub_type == PARAM_MODEL_ATTRIBUTES)
       result = new ModelAttributes(model);
     else if (sub_type == PARAM_NUMERIC_LAYER)

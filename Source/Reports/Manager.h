@@ -43,6 +43,7 @@ public:
   void                        Prepare();
   void                        Finalise();
   void                        FlushReports();
+  void                        PrintObservations();
   void                        StopThread() { run_.clear(); }
   void                        Pause();
   void                        Resume() { pause_ = false; }

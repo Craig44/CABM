@@ -382,6 +382,10 @@ void Model::Reset() {
 void Model::RunBasic() {
   LOG_MEDIUM();
   // Model is about to run
+  /*
+   * - iterate over -i file
+   * - iterate over -s values
+   */
   Addressables& addressables = *managers_->addressables();
   LOG_FINE() << "Multi line value = " << adressable_values_count_;
   for (unsigned i = 0; i < adressable_values_count_; ++i) {
@@ -389,7 +393,10 @@ void Model::RunBasic() {
       addressables.LoadValues(i);
        Reset();
      }
-
+    int simulation_candidates = global_configuration_->simulation_candidates();
+    if (simulation_candidates < 1) {
+      LOG_FATAL() << "The number of simulations specified at the command line parser must be at least one";
+  }
     /**
      * Running the model now
      */
@@ -419,14 +426,26 @@ void Model::RunBasic() {
       time_step_manager.Execute(current_year_);
       LOG_FINE() << "finished year exectution";
     }
+    unsigned suffix_width = (unsigned)floor(log10((double) simulation_candidates + 1)) + 1;
+    for (int s = 0; s < simulation_candidates; ++s) {
+      string report_suffix = ".";
+      unsigned iteration_width = (unsigned)floor(log10(s + 1 * (i + 1))) + 1;
 
-    managers_->observation()->SimulateData();
+      unsigned diff = suffix_width - iteration_width;
+      report_suffix.append(diff,'0');
+      report_suffix.append(utilities::ToInline<unsigned, string>(s + 1 * (i + 1)));
+      managers_->report()->set_report_suffix(report_suffix);
 
-    for (auto executor : executors_[State::kExecute])
-      executor->Execute();
+      managers_->observation()->SimulateData();
 
+      /*// Not convinced this is doing anything
+      for (auto executor : executors_[State::kExecute])
+        executor->Execute();
+       */
+      managers_->report()->PrintObservations();
+
+    }
     // Model has finished so we can run finalise.
-
     LOG_FINE() << "Model: State change to Iteration Complete";
     managers_->report()->Execute(State::kIterationComplete);
   }

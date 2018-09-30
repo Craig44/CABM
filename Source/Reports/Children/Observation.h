@@ -40,6 +40,7 @@ private:
   string              observation_label_;
   niwa::Observation*  observation_;
   bool								first_run_ = true;
+  bool                simulate_new_file_;
 };
 
 } /* namespace reports */
