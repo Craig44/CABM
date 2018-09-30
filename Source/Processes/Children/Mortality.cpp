@@ -27,6 +27,14 @@ Mortality::Mortality(Model* model) : Process(model) {
 
 }
 
+void Mortality::DoReset() {
+  LOG_FINE() << "clearing containers";
+  removals_by_age_and_area_.clear();
+  removals_by_length_and_area_.clear();
+  removals_census_.clear();
+  removals_tag_recapture_.clear();
+}
+
 
 } /* namespace processes */
 } /* namespace niwa */

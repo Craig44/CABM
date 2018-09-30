@@ -76,13 +76,13 @@ public:
   bool                            HasAddressableUsage(const string& label, const addressable::Usage&) const;
   bool                            IsAddressableAVector(const string& label) const;
   unsigned                        GetAddressableSize(const string& label) const;
-  float*                         GetAddressable(const string& label);
-  virtual float*                 GetAddressable(const string& label, const string& index);
-  vector<float*>*                GetAddressables(const string& absolute_label, const vector<string> indexes);
-  map<unsigned, float>*          GetAddressableUMap(const string& label);
-  map<unsigned, float>*          GetAddressableUMap(const string& label, bool& create_missing);
-  OrderedMap<string, float>*     GetAddressableSMap(const string& label);
-  vector<float>*                 GetAddressableVector(const string& label);
+  float*                          GetAddressable(const string& label);
+  virtual float*                  GetAddressable(const string& label, const string& index);
+  vector<float*>*                 GetAddressables(const string& absolute_label, const vector<string> indexes);
+  map<unsigned, float>*           GetAddressableUMap(const string& label);
+  map<unsigned, float>*           GetAddressableUMap(const string& label, bool& create_missing);
+  OrderedMap<string, float>*      GetAddressableSMap(const string& label);
+  vector<float>*                  GetAddressableVector(const string& label);
   addressable::Type               GetAddressableType(const string& label) const;
   void                            PrintParameterQueryInfo();
   virtual void                    RebuildCache() { };
@@ -115,10 +115,10 @@ protected:
   string                          label_                = "";
   string                          type_                 = "";
   ParameterList                   parameters_;
-  map<string, float*>            addressables_;
+  map<string, float*>             addressables_;
   map<string, bool>               create_missing_addressables_;
-  map<string, vector<float>* >   addressable_vectors_;
-  map<string, vector<float*> >   addressable_custom_vectors_;
+  map<string, vector<float>* >    addressable_vectors_;
+  map<string, vector<float*> >    addressable_custom_vectors_;
   map<string, addressable::Type>  addressable_types_;
   map<string, addressable::Usage> addressable_usage_;
 

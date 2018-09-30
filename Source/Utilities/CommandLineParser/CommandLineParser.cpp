@@ -50,6 +50,7 @@ void CommandLineParser::Parse(int argc, char* argv[], RunParameters& options) {
     ("help,h", "Print help")
     ("license,l", "Display IBM license")
     ("version,v", "Display version information")
+    ("simulation,s", value<unsigned>(), "Simulation mode (arg = number of candidates)")
     ("config,c", value<string>(), "Configuration file")
     ("run,r", "Basic model run mode")
     ("input,i", value<string>(), "Load free parameter values from file")
@@ -87,7 +88,7 @@ void CommandLineParser::Parse(int argc, char* argv[], RunParameters& options) {
   if (parameters.count("config"))
     options.config_file_ = parameters["config"].as<string>();
   if (parameters.count("input"))
-    options.estimable_value_input_file_ = parameters["input"].as<string>();
+    options.addressable_value_input_file_ = parameters["input"].as<string>();
 
   /**
    * Determine what run mode we should be in. If we're
@@ -135,7 +136,10 @@ void CommandLineParser::Parse(int argc, char* argv[], RunParameters& options) {
   if (parameters.count("seed")) {
     options.override_rng_seed_value_ = parameters["seed"].as<unsigned>();
     options.override_random_number_seed_ = true;
+  }  else if (parameters.count("simulation")) {
+    options.simulation_candidates_ = parameters["simulation"].as<unsigned>();
   }
+
 }
 
 } /* namespace utilities */

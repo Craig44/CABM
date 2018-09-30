@@ -81,7 +81,9 @@ void DoubleExponential::DoValidate() {
 void DoubleExponential::RebuildCache() {
   if (not length_based_) {
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
-      if ((float)age <= x0_) {
+      if (not include_zero_age_values_ & (age == 0)) {
+        values_[age - min_index_] = 0;
+      } else if ((float)age <= x0_) {
         values_[age - min_index_] = alpha_ * y0_ * pow((y1_ / y0_), ((float)age - x0_)/(x1_ - x0_));
       } else if ((float)age > x0_ && (float)age <= x2_) {
         values_[age - min_index_] = alpha_ * y0_ * pow((y2_ / y0_), ((float)age - x0_)/(x2_ - x0_));

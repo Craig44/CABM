@@ -33,6 +33,8 @@ public:
   void                        DoValidate() override final { };
   void                        DoBuild() override final;
   void                        DoExecute() override final;
+  void                        DoReset() override final  { };
+
 private:
   // members
   string              observation_label_;

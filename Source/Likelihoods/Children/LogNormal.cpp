@@ -35,8 +35,9 @@ void LogNormal::SimulateObserved(map<unsigned, map<string, vector<observations::
   for (; iterator != comparisons.end(); ++iterator) {
     LOG_FINE() << "Simulating values for year: " << iterator->first;
     for (auto second_iter = iterator->second.begin(); second_iter != iterator->second.end(); ++second_iter) {
-      LOG_FINE() << "Simulating values for cell: " << second_iter->first;
+      LOG_FINE() << "Simulating values for cell: " << second_iter->first << " next loop = " << second_iter->second.size();
       for (observations::Comparison& comparison : second_iter->second) {
+
         float error_value = comparison.error_value_;
 
         if (comparison.expected_ <= 0.0 || error_value <= 0.0)

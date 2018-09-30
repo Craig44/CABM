@@ -122,7 +122,7 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
     Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], mort_par[agent], (model_->current_year() - age),
         growth_pars[agent][2], growth_pars[agent][3], model_, mature, sex, 1.0, row_, col_, 0);
     if (agent == 0) {
-      LOG_MEDIUM() << "number of bytes of an agent class" << sizeof(new_agent);
+      LOG_MEDIUM() << "number of bytes of an agent class " << sizeof(new_agent);
     }
     agents_.push_back(new_agent); // This doesn't work if there is movement between stocks and areas then we this approximation becomes a bit shit. but I can't think of an alternative.
   }
@@ -273,6 +273,7 @@ float  WorldCell::get_mature_biomass() {
   float biomass = 0.0;
   for (auto& agent : agents_) {
     if (agent.is_alive() & agent.get_maturity()) {
+      //LOG_FINEST() << "weight = " << agent.get_weight() << " scalar = " << agent.get_scalar();
       biomass += agent.get_weight() * agent.get_scalar();
     }
   }

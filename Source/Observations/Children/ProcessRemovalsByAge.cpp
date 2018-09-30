@@ -44,6 +44,8 @@ ProcessRemovalsByAge::ProcessRemovalsByAge(Model* model) : Observation(model) {
   parameters_.Bind<string>(PARAM_CELLS, &cells_, "The cells we want to generate observations for from the layer of cells supplied", "");
   allowed_likelihood_types_.push_back(PARAM_LOGNORMAL);
   allowed_likelihood_types_.push_back(PARAM_MULTINOMIAL);
+  allowed_likelihood_types_.push_back(PARAM_LOGISTIC_NORMAL);
+
 }
 
 /**

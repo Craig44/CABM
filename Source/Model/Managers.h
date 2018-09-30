@@ -35,7 +35,7 @@ namespace timesteps { class Manager; }
 namespace timevarying { class Manager; }
 namespace minimisers { class Manager; }
 
-class Estimables;
+class Addressables;
 class Model;
 
 // classes
@@ -44,6 +44,7 @@ class Managers {
   friend class MockManagers;
 public:
   // accessors
+  virtual Addressables*                   addressables() { return addressables_; }
   virtual ageingerrors::Manager*          ageing_error() { return ageing_error_; }
   virtual asserts::Manager*               assertx() { return assert_; }
   virtual derivedquantities::Manager*     derived_quantity() { return derived_quantity_; }
@@ -71,6 +72,7 @@ protected:
 
   // members
   Model*                              model_;
+  Addressables*                       addressables_; // TODO: Move to Model
   ageingerrors::Manager*              ageing_error_;
   asserts::Manager*                   assert_;
   derivedquantities::Manager*         derived_quantity_;

@@ -74,7 +74,7 @@ public:
   virtual                     ~Mortality() = default;
   virtual void                        DoValidate(){ };
   virtual void                        DoBuild() { };
-  virtual void                        DoReset() { };
+  virtual void                        DoReset();
   virtual void                        DoExecute() { };
 
   virtual void                        draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) = 0;

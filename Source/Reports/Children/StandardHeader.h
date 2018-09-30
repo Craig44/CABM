@@ -40,6 +40,7 @@ public:
   void                        DoPrepare() override final;
   void                        DoExecute() override final;
   void                        DoFinalise() override final;
+  void                        DoReset() override final  { };
 
   const std::string&          header() const { return header_; }
 

@@ -25,6 +25,8 @@
 #include "Managers.h"
 #include "Objects.h"
 #include "Agents/Agent.h"
+#include "Addressables/Addressables.h"
+#include "ConfigurationLoader/AddressableValuesLoader.h"
 #include "GlobalConfiguration/GlobalConfiguration.h"
 #include "InitialisationPhases/Manager.h"
 #include "Logging/Logging.h"
@@ -146,6 +148,10 @@ bool Model::Start(RunMode::Type run_mode) {
 
   if (state_ != State::kStartUp)
     LOG_CODE_ERROR() << "Model state should always be startup when entering the start method";
+  if (global_configuration_->addressable_value_file() != "") {
+    configuration::AddressableValuesLoader loader(this);
+    loader.LoadValues(global_configuration_->addressable_value_file());
+  }
 
   managers_->report()->Execute(State::kStartUp);
 
@@ -262,7 +268,7 @@ void Model::Validate() {
  *
  */
 void Model::Build() {
-  LOG_TRACE();
+  LOG_FINE();
   // Build lat long stuff
   if (parameters_.Get(PARAM_LATITUDE_BOUNDS)->has_been_defined() && parameters_.Get(PARAM_LONGITUDE_BOUNDS)->has_been_defined()) {
     if (lon_bounds_.size() != (world_width_ + 1)) {
@@ -343,6 +349,12 @@ void Model::Build() {
   // Calculate length bin midpoints
   for (unsigned length_ndx = 1; length_ndx < length_bins_.size(); ++length_ndx)
     length_bin_mid_points_.push_back((float)(length_bins_[length_ndx] - length_bins_[length_ndx - 1] / 2));
+
+  Addressables& addressables = *managers_->addressables();
+  if (addressables.GetValueCount() > 0) {
+    addressable_values_file_ = true;
+    adressable_values_count_ = addressables.GetValueCount();
+  }
 }
 
 /**
@@ -368,13 +380,15 @@ void Model::Reset() {
  *
  */
 void Model::RunBasic() {
-  LOG_TRACE();
+  LOG_MEDIUM();
   // Model is about to run
+  Addressables& addressables = *managers_->addressables();
+  LOG_FINE() << "Multi line value = " << adressable_values_count_;
   for (unsigned i = 0; i < adressable_values_count_; ++i) {
-    //if (addressable_values_file_) {
-    // estimables.LoadValues(i);
-    //  Reset();
-    //}
+    if (addressable_values_file_) {
+      addressables.LoadValues(i);
+       Reset();
+     }
 
     /**
      * Running the model now

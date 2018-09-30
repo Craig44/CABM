@@ -36,9 +36,9 @@ using niwa::utilities::Double;
 /**
  * LnGamma
  */
-inline Double LnGamma(Double t) {
-  Double x, y, tmp, ser;
-  Double cof[6] = {76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5};
+inline double LnGamma(double t) {
+  double x, y, tmp, ser;
+  double cof[6] = {76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5};
   y = x = t;
   tmp = x + 5.5 - (x + 0.5) * log(x + 5.5);
   ser = 1.000000000190015;
@@ -52,7 +52,7 @@ inline Double LnGamma(Double t) {
 /**
  * LnFactorial
  */
-inline Double LnFactorial(Double t) {
+inline double LnFactorial(double t) {
   return niwa::utilities::math::LnGamma(t + 1.0);
 }
 /*
@@ -62,8 +62,8 @@ inline Double LnFactorial(Double t) {
 /**
  * dnorm: return the pdf for the normal
  */
-inline Double dnorm(const Double& x, const Double& mu, const Double& sigma) {
-  Double z = 1 / (sigma * sqrt(2 * PI)) * exp(-((x - mu) * (x - mu))/(2 * sigma * sigma));
+inline double dnorm(const double& x, const double& mu, const double& sigma) {
+  double z = 1 / (sigma * sqrt(2 * PI)) * exp(-((x - mu) * (x - mu))/(2 * sigma * sigma));
   return(z);
 }
 
@@ -73,7 +73,7 @@ inline Double dnorm(const Double& x, const Double& mu, const Double& sigma) {
 /*
  * dlognorm: return the pdf for the log-normal
  */
-inline Double dlognorm(const Double& x, const Double& mu = 0.0, const Double& sigma = 1.0) {
+inline double dlognorm(const double& x, const double& mu = 0.0, const double& sigma = 1.0) {
   // Parameterised by the mean and standard deviation of the (normal) distribution
   //  of log(x), NOT by those of the (lognormal) distribution of x.
   if (x <= 0)
@@ -85,13 +85,13 @@ inline Double dlognorm(const Double& x, const Double& mu = 0.0, const Double& si
 /**
  * pnorm: return the cdf for the normal
  */
-inline Double pnorm(const Double& x, const Double& mu = 0.0, const Double& sigma = 1.0) {
+inline double pnorm(const double& x, const double& mu = 0.0, const double& sigma = 1.0) {
   // Abramowitz & Stegun eqn 26.2.18
   // Equations: z = fabs((x-mu)/sigma);
   //            p = 1-0.5*pow((1+0.196854*z+0.115194*z*z+0.000344*z*z*z+0.019527*z*z*z*z),-4);
   //            if (x<mu) p=1-p;
-  Double z = fabs((x - mu)/sigma);
-  Double p = 1 - 0.5*pow((1+0.196854*z+0.115194*z*z+0.000344*z*z*z+0.019527*z*z*z*z),-4);
+  double z = fabs((x - mu)/sigma);
+  double p = 1 - 0.5*pow((1+0.196854*z+0.115194*z*z+0.000344*z*z*z+0.019527*z*z*z*z),-4);
   if (x < mu)
     p = 1 - p;
   return(p);
@@ -100,11 +100,11 @@ inline Double pnorm(const Double& x, const Double& mu = 0.0, const Double& sigma
 /**
  * pnorm2: return the cdf for the normal that may be more expensive (computationally) but is a better approximation.
  */
-inline Double pnorm2(const Double& x, const Double& mu = 0.0, const Double& sigma = 1.0) {
+inline double pnorm2(const double& x, const double& mu = 0.0, const double& sigma = 1.0) {
   // Ian Doonan's code, A better approximation of the normal CDF as there is no closed form
-  Double norm, ttt, p;
-  Double z = fabs((x - mu)/sigma);
-  Double tt = 1.0 / (1.0 + 0.2316419 * z);
+  double norm, ttt, p;
+  double z = fabs((x - mu)/sigma);
+  double tt = 1.0 / (1.0 + 0.2316419 * z);
   norm = 1.0 / sqrt(2.0 * PI) * exp(-0.5 * z * z);
   ttt = tt;
   p = 0.319381530 * ttt;
@@ -125,7 +125,7 @@ inline Double pnorm2(const Double& x, const Double& mu = 0.0, const Double& sigm
 /**
  * plnorm: return the cdf for the normal
  */
-inline Double plognorm(const Double& x, const Double& mu, const Double& sigma) {
+inline double plognorm(const double& x, const double& mu, const double& sigma) {
   // Parameterised by the mean and standard deviation of the (normal) distribution
   //  of log(x), NOT by those of the (lognormal) distribution of x.
   if (x <= 0)
@@ -144,11 +144,11 @@ inline Double plognorm(const Double& x, const Double& mu, const Double& sigma) {
 //
 // We use an approximation: P(X is more than 5 std.devs away from its mean) = 0.
 //  Almost true for the normal distribution, but may be problematic if you use something more skewed.
-inline vector<Double> distribution(const vector<Double>& class_mins, int plus_group = 0, string dist = "normal", const Double& mean = 0.0, const Double& stdev = 1.0) {
+inline vector<double> distribution(const vector<double>& class_mins, int plus_group = 0, string dist = "normal", const double& mean = 0.0, const double& stdev = 1.0) {
   int n_bins = class_mins.size() - (plus_group ? 0 : 1);
-  vector<Double> result(n_bins, 0.0);
-  Double so_far;
-  Double mu, sigma;
+  vector<double> result(n_bins, 0.0);
+  double so_far;
+  double mu, sigma;
   if (dist == PARAM_LOGNORMAL){
     sigma = sqrt(log(1+pow(stdev/mean,2)));
     mu = log(mean) - sigma*sigma/2;
@@ -212,7 +212,7 @@ inline vector<Double> distribution(const vector<Double>& class_mins, int plus_gr
 // void Engine::condassign( double &res, const double &cond, const double &arg1, const double &arg2 ) {
 // Conditional Assignment
 //**********************************************************************
-inline void cond_assign(Double &res, const Double &cond, const Double &arg1, const Double &arg2) {
+inline void cond_assign(double &res, const double &cond, const double &arg1, const double &arg2) {
   res = (cond) > 0 ? arg1 : arg2;
 }
 
@@ -220,7 +220,7 @@ inline void cond_assign(Double &res, const Double &cond, const Double &arg1, con
 // void Engine::condassign( double &res, const double &cond, const double &arg)
 // Conditional Assignment
 //**********************************************************************
-inline void cond_assign(Double &res, const Double &cond, const Double &arg) {
+inline void cond_assign(double &res, const double &cond, const double &arg) {
   res = (cond) > 0 ? arg : res;
 }
 
@@ -229,7 +229,7 @@ inline void cond_assign(Double &res, const Double &cond, const Double &arg) {
  * Boundary Pin
  */
 
-inline Double scale_value(Double value, Double min, Double max) {
+inline double scale_value(double value, double min, double max) {
   if (dc::IsEqual(value, min))
     return -1;
   else if (dc::IsEqual(value, max))
@@ -241,11 +241,11 @@ inline Double scale_value(Double value, Double min, Double max) {
 /**
  *
  */
-inline Double unscale_value(const Double& value, Double& penalty, Double min, Double max) {
+inline double unscale_value(const double& value, double& penalty, double min, double max) {
   // courtesy of AUTODIF - modified to correct error -
   // penalty on values outside [-1,1] multiplied by 100 as of 14/1/02.
-  Double t = 0.0;
-  Double y = 0.0;
+  double t = 0.0;
+  double y = 0.0;
 
   t = min + (max - min) * (sin(value * 1.57079633) + 1) / 2;
   cond_assign(y, -.9999 - value, (value + .9999) * (value + .9999), 0);
@@ -264,67 +264,84 @@ inline Double unscale_value(const Double& value, Double& penalty, Double min, Do
 //**********************************************************************
 //    General math utilities
 //**********************************************************************
+
+// Check if a vecotr contains all ones
+inline bool all_ones(const vector<double>& x) {
+  for(auto num : x) {
+    if (num != 1.0)
+      return false;
+  }
+  return true;
+}
+
 // Return the mean for a vector
-inline Double mean(const vector<Double>& Values){
-  Double mu = 0.0;
-  Double total = 0.0;
+inline double mean(const vector<double>& Values){
+  double mu = 0.0;
+  double total = 0.0;
   for (const auto& value : Values)
     total += value;
-  Double n = AS_DOUBLE(Values.size();
-  mu = total / n);
+  double n = Values.size();
+  mu = total / n;
   return mu;
 }
 
 // Return the mean for an unsigned map
-inline Double mean(const map<unsigned, Double>& Values){
-  Double mu = 0.0;
-  Double total = 0.0;
+inline double mean(const map<unsigned, double>& Values){
+  double mu = 0.0;
+  double total = 0.0;
   for (const auto& value : Values)
     total += value.second;
-  Double n = Values.size();
+  double n = Values.size();
   mu = total / n;
   return mu;
 }
 
 // Return the Variance for a vector
-inline Double Var(const vector<Double>& Values){
-  Double mean_ = math::mean(Values);
-  Double variance = 0;
+inline double Var(const vector<double>& Values){
+  double mean_ = math::mean(Values);
+  double variance = 0;
   for (const auto& value : Values)
     variance += (value - mean_) * (value - mean_);
-  Double n = Values.size();
-  Double var = variance / (n - 1.0);
+  double n = Values.size();
+  double var = variance / (n - 1.0);
   return var;
 }
 
 // Return the Variance for an unsigned map
-inline Double Var(const map<unsigned, Double>& Values){
-  Double mean_ = math::mean(Values);
-  Double variance = 0;
+inline double Var(const map<unsigned, double>& Values){
+  double mean_ = math::mean(Values);
+  double variance = 0;
   for (const auto& value : Values)
     variance += (value.second - mean_) * (value.second - mean_);
-  Double n = Values.size();
-  Double var = variance / (n - 1.0);
+  double n = Values.size();
+  double var = variance / (n - 1.0);
   return var;
 }
 
 // Return the Standard Deviation for a vector
-inline Double std_dev(const vector<Double>& Values){
-  Double sd;
+inline double std_dev(const vector<double>& Values){
+  double sd;
   sd = sqrt(math::Var(Values));
   return sd;
 }
 
 // Return the Standard Deviation for an unsigned map
-inline Double std_dev(const map<unsigned, Double>& Values){
-  Double sd;
+inline double std_dev(const map<unsigned, double>& Values){
+  double sd;
   sd = sqrt(math::Var(Values));
   return sd;
 }
 
+// Return the Sum of a vector
+inline double Sum(const vector<double>& Values){
+  double total = 0;
+  for (auto val : Values)
+    total += val;
+  return total;
+}
 // Return the maximum value for a vector
-inline Double Max(const vector<Double>& Values){
-  Double max = 0.0;
+inline double Max(const vector<double>& Values){
+  double max = 0.0;
   unsigned iter = 1;
   for (auto value : Values) {
     if (iter == 1)
@@ -334,6 +351,30 @@ inline Double Max(const vector<Double>& Values){
    ++iter;
   }
   return max;
+}
+
+
+// Return the row index and column index of a matrix given an index. This follows R functionality.
+// Assumes the index follows byrow = T.
+inline vector<int> get_mat_index(int rows, int cols, double index) {
+  //unsigned  row_index, col_index;
+  vector<int> result;
+  int row_ind= floor(index / rows);
+  int col_index = index - (row_ind * cols);
+  result.push_back(row_ind);
+  result.push_back(col_index);
+  return result;
+}
+
+// Calculate the Sum of a vector
+inline vector<double> elem_prod(vector<double>& x,vector<double>& y) {
+  if(x.size() != y.size())
+    LOG_FATAL() << "method  elem_prod() can only work for equal length vectors";
+  vector<double> result(y.size(),0.0);
+    for (unsigned i = 0; i< x.size(); ++i) {
+      result[i] = x[i] * y[i];
+    }
+    return result;
 }
 
 } /* namespace math */

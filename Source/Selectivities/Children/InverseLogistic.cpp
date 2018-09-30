@@ -69,7 +69,9 @@ void InverseLogistic::RebuildCache() {
       float temp = (float)age;
       threshold = (float)(a50_ - temp) / ato95_;
 
-      if (threshold > 5.0)
+      if (not include_zero_age_values_ & (age == 0)) {
+        values_[age - min_index_] = 0;
+      } else if (threshold > 5.0)
         values_[age - min_index_] = alpha_;
       else if (threshold < -5.0)
         values_[age - min_index_] = 0.0;

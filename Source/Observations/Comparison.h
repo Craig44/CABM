@@ -27,6 +27,7 @@ using utilities::Double;
 
 struct Comparison {
   unsigned  age_ = 0;
+  unsigned  sex_ = 0;
   float    length_ = 0;
   float    expected_ = 0;
   float    simulated_ = 0;

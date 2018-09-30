@@ -127,11 +127,11 @@ void Iterative::Execute() {
     total_b0 += iter.second;
   }
 
-  LOG_FINEST() << "total b0 = " << total_b0 << " number = " << number << " number of agents = " << number_agents_;
+  LOG_FINE() << "total b0 = " << total_b0 << " number = " << number << " number of agents = " << number_agents_;
 
   for (auto iter : model_->get_b0s()) {
     unsigned value = (unsigned)(number_agents_ / number * iter.second / total_b0);
-    LOG_FINEST() << "setting R0 for " << iter.first << " = " << value;
+    LOG_FINE() << "setting R0 for " << iter.first << " = " << value;
     model_->set_r0(iter.first, value);
   }
 
@@ -163,7 +163,7 @@ void Iterative::Execute() {
   unsigned init_year = model_->start_year() - years_ - 1;
   model_->set_current_year_in_initialisation(init_year);
 
-  LOG_FINEST() << "check seed = " << seed_z;
+  LOG_FINE() << "check seed = " << seed_z;
   // Seed some individuals in the world
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
@@ -193,7 +193,7 @@ void Iterative::Execute() {
     b0 += iter.second;
     ssb += model_->get_ssb(iter.first);
     scalar = iter.second / model_->get_ssb(iter.first);
-    LOG_FINEST() << "stock = " << iter.first << " b0 = " <<  iter.second << " ssb = " << model_->get_ssb(iter.first) << " scalar = " << scalar;
+    LOG_FINE() << "stock = " << iter.first << " b0 = " <<  iter.second << " ssb = " << model_->get_ssb(iter.first) << " scalar = " << scalar;
     model_->set_scalar(iter.first, scalar);
   }
   scalar = b0 / ssb;
@@ -201,7 +201,7 @@ void Iterative::Execute() {
   if (scalar < 1.0) {
     LOG_WARNING() << "the scalar that compares your individual numbers to population numbers is less than 1.0 (" << scalar << "), this means that given your growth model and number of individuals you are modelling more individuals than could/should exist. I think you could get away with modelling less individuals.";
   }
-  LOG_FINEST() << "scalar = " << scalar << " SSB = " << ssb << " B0 = " << b0;
+  LOG_FINE() << "scalar = " << scalar << " SSB = " << ssb << " B0 = " << b0;
 
 
   // Set scalar before continuing on

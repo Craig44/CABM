@@ -30,28 +30,15 @@ using std::string;
 struct RunParameters {
   RunMode::Type run_mode_ = RunMode::kInvalid;
   string        config_file_ = "config.ibm";
-  bool          resume_mcmc_chain_ = false;
-  string        mcmc_objective_file_ = "";
-  string        mcmc_sample_file_ = "";
-  unsigned      estimation_phases_ = 1;
-  string        estimable_value_input_file_ = "";
-  bool          force_estimables_as_named_ = false;
+  string        addressable_value_input_file_ = "";
   unsigned      random_number_seed_ = 123u;
-  string        query_object_ = "";
   bool          debug_mode_ = false;
   bool          no_std_report_ = false;
   string        log_level_ = "warning";
   string        output_ = "";
-  bool          single_step_model_ = false;
-  bool          tabular_reports_ = false;
   unsigned      simulation_candidates_ = 1u;
-  unsigned      projection_candidates_ = 1u;
-
   bool          override_random_number_seed_ = false;
   unsigned      override_rng_seed_value_ = 123u;
-
-  string        minimiser_ = "";
-  bool          create_mpd_file_ = true;
 };
 
 } /* namespace niwa */

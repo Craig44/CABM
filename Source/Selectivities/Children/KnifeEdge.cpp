@@ -47,7 +47,9 @@ void KnifeEdge::RebuildCache() {
   if (not length_based_) {
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
       float temp = age * 1.0;
-      if (temp >= edge_)
+      if (not include_zero_age_values_ & (age == 0)) {
+        values_[age - min_index_] = 0;
+      } else if (temp >= edge_)
         values_[age - min_index_] = alpha_;
       else
         values_[age - min_index_] = 0.0;

@@ -13,6 +13,7 @@
 #include "Managers.h"
 
 #include "Model/Model.h"
+#include "Addressables/Addressables.h"
 #include "AgeingErrors/Manager.h"
 #include "Asserts/Manager.h"
 #include "DerivedQuantities/Manager.h"
@@ -39,6 +40,7 @@ Managers::Managers(Model* model) {
 
   model_ = model;
 
+  addressables_           = new Addressables(model_);
   minimiser_              = new minimisers::Manager();
   ageing_error_           = new ageingerrors::Manager();
   assert_                 = new asserts::Manager();
@@ -61,6 +63,7 @@ Managers::Managers(Model* model) {
  */
 Managers::~Managers() {
   delete ageing_error_;
+  delete addressables_;
   delete assert_;
   delete derived_quantity_;
   delete initialisation_phase_;

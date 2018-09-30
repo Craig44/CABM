@@ -52,7 +52,7 @@ public:
   virtual                     ~WorldView();
   void                        Validate();
   void                        Build();
-  void                        Reset() {};
+  void                        Reset();
 
   // Accessors
   float                      get_abundance(void) {return 1.0; };

@@ -54,6 +54,17 @@ void WorldView::Validate() {
 }
 
 // Build Method
+void WorldView::Reset() {
+  LOG_FINE() << "resetting world, clearing all world cells of agents, but keeping all the structure the same.";
+  for (unsigned i = 0; i < height_; ++i) {
+    for (unsigned j = 0; j < width_; ++j) {
+      if (base_grid_[i][j].is_enabled()) {
+        base_grid_[i][j].agents_.clear();
+      }
+    }
+  }
+}
+// Build Method
 void WorldView::Build() {
   LOG_TRACE();
   base_layer_ = model_->managers().layer()->GetNumericLayer(model_->get_base_layer_label());

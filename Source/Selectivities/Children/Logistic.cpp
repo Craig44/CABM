@@ -68,7 +68,9 @@ void Logistic::RebuildCache() {
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
       threshold = (a50_ - (float)age) / ato95_;
 
-      if (threshold > 5.0)
+      if (not include_zero_age_values_ & (age == 0)) {
+        values_[age - min_index_] = 0;
+      } else if (threshold > 5.0)
         values_[age - min_index_] = 0.0;
       else if (threshold < -5.0)
         values_[age - min_index_] = alpha_;

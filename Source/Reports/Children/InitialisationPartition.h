@@ -30,6 +30,7 @@ public:
   virtual                     ~InitialisationPartition() = default;
   void                        DoValidate() override final { };
   void                        DoBuild() override final;
+  void                        DoReset() override final {call_number_ = true;};
   void                        DoExecute() override final;
 
 

@@ -51,7 +51,7 @@ public:
   void                        Validate();
   void                        Build();
   void                        Prepare();
-  void                        Reset() {};
+  void                        Reset() {DoReset();};
   void                        Execute();
   void                        Finalise();
   bool                        HasYear(unsigned year);
@@ -73,6 +73,7 @@ protected:
   virtual void                DoPrepare() { };
   virtual void                DoExecute() = 0;
   virtual void                DoFinalise() { };
+  virtual void                DoReset() { };
 
   // Members
   Model*                      model_;

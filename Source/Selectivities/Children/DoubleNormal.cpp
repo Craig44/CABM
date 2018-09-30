@@ -69,7 +69,9 @@ void DoubleNormal::RebuildCache() {
   if (not length_based_) {
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
       float temp = (float)age;
-      if (temp < mu_)
+      if (not include_zero_age_values_ & (age == 0)) {
+        values_[age - min_index_] = 0;
+      } else if (temp < mu_)
         values_[age - min_index_] = pow(2.0, -((temp - mu_) / sigma_l_ * (temp - mu_) / sigma_l_)) * alpha_;
       else
         values_[age - min_index_] = pow(2.0, -((temp - mu_) / sigma_r_ * (temp - mu_) / sigma_r_)) * alpha_;

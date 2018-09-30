@@ -147,7 +147,6 @@ void MortalityConstantRate::DoBuild() {
 
 }
 
-
 /**
  * DoExecute
  */
@@ -250,11 +249,10 @@ void  MortalityConstantRate::draw_rate_param(unsigned row, unsigned col, unsigne
 
   //LOG_FINEST() << "mean M = " << mean_m;
   for (unsigned i = 0; i < number_of_draws; ++i) {
-    float value = rng.lognormal(mean_m, cv_);
+    float value = rng.normal(mean_m, cv_ * mean_m);
     //LOG_FINEST() << "value of M = " << value;
     vector[i] = value;
   }
-
 }
 
 // FillReportCache, called in the report class, it will print out additional information that is stored in

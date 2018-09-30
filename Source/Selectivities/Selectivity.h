@@ -33,8 +33,9 @@ public:
   void                        Validate();
   virtual void                Build() { RebuildCache(); };
   void                        Reset();
-  virtual float               GetResult(unsigned age_or_length);
+  virtual float               GetResult(unsigned age_or_length); // TODO currently its actual age but length index, a bit confusing
   bool                        is_length_based() {return length_based_;}
+  bool                        include_zero_age_values_;
 
 protected:
   // pure methods

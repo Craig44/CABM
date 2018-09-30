@@ -63,11 +63,11 @@ protected:
   string                      type_ = "";
   vector<unsigned>            years_;
   string                      parameter_;
-  float                      original_value_ = 0;
-  map<unsigned, float>*      addressable_map_ = 0;
-  vector<float>*             addressable_vector_ = 0;
-  float*                     addressable_ = 0;
-  map<unsigned, float>       parameter_by_year_;
+  float                       original_value_ = 0;
+  map<unsigned, float>*       addressable_map_ = 0;
+  vector<float>*              addressable_vector_ = 0;
+  float*                      addressable_ = 0;
+  map<unsigned, float>        parameter_by_year_;
 };
 
 typedef std::shared_ptr<TimeVarying> TimeVaryingPtr;
