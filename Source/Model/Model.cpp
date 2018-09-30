@@ -442,7 +442,8 @@ void Model::RunBasic() {
       for (auto executor : executors_[State::kExecute])
         executor->Execute();
        */
-      managers_->report()->PrintObservations();
+      if (s != (simulation_candidates - 1)) // Only need to execute this s - 1 times as the last run will be done at line 451
+        managers_->report()->PrintObservations();
 
     }
     // Model has finished so we can run finalise.

@@ -62,7 +62,7 @@ void Manager::Build() {
 void Manager::PrintObservations() {
   LOG_FINE();
   for (auto report : objects_) {
-    if (report->type() == PARAM_OBSERVATION) {
+    if (report->type() == PARAM_OBSERVATION || report->type() == PARAM_SIMULATED_OBSERVATION) {
       LOG_FINE() << "executing observation report " << report->label();
       report->Execute();
     }

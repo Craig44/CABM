@@ -67,6 +67,7 @@ protected:
   vector<string>                cells_;
   layers::CategoricalLayer*     layer_ = nullptr;
   string                        layer_label_;
+  bool                          first_simualtion_run_ = true;
 
 
 };

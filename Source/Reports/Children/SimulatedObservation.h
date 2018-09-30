@@ -32,11 +32,11 @@ public:
   void                        DoValidate() override final { };
   void                        DoBuild() override final;
   void                        DoExecute() override final;
-  void                        DoExecuteTabular() override final { };
 
 private:
   // members
   string                      observation_label_;
+  vector<string>              cells_;
   Observation*                observation_;
 };
 

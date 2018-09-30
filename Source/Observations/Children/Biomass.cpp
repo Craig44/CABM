@@ -268,6 +268,17 @@ void Biomass::Execute() {
         }
       }
     }
+    for (auto& second_iter : obs_values_by_year_[year]) {
+      if (utilities::doublecompare::IsZero(time_step_proportion_)) {
+        SaveComparison(0, 0, second_iter.first, pre_obs_values_by_year_[year][second_iter.first], 0.0, error_values_by_year_[year], year);
+      } else if (utilities::doublecompare::IsOne(time_step_proportion_)) {
+        SaveComparison(0, 0, second_iter.first, obs_values_by_year_[year][second_iter.first], 0.0, error_values_by_year_[year], year);
+      } else {
+        float value = 0.0;
+        value = pre_obs_values_by_year_[year][second_iter.first] + ((obs_values_by_year_[year][second_iter.first] - pre_obs_values_by_year_[year][second_iter.first]) * time_step_proportion_);
+        SaveComparison(0, 0, second_iter.first, value, 0.0, error_values_by_year_[year], year);
+      }
+    }
   }
 }
 
@@ -279,20 +290,6 @@ void Biomass::Simulate() {
    * Simulate or generate results
    * During simulation mode we'll simulate results for this observation
    */
-  for (auto& iter : obs_values_by_year_) {
-    LOG_FINE() << "number of years " << obs_values_by_year_.size() << " number of cells = " << iter.second.size();;
-    for (auto& second_iter : iter.second) {
-      if (utilities::doublecompare::IsZero(time_step_proportion_)) {
-        SaveComparison(0, 0, second_iter.first, pre_obs_values_by_year_[iter.first][second_iter.first], 0.0, error_values_by_year_[iter.first], iter.first);
-      } else if (utilities::doublecompare::IsOne(time_step_proportion_)) {
-        SaveComparison(0, 0, second_iter.first, obs_values_by_year_[iter.first][second_iter.first], 0.0, error_values_by_year_[iter.first], iter.first);
-      } else {
-        float value = 0.0;
-        value = pre_obs_values_by_year_[iter.first][second_iter.first] + ((obs_values_by_year_[iter.first][second_iter.first] - pre_obs_values_by_year_[iter.first][second_iter.first]) * time_step_proportion_);
-        SaveComparison(0, 0, second_iter.first, value, 0.0, error_values_by_year_[iter.first], iter.first);
-      }
-    }
-  }
 	LOG_FINEST() << "Calculating score for observation = " << label_;
   likelihood_->SimulateObserved(comparisons_);
 }

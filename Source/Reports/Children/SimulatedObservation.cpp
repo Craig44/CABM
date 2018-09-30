@@ -22,11 +22,13 @@ namespace reports {
  * default constructor
  */
 SimulatedObservation::SimulatedObservation(Model* model) : Report(model) {
-  run_mode_    = RunMode::kSimulation;
+  run_mode_    = (RunMode::Type)(RunMode::kBasic);
   model_state_ = State::kIterationComplete;
   skip_tags_   = true;
 
   parameters_.Bind<string>(PARAM_OBSERVATION, &observation_label_, "Observation label", "");
+  parameters_.Bind<string>(PARAM_CELLS, &cells_, "Cells to aggregate the observaton over.", "", true);
+
 }
 
 /**
@@ -42,21 +44,24 @@ void SimulatedObservation::DoBuild() {
  * execute method
  */
 void SimulatedObservation::DoExecute() {
+  LOG_FINE() << "generate simulated style report";
   cache_ << CONFIG_SECTION_SYMBOL << PARAM_OBSERVATION << " " << label_ << "\n";
+  map<unsigned,map<string,vector<obs::Comparison> > >& comparisons = observation_->comparisons();
+
   bool biomass_abundance_obs = false;
   ParameterList& parameter_list = observation_->parameters();
   const map<string, Parameter*>& parameters = parameter_list.parameters();
   for (auto iter = parameters.begin(); iter != parameters.end(); ++iter) {
-    if (iter->first == PARAM_LIKELIHOOD) {
+    if (iter->first == PARAM_SIMULATION_LIKELIHOOD) {
       if (iter->second->values()[0] == PARAM_PSEUDO)
-        cache_ << PARAM_LIKELIHOOD << " " << parameter_list.Get(PARAM_SIMULATED_OBSERVATION)->values()[0] << "\n";
+        cache_ << PARAM_LIKELIHOOD << " " << parameter_list.Get(PARAM_OBSERVATION)->values()[0] << "\n";
       else
         cache_ << PARAM_LIKELIHOOD << " " << iter->second->values()[0] << "\n";
 
       continue;
     }
 
-    if (iter->first == PARAM_OBS || iter->first == PARAM_ERROR_VALUE || iter->first == PARAM_LABEL || iter->first == PARAM_SIMULATION_LIKELIHOOD)
+    if (iter->first == PARAM_OBS || iter->first == PARAM_ERROR_VALUE || iter->first == PARAM_LABEL)
       continue;
 
     if (iter->second->values().size() > 0) {
@@ -73,49 +78,53 @@ void SimulatedObservation::DoExecute() {
       cache_ << "\n";
     }
   }
-
-  map<unsigned, vector<obs::Comparison> >& comparison = observation_->comparisons();
-  // Print Observations
-
   if (biomass_abundance_obs) {
     // biomass obs
     cache_ << PARAM_OBS << " ";
-    for (auto iter = comparison.begin(); iter != comparison.end(); ++iter) {
-      for (obs::Comparison comparison : iter->second)
-        cache_ << comparison.observed_ << " ";
+    for (auto iter = comparisons.begin(); iter != comparisons.end(); ++iter) {
+      for (auto second_iter = iter->second.begin(); second_iter != iter->second.end(); ++second_iter) {
+        for (obs::Comparison comparison : second_iter->second) {
+          cache_ << comparison.simulated_ << " ";
+        }
+      }
     }
     cache_ << "\n";
   } else {
     // proportion at age obs
     cache_ << PARAM_TABLE << " " << PARAM_OBS << "\n";
-    for (auto iter = comparison.begin(); iter != comparison.end(); ++iter) {
+    for (auto iter = comparisons.begin(); iter != comparisons.end(); ++iter) {
       cache_ << iter->first << " ";
-      for (obs::Comparison comparison : iter->second) {
-        cache_ << AS_DOUBLE(comparison.observed_) << " ";
+      for (auto second_iter = iter->second.begin(); second_iter != iter->second.end(); ++second_iter) {
+        for (obs::Comparison comparison : second_iter->second) {
+          cache_ << comparison.simulated_  << " ";
+        }
       }
       cache_ << "\n";
     }
     cache_ << PARAM_END_TABLE << "\n";
   }
-
-
-
   // Print Error values
   if (biomass_abundance_obs) {
     // biomass error
     cache_ << PARAM_ERROR_VALUE << " ";
-    for (auto iter = comparison.begin(); iter != comparison.end(); ++iter) {
-      for (obs::Comparison comparison : iter->second)
-        cache_ << comparison.error_value_ << " ";
+    for (auto iter = comparisons.begin(); iter != comparisons.end(); ++iter) {
+      cache_ << " ";
+      for (auto second_iter = iter->second.begin(); second_iter != iter->second.end(); ++second_iter) {
+        for (obs::Comparison comparison : second_iter->second) {
+          cache_ << comparison.error_value_ << " ";
+        }
+      }
     }
     cache_ << "\n";
   } else {
     // proportion at age obs
     cache_ << PARAM_TABLE << " " << PARAM_ERROR_VALUES << "\n";
-    for (auto iter = comparison.begin(); iter != comparison.end(); ++iter) {
+    for (auto iter = comparisons.begin(); iter != comparisons.end(); ++iter) {
       cache_ << iter->first << " ";
-      for (obs::Comparison comparison : iter->second) {
-        cache_ << AS_DOUBLE(comparison.error_value_) << " ";
+      for (auto second_iter = iter->second.begin(); second_iter != iter->second.end(); ++second_iter) {
+        for (obs::Comparison comparison : second_iter->second) {
+          cache_ << comparison.error_value_ << " ";
+        }
       }
       cache_ << "\n";
     }
@@ -123,6 +132,8 @@ void SimulatedObservation::DoExecute() {
   }
   cache_ << "\n";
   ready_for_writing_ = true;
+
+
 }
 
 } /* namespace reports */
