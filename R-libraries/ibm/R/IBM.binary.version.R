@@ -1,4 +1,4 @@
 "IBM.binary.version"<-
 function() {
-return("2018-09-27 04:28:11 UTC (rev. e164f29)")
+return("2018-09-30 11:05:30 UTC (rev. ab4252c)")
 }
