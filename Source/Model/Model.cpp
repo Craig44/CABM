@@ -388,15 +388,19 @@ void Model::RunBasic() {
    */
   Addressables& addressables = *managers_->addressables();
   LOG_FINE() << "Multi line value = " << adressable_values_count_;
+
+  int simulation_candidates = global_configuration_->simulation_candidates();
+  if (simulation_candidates < 1) {
+    LOG_FATAL() << "The number of simulations specified at the command line parser must be at least one";
+  }
+  unsigned suffix_width = (unsigned)floor(log10((double) (simulation_candidates) * (adressable_values_count_))) + 1;
+  LOG_FINE() << "suffix width = " << suffix_width << " value = " << (simulation_candidates) * (adressable_values_count_);
+
   for (unsigned i = 0; i < adressable_values_count_; ++i) {
     if (addressable_values_file_) {
       addressables.LoadValues(i);
        Reset();
      }
-    int simulation_candidates = global_configuration_->simulation_candidates();
-    if (simulation_candidates < 1) {
-      LOG_FATAL() << "The number of simulations specified at the command line parser must be at least one";
-  }
     /**
      * Running the model now
      */
@@ -426,14 +430,14 @@ void Model::RunBasic() {
       time_step_manager.Execute(current_year_);
       LOG_FINE() << "finished year exectution";
     }
-    unsigned suffix_width = (unsigned)floor(log10((double) simulation_candidates + 1)) + 1;
     for (int s = 0; s < simulation_candidates; ++s) {
       string report_suffix = ".";
-      unsigned iteration_width = (unsigned)floor(log10(s + 1 * (i + 1))) + 1;
+      unsigned iteration_width = (unsigned)floor(log10((s + 1) + (i * adressable_values_count_))) + 1;
 
       unsigned diff = suffix_width - iteration_width;
       report_suffix.append(diff,'0');
-      report_suffix.append(utilities::ToInline<unsigned, string>(s + 1 * (i + 1)));
+      report_suffix.append(utilities::ToInline<unsigned, string>((s + 1) + (i * adressable_values_count_)));
+      LOG_FINE() << "i = " << i + 1 << " s = " << s + 1 <<  " suffix = " << report_suffix << " what i think it should be doing " << (s + 1) + (i * adressable_values_count_);
       managers_->report()->set_report_suffix(report_suffix);
 
       managers_->observation()->SimulateData();

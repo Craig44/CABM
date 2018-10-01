@@ -31,6 +31,7 @@ namespace processes {
 Tagging::Tagging(Model* model) : Process(model) {
   parameters_.Bind<string>(PARAM_TAGGING_LAYERS, &tag_layer_label_, "Spatial layer describing catch by cell for each year, there is a one to one link with the year specified, so make sure the order is right", "", true);
   parameters_.Bind<string>(PARAM_SELECTIVITIES, &selectivity_labels_, "selectivity used to capture agents", "");
+  parameters_.Bind<float>(PARAM_HANDLING_MORTALITY, &handling_mortality_, "What is the handling mortality assumed for tagged fish, sometimes called initial mortality", "", 0);
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "Years to execute the transition in", "");
   process_type_ = ProcessType::kTransition;
 }
@@ -78,6 +79,7 @@ void Tagging::DoBuild() {
   cell_offset_.resize(model_->get_height());
   model_length_bins_.resize(model_->get_height());
   model_age_bins_.resize(model_->get_height());
+  handling_mort_by_space_.resize(model_->get_height());
   current_year_by_space_.resize(model_->get_height());
   for (unsigned i = 0; i < model_->get_height(); ++i) {
     cell_offset_[i].resize(model_->get_width());
@@ -85,6 +87,7 @@ void Tagging::DoBuild() {
     model_length_bins_[i].resize(model_->get_width(), model_->length_bins().size());
     model_age_bins_[i].resize(model_->get_width(), model_->age_spread());
     current_year_by_space_[i].resize(model_->get_width());
+    handling_mort_by_space_[i].resize(model_->get_width(), handling_mortality_);
   }
   if (selectivity_length_based_) {
     for (unsigned i = 0; i < model_->get_height(); ++i) {
@@ -136,6 +139,7 @@ void Tagging::DoExecute() {
     for (unsigned i = 0; i <= n_agents_; ++i) {
       random_numbers_[i] = rng.chance();
       selectivity_random_numbers_[i] = rng.chance();
+      handling_mortality_random_numbers_[i] = rng.chance();
     }
     LOG_FINE() << "about to apply tagging";
     if (not selectivity_length_based_) {
@@ -178,7 +182,13 @@ void Tagging::DoExecute() {
                   age_freq[this_agent.get_age_index()]++;
                   length_freq[this_agent.get_length_bin_index()]++;
                   tags_to_release--;
-                  // find a slot to add this tagged agent back in
+
+                  // Lets see if it survives handling
+                  if (handling_mortality_random_numbers_[cell_offset_[row][col] + counter] <= handling_mort_by_space_[row][col]) {
+                    // It died we will never see this or know about this tagged fish so I am just going to skip the rest of the algorithm
+                    continue;
+                  }
+                  // Agent is tagged and survived the process find a slot to add this tagged agent back in
                   while(tag_slot < cell->agents_.size()) {
                     if (not cell->agents_[tag_slot].is_alive()) {
                       cell->agents_[tag_slot] = tagged_agent;

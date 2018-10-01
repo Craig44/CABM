@@ -37,7 +37,7 @@ namespace utils = niwa::utilities;
  * Default constructor
  */
 Biomass::Biomass(Model* model) : Observation(model) {
-  //parameters_.Bind<string>(PARAM_CATCHABILITY, &catchability_label_, "The Catchability to use to scale the observation for vulnerability", ""); // TODO not sure if neccessary
+  parameters_.Bind<float>(PARAM_CATCHABILITY, &catchability_value_, "The Catchability multiplier", ""); // TODO not sure if neccessary
   parameters_.Bind<string>(PARAM_TIME_STEP, &time_step_label_, "The label of time-step that the observation occurs in", "");
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "The years of the observed values", "");
   parameters_.Bind<float>(PARAM_ERROR_VALUE, &error_values_, "The error values of the observed values (note the units depend on the likelihood)", "");
@@ -45,6 +45,8 @@ Biomass::Biomass(Model* model) : Observation(model) {
   parameters_.Bind<float>(PARAM_PROPORTION_TRHOUGH_MORTALITY, &time_step_proportion_, "Proportion through the mortality block of the time step to infer observation with", "", float(0.5))->set_range(0.0, 1.0);
   parameters_.Bind<string>(PARAM_LAYER_OF_CELLS, &layer_label_, "The layer that indicates what area to summarise observations over.", "");
   parameters_.Bind<string>(PARAM_CELLS, &cells_, "The cells we want to generate observations for from the layer of cells supplied", "");
+
+  RegisterAsAddressable(PARAM_CATCHABILITY, &catchability_value_);
 
   allowed_likelihood_types_.push_back(PARAM_NORMAL);
   allowed_likelihood_types_.push_back(PARAM_LOGNORMAL);
@@ -270,13 +272,13 @@ void Biomass::Execute() {
     }
     for (auto& second_iter : obs_values_by_year_[year]) {
       if (utilities::doublecompare::IsZero(time_step_proportion_)) {
-        SaveComparison(0, 0, second_iter.first, pre_obs_values_by_year_[year][second_iter.first], 0.0, error_values_by_year_[year], year);
+        SaveComparison(0, 0, second_iter.first, pre_obs_values_by_year_[year][second_iter.first] * catchability_value_, 0.0, error_values_by_year_[year], year);
       } else if (utilities::doublecompare::IsOne(time_step_proportion_)) {
-        SaveComparison(0, 0, second_iter.first, obs_values_by_year_[year][second_iter.first], 0.0, error_values_by_year_[year], year);
+        SaveComparison(0, 0, second_iter.first, obs_values_by_year_[year][second_iter.first] * catchability_value_, 0.0, error_values_by_year_[year], year);
       } else {
         float value = 0.0;
         value = pre_obs_values_by_year_[year][second_iter.first] + ((obs_values_by_year_[year][second_iter.first] - pre_obs_values_by_year_[year][second_iter.first]) * time_step_proportion_);
-        SaveComparison(0, 0, second_iter.first, value, 0.0, error_values_by_year_[year], year);
+        SaveComparison(0, 0, second_iter.first, value * catchability_value_, 0.0, error_values_by_year_[year], year);
       }
     }
   }

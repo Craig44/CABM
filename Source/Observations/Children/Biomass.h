@@ -43,6 +43,7 @@ public:
 protected:
   // members
   vector<unsigned>                years_;
+  float                           catchability_value_;
   map<unsigned, float>           error_values_by_year_;
   map<unsigned,map<string, float>> pre_obs_values_by_year_;
   map<unsigned,map<string, float>> obs_values_by_year_;

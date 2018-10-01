@@ -144,7 +144,6 @@ void MortalityConstantRate::DoBuild() {
       }
     }
   }
-
 }
 
 /**

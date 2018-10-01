@@ -48,6 +48,8 @@ void MortalityEventBiomass::DoValidate() {
   if (years_.size() != catch_layer_label_.size())
     LOG_ERROR_P(PARAM_YEARS) << "you must specify a layer label for each year. You have supplied '" << years_.size() << "' years but '" << catch_layer_label_.size() << "' catch layer labels, please sort this out.";
 
+  if (scanning_proportion_.size() == 1)
+    scanning_proportion_.resize(scanning_years_.size(), scanning_proportion_[0]);
   if (scanning_years_.size() != scanning_proportion_.size()) {
     LOG_ERROR_P(PARAM_SCANNING_YEARS) << "there needs to be a proportion for all years to apply tagging in. You supplied " << scanning_years_.size() << " years but " << scanning_proportion_.size() << " proportions, sort this descrepency out please";
   }
@@ -259,8 +261,8 @@ void MortalityEventBiomass::DoExecute() {
                         // record information
                         catch_taken -= this_agent.get_weight() * this_agent.get_scalar();
                         actual_catch_this_cell += this_agent.get_weight() * this_agent.get_scalar();
-                        age_freq.frequency_[this_agent.get_age_index()]+= this_agent.get_scalar(); // This catch actually represents many individuals.
-                        length_freq.frequency_[this_agent.get_length_bin_index()]+= this_agent.get_scalar();
+                        age_freq.frequency_[this_agent.get_age_index()] += this_agent.get_scalar(); // This catch actually represents many individuals.
+                        length_freq.frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
                         census_fishery.age_.push_back(this_agent.get_age());
                         census_fishery.length_.push_back(this_agent.get_length());
                         census_fishery.scalar_.push_back(this_agent.get_scalar());

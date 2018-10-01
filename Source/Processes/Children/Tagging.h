@@ -46,6 +46,7 @@ protected:
   // objects for thread safety of rng
   vector<float>                       random_numbers_;
   vector<float>                       selectivity_random_numbers_;
+  vector<float>                       handling_mortality_random_numbers_;
   vector<vector<vector<float>>>       cell_offset_for_selectivity_;
 
   unsigned                            n_agents_;
@@ -53,12 +54,13 @@ protected:
   vector<vector<unsigned>>            model_length_bins_;
   vector<vector<unsigned>>            model_age_bins_;
   vector<vector<unsigned>>            current_year_by_space_;
+  vector<vector<unsigned>>            handling_mort_by_space_;
 
   vector<string>                      tag_layer_label_;
   vector<layers::IntLayer*>           tag_layer_;
   vector<unsigned>                    scanning_years_;
   vector<float>                       scanning_proportion_;
-
+  float                               handling_mortality_;
   // Reporting
   map<unsigned,vector<unsigned>>      age_distribution_of_tagged_fish_by_year_;
   map<unsigned,vector<unsigned>>      length_distribution_of_tagged_fish_by_year_;
