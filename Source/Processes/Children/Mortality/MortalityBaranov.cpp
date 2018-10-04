@@ -200,7 +200,7 @@ void MortalityBaranov::DoExecute() {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   unsigned current_year = model_->current_year();
   // Check if we are in initialsiation or in an execute model year that we don't apply F then just apply M.
-  if ((model_->state() == State::kInitialise) || (find(years_.begin(), years_.end(), current_year) != years_.end())) {
+  if ((model_->state() == State::kInitialise) || (find(years_.begin(), years_.end(), current_year) == years_.end())) {
     LOG_FINEST() << "Just applying M";
     if (m_selectivity_length_based_) {
       LOG_FINE() << "M is length based";
@@ -287,6 +287,7 @@ void MortalityBaranov::DoExecute() {
       }
     }
     float total_catch = 0;
+    float actual_catch_taken = 0;
     // There are 4 combos that we will split out M age - F age, M age - F length, M-length F age, M length - F length
     if (m_selectivity_length_based_ & f_selectivity_length_based_) {
       LOG_FINE() << "both M and F are length based";
@@ -348,6 +349,7 @@ void MortalityBaranov::DoExecute() {
               global_age_freq[i] += age_freq.frequency_[i];
             removals_by_length_and_area_.push_back(length_freq);
             removals_by_age_and_area_.push_back(age_freq);
+            actual_catch_taken += catch_by_cell;
             LOG_FINEST() << initial_size << " after mortality";
           }
         }
@@ -411,6 +413,7 @@ void MortalityBaranov::DoExecute() {
               global_age_freq[i] += age_freq.frequency_[i];
             removals_by_length_and_area_.push_back(length_freq);
             removals_by_age_and_area_.push_back(age_freq);
+            actual_catch_taken += catch_by_cell;
             LOG_FINEST() << initial_size << " after mortality";
           }
         }
@@ -474,6 +477,7 @@ void MortalityBaranov::DoExecute() {
               global_age_freq[i] += age_freq.frequency_[i];
             removals_by_length_and_area_.push_back(length_freq);
             removals_by_age_and_area_.push_back(age_freq);
+            actual_catch_taken += catch_by_cell;
             LOG_FINEST() << initial_size << " after mortality";
           }
         }
@@ -494,7 +498,7 @@ void MortalityBaranov::DoExecute() {
             unsigned initial_size = cell->agents_.size();
             LOG_FINEST() << initial_size << " initial agents";
             float f_in_this_cell = f_layer_[year_ndx]->get_value(row, col);
-            LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << f_in_this_cell;
+            LOG_FINE() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << f_in_this_cell;
 
             float f_a = 0;
             float m_a = 0;
@@ -537,12 +541,14 @@ void MortalityBaranov::DoExecute() {
               global_age_freq[i] += age_freq.frequency_[i];
             removals_by_length_and_area_.push_back(length_freq);
             removals_by_age_and_area_.push_back(age_freq);
+            actual_catch_taken += catch_by_cell;
             LOG_FINEST() << initial_size << " after mortality";
           }
         }
       }
     }
-    catch_by_year_[model_->current_year()] = total_catch;
+    actual_removals_by_year_[model_->current_year()] = actual_catch_taken;
+    removals_by_age_[model_->current_year()] = global_age_freq;
   }// M + F
 }
 
@@ -578,9 +584,6 @@ void  MortalityBaranov::FillReportCache(ostringstream& cache) {
   LOG_FINE();
   cache << "biomass_removed: ";
   for (auto& year : actual_removals_by_year_)
-    cache << year.second << " ";
-  cache << "\ncatch_input_removed: ";
-  for (auto& year : removals_by_year_)
     cache << year.second << " ";
   cache << "\n";
 
