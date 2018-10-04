@@ -40,7 +40,7 @@ public:
   void                                draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) override final;
   void                                FillReportCache(ostringstream& cache) override final;
   void                                RebuildCache() override final;
-
+  bool                                check_years(vector<unsigned> years_to_check_);
 protected:
   // F variables
   vector<string>                      f_layer_label_;
@@ -52,6 +52,16 @@ protected:
   float                               mls_;
   bool                                f_selectivity_length_based_ = false;
   map<unsigned,float>                 catch_by_year_;
+  bool                                print_extra_info_ = false;
+  // For reporting
+   map<unsigned, float>                actual_removals_by_year_;
+   map<unsigned, float>                removals_by_year_;
+  // For Tag-recaptures
+  vector<unsigned>                    scanning_years_;
+  vector<float>                       scanning_proportion_;
+  vector<vector<float>>               scanning_prop_year_by_space_;
+  vector<float>                       scanning_random_numbers_;
+
   // M variables
   vector<string>                      natural_mortality_selectivity_label_;
   string                              m_layer_label_;
@@ -61,6 +71,18 @@ protected:
   string                              distribution_;
   bool                                m_selectivity_length_based_ = false;
   float                               m_;
+
+  // Threading variables
+  vector<vector<unsigned>>            cell_offset_;
+  vector<vector<unsigned>>            model_length_bins_;
+  vector<vector<unsigned>>            model_age_bins_;
+  vector<vector<float>>               mls_by_space_;
+  vector<vector<float>>               discard_by_space_;
+  vector<vector<unsigned>>            current_year_by_space_;
+  vector<vector<unsigned>>            current_time_step_by_space_;
+  vector<vector<vector<float>>>       cell_offset_for_selectivity_;
+  unsigned                            n_agents_;
+
 };
 
 } /* namespace processes */

@@ -33,7 +33,10 @@ MortalityBaranov::MortalityBaranov(Model* model) : Mortality(model) {
   parameters_.Bind<string>(PARAM_FISHING_MORTALITY_LAYERS, &f_layer_label_, "Spatial layer describing catch by cell for each year, there is a one to one link with the year specified, so make sure the order is right", "");
   parameters_.Bind<float>(PARAM_MINIMUM_LEGAL_LENGTH, &mls_, "The minimum legal length for this fishery, any individual less than this will be returned using some discard mortality", "", 0);
   parameters_.Bind<float>(PARAM_HANDLING_MORTALITY, &discard_mortality_, "if discarded due to being under the minimum legal length, what is the probability the individual will die when released", "", 0.0);
-  // Sampling of the F process TODO add sampling coverage for observation error
+  parameters_.Bind<bool>(PARAM_PRINT_EXTRA_INFO, &print_extra_info_, "if you have process report for this process you can control the amount of information printed to the file.", "", true);
+  // Tag-recapture inputs
+  parameters_.Bind<unsigned>(PARAM_SCANNING_YEARS, &scanning_years_, "Years to scan for tags in the fishery", "", true);
+  parameters_.Bind<float>(PARAM_SCANNING_PROPROTION, &scanning_proportion_, "The proportion of catch scanned in each year", "", true);
 
   // Tagging information TODO if the fishery release or recaptures tagged fish add this functionality
 
@@ -43,6 +46,7 @@ MortalityBaranov::MortalityBaranov(Model* model) : Mortality(model) {
   parameters_.Bind<string>(PARAM_M_MULTIPLIER_LAYER_LABEL, &m_layer_label_, "Label for the numeric layer that describes a multiplier of M through space", "", ""); // TODO perhaps as a multiplier, 1.2 * 0.2 = 0.24
   parameters_.Bind<bool>(PARAM_UPDATE_MORTALITY_PARAMETERS, &update_natural_mortality_parameters_, "If an agent/individual moves do you want it to take on the natural mortality parameters of the new spatial cell", "");
   parameters_.Bind<string>(PARAM_NATURAL_MORTALITY_SELECTIVITY, &natural_mortality_selectivity_label_, "Selectivity label for the natural mortality process", "");
+  parameters_.Bind<float>(PARAM_M, &m_, "Natural mortality for the model", "");
 
 
 }
@@ -54,6 +58,17 @@ void MortalityBaranov::DoValidate() {
   LOG_TRACE();
   if (years_.size() != f_layer_label_.size())
     LOG_ERROR_P(PARAM_YEARS) << "you must specify a layer label for each year. You have supplied '" << years_.size() << "' years but '" << f_layer_label_.size() << "' fishing mortality labels, please sort this out.";
+
+  if (scanning_proportion_.size() == 1)
+    scanning_proportion_.resize(scanning_years_.size(), scanning_proportion_[0]);
+  if (scanning_years_.size() != scanning_proportion_.size()) {
+    LOG_ERROR_P(PARAM_SCANNING_YEARS) << "there needs to be a proportion for all years to apply tagging in. You supplied " << scanning_years_.size() << " years but " << scanning_proportion_.size() << " proportions, sort this descrepency out please";
+  }
+
+  for (auto& prop : scanning_proportion_) {
+    if (prop < 0.0)
+      LOG_ERROR_P(PARAM_SCANNING_PROPROTION) << "you cannot supply a proportion less than 0";
+  }
 }
 
 /**
@@ -62,6 +77,13 @@ void MortalityBaranov::DoValidate() {
 void MortalityBaranov::DoBuild() {
   LOG_FINE();
 
+  // Users don't have to apply tagging
+  if (parameters_.Get(PARAM_SCANNING_YEARS)->has_been_defined()) {
+    for (auto year : scanning_years_) {
+      if (find(years_.begin(), years_.end(), year) == years_.end())
+        LOG_ERROR_P(PARAM_SCANNING_YEARS) << "could not find the year " << year << " in the process years, please sort this out";
+    }
+  }
   /*
    *  Build M information
    */
@@ -147,6 +169,27 @@ void MortalityBaranov::DoBuild() {
       }
     }
   }
+
+  cell_offset_for_selectivity_.resize(model_->get_height());
+  cell_offset_.resize(model_->get_height());
+  model_length_bins_.resize(model_->get_height());
+  model_age_bins_.resize(model_->get_height());
+  mls_by_space_.resize(model_->get_height());
+  current_year_by_space_.resize(model_->get_height());
+  scanning_prop_year_by_space_.resize(model_->get_height());
+  discard_by_space_.resize(model_->get_height());
+  current_time_step_by_space_.resize(model_->get_height());
+  for (unsigned i = 0; i < model_->get_height(); ++i) {
+    cell_offset_[i].resize(model_->get_width());
+    cell_offset_for_selectivity_[i].resize(model_->get_width());
+    model_length_bins_[i].resize(model_->get_width(), model_->length_bins().size());
+    model_age_bins_[i].resize(model_->get_width(), model_->age_spread());
+    mls_by_space_[i].resize(model_->get_width(), mls_);
+    current_year_by_space_[i].resize(model_->get_width());
+    discard_by_space_[i].resize(model_->get_width(), discard_mortality_);
+    scanning_prop_year_by_space_[i].resize(model_->get_width(), 0.0);
+    current_time_step_by_space_[i].resize(model_->get_width(), 1);
+  }
 }
 
 /**
@@ -155,9 +198,9 @@ void MortalityBaranov::DoBuild() {
 void MortalityBaranov::DoExecute() {
   LOG_MEDIUM();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-
+  unsigned current_year = model_->current_year();
   // Check if we are in initialsiation or in an execute model year that we don't apply F then just apply M.
-  if ((model_->state() == State::kInitialise) || (find(years_.begin(), years_.end(), model_->current_year()) != years_.end())) {
+  if ((model_->state() == State::kInitialise) || (find(years_.begin(), years_.end(), current_year) != years_.end())) {
     LOG_FINEST() << "Just applying M";
     if (m_selectivity_length_based_) {
       LOG_FINE() << "M is length based";
@@ -209,6 +252,40 @@ void MortalityBaranov::DoExecute() {
     auto year_iter = find(years_.begin(), years_.end(), model_->current_year());
     unsigned year_ndx = distance(years_.begin(), year_iter);
     vector<unsigned> global_age_freq(model_->age_spread(), 0);
+
+    LOG_FINE() << "Populate containers that will be used for threading";
+
+    // Are we applying Tagging either releases or scanning, or both
+    auto scan_iter = scanning_years_.begin();
+    bool scanning = false; // A bool used to see if we are scanning
+    unsigned scanning_ndx = 0;
+    if (find(scan_iter , scanning_years_.end(), model_->current_year()) != scanning_years_.end()) {
+      scanning = true;
+      scanning_ndx = distance(scanning_years_.begin(),scan_iter);
+    }
+    LOG_FINE() << "scanning index = " << scanning_ndx;
+
+    n_agents_ = 0;
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        WorldCell* cell = world_->get_base_square(row, col);
+        if (cell->is_enabled()) {
+          LOG_FINEST() << "Setting spatial areas, row = " << row + 1 << " col = " << col + 1;
+          cell_offset_[row][col] = n_agents_;
+          LOG_FINEST() << "cell_offset done";
+          n_agents_ += cell->agents_.size();
+          current_year_by_space_[row][col] = model_->current_year();
+          LOG_FINEST() << "year by size done";
+          if (scanning) {
+            scanning_prop_year_by_space_[row][col] = scanning_proportion_[scanning_ndx];
+            LOG_FINEST() << "scanning by size done";
+          }
+          current_time_step_by_space_[row][col] = model_->get_time_step_counter();
+          LOG_FINEST() << "time-step by size done";
+
+        }
+      }
+    }
     float total_catch = 0;
     // There are 4 combos that we will split out M age - F age, M age - F length, M-length F age, M length - F length
     if (m_selectivity_length_based_ & f_selectivity_length_based_) {
@@ -219,6 +296,9 @@ void MortalityBaranov::DoExecute() {
           if (cell->is_enabled()) {
             composition_data age_freq(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
             composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->length_bins().size());
+            census_data census_fishery(current_year_by_space_[row][col], row, col);
+            tag_recapture tag_recapture_info(current_year_by_space_[row][col], row, col, current_time_step_by_space_[row][col]);
+
             float catch_by_cell = 0;
             unsigned counter = 0;
             unsigned initial_size = cell->agents_.size();
@@ -238,9 +318,27 @@ void MortalityBaranov::DoExecute() {
                     // this individual dies because of F process
                     catch_by_cell += (*iter).get_weight() * (*iter).get_scalar();
                     total_catch += (*iter).get_weight() * (*iter).get_scalar();
-                    age_freq.frequency_[(*iter).get_age_index()]++; //TODO do we need to multiple this by scalar for true numbers
-                    length_freq.frequency_[(*iter).get_length_bin_index()]++;
+                    age_freq.frequency_[(*iter).get_age_index()]+= (*iter).get_scalar(); //TODO do we need to multiple this by scalar for true numbers
+                    length_freq.frequency_[(*iter).get_length_bin_index()]+= (*iter).get_scalar();
+
+                    if (scanning) {
+                      // Probability of scanning agent
+                      if (rng.chance() <= scanning_proportion_[scanning_ndx]) {
+                        // We scanned this agent
+                        tag_recapture_info.scanned_fish_++;
+                        if ((*iter).get_number_tags() > 0) {
+                          // fish has a tag record it
+                          tag_recapture_info.age_.push_back((*iter).get_age());
+                          tag_recapture_info.length_.push_back((*iter).get_length());
+                          tag_recapture_info.time_at_liberty_.push_back((*iter).get_time_at_liberty(current_time_step_by_space_[row][col]));
+                          tag_recapture_info.length_increment_.push_back((*iter).get_length_increment_since_tag());
+                          tag_recapture_info.tag_row_.push_back((*iter).get_tag_row());
+                          tag_recapture_info.tag_col_.push_back((*iter).get_tag_col());
+                        }
+                      }
+                    }
                   } // else it dies from M and we don't care about reporting that
+
                   (*iter).dies();
                   initial_size--;
                 }
@@ -262,6 +360,9 @@ void MortalityBaranov::DoExecute() {
           if (cell->is_enabled()) {
             composition_data age_freq(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
             composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->length_bins().size());
+            census_data census_fishery(current_year_by_space_[row][col], row, col);
+            tag_recapture tag_recapture_info(current_year_by_space_[row][col], row, col, current_time_step_by_space_[row][col]);
+
             float catch_by_cell = 0;
             unsigned counter = 0;
             unsigned initial_size = cell->agents_.size();
@@ -281,8 +382,25 @@ void MortalityBaranov::DoExecute() {
                     // this individual dies because of F process
                     catch_by_cell += (*iter).get_weight() * (*iter).get_scalar();
                     total_catch += (*iter).get_weight() * (*iter).get_scalar();
-                    age_freq.frequency_[(*iter).get_age_index()]++; //TODO do we need to multiple this by scalar for true numbers
-                    length_freq.frequency_[(*iter).get_length_bin_index()]++;
+                    age_freq.frequency_[(*iter).get_age_index()]+= (*iter).get_scalar();
+                    length_freq.frequency_[(*iter).get_length_bin_index()]+= (*iter).get_scalar();
+
+                    if (scanning) {
+                      // Probability of scanning agent
+                      if (rng.chance() <= scanning_proportion_[scanning_ndx]) {
+                        // We scanned this agent
+                        tag_recapture_info.scanned_fish_++;
+                        if ((*iter).get_number_tags() > 0) {
+                          // fish has a tag record it
+                          tag_recapture_info.age_.push_back((*iter).get_age());
+                          tag_recapture_info.length_.push_back((*iter).get_length());
+                          tag_recapture_info.time_at_liberty_.push_back((*iter).get_time_at_liberty(current_time_step_by_space_[row][col]));
+                          tag_recapture_info.length_increment_.push_back((*iter).get_length_increment_since_tag());
+                          tag_recapture_info.tag_row_.push_back((*iter).get_tag_row());
+                          tag_recapture_info.tag_col_.push_back((*iter).get_tag_col());
+                        }
+                      }
+                    }
                   } // else it dies from M and we don't care about reporting that
                   (*iter).dies();
                   initial_size--;
@@ -305,6 +423,9 @@ void MortalityBaranov::DoExecute() {
           if (cell->is_enabled()) {
             composition_data age_freq(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
             composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->length_bins().size());
+            census_data census_fishery(current_year_by_space_[row][col], row, col);
+            tag_recapture tag_recapture_info(current_year_by_space_[row][col], row, col, current_time_step_by_space_[row][col]);
+
             float catch_by_cell = 0;
             unsigned counter = 0;
             unsigned initial_size = cell->agents_.size();
@@ -324,8 +445,25 @@ void MortalityBaranov::DoExecute() {
                     // this individual dies because of F process
                     catch_by_cell += (*iter).get_weight() * (*iter).get_scalar();
                     total_catch += (*iter).get_weight() * (*iter).get_scalar();
-                    age_freq.frequency_[(*iter).get_age_index()]++; //TODO do we need to multiple this by scalar for true numbers
-                    length_freq.frequency_[(*iter).get_length_bin_index()]++;
+                    age_freq.frequency_[(*iter).get_age_index()]+= (*iter).get_scalar();
+                    length_freq.frequency_[(*iter).get_length_bin_index()]+= (*iter).get_scalar();
+
+                    if (scanning) {
+                      // Probability of scanning agent
+                      if (rng.chance() <= scanning_proportion_[scanning_ndx]) {
+                        // We scanned this agent
+                        tag_recapture_info.scanned_fish_++;
+                        if ((*iter).get_number_tags() > 0) {
+                          // fish has a tag record it
+                          tag_recapture_info.age_.push_back((*iter).get_age());
+                          tag_recapture_info.length_.push_back((*iter).get_length());
+                          tag_recapture_info.time_at_liberty_.push_back((*iter).get_time_at_liberty(current_time_step_by_space_[row][col]));
+                          tag_recapture_info.length_increment_.push_back((*iter).get_length_increment_since_tag());
+                          tag_recapture_info.tag_row_.push_back((*iter).get_tag_row());
+                          tag_recapture_info.tag_col_.push_back((*iter).get_tag_col());
+                        }
+                      }
+                    }
                   } // else it dies from M and we don't care about reporting that
                   (*iter).dies();
                   initial_size--;
@@ -348,6 +486,9 @@ void MortalityBaranov::DoExecute() {
           if (cell->is_enabled()) {
             composition_data age_freq(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
             composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->length_bins().size());
+            census_data census_fishery(current_year_by_space_[row][col], row, col);
+            tag_recapture tag_recapture_info(current_year_by_space_[row][col], row, col, current_time_step_by_space_[row][col]);
+
             float catch_by_cell = 0;
             unsigned counter = 0;
             unsigned initial_size = cell->agents_.size();
@@ -367,8 +508,25 @@ void MortalityBaranov::DoExecute() {
                     // this individual dies because of F process
                     catch_by_cell += (*iter).get_weight() * (*iter).get_scalar();
                     total_catch += (*iter).get_weight() * (*iter).get_scalar();
-                    age_freq.frequency_[(*iter).get_age_index()]++; //TODO do we need to multiple this by scalar for true numbers
-                    length_freq.frequency_[(*iter).get_length_bin_index()]++;
+                    age_freq.frequency_[(*iter).get_age_index()]+= (*iter).get_scalar();
+                    length_freq.frequency_[(*iter).get_length_bin_index()]+= (*iter).get_scalar();
+
+                    if (scanning) {
+                      // Probability of scanning agent
+                      if (rng.chance() <= scanning_proportion_[scanning_ndx]) {
+                        // We scanned this agent
+                        tag_recapture_info.scanned_fish_++;
+                        if ((*iter).get_number_tags() > 0) {
+                          // fish has a tag record it
+                          tag_recapture_info.age_.push_back((*iter).get_age());
+                          tag_recapture_info.length_.push_back((*iter).get_length());
+                          tag_recapture_info.time_at_liberty_.push_back((*iter).get_time_at_liberty(current_time_step_by_space_[row][col]));
+                          tag_recapture_info.length_increment_.push_back((*iter).get_length_increment_since_tag());
+                          tag_recapture_info.tag_row_.push_back((*iter).get_tag_row());
+                          tag_recapture_info.tag_col_.push_back((*iter).get_tag_col());
+                        }
+                      }
+                    }
                   } // else it dies from M and we don't care about reporting that
                   (*iter).dies();
                   initial_size--;
@@ -417,12 +575,12 @@ void  MortalityBaranov::draw_rate_param(unsigned row, unsigned col, unsigned num
 // FillReportCache, called in the report class, it will print out additional information that is stored in
 // containers in this class.
 void  MortalityBaranov::FillReportCache(ostringstream& cache) {
-
+  LOG_FINE();
   cache << "biomass_removed: ";
-  for (auto& year : catch_by_year_)
+  for (auto& year : actual_removals_by_year_)
     cache << year.second << " ";
   cache << "\ncatch_input_removed: ";
-  for (auto& year : catch_by_year_)
+  for (auto& year : removals_by_year_)
     cache << year.second << " ";
   cache << "\n";
 
@@ -440,6 +598,49 @@ void  MortalityBaranov::FillReportCache(ostringstream& cache) {
     }
   }
 
+  if (print_extra_info_) {
+    if (removals_tag_recapture_.size() > 0) {
+      for (auto& tag_recapture : removals_tag_recapture_) {
+        cache << "tag_recapture_info-" << tag_recapture.year_ << "-" << tag_recapture.row_ << "-" << tag_recapture.col_ << " " << REPORT_R_LIST << "\n";
+        cache << "scanned_fish: " << tag_recapture.scanned_fish_ << "\n";
+        cache << "values " << REPORT_R_MATRIX << "\n";
+        //cache << "age length length-increment time_at_liberty\n";
+        for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+          cache << tag_recapture.age_[ndx] << " ";
+        cache << "\n";
+        for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+          cache << tag_recapture.length_[ndx] << " ";
+        cache << "\n";
+        for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+          cache << tag_recapture.time_at_liberty_[ndx] << " ";
+        cache << "\n";
+        for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+          cache << tag_recapture.length_increment_[ndx] << " ";
+        cache << "\n";
+        for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+          cache << tag_recapture.tag_row_[ndx] << " ";
+        cache << "\n";
+        for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+          cache << tag_recapture.tag_col_[ndx] << " ";
+        cache << "\n" << REPORT_R_LIST_END << "\n";
+      }
+    }
+
+    // Print census information
+    for (auto& census : removals_census_) {
+      cache << "census_info-" << census.year_ << "-" << census.row_ << "-" << census.col_ << " " << REPORT_R_MATRIX << "\n";
+      //cache << "age length scalar\n";
+      for (unsigned ndx = 0; ndx < census.age_.size(); ++ndx)
+        cache << census.age_[ndx] << " ";
+      cache << "\n";
+      for (unsigned ndx = 0; ndx < census.age_.size(); ++ndx)
+        cache << census.length_[ndx] << " ";
+      cache << "\n";
+      for (unsigned ndx = 0; ndx < census.age_.size(); ++ndx)
+        cache << census.scalar_[ndx] << " ";
+      cache << "\n";
+    }
+  }
 }
 
 // A Method for telling the world we need to redistribute Mortality parmaeters
@@ -447,5 +648,18 @@ void MortalityBaranov::RebuildCache() {
   LOG_FINE();
   world_->rebuild_mort_params();
 }
+
+
+
+// true means all years are found, false means there is a mismatch in years
+bool MortalityBaranov::check_years(vector<unsigned> years_to_check_) {
+  LOG_FINE();
+  for (unsigned year_ndx = 0; year_ndx < years_to_check_.size(); ++year_ndx) {
+    if (find(years_.begin(), years_.end(), years_to_check_[year_ndx]) == years_.end())
+      return false;
+  }
+  return true;
+}
+
 } /* namespace processes */
 } /* namespace niwa */

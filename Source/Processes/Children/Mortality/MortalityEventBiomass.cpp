@@ -305,7 +305,8 @@ void MortalityEventBiomass::DoExecute() {
                   removals_census_.push_back(census_fishery);
                   if (scanning) {
                     removals_tag_recapture_.push_back(tag_recapture_info);
-                  }                }
+                  }
+                }
               }
               LOG_FINEST() << "individuals = " << cell->agents_.size();
             }
