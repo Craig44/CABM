@@ -56,6 +56,7 @@ protected:
   // For reporting
    map<unsigned, float>                actual_removals_by_year_;
    map<unsigned, float>                removals_by_year_;
+   vector<vector<vector<float>>>       F_by_cell_year_;
   // For Tag-recaptures
   vector<unsigned>                    scanning_years_;
   vector<float>                       scanning_proportion_;
@@ -82,6 +83,8 @@ protected:
   vector<vector<unsigned>>            current_time_step_by_space_;
   vector<vector<vector<float>>>       cell_offset_for_selectivity_;
   unsigned                            n_agents_;
+
+
 
 };
 

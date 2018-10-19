@@ -42,6 +42,7 @@ protected:
   float					      cv_;
   string					    distribution_;
   bool                update_growth_parameters_;
+  map<unsigned, float>   time_step_ratios_;
 
 };
 

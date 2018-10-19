@@ -19,13 +19,14 @@
 namespace niwa {
 
 
-Agent::Agent(float lat, float lon, float first_age_length_par, float second_age_length_par, float M, unsigned birth_year,
+Agent::Agent(float lat, float lon, float first_age_length_par, float second_age_length_par, float third_age_length_par, float M, unsigned birth_year,
     float first_length_weight_par, float second_length_weigth_par, Model* model, bool mature, unsigned sex, float scalar,
     unsigned home_row, unsigned home_col, unsigned tag) :
     lat_(lat),
     lon_(lon),
     first_age_length_par_(first_age_length_par),
     second_age_length_par_(second_age_length_par),
+    third_age_length_par_(third_age_length_par),
     M_(M),
     birth_year_(birth_year),
     first_length_weight_par_(first_length_weight_par),
@@ -98,7 +99,7 @@ void Agent::growth_init() {
     length_ = first_age_length_par_ * (1-std::exp(-second_age_length_par_ * ((float)get_age() - third_age_length_par_)));
   }
   weight_ = first_length_weight_par_ * pow(length_, second_length_weight_par_); // Just update weight when ever we update length to save executions
-  LOG_FINEST() << "initialise agent, age = " << get_age() << " length = " << length_ << " weight = " << weight_;
+  //LOG_FINEST() << "initialise agent, age = " << get_age() << " length = " << length_ << " weight = " << weight_;
 }
 
 } /* namespace niwa */

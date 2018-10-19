@@ -26,7 +26,7 @@ class Agent { // Don't make this inherit from BaseClasses/Object.h
 public:
   // Methods
   virtual                       ~Agent() = default;
-  Agent(float lat, float lon, float first_age_length_par, float second_age_length_par, float M, unsigned birth_year, float first_length_weight_par,
+  Agent(float lat, float lon, float first_age_length_par, float second_age_length_par, float third_age_length_par, float M, unsigned birth_year, float first_length_weight_par,
       float second_length_weigth_par, Model* model, bool mature, unsigned sex, float scalar, unsigned home_row, unsigned home_col, unsigned tag);
   // Overload the constructor with another agent, used in tagging to mirror an existing agent.
   //Agent(Agent& agent_to_copy);
@@ -46,7 +46,7 @@ public:
   virtual const float&         get_m() const {return M_;};
   virtual const float&         get_first_age_length_par() const {return first_age_length_par_;}; // L_inf
   virtual const float&         get_second_age_length_par() const {return second_age_length_par_;}; // K
-  virtual const float&         get_third_age_length_par() const {return third_age_length_par_;}; // K
+  virtual const float&         get_third_age_length_par() const {return third_age_length_par_;}; // t0
   virtual const float&         get_first_length_weight_par() const {return first_length_weight_par_;}; // a
   virtual const float&         get_second_length_weight_par() const {return second_length_weight_par_;}; // b
   virtual const unsigned&      get_home_row() const {return home_row_ ;};
@@ -82,7 +82,7 @@ protected:
   float                       lon_;
   float                       first_age_length_par_;  // L_inf for von bert
   float                       second_age_length_par_; // k for von bert
-  float                       third_age_length_par_ = 0;  // t0 for von bert
+  float                       third_age_length_par_;  // t0 for von bert
   float                       M_; // natural mortality
   unsigned                    birth_year_;
   float                       length_ = 0.0;

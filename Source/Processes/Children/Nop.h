@@ -32,7 +32,7 @@ public:
   void                        DoValidate() override final { };
   void                        DoBuild() override final { };
   void                        DoReset() override final { };
-  void                        DoExecute() override final { };
+  void                        DoExecute() override final { LOG_FINE() << "Nop";};
 };
 
 } /* namespace processes */

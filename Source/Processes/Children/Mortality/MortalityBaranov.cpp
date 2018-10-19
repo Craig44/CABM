@@ -179,6 +179,7 @@ void MortalityBaranov::DoBuild() {
   scanning_prop_year_by_space_.resize(model_->get_height());
   discard_by_space_.resize(model_->get_height());
   current_time_step_by_space_.resize(model_->get_height());
+  F_by_cell_year_.resize(model_->get_height());
   for (unsigned i = 0; i < model_->get_height(); ++i) {
     cell_offset_[i].resize(model_->get_width());
     cell_offset_for_selectivity_[i].resize(model_->get_width());
@@ -189,6 +190,13 @@ void MortalityBaranov::DoBuild() {
     discard_by_space_[i].resize(model_->get_width(), discard_mortality_);
     scanning_prop_year_by_space_[i].resize(model_->get_width(), 0.0);
     current_time_step_by_space_[i].resize(model_->get_width(), 1);
+    F_by_cell_year_[i].resize(model_->get_width());
+  }
+
+  for (unsigned row = 0; row < model_->get_height(); ++row) {
+    for (unsigned col = 0; col < model_->get_width(); ++col) {
+      F_by_cell_year_[row][col].resize(years_.size(),0);
+    }
   }
 }
 
@@ -275,6 +283,7 @@ void MortalityBaranov::DoExecute() {
           LOG_FINEST() << "cell_offset done";
           n_agents_ += cell->agents_.size();
           current_year_by_space_[row][col] = model_->current_year();
+
           LOG_FINEST() << "year by size done";
           if (scanning) {
             scanning_prop_year_by_space_[row][col] = scanning_proportion_[scanning_ndx];
@@ -306,6 +315,8 @@ void MortalityBaranov::DoExecute() {
             LOG_FINEST() << initial_size << " initial agents";
             float f_in_this_cell = f_layer_[year_ndx]->get_value(row, col);
             LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << f_in_this_cell;
+
+            F_by_cell_year_[row][col][year_ndx] = f_in_this_cell;
 
             float f_l = 0;
             float m_l = 0;
@@ -371,6 +382,7 @@ void MortalityBaranov::DoExecute() {
             LOG_FINEST() << initial_size << " initial agents";
             float f_in_this_cell = f_layer_[year_ndx]->get_value(row, col);
             LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << f_in_this_cell;
+            F_by_cell_year_[row][col][year_ndx] = f_in_this_cell;
 
             float f_l = 0;
             float m_a = 0;
@@ -435,6 +447,7 @@ void MortalityBaranov::DoExecute() {
             LOG_FINEST() << initial_size << " initial agents";
             float f_in_this_cell = f_layer_[year_ndx]->get_value(row, col);
             LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << f_in_this_cell;
+            F_by_cell_year_[row][col][year_ndx] = f_in_this_cell;
 
             float f_a = 0;
             float m_l = 0;
@@ -499,6 +512,7 @@ void MortalityBaranov::DoExecute() {
             LOG_FINEST() << initial_size << " initial agents";
             float f_in_this_cell = f_layer_[year_ndx]->get_value(row, col);
             LOG_FINE() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << f_in_this_cell;
+            F_by_cell_year_[row][col][year_ndx] = f_in_this_cell;
 
             float f_a = 0;
             float m_a = 0;
@@ -586,6 +600,22 @@ void  MortalityBaranov::FillReportCache(ostringstream& cache) {
   for (auto& year : actual_removals_by_year_)
     cache << year.second << " ";
   cache << "\n";
+
+
+  cache << "F_by_cell_and_year " << REPORT_R_DATAFRAME << "\n" << "cell ";
+  for (auto& year : years_)
+    cache << year << " ";
+  cache << "\n";
+
+  for (unsigned row = 0; row < model_->get_height(); ++row) {
+    for (unsigned col = 0; col < model_->get_width(); ++col) {
+      cache << row + 1 << "-" << col + 1 << " ";
+      for (auto& val : F_by_cell_year_[row][col]) {
+        cache << val << " ";
+      }
+      cache << "\n";
+    }
+  }
 
   if (removals_by_age_.size() > 0) {
     cache << "age_frequency " << REPORT_R_DATAFRAME << "\n";

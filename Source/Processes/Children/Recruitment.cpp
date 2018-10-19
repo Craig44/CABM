@@ -33,7 +33,7 @@ Recruitment::Recruitment(Model* model) : Process(model) {
 
 // DoBuild
 void Recruitment::DoBuild() {
-  LOG_MEDIUM() << "Build Parent";
+  LOG_MEDIUM() << "Build Parent this will be overided if the child has this method.";
 
 
 }

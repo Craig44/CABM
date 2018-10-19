@@ -35,16 +35,32 @@ Growth::Growth(Model* model) : Process(model) {
 
 
 void Growth::DoBuild() {
-  unsigned time_step_count = model_->managers().time_step()->ordered_time_steps().size();
-  if (time_step_proportions_.size() == 0) {
-    time_step_proportions_.assign(time_step_count, 0.0);
-  } else if (time_step_count != time_step_proportions_.size()) {
-    LOG_FATAL_P(PARAM_TIME_STEP_PROPORTIONS) << "size (" << time_step_proportions_.size() << ") must match the number "
-        "of defined time steps for this process (" << time_step_count << ")";
+  LOG_FINE();
+  vector<TimeStep*> time_steps = model_->managers().time_step()->ordered_time_steps();
+  LOG_FINEST() << "time_steps.size(): " << time_steps.size();
+  vector<unsigned> active_time_steps;
+  for (unsigned i = 0; i < time_steps.size(); ++i) {
+    if (time_steps[i]->HasProcess(label_))
+      active_time_steps.push_back(i);
   }
-  for (auto iter : time_step_proportions_) {
-    if (iter < 0.0 || iter > 1.0)
-      LOG_ERROR_P(PARAM_TIME_STEP_PROPORTIONS) << " value (" << iter << ") must be in the range 0.0-1.0";
+
+  if (time_step_proportions_.size() == 0) {
+    for (unsigned i : active_time_steps)
+      time_step_proportions_[i] = 1.0;
+  } else {
+    if (time_step_proportions_.size() != active_time_steps.size())
+      LOG_FATAL_P(PARAM_TIME_STEP_PROPORTIONS) << " length (" << time_step_proportions_.size()
+          << ") does not match the number of time steps this process has been assigned to (" << active_time_steps.size() << ")";
+
+    for (float value : time_step_proportions_) {
+      if (value < 0.0 || value > 1.0)
+        LOG_ERROR_P(PARAM_TIME_STEP_PROPORTIONS) << " value (" << value << ") must be between 0.0 (exclusive) and 1.0 (inclusive)";
+    }
+
+    for (unsigned i = 0; i < time_step_proportions_.size(); ++i) {
+      time_step_ratios_[active_time_steps[i]] = time_step_proportions_[i];
+      LOG_FINE() << "setting growth in time step " << active_time_steps[i] << " = " << time_step_proportions_[i];
+    }
   }
 }
 
