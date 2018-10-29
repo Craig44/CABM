@@ -56,12 +56,14 @@ float Abundance::get_value(unsigned RowIndex, unsigned ColIndex) {
   if (cell->is_enabled()) {
     if (mature_) {
       for (Agent& agent : cell->agents_) {
-        if (agent.get_maturity())
-          ++value;
+        if (agent.is_alive() and agent.get_maturity())
+          value += agent.get_scalar();
       }
-      return value;
     } else {
-      return (float)cell->agents_.size();
+      for (Agent& agent : cell->agents_) {
+        if (agent.is_alive())
+          value += agent.get_scalar();
+      }
     }
   }
   return value;
@@ -76,12 +78,14 @@ float Abundance::get_value(unsigned RowIndex, unsigned ColIndex, unsigned year) 
   if (cell->is_enabled()) {
     if (mature_) {
       for (Agent& agent : cell->agents_) {
-        if (agent.get_maturity())
-          ++value;
+        if (agent.is_alive() and agent.get_maturity())
+          value += agent.get_scalar();
       }
-      return value;
     } else {
-      return (float)cell->agents_.size();
+      for (Agent& agent : cell->agents_) {
+        if (agent.is_alive())
+          value += agent.get_scalar();
+      }
     }
   }
   return value;

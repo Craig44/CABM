@@ -56,12 +56,14 @@ float Biomass::get_value(unsigned RowIndex, unsigned ColIndex) {
     float value = 0.0;
     if (mature_) {
       for (Agent& agent : cell->agents_) {
-        if (agent.get_maturity())
+        if (agent.is_alive() and agent.get_maturity())
           value += agent.get_weight() * agent.get_scalar();
       }
     } else {
-      for (Agent& agent : cell->agents_)
-        value += agent.get_weight() * agent.get_scalar();
+      for (Agent& agent : cell->agents_) {
+        if (agent.is_alive())
+          value += agent.get_weight() * agent.get_scalar();
+      }
     }
     return value;
   }
@@ -77,12 +79,14 @@ float Biomass::get_value(unsigned RowIndex, unsigned ColIndex, unsigned year) {
     float value = 0.0;
     if (mature_) {
       for (Agent& agent : cell->agents_) {
-        if (agent.get_maturity())
+        if (agent.is_alive() and agent.get_maturity())
           value += agent.get_weight() * agent.get_scalar();
       }
     } else {
-      for (Agent& agent : cell->agents_)
-        value += agent.get_weight() * agent.get_scalar();
+      for (Agent& agent : cell->agents_) {
+        if (agent.is_alive())
+          value += agent.get_weight() * agent.get_scalar();
+      }
     }
     return value;
   }
