@@ -41,13 +41,14 @@ MortalityBaranov::MortalityBaranov(Model* model) : Mortality(model) {
   // Tagging information TODO if the fishery release or recaptures tagged fish add this functionality
 
   // M information
-  parameters_.Bind<string>(PARAM_DISTRIBUTION, &distribution_, "the distribution to allocate the natural mortality parameter to the agents", "");
+  parameters_.Bind<string>(PARAM_DISTRIBUTION, &distribution_, "the distribution to allocate the parameters to the agents", PARAM_NORMAL)->set_allowed_values({PARAM_NORMAL, PARAM_LOGNORMAL});
   parameters_.Bind<float>(PARAM_CV, &cv_, "The cv of the distribution for the M distribution", "");
   parameters_.Bind<string>(PARAM_M_MULTIPLIER_LAYER_LABEL, &m_layer_label_, "Label for the numeric layer that describes a multiplier of M through space", "", ""); // TODO perhaps as a multiplier, 1.2 * 0.2 = 0.24
   parameters_.Bind<bool>(PARAM_UPDATE_MORTALITY_PARAMETERS, &update_natural_mortality_parameters_, "If an agent/individual moves do you want it to take on the natural mortality parameters of the new spatial cell", "");
   parameters_.Bind<string>(PARAM_NATURAL_MORTALITY_SELECTIVITY, &natural_mortality_selectivity_label_, "Selectivity label for the natural mortality process", "");
   parameters_.Bind<float>(PARAM_M, &m_, "Natural mortality for the model", "");
 
+  RegisterAsAddressable(PARAM_M, &m_);
 
 }
 
@@ -583,10 +584,18 @@ void  MortalityBaranov::draw_rate_param(unsigned row, unsigned col, unsigned num
   vector.resize(number_of_draws);
 
   //LOG_FINEST() << "mean M = " << mean_m;
-  for (unsigned i = 0; i < number_of_draws; ++i) {
-    float value = rng.normal(mean_m, cv_ * mean_m);
-    //LOG_FINEST() << "value of M = " << value;
-    vector[i] = value;
+  if (distribution_ == PARAM_NORMAL) {
+    for (unsigned i = 0; i < number_of_draws; ++i) {
+      float value = rng.normal(mean_m, cv_ * mean_m);
+      //LOG_FINEST() << "value of M = " << value;
+      vector[i] = value;
+    }
+  } else {
+    for (unsigned i = 0; i < number_of_draws; ++i) {
+      float value = rng.lognormal(mean_m, cv_);
+      //LOG_FINEST() << "value of M = " << value;
+      vector[i] = value;
+    }
   }
 }
 

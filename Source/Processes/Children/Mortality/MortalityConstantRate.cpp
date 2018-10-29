@@ -28,7 +28,7 @@ namespace processes {
  * constructor
  */
 MortalityConstantRate::MortalityConstantRate(Model* model) : Mortality(model) {
-  parameters_.Bind<string>(PARAM_DISTRIBUTION, &distribution_, "the distribution to allocate the parameters to the agents", "");
+  parameters_.Bind<string>(PARAM_DISTRIBUTION, &distribution_, "the distribution to allocate the parameters to the agents", PARAM_NORMAL)->set_allowed_values({PARAM_NORMAL, PARAM_LOGNORMAL});
   parameters_.Bind<float>(PARAM_CV, &cv_, "The cv of the distribution", "");
   parameters_.Bind<string>(PARAM_M_MULTIPLIER_LAYER_LABEL, &m_layer_label_, "Label for the numeric layer that describes a multiplier of M through space", "", ""); // TODO perhaps as a multiplier, 1.2 * 0.2 = 0.24
   parameters_.Bind<string>(PARAM_SELECTIVITY_LABEL, &selectivity_label_, "Label for the selectivity block", "");
@@ -247,10 +247,18 @@ void  MortalityConstantRate::draw_rate_param(unsigned row, unsigned col, unsigne
   vector.resize(number_of_draws);
 
   //LOG_FINEST() << "mean M = " << mean_m;
-  for (unsigned i = 0; i < number_of_draws; ++i) {
-    float value = rng.normal(mean_m, cv_ * mean_m);
-    //LOG_FINEST() << "value of M = " << value;
-    vector[i] = value;
+  if (distribution_ == PARAM_NORMAL) {
+    for (unsigned i = 0; i < number_of_draws; ++i) {
+      float value = rng.normal(mean_m, cv_ * mean_m);
+      //LOG_FINEST() << "value of M = " << value;
+      vector[i] = value;
+    }
+  } else {
+    for (unsigned i = 0; i < number_of_draws; ++i) {
+      float value = rng.lognormal(mean_m, cv_);
+      //LOG_FINEST() << "value of M = " << value;
+      vector[i] = value;
+    }
   }
 }
 
