@@ -1,10 +1,11 @@
 \section{\I{The population section}\label{sec:population-section}}
 
 \subsection{Introduction}
-The population section\index{Population section} specifies the model of the population dynamics. It describes the model structure (population structure), defines the population processes (e.g., recruitment, migration, and mortality), the selectivities, and associated parameters.
+The population section\index{Population section} specifies the dynamics that occur to agents in a population over time. They are labelled as as population level population level processes such as death, birth, migration and growth but all occur at an agent level. For each process we will define the algorithm and mathematical representation and an example of the syntax for how you would incorporate in your own model. This section also discusses how to define the temporal and spatial resolution, which are completely user defined albeit some are computationally limited.
 
 The population section consists of several components, including:
 \begin{itemize}
+  \item The spatial structure (Section~\ref{sec:spatial-structure});
   \item The population structure;
   \item Model initialisation (i.e., the state of the partition at the start of the first year)\index{Initialisation}\index{Model ! initialisation};
   \item The years over which the model runs (i.e., the start and end years of the model)
@@ -17,14 +18,13 @@ The population section consists of several components, including:
 \end{itemize}
 
 \subsection{\I{Spatial structure}\label{sec:spatial-structure}}
-
-The spatial structure of \IBM\ is represented by an $n_{rows} \times n_{cols}$ grid, with rows $i=1 \dots n_{rows}$ and columns $j=1 \ldots n_{cols}$. Each cell of this matrix records the population structure at that point in space, where the population structure is represented by a list of individuals. Locations where individuals can and cannot potentially be present using a \emph{layer}. 
+The spatial structure of \IBM\ is represented by an $n_{rows} \times n_{cols}$ grid, with rows $i=1 \dots n_{rows}$ and columns $j=1 \ldots n_{cols}$. Each cell of this matrix records the population structure at that point in space, where the population structure is represented by a vector of agents. Locations where agents can and cannot potentially be present using a \emph{layer}. 
 
 \IBM\ implements a single spatial structure, a grid of \emph{square} cells (Figure \ref{fig:SquareSpatialStructure}). The spatial grid can be of an arbitrary size, but must be rectangular. 
 
 The dimensions of the spatial grid are user defined but must be at least a $1 \times 1$ grid (i.e., a single spatial cell), and the largest spatial structure currently allowed by \IBM\ is a grid of $1000 \times 1000$ cells\index{Maximum size of the spatial grid} -- although we note that models of this size are untested and will probably have very long run times. 
 
-Associated with the $n_{rows} \times n_{cols}$ spatial structure is the one compulsory layer (see Section \ref{sec:layers}), the \emph{base layer}\index{Base layer}. This defines the locations where the population can and cannot potentially be present (e.g., in a marine model, the locations associated with the sea and not land). These are defined as the cells where the base layer has a value greater than zero. There must be at least one cell in the spatial grid where the population can be present. In addition, the base layer also defines the relative \emph{area}\index{Cell area} of each spatial cell that is used for density calculations within \IBM.
+Associated with the $n_{rows} \times n_{cols}$ spatial structure is the one compulsory layer (see Section \ref{sec:layers}), the \emph{base layer}\index{Base layer}. This defines the locations where agents can and cannot be present (e.g., in a marine model, the locations associated with the sea and not land). These are defined as the cells where the base layer has a value greater than zero. There must be at least one cell in the spatial grid where the population can be present. In addition, the base layer also defines the relative \emph{area}\index{Cell area} of each spatial cell that is used for density calculations within \IBM.
 
 \begin{figure}[htp]
 	\centering
@@ -49,7 +49,7 @@ For example, to specify a model with 3 rows and 4 columns (i.e., 12 spatial cell
 		layer base
 		\end{verbatim}}}
 
-See below for how to define a layer using \command{layer}. Some processes reports require the user to define latitude and longitude bounds for cells. As they are cell bounds the model expects one more bound than rows or columns. The format of latitude and longitude are 0-180 and 0-360, respectively.
+See Section~\ref{sec:layers} for how to define a layer using \command{layer}. Some processes reports require the user to define latitude and longitude bounds for cells. As they are cell bounds the model expects one more bound than rows or columns. The format of latitude and longitude are 0-180 and 0-360, respectively.
 
 
 \subsection{\I{Population structure}}\label{sub:sec:pop_sec}
@@ -57,31 +57,40 @@ The basic structure of the population section of a \IBM\ model is defined in ter
 
 The annual cycle defines what processes happen in each model year, and in what sequence. \IBM\ runs on an annual cycle rather than, for example, a 6-monthly cycle.
 
-Each year is split into one or more time steps, with at least one process occurring in each time step. Each time step can be thought of as representing a particular part of the calendar year, or time steps can be treated as an abstract sequence of events. In every time step, there exists a mortality block: a group of consecutive mortality-based processes, where individuals are removed from the partition (see Section~\ref{sec:mortality_block}).
-
-The state is the current status of the population at any given time. The state can change one or more times in each time step of every year. The state object must contain sufficient information to figure out how the underlying population changes over time (given a model and a complete set of parameters).
-
-The state can undergo a number of possible changes, called transitions. Transitions are accomplished by processes, including: recruitment, natural mortality, anthropogenic mortality, ageing, migration, tagging events, and maturation. 
+Each year is split into one or more time steps, with at least one process occurring in each time step. Each time step can be thought of as representing a particular part of the calendar year, or time steps can be treated as an abstract sequence of events. In every time step, there exists a mortality block: a group of consecutive mortality-based processes, where individuals are deleted from the population (see Section~\ref{sec:mortality_block}). This is an important concept to understand as derived quantities and some observations are associated with mortality blocks.
 
 The division of the year into an arbitrary number of time steps allows the user to specify the exact order in which processes and observations occur throughout the year. The user needs to specify the time step in which each process occurs. If more than one process occurs in the same time step, the order in which to apply each process is specified in the \command{time\_step} block.
 
-The key element of the state is the spatial world view, which holds all the entities.
+The state is the current status of the population which is made of a collection of agents at any given time. The state can change one or more times in each time step of every year. The state object must contain sufficient information to figure out how the underlying population changes over time (given a model and a complete set of parameters).
 
-An example, to specify a model with 2 categories (male and female) with ages 1-20 (with the last age a plus group) and an age-length relationship defined with the label \texttt{male\_growth} and \texttt{female\_growth}, then the \texttt{@model} block is specified as:
+The state can undergo a number of possible changes, called transitions. Transitions are accomplished by processes, including: recruitment, natural mortality, anthropogenic mortality, movement, tagging events, growth, and maturation. 
+
+The key element of the state is the spatial world view, which holds all the entities, and is described earlier in Section~\ref{sec:spatial-structure}.
+
+An example of syntax, to specify a model with the the above concepts is done using the \texttt{@model} block is specified as:
 {\small{\begin{verbatim}
 		@model
-		start_year
-		final_year
+		start_year 1970
+		final_year 2018
 		min_age 1
 		max_age 20
+		nrows 2
+		ncols 4
 		age_plus_group True
-		initialisation_phases iphase
-		time_steps step1 step2 step3
+		initialisation_phases iterative
+		time_steps Summer Autumn Winter Spring
+		
+		@time_step Summer
+		processes recruitment summer_fishery 
+
+		@time_step Autumn
+		processes migrate_off_shore
+		...
 \end{verbatim}}}
 
 
-\subsection{\I{Individuals}\label{sec:individuals}}
-An individual is the core object in the state that everything manipulates or summarises. An individual has a list of predefined attributes that the user can choose to incorporate in the model or ignore, the list is below.
+\subsection{\I{Agents}\label{sec:individuals}}
+An agent is the core object in the state that everything manipulates or summarises. An individual has a list of predefined attributes that the user can choose to incorporate in the model or ignore, the list is below.
 
 \begin{itemize}
 	\item age
@@ -91,27 +100,26 @@ An individual is the core object in the state that everything manipulates or sum
 	\item maturity
 	\item current area, birth area
 	\item lat and long
-	\item \I{population scalar} how many other individuals does this represent (scalar)
+	\item \I{population scalar} how many individuals does this agent represent = 1 means an individual based model (scalar)
 	\item natural mortality parameter
 	\item growth parameters
-	\item scalar (if > 1 then this individual represents more than one is stock specific.)
+	\item scalar (if > 1 then this individual represents more than one is a stock specific attribute)
 \end{itemize}
 
-An important attribute, if the model contains super individuals (agents) where a single agent represents many individuals with the same characteristics is the scalar parameter. This parameter is associated with a recruitment event as we use the scalers to scale up a $SSB$ to $B_0$ for a given recruitment event. This makes the scalar more of a meta-population parameter or a stock parameter in fisheries. The way a scalar is applied is through the subcommand \subcommand{recruitment\_layer\_label} where you link a cell to a recruitment process (for more information see Section~\ref{subsec:initialisation}). This link says that any individual that was created by that recruitment dynamic gets a stock or recruitment scalar.
+An important attribute, if the model contains super individuals (agents) where a single agent represents many individuals with the same characteristics is the scalar parameter. This parameter is associated with a recruitment event as we use the scalers to scale up a $SSB$ to $B_0$ for a given recruitment event. This makes the scalar more of a meta-population parameter or a stock parameter in fisheries. The way a scalar is applied is through the subcommand \subcommand{recruitment\_layer\_label} where you link a cell to a recruitment process (for more information see Section~\ref{subsec:initialisation}). This link says that any individual that was created by that recruitment dynamic gets a stock or recruitment scalar from that cell.
 
 Maturity is an attribute that is activated by the maturity process (see Section~\ref{subsubsec:maturity}), it is tied to some specific derived quantities such as the type \subcommand{mature\_biomass}. You could also calculate the mature biomass on the fly, using the other derived quantities and selectivities, an example of this is shown in the maturity process section.
 
 Sex is hard coded into the model and at this point the only way that sex effects model outcomes is through selectivities. So sex can have different maturation by age or length, and different vulnerability to mortality processes. The next additions are to have sex specific growth, which is a common occurrence in fish populations.
 
-The other attributes don't need any explanations are usually modified by processes, such as growth, movement and mortality. The attribute that I will spend a bit of time discussing is the method on how we initially set scalars on Individuals.
+The other attributes don't need any explanations are usually modified by processes, such as growth, movement and mortality. The attribute that I will dig into a little bit more is the scalar parameter which is calculated at the end of an initialisation phase, and assumes the initialisation phase has had a long in burn-in time to represent the correct age and length distribution.
 
 \begin{equation}
-	S = \frac{\sum_{s = 1}^{n_s}B0_s}{\sum_{s = 1}^{n_s}SSB_s}
+	S_s = \frac{\sum_{s = 1}^{n_s}B0_s}{\sum_{s = 1}^{n_s}SSB_s}
 \end{equation}
-Where $S$ is the global scalar that is associated to all new individuals in the system, $B0_s$ is the $B_0$ parameter for stock $s$ $SSB_s$ is the related spawning stock biomass. There are processes that do modify this, and that usually consists of processes or observations that truly involve a single entity such as tagging, when this occurs adjustments are made to this scalar.
+Where $S_s$ is the global scalar that is associated to all new individuals in the system from stock $s$, $B0_s$ is the $B_0$ parameter (user defined) for stock $s$ $SSB_s$ is the related spawning stock biomass. There are processes that do modify this, and that usually consists of processes or observations that truly involve a single entity such as tagging, when this occurs adjustments are made to this scalar.
 
 \subsection{\I{Layers}\label{sec:layers}}
-
 Layers are a key underlying concept in \IBM. They comprise of a grid of known values, with a value for every spatial cell in the model. Layers are used by processes, observations, and outputs commands to supply spatially explicit covariates and any categorical groupings required. 
 
 Layers are used by \IBM\ to evaluate locations where the population may be present (via the \emph{base layer}), to provide sets of known attributes or values of each spatial location (for some processes and for preference based movements), and to group or categorise cells for use by processes and observations. Layers consist of an $n_{rows} \times n_{cols}$ matrix and can be either \emph{numeric} or \emph{categorical}. 
@@ -214,7 +222,7 @@ Within \IBM, layers are used in the following contexts:
 		\item {\I{Numeric meta-layers}\label{numeric meta-layer}}: Numeric meta-layers are a meta layer of numeric layers --- the individual ordinary layers that make up the meta-layer must all be of numeric type. For example, assuming that the layers \texttt{SST} and \texttt{SST1990}, \texttt{SST1995}, etc., are defined elsewhere, then to specify a numeric meta-layer with specific values for the years 1990-1995, and a default for all other years (including the initialisation phases), use, 
 		
 		{\small{\begin{verbatim}
-				@layer AnnualNumericLayer
+				@layer AnnualSST
 				type numeric_meta
 				default_layer SST
 				years    1990    1991    1992    1993    1994    1995
@@ -232,7 +240,6 @@ Within \IBM, layers are used in the following contexts:
 				\end{verbatim}}}
 	\end{enumerate}
 \end{enumerate}
-
 
 
 
@@ -264,13 +271,13 @@ A mortality block is defined as a consecutive sequence of mortality processes wi
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.5]{Figures/annual_cycle.jpg}
-	\caption{A visual representation of a hypothetical sequence for an annual cycle.}\label{Fig:annual}
+	\caption{A visual representation of a hypothetical sequence for an annual cycle, with mortality blocks over multiple time steps.}\label{Fig:annual}
 \end{figure}
 
 \subsubsection{\I{Initialisation}}\label{subsec:initialisation}
 Initialisation is the process of determining the world's state just before \subcommand{start\_year}, whether it be equilibrium/steady state or some other initial state for the model (e.g exploited), prior to the start year of the model. This can be computationally expensive if a plus group is present in the partition.
 
-Currently users can only initialise the partition via an iterative process. \IBM\ does a few tricks to help speed up the initialisation. The first thing \IBM\ does is gets the parameter \subcommand{number\_of\_agents} and spits that number of agents uniformly, over the spatial domain, alternatively the user could supply a layer \subcommand{layer\_label} of proportions to seed the initial spatial distribution. This layer should sum to one so that the model initially seeds \subcommand{number\_of\_agents}. When the \IBM\ seeds the initial number of agents it also randomly assigns the agents an age based on an exponential distribution where the parameter $\lambda$ of the exponential distribution is set by the command on the \command{model}, \subcommand{natural\_mortality\_process\_label}. We suggest setting this command to the assumed natural mortality of the model. To see what age structure this would look like you can quickly use \R\ to visualise. by running the following code in an \R\ terminal you could see.
+Currently users can only initialise the partition via an iterative method. \IBM\ does a few tricks to help speed up the initialisation. The first thing \IBM\ does is gets the parameter \subcommand{number\_of\_agents} and spits that number of agents uniformly, over the spatial domain, alternatively the user could supply a layer \subcommand{layer\_label} of proportions to seed the initial spatial distribution. This layer should sum to one so that the model initially seeds \subcommand{number\_of\_agents}. When the \IBM\ seeds the initial number of agents it also randomly assigns the agents an age based on an exponential distribution where the parameter $\lambda$ of the exponential distribution is set by the command on the \command{model}, \subcommand{natural\_mortality\_process\_label}. We suggest setting this command to the assumed natural mortality of the model. To see what age structure this would look like you can quickly use \R\ to visualise. by running the following code in an \R\ terminal you could see.
 
 \begin{lstlisting}
 Z_param = 0.2;
@@ -309,22 +316,52 @@ For an example of setting an initialisation block with multiple stocks see the 3
 
 
 \subsection{\I{Processes}}\label{sec:process}
-Processes are a set of classes that get access to agents parameters and either modifies them (growth), moves them (to anther cell), adds new agents (recruitment) or removes them (mortality). Some users may not think having an analagous to population processes fits in the Individual based model framework, but it is structured this way for convenience and code maintenance more than anything. The other thing to note is that most proceses are dictated by agent specific parameters such as natural mortality and growth etc.
+Processes are a set of classes that get access to agents parameters and either modifies them (growth), moves them (to anther cell), adds new agents (recruitment) or removes them (mortality). The other thing to note is that most processes are dictated by agent specific parameters such as natural mortality and growth see specific process for more information, and usually involve a Bernoulli trial to add stochastic error. An example of this is evaluating whether an agent is caught by a fishing method, lets say that a fishing method has a length based vulnerability associated with it as shown in figure~\ref{fig:capture}
 
+
+\begin{figure}[htp]\label{fig:capture}
+	\centering
+	\includegraphics[scale=0.6]{Figures/vulnerability.png}%
+	\caption{An example of a length based logistic vulnerability curve that describes the probability of capture when an interaction occurs.}
+\end{figure}
+
+So if we were to iterate over all the spatially available agents to this process we would calculate the probability of capture by taking the vulnerability curve and a specific agents length and compare that capture probability ($P_l$) to random number drawn from a $uniform(0,1)$ distribution ($U()$) and so many of the algorithms would run something like,
+
+$$ \text{if }U() <= P_l \text{ agent is captured and removed}$$
+$$ \text{else it survives the event}$$
 
 \subsubsection{\I{Ageing}}
 Ageing is an implicit process in the model, Each agent that is created or recruited gets assigned a birth year. This means that when ever we want to ask for the agent we just calculate \subcommand{current\_year - birth\_year}, thus there is no explicit ageing process. Note that we do return the \subcommand{max\_age} of the model, if the agent is older than that age (so we only work with the truncated age distribution).
 
 
-This means every fish automatically ages by one at the end of the year, or you could think of ageing a fish at the very beginning of the year (tomayto, tomahto), just be aware that you don't  have control over that, but if you want to account for growth in between annual increments that is possible via time step proportion increments, see growth processes for more information.
+This means every fish automatically ages by one at the end of the year, or you could think of ageing a fish at the very beginning of the year (tomayto, tomahto), just be aware that you don't have control over this process. Something to keep in mind is that growth is not directly tied with ageing, that is a individual that ages one year does not also get a years worth of growth. This unlike most population based models that will usually have an implicit assumption of growth with ageing. Although if one puts a growth process at the beginning or end of an annual cycle this can be achieved. This is just a side note to keep in mind when trying to align this model with others you may want to test against.
+
 
 \subsubsection{\I{Maturity}}\label{subsubsec:maturity}
-The process of converting an individual from immature to mature, only should be used if you link it to a mature-biomass derived quantity (Section~\ref{para:mature_biomass}). An alternative way and perhaps more efficient method for capturing a snap shot of the mature biomass or abundance of all individuals in the population is by using the generic biomass or abundance derived quantities (Section~\ref{para:biomass}~\ref{para:abundance}). Where we calculate what is mature at the time of the derived quantity, rather than having an explicit process that allows users to separate the maturation process from the summarising of abundance of biomass of the mature component. Examples of how you would set up the two methods in \IBM\ are below, firstly with maturity as an explicit process and secondly as it being implicit.
+The process of converting an agent from immature to mature, only should be used if you link it to a mature-biomass derived quantity (Section~\ref{para:mature_biomass}). This process only changes the internal state of an agent i.e. no material change happens to the agent. This could be useful down the track if we have dynamics that only occur to mature agents and so this internal flag can be checked against for use in a different algorithm. Maturity is applied using the ogive defined in the subcommand \subcommand{maturity\_ogive\_label} in the \command{model} block, and is applied for a single agent (assuming the agent is not already mature)
+
+\begin{equation}
+	\begin{cases}
+	\text{mature } = 1, & \text{if } U() \leq P_a\\
+	\text{mature } = 0, & \text{if } U() > P_a\\
+	\end{cases}
+\end{equation}
+
+where, $P_a$ is the probability of an immature individual at age $a$ turning to a mature individual. Currently maturity can only be an age based process, although this is not difficult to make a length based probability statement if someone in the future wanted this. A note about creating a logistic based maturity schedule, we recommend users use the selectivity logistic producing (Section~\ref{sec:selectivities}) or a similar style of selectivity. The results will not be as expected if you use a normal logistic selectivity. This is because this is only applied to the non-mature agents and so the selectivity needs more thought than other situations where a selectivity is needed\\
+
+\begin{figure}[htp]\label{fig:mature}
+	\centering
+	\includegraphics[scale=0.6]{Figures/maturity_ogives.png}%
+	\caption{A comparison of maturity schedules, on the left we have used a logistic producing ogive, and on the right if we apply the maturity ogive over and over you get the resulting proportion mature in the right hand panel (which is logistic).}
+\end{figure}
+
+
+An alternative way and perhaps more efficient method for capturing a snap shot of the mature biomass or abundance of all individuals in the population is by using the generic biomass or abundance derived quantities (Section~\ref{para:biomass}~\ref{para:abundance}). Where we calculate what is mature at the time of the derived quantity, rather than having an explicit process that allows users to separate the maturation process from the summarising of abundance of biomass of the mature component. Examples of how you would set up the two methods in \IBM\ are below, firstly with maturity as an explicit process and secondly as it being implicit.
 
 {\small{\begin{verbatim}
 @model
 ...
-maturity_ogive_label mature_ogive // define maturity selectivity: male female (order is important)
+maturity_ogive_label mature_ogive # define maturity selectivity: male female (order is important)
 
 @time_step Annual
 processes  Maturation 
@@ -332,17 +369,17 @@ processes  Maturation
 @time_step Spawn
 processes  no_process 
 
-@process Maturation  // This will use the maturity ogive on the @model
+@process Maturation  # This will use the maturity ogive on the @model
 type maturation
 
-@derived_quantitiy SSB  // get a snap shot of mature biomass
+@derived_quantitiy SSB  # get a snap shot of mature biomass
 type mature_biomass
 time_step Spawn
 biomass_layer_label SSB_areas
 proportion_through_mortality_block 0.0
 \end{verbatim}}}
 
-The above model setup will have individuals in the system that are mature and immature and we can call the specialised \subcommand{mature\_biomass} derived quantity to get a snap shot at any point in the system to view the biomass or abundance. The other way of dealing with maturity is implicitly as shown below.
+The above model setup will have agents in the system that are mature and immature and we can call the specialised \subcommand{mature\_biomass} derived quantity to get a snap shot at any point in the system to view the biomass or abundance. The other way of dealing with maturity is implicitly as shown below.
 
 {\small{\begin{verbatim}
 @model
@@ -367,32 +404,64 @@ So just to re-iterate the difference, you can have an explicit maturing process 
 
 
 \subsubsection{\I{Recruitment}}
-Recruitment is the process where new individuals are created in the system. It is also the process that defines stock structure in the model. Stocks are not an explicit attribute of \IBM\ so consideration on this process is important. How the stock is defined using the recruitment dynamic surrounds where we calculate Spawning Stock Biomass ($SSB$) and where the resulting recruits are first seeded. This means that for all recruitment types you will need to specify a $B_0$ parameter and an associated derived quantity that represents the $SSB$ for that event.
+Recruitment is the process where new agents are created in the system. It is also the process that defines stock structure in the model. Stocks are not an explicit attribute of \IBM\ so consideration on this process is important. How the stock is defined using the recruitment dynamic surrounds where we calculate Spawning Stock Biomass ($SSB$) and where the resulting recruits are first seeded. This means that for all recruitment types you will need to specify a $B_0$ parameter and an associated derived quantity that represents the $SSB$ for that event. This is how an $R_0$ value is calculated from the initialisation phase.
+
+\begin{equation}
+	X = \sum_{a = 0}^{4A}exp^{-M a}
+\end{equation}
+
+Where, $M$ is the average natural mortality rate as defined by the \subcommand{natural\_mortality\_process\_label} in the \command{model} block. $A$ is the maximum age of the population, $4$ is an arbitrary scalar to make sure that we cover the entire age distribution. Once we have our multiplier ($X$), we then
+
+
+\begin{equation}
+R_{0,s} = \frac{N_a}{X} \frac{B_{0,s}}{\sum_s B_{0,s}}
+\end{equation}
+where, $R_{0,s}$ is the stock specific initial/equilibrium number of agents to seed, $N_a$ is the number of agents in the model world defined in the \command{initialisation\_phase} using the subcommand \subcommand{number\_of\_individuals} and $B_{0,s}$ is the user defined stock specific equilibrium spawning stock biomass.
 
 \paragraph{\I{Constant recruitment}}\label{subsubsec:constant-recruitment}
 
+\begin{equation}
+	R_{y,s} = R_{0,s}
+\end{equation}
+
 \paragraph{\I{Beverton-Holt recruitment}}\label{subsubsec:bev-holt-recruitment}
 
+We have taken the parametrisation akin to \cite{mace_doonan_88} that is a population based formula. There is room to make this a more pure agent based model where we look at probability of finding a mate and etc, but for know this is all we have.
+\begin{equation}
+R_{y,s} = R_{0,s} \times \frac{SSB_{y-ssb offset,s}}{B_{0,s}}/ \left(1 - \frac{5h - 1}{4h} \left( 1 - \frac{SSB_{y-ssb offset,s}}{B_{0,s}}\right)\right) \times YCS_y
+\end{equation}
+where $h$ is the compensation parameter known as the steepness parameter that represents the number of agents when the stock SSB is at 20\% of $B_0$, $YCS_y$ is the year class strength parameter also termed the stock recruitment residual that accounts for any deviation of the deterministic Beverton Holt relationship due to things like predation, environment etc. If there are multiple spatial cells that are associated with a recruitment event then the allocation to a single cell is a simple multiplication with a proportion e.g.
+
+\begin{equation}
+R_{y,s,c} = R_{y,s} \times p_c
+\end{equation}
+where $R_{y,s,c}$ is the resulting agents in cell $c$ with proportion $p_c$ there is no stochastic behaviour in this process unlike other processes.
 
 \subsubsection{\I{Mortality}\label{sec:mortality}}
-Mortality processes remove individuals from the model domain (and also from memory).
+Mortality processes remove agents from the model domain, and do not allow them to be available to processes or summaries.
 
 \paragraph{Constant mortality rate}
-Apply an instantaneous mortality rate, and we remove the individual if the following condition is met which compares the survivorship ($1 - e^{-M_i * S_a}$) with a draw from a uniform random variable ($uniform()$).
+Apply an instantaneous mortality rate, and we remove the individual if the following condition is met which compares the survivorship ($1 - e^{-M_i * S_a}$) with a draw from a uniform random variable ($U()$).
 
 \begin{equation}\label{constan_mort}
-uniform() \leq 1 - e^{-M_i * S_a}
+\text{if } U() \leq 1 - e^{-M_i * S_a} \text{ agent dies}
 \end{equation}
 
-where, $M_i$ is the individuals instantaneous mortality rate and $S_a$ is a selectivity at age allowing the process to be age based. $M_i$ the individuals instantaneous mortality rate is generated via the following process
+where, $M_i$ is the individuals instantaneous mortality rate and $S_a$ is a selectivity at age allowing the process to be age based (but can be length based). $M_i$ the individuals instantaneous mortality rate is assigned from generating a random value from either a normal or lognormal distribution by using the subcommand \subcommand{distribution}
 
 \begin{equation}\label{constan_mort_assign}
-M_i \sim LN(M * M_{row,col}, CV)
+M_i \sim N(M * M_{row,col}, CV\times M * M_{row,col}) \text{ with syntax } \sim N(\mu,\sigma)
 \end{equation}
 
-where $M$ is the parameter \subcommand{m} and $M_{row,col}$ is the multiplier layer value in row $row$ and column $col$. Users can also set a flag that says if individuals move they will take on a new mortality rate parameter of the new area, if not they will retain their mortality rate at birth.
+or 
 
-An example of how you could set up a constant mortality rate process that varied through time and by age is below
+\begin{equation}\label{constan_mort_assign_ln}
+M_i \sim LN(M * M_{row,col}, CV) \text{ with syntax } \sim LN(E[X],CV)
+\end{equation}
+
+where $M$ is the parameter \subcommand{m} and $M_{row,col}$ is the multiplier layer value in row $row$ and column $col$. For the lognormal parametrisation we make users define the expectation rather than the $\mu$ parameter as it seems more intuitive and this follows that $E[X] = e^{\mu + 0.5\sigma^2}$ Users can also set a flag (\subcommand{update\_mortality\_parameters}) that says if individuals move they will take on a new mortality rate parameter of the new area, if not they will retain their mortality rate assigned to them at birth.
+
+An example of how you could set up a constant mortality rate process that varied through time, space and by age is below
 
 {\small{\begin{verbatim}
 @process natural_mortality
@@ -420,20 +489,30 @@ x2 30
 y1 0.6
 y0 0.1
 y2 0.4
+
+@time_varying m_by_year
+type constant
+parameter process[natural_mortality].m
+values 0.134 0.153 0.106 0.1833
+years 1990 1991 1992 1993 
 \end{verbatim}}}
 
+
+
+
 \paragraph{Event-Biomass}\label{para:event_mort}
-This is a removal event such as fishing, where we iterate over a range of cells and remove agents based on some selectivity or spatial vulnerability. This is the simplest way to remove individuals from an anthropogenic process, however it is quite annoying to set up for a spatial model with a fine spatial resolution as you need to specify a catch for each cell. An example of how this process is set up is specified below, if you want an alternative fishing process that is based in theoretiical spatial fishing distributions see the next section (Section~\ref{para:effort_based_F}). Advantages over using this mortality process say over the Baranov method (next paragraph~\ref{para:baranov}) is that it allows for individuals to have multiple encounters with a fishery, but the negatives is that you cannot simply add natural mortality processes.\\
+This is a removal event such as fishing, where we iterate over a range of cells and remove agents based on some selectivity or spatial vulnerability. This is the simplest way to remove individuals from an anthropogenic process, however it is quite annoying to set up for a spatial model with a fine spatial resolution as you need to specify a catch for each cell. An example of how this process is set up is specified below, if you want an alternative fishing process that is based in theoretiical spatial fishing distributions see the next section (Section~\ref{para:effort_based_F}). Advantages over using this mortality process say over the Baranov method (next paragraph~\ref{para:baranov}) is that it allows for agents to have multiple encounters with a fishery, but the negatives is that you cannot simply incorporate simultaneously natural mortality processes, and may be more suited for pulse fisheries.\\
 
 \textbf{The algorithm}
 \begin{itemize}
 	\item randomly select an agent, \textbf{with replacement}
 	\item check to see if this agent is vulnerable to the fishery either age or length based process, by comparing a uniform random draw with a ogive
-	\item if we have minimum legal size (MLS) check to see if the fish will be returned this is a true or false statement, if agent length < MLS return with some handling mortality probability that will be again checked with a uniform random variable
+	\item if we are scanning fish for tag-recaptures check for tags
+	\item if we have minimum legal size (MLS) check to see if the fish will be returned this is a true or false statement, if agent length $<$ MLS return with some handling mortality probability that will be again checked with a uniform random variable
 	\item if not MLS check then we remove this agent from the population and add it to the catch (all agents are removed, this must be remembered)
 	\item repeat the above steps until we have removed a desired biomass or if there are not enough fish to remove we exit with an error.
 \end{itemize}
-The key here is that fish can interact with fishery many times during a fishing event, but there is no natural mortality.
+The key here is that an agent can interact with fishery many times during a fishing event, but there is no natural mortality.
 
 
 \paragraph{Baranov}\label{para:baranov}
@@ -442,13 +521,12 @@ This process applies both natural mortality and fishing mortality
 \textbf{The algorithm}
 \begin{itemize}
 	\item iterate over every individual in the partition or spatial cell
-	\item randomly pick either natural mortality or fishing mortality process to apply, \textbf{with replacement}
-	\item check to see if the agent survives this dynamic (compare survivability with a uniform random variable)
-	\item then apply the non-selected dynamic to apply the remaining dynamic  (compare survivability with a uniform random variable)
-	\item if agent makes it through it has survived the mortlaity for this time step.
+	\item See if the fish dies by comparing total mortality survivor ship $U() \leq 1 - e^{- M + F}$
+	\item If fish dies see if it was from $M$ or $F$ if $U() < \frac{F}{F + M}$ then it was removed from an fishing event and is included in fishing specific observations.
+	\item we also can apply MLS and handling survivor ship
+	\item we can also choose to check for tag-recaptures
 \end{itemize}
 So from the algorithm above we can see that agents are exposed to both M and F, however the negative is that this assumes only a single interaction with the fishery which is an unlikely assumption. However I added this process because it both takes M and F simultaneously and may actually be faster than an event biomass dynamic (previous paragraph~\ref{para:event_mort}).
-
 
 
 \paragraph{Effort-Based F}\label{para:effort_based_F}
@@ -458,7 +536,6 @@ A lot of this process was inspired by \cite{truesdell2017effects}, where users c
 	E_{row,col} = B_{row,col} * col
 \end{equation}
 
-%
 
 
 
@@ -525,10 +602,6 @@ The above assumes that the probability of movement from one cell to another does
 You can see from the above example that the movement from cell 1 to all other cells has different probabilities from before 2000 and after 2000. The above example could be generalised furthur having a different probability matrix for every year, I kept it simple for illustration.
 
 
-
-
-
-
 \paragraph{\I{Preference Based movement}}\label{subsubsec:pref_movement}
 
 The preference in cell $i$ for preference variable $x$ can be described as,
@@ -578,24 +651,25 @@ Where $t$ is the time steps we have applied the preference movement in annual cy
 
 
 
-\subsection{\I{Derived Quantities}\label{sec:derived-quantities}}
-Derived quantities surround a mortality block and so the value of the derived quantity is calculated twice, once before the mortality block (Pre-Execute), and once after (Execute). The final value is an interpolation based on how much mortality the user wants to take into account when calculating derived quantities. If users set the \subcommand{proportion\_through\_mortality\_block} parameter equal to one or zero then only one calculation is taken, and can reduce the run time of some models, so it is worth exploring.
-\paragraph*{Biomass}\label{para:biomass}
-
-\paragraph*{Mature Biomass}\label{para:mature_biomass}
-
-\paragraph*{Abundance}\label{para:abundance}
-
-\subsection{\I{Growth}\label{sec:age-at-age}}
-Growth currently means updating length and weight for an agent, if the Von Bertalanffy formula currently is used (currently the default in agent class for initialising length) it follows the following formula
+\subsubsection{\I{Growth}\label{sec:age-at-age}}
+Growth is the process where \IBM\ updates both length and weight for an agent, and the same growth process can be applied over multiple time steps.
+\paragraph{\I{Von Bertalanffy with Basic}}\label{subsubsec:vonbert_basic}
+This process assumes that weight is an allometric function of length (Equation~\ref{mean_weight}) and that length is an incremental function of time that follows the Von Bertalanffy growth formula. Currently it is also the default growth function used to initialise the equilibrium partition structure. The length from going from one year to the next ($t$ represents a year) follows,
 
 \begin{equation}\label{VB}
-	\Delta L_{t,i} = p_t((L_{i,\infty} - L_i)(1 - e^{-k_i}))
+\Delta L_{t,i} = p_t((L_{i,\infty} - L_i)(1 - e^{-k_i}))
 \end{equation}
 
 \begin{equation}\label{actual_growth}
 L_{t+1,i} = L_{t,i} + \Delta L_{t,i}
 \end{equation}
+
+If you have multiple time steps in a year and you want growth over all of them, say for example you have monthly time steps and you want to apply $\frac{1}{12}$ of that increment in each year, this can be done by adding the process to all time steps and using the subcommand \subcommand{time\_step\_proportions}. So the growth increment within a time step ($k$) multiplies the annual growth increment by a user defined proportion.
+
+\begin{equation}\label{actual_growth_in_time_step}
+L_{t,k + 1,i} = L_{t,k,i} + \Delta L_{t,i}P_k
+\end{equation}
+
 
 Where $i$ indexes each agents own length and growth parameters. If the basic length weight formulation is used, then an agents weight follows the following formula.
 
@@ -616,26 +690,91 @@ So obviously if the layer pointed to by \subcommand{linf\_layer\_label} are all 
 When an agent is created (either in initialisation or through a recruitment process) or moves cell, it gets assigned new growth parameters that relate to that cell. This allows for spatial growth, one could hypothesis that environment may explain growth and so different environments over cells will cause different rates of growth. For the growth process you must specify either a spatial layer for mean values of each growth parameter or a single value (if growth doesn't change through space), a distribution and Coefficient of variation (CV). This randomly generates an agent a parameter from that distribution, an example of the syntax in a four area model,
 
 {\small{\begin{verbatim}
-@process von_bert
-type growth_von_bertalanffy_with_basic_weight
-#linf_layer_label L_inf_layer
-linf 101.8
-#k_layer_label k_layer
-k 0.161
-a 2.0e-6 
-b 3.288
-distribution lognormal
-cv 0.15
-time_step_proportions 1 ## if growth occurs in multiple 
-#time step how much growth in each time step
-update_growth_parameters false ## if a individual moves area 
-#do we need to update its growth parameters.
+		@process von_bert
+		type growth_von_bertalanffy_with_basic_weight
+		#linf_layer_label L_inf_layer
+		linf 101.8
+		#k_layer_label k_layer
+		k 0.161
+		a 2.0e-6 
+		b 3.288
+		distribution lognormal
+		cv 0.15
+		time_step_proportions 1 ## if growth occurs in multiple 
+		#time step how much growth in each time step
+		update_growth_parameters false ## if a individual moves area 
+		#do we need to update its growth parameters.
+		\end{verbatim}}}
+
+
+
+\subsection{\I{Derived Quantities}\label{sec:derived-quantities}}
+Derived quantities surround a mortality block and so the value of the derived quantity is calculated twice, once before the mortality block (Pre-Execute), and once after (Execute). The final value is an interpolation based on how much mortality the user wants to take into account when calculating derived quantities. If users set the \subcommand{proportion\_through\_mortality\_block} parameter equal to one or zero then only one calculation is taken, and can reduce the run time of some models, so it is worth exploring.
+
+\begin{equation}
+	B_p = (1 - p)B + pB'
+\end{equation}
+where $B_p$ is the interpolated derived quantity after $p$ proportion through the mortality block, $B$ is the quantity at the beginning of the mortality block and $B'$ is the derived quantity at the end of the mortality block.\\
+
+Derived quantities can be used either to report the state of a particular components of the population, or used in populations. For example in the Beverton Holt recruitment process (Section~\ref{subsubsec:bev-holt-recruitment}) users must define a subcommand \subcommand{ssb} which is a derived quantity. So this can be a useful tool to incorporate density dependence based processes.
+
+\paragraph*{Biomass}\label{para:biomass}
+Users must specify cells in which to calculate the derived quantity over using the subcommand \subcommand{biomass\_layer\_label}
+\begin{equation}
+	B = \sum_i \text{if }(U() \leq S_a)\text{I } \bar{w_i} \times s_i
+\end{equation}
+where for an age based selectivity where $S_a$ is the probability of being included in this derived quantity, if the summary is age based, I is a 0 or 1 depending on the condition of the if statement, $\bar{w_i}$ is the weight of the agent and $s_i$ is the scalar of the agent i.e. how many individuals that agent represents.
+{\small{\begin{verbatim}
+	@derived_quantity Total_biomass_in_Summer
+	type biomass
+	biomass_layer_label Base
+	selectivity All
+	time_step Summer
+	proportion_through_mortality_block 0.0
+	
+	@selectivity All
+	type constant
+	c 1
 \end{verbatim}}}
 
-\subsection{\I{Preference Functions}\label{sec:preference_functions}}\textsl{}
+
+\paragraph*{Mature Biomass}\label{para:mature_biomass}
+
+\begin{equation}
+B = \sum_i if(mature = 1)\text{ I } \bar{w_i} \times s_i
+\end{equation}
+where $s_i$ is the scalar of the agent i.e. how many individuals that agent represents.
+
+{\small{\begin{verbatim}
+		@derived_quantity SSB
+		type mature_biomass
+		biomass_layer_label SSB_layer
+		time_step time_step_one
+		proportion_through_mortality_block 0.0
+\end{verbatim}}}
+	
+\paragraph*{Abundance}\label{para:abundance}
+
+\begin{equation}
+B = \sum_i \text{if }(U() \leq S_a)\text{I } s_i
+\end{equation}
+where for an age based selectivity where $S_a$ is the probability of being included in this derived quantity, if the summary is age based, I is a 0 or 1 depending on the condition of the if statement,$s_i$ is the scalar of the agent i.e. how many individuals that agent represents.
+{\small{\begin{verbatim}
+		@derived_quantity Total_abundance_in_Summer
+		type abundance
+		layer_label Base
+		selectivity All
+		time_step Summer
+		proportion_through_mortality_block 0.0
+		
+		@selectivity All
+		type constant
+		c 1
+\end{verbatim}}}
+
 
 \subsection{\I{Selectivities}\label{sec:selectivities}}
-A selectivity is a function that can have a different value for each age class. Selectivities are used throughout \IBM\ to interpret observations or to modify the effects of processes on each age class (Section \ref{sec:population-section}). \IBM\ implements a number of different parametric forms, including logistic, knife edge, and double normal selectivities. Selectivities are defined in there own command block (\command{selectivity}), where the unique label is used by observations or processes to identify which selectivity to apply.
+A selectivity is a function that can have a different value for each age class or length bin. Selectivities are used throughout \IBM\ to interpret observations or to modify the effects of processes on each age class or length bins (Section \ref{sec:population-section}). \IBM\ implements a number of different parametric forms, including logistic, knife edge, and double normal selectivities. Selectivities are defined in there own command block (\command{selectivity}), where the unique label is used by observations or processes to identify which selectivity to apply.
 
 Selectivities are indexed by age, with indices from \argument{min\_age} to \argument{max\_age}. For example, for a logistic age-based selectivity with $50\%$ selected at age $5$ and $95\%$ selected at age $7$, would be defined by the \subcommand{type}=\argument{logistic} with parameters $a_{50}=5$ and $a_{to95}=(7-5)=2$. The value of the selectivity at age $x=7$ is $0.95$, and the value at age $x=3$ is $0.05$. Note, while selectivities can be length based, use with caution as more testing is needed for this functionality.
 
@@ -665,7 +804,7 @@ The available selectivities are described below.
 f(x)=C
 \end{equation}
 
-The constant selectivity has the estimable parameter C. 
+The constant selectivity has the parameter C. 
 
 \subsubsection[Knife-edge]{\argument{knife\_edge}}
 \begin{equation}
@@ -683,7 +822,7 @@ The knife-edge ogive has the estimable parameter E and a scaling parameter $\alp
 f(x)=V_x
 \end{equation}
 
-The all-values selectivity has estimable parameters $V_{low}$, $V_{low+1}$ \ldots $V_{high}$. Here, you need to provide the selectivity value for each age class.
+The all-values selectivity has parameters $V_{low}$, $V_{low+1}$ \ldots $V_{high}$. Here, you need to provide the selectivity value for each age class.
 
 \subsubsection[All-values-bounded]{\argument{all\_values\_bounded}}\index{Selectivities!All-values-bounded}
 
@@ -695,7 +834,7 @@ f(x)=\begin{cases}
   \end{cases}
 \end{equation}
 
-The all-values-bounded selectivity has non-estimable parameters L and H. The estimable parameters are $V_L$, $V_{L+1}$ \ldots $V_H$. Here, you need to provide an selectivity value for each age class from $L \ldots H$.
+The all-values-bounded selectivity has parameters  $L$, $H$, $V_L$, $V_{L+1}$ \ldots $V_H$. Here, you need to provide an selectivity value for each age class from $L \ldots H$.
 
 \subsubsection[Increasing]{\argument{increasing}}\index{Selectivities!Increasing}
 
@@ -707,7 +846,7 @@ f(x)=\begin{cases}
   \end{cases}
 \end{equation}
 
-The increasing ogive has non-estimable parameters $L$ and $H$. The estimable parameters are $\pi_L$, $\pi_{L+1}$ \ldots $\pi_H$ (but if these are estimated, they should always be constrained to be between 0 and 1). $\alpha$ is a scaling parameter, with default value of $\alpha = 1$. Note that the increasing ogive is similar to the all-values-bounded ogive, but is constrained to be non-decreasing.
+The increasing ogive has parameters $L$ and $H$, $\pi_L$, $\pi_{L+1}$ \ldots $\pi_H$ (but if these are estimated, they should always be constrained to be between 0 and 1). $\alpha$ is a scaling parameter, with default value of $\alpha = 1$. Note that the increasing ogive is similar to the all-values-bounded ogive, but is constrained to be non-decreasing.
 
 \subsubsection[Logistic]{\argument{logistic}}\index{Selectivities!Logistic}
 
@@ -715,7 +854,7 @@ The increasing ogive has non-estimable parameters $L$ and $H$. The estimable par
   f(x) = \alpha / [1+19^{(a_{50}-x)/a_{to95}}]
 \end{equation}
  
-The logistic selectivity has estimable parameters $a_{50}$ and $a_{to95}$. $\alpha$ is a scaling parameter, with default value of $\alpha = 1$. The logistic selectivity takes values $0.5 \alpha$ at $x=a_{50}$ and $0.95 \alpha$ at $x=a_{50}+a_{to95}$. 
+The logistic selectivity has parameters $a_{50}$ and $a_{to95}$. $\alpha$ is a scaling parameter, with default value of $\alpha = 1$. The logistic selectivity takes values $0.5 \alpha$ at $x=a_{50}$ and $0.95 \alpha$ at $x=a_{50}+a_{to95}$. 
 
 \subsubsection[Inverse logistic]{\argument{inverse\_logistic}}\index{Selectivities!Inverse-logistic}
 
@@ -723,7 +862,7 @@ The logistic selectivity has estimable parameters $a_{50}$ and $a_{to95}$. $\alp
   f(x) = \alpha - \alpha / [1+19^{(a_{50}-x)/a_{to95}}]
 \end{equation}
  
-The inverse logistic selectivity has estimable parameters $a_{50}$ and $a_{to95}$. $\alpha$ is a scaling parameter, with default value of $\alpha = 1$. The logistic selectivity takes values $0.5 \alpha$ at $x=a_{50}$ and $0.95 \alpha$ at $x=a_{50}-a_{to95}$. 
+The inverse logistic selectivity has parameters $a_{50}$ and $a_{to95}$. $\alpha$ is a scaling parameter, with default value of $\alpha = 1$. The logistic selectivity takes values $0.5 \alpha$ at $x=a_{50}$ and $0.95 \alpha$ at $x=a_{50}-a_{to95}$. 
 
 \subsubsection[Logistic producing]{\argument{logistic\_producing}}\index{Selectivities!Logistic-producing}
 
@@ -736,7 +875,7 @@ f(x)=\begin{cases}
   \end{cases}
 \end{equation}
 
-The logistic-producing selectivity has the non-estimable parameters $L$ and $H$, and has estimable parameters $a_{50}$ and $a_{to95}$. $\alpha$ is a scaling parameter, with default value of $\alpha = 1$. For category transitions, $f(x)$ represents the proportion moving, not the proportion that have moved. This selectivity was designed for use in an age-based model to model maturity. In such a model, a logistic-producing maturation selectivity will (in the absence of other influences) make the proportions mature follow a logistic curve with parameters $a_{50}$, $a_{to95}$.
+The logistic-producing selectivity has the parameters $L$ and $H$, $a_{50}$ and $a_{to95}$. $\alpha$ is a scaling parameter, with default value of $\alpha = 1$. For category transitions, $f(x)$ represents the proportion moving, not the proportion that have moved. This selectivity was designed for use in an age-based model to model maturity. In such a model, a logistic-producing maturation selectivity will (in the absence of other influences) make the proportions mature follow a logistic curve with parameters $a_{50}$, $a_{to95}$.
 
 \subsubsection[Double-normal]{\argument{double\_normal}}\index{Selectivities!Double-normal}
 
@@ -747,7 +886,7 @@ The logistic-producing selectivity has the non-estimable parameters $L$ and $H$,
   \end{cases}
 \end{equation} 
 
-The double-normal selectivity has estimable parameters $a_1$, $s_L$, and $s_R$. $\alpha$ is a scaling parameter, with default value of $\alpha = 1$. It has values $\alpha$ at $x=a_1$, and $0.5 \alpha$ at $x=a_1-s_L$ and $x=a_1+s_R$. 
+The double-normal selectivity has parameters $\mu$, $\sigma_L$, and $\sigma_R$. $\alpha$ is a scaling parameter, with default value of $\alpha = 1$. It has values $\alpha$ at $x=\mu$
 
 \subsubsection[Double-exponential]{\argument{double\_exponential}}\index{Selectivities!Double-exponential}
 
@@ -758,12 +897,7 @@ f(x)=\begin{cases}
   \end{cases}
 \end{equation}
 
-The double-exponential selectivity has non-estimable parameters $x_1$ and $x_2$, and estimable parameters $x_0$, $y_0$, $y_1$, and $y_2$.  $\alpha$ is a scaling parameter, with default value of $\alpha = 1$. It can be `U-shaped'. Bounds for $x_0$ must be such that $x_1 < x_0 < x_2$. With $\alpha=1$, the selectivity passes through the points $(x_1, y)$, $(x_0, y_0)$, and $(x_2, y_2)$. If both $y_1$ and $y_2$ are greater than $y_0$ the selectivity is `U-shaped' with minimum at $(x_0, y_0)$.
-
-%\subsubsection[Spline]{\argument{spline}}\index{Selectivities!Spline}
-%
-%The spline selectivity implements a cubic spline that has non-estimable knots, and an estimable value for each knot. The cubic spline is either (i) a natural splines where the second derivatives are set to 0 at the boundaries, i.e., the values at the boundaries are horizontal, (ii) a spline with a fixed first derivative at the boundaries (linear, but not necessarily horizontal) and (iii) spline which turns into a parabola at the boundaries. 
-%
+The double-exponential selectivity has  parameters $x_1$, $x_2$, $x_0$, $y_0$, $y_1$, and $y_2$.  $\alpha$ is a scaling parameter, with default value of $\alpha = 1$. It can be `U-shaped'. Bounds for $x_0$ must be such that $x_1 < x_0 < x_2$. With $\alpha=1$, the selectivity passes through the points $(x_1, y)$, $(x_0, y_0)$, and $(x_2, y_2)$. If both $y_1$ and $y_2$ are greater than $y_0$ the selectivity is `U-shaped' with minimum at $(x_0, y_0)$.
 
 
 Selectivities \subcommand{all\_values} and \subcommand{all\_values\_bounded} can be addressed in additional priors using the following syntax,
@@ -780,7 +914,102 @@ Selectivities \subcommand{all\_values} and \subcommand{all\_values\_bounded} can
 		
 		\end{verbatim}}}
 	
-	
+\subsection{\I{Preference Functions}\label{sec:preference_functions}}
+Preference functions are a class of equations that describe the preference for of agents to a covariate used to describe movement in the preference based movement process (Section~\ref{subsubsec:pref_movement}). Currently there are only three options
+
+\begin{enumerate}
+	\item Double normal
+	\item Logistic
+	\item Normal
+\end{enumerate}
+
+These are the same equations as in the selectivities (Section~\ref{sec:selectivities}), but that instead of specifying the vulnerability for age or length they describe the preference for a user defined covariate or explanatory variable so the units are completely user defined.
+\subsubsection[Double-normal]{\argument{double\_normal}}\index{Preference Functions!Double-normal}
+
+\begin{equation}
+f(x) = \begin{cases}
+\alpha 2^{-[(x- \mu)/\sigma_L ]^2}, & \text{if $x \leq \mu$} \\
+\alpha 2^{-[(x- \mu)/\sigma_R ]^2}, & \text{if $x \ge \mu$}\\
+\end{cases}
+\end{equation} 
+
+The double-normal preference function has parameters $\mu$, $\sigma_L$, and $\sigma_R$. $\alpha$ is a scaling parameter, with default value of $\alpha = 1$. It has values $\alpha$ at $x=\mu$.
+
+\subsubsection[Logistic]{\argument{logistic}}\index{Preference Functions!Logistic}
+
+\begin{equation}
+f(x) = \alpha / [1+19^{(a_{50}-x)/a_{to95}}]
+\end{equation}
+
+The logistic preference function has parameters $a_{50}$ and $a_{to95}$. $\alpha$ is a scaling parameter, with default value of $\alpha = 1$. The logistic selectivity takes values $0.5 \alpha$ at $x=a_{50}$ and $0.95 \alpha$ at $x=a_{50}+a_{to95}$. 
+
+\subsubsection[Normal]{\argument{double\_normal}}\index{Preference Functions!Normal}
+
+\begin{equation}
+f(x) = 
+\alpha 2^{-[(x- \mu)/\sigma]^2}
+\end{equation} 
+
+The normal preference function has parameters  $\sigma$, and $\mu$. $\alpha$ is a scaling parameter, with default value of $\alpha = 1$. It has values $\alpha$.
+
+\subsection{\I{Time Varying Parameters}\label{sec:time_var}}
+
+\IBM\ has the functionality to vary some parameters annually between the start and final year of a model run. This can be for blocks of years or specific years. For years that are not specified the parameter will default to the input. Method types for time varying a parameter are; \subcommand{constant}, \subcommand{random\_walk}, \subcommand{exogenous}, \subcommand{linear}, \subcommand{annual\_shift}, \subcommand{random\_draw}. This allows users to let a parameter be known in a year, be the result of a deterministic equation, or stochastic. 
+
+When allowing removals to have annual varying, selectivities and other more realistic model components, simulated observations more closely model real data and associated conclusions become more useful. Another driver for implementing time-varying parameters was allowing mean or location parameters of selectivities to change between years based on an explanatory variable. An example of this is in the New Zealand Hoki fishery where we allow the $\mu$ and $a_{50}$ parameters to shift depending on when the fishing season occurs. Descriptive analysis showed that when fishing was earlier relative to other years smaller fish were caught and vice versa.
+
+\subsubsection[Constant]{\argument{constant}}\index{Time Varying Parameters!Constant}
+Allows a parameter to have an alternative value during certain years, which can be estimated.
+{\small{\begin{verbatim}
+		@time_varying m_time_var
+		type constant
+		parameter process[natural_mortality].m
+		years 1975:1988
+		values 0.123
+		\end{verbatim}}}
+
+
+\subsubsection[Random Walk]{\argument{random\_walk}}\index{Time Varying Parameters!Random Walk}
+
+A random deviate is added into the last value drawn from a standard normal distribution. This has an estimable parameter $\sigma_p$ for each time varying parameter $p$. For reproducible modelling, it is highly recommended that users set the seed (see Section~\ref{sec:command-line-arguments}) when using stochastic functionality like this, otherwise reproducing models becomes almost impossible.
+{\small{\begin{verbatim}
+		@time_varying m_time_var
+		type random_walk
+		parameter process[natural_mortality].m
+		distribution normal
+		mean 0.123
+		sigma 0.05
+		\end{verbatim}}}
+
+A constraint whilst using this functionality is that a parameter cannot be less than 0.0, if it is \IBM\ sets it equal to 0.01.
+
+\subsubsection[Annual shift]{\argument{annual\_shift}}\index{Time Varying Parameters!Annual shift}
+
+A parameter generated in year $y$ ($\theta'_y$) depends on the value specified by the user ($\theta_y$) along with three coefficients $a,b$ and $c$ as follows,
+
+\begin{equation}
+\bar{\theta}_y = \frac{\sum_{y}^Y\theta_y}{Y}
+\end{equation}
+
+\begin{equation}
+\theta'_y = a \bar{\theta}_y + b\bar{\theta}_y^{2} + c\bar{\theta}_y^{3}
+\end{equation}
+
+\subsubsection[Exogenous]{\argument{exogenous}}\index{Time Varying Parameters!Exogenous}
+
+Parameters are shifted based on an exogenous variable, an example of this is an exploitation selectivity parameters that may vary between years based on known changes in exploitation behaviour such as season, start time, and average depth of exploitation.
+
+\begin{equation}
+\delta_y = a(E_y - \bar{E})
+\end{equation}
+
+\begin{equation}
+\theta'_y = \theta_y + \delta_y
+\end{equation}
+
+where $\delta_y$ is the shift or deviation in parameter $\theta_y$ in year $y$ to generate the new parameter value in year $y$ ($\theta'_y$). $a$ is an estimable shift parameter, $E$ is the exogenous variable and $E_y$ is the value of this variable in year $y$. For more information readers can see \cite{francis_03}.
+
+
 \subsection{\I{Tips setting up configuration files}\label{sec:tips}}
 \IBM\ can take a while if you have a complex spatial model and complex life history. So there are some tips and tricks that I have come found can be useful when setting up configuration files.
 
