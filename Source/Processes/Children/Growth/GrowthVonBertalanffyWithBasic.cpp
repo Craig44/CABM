@@ -29,12 +29,12 @@ namespace processes {
  * constructor
  */
 GrowthVonBertalanffyWithBasic::GrowthVonBertalanffyWithBasic(Model* model) : Growth(model) {
-  parameters_.Bind<string>(PARAM_LINF_LAYER_LABEL, &l_inf_layer_label_, "Label for the numeric layer that describes mean L_inf through space", "", "");
+  parameters_.Bind<string>(PARAM_LINF_LAYER_LABEL, &l_inf_layer_label_, "Label for the numeric layer that describes mean L inf through space", "", "");
   parameters_.Bind<string>(PARAM_K_LAYER_LABEL, &k_layer_label_, "Label for the numeric layer that describes mean k through space", "", "");
   parameters_.Bind<float>(PARAM_T0, &t0_, "The value for t0 default = 0", "", 0);
   parameters_.Bind<string>(PARAM_A_LAYER_LABEL, &a_layer_label_, "Label for the numeric layer that describes mean a in the weight calcualtion through space", "", "");
   parameters_.Bind<string>(PARAM_B_LAYER_LABEL, &b_layer_label_, "Label for the numeric layer that describes mean b in the weight calcualtion through space", "", "");
-  parameters_.Bind<float>(PARAM_LINF, &l_inf_, "Value of mean L_inf multiplied by the layer value if supplied", "", 0);
+  parameters_.Bind<float>(PARAM_LINF, &l_inf_, "Value of mean L inf multiplied by the layer value if supplied", "", 0);
   parameters_.Bind<float>(PARAM_K, &k_, "Value of mean k multiplied by the layer value if supplied", "", 0);
   parameters_.Bind<float>(PARAM_A, &a_, "alpha value for weight at length function", "", 0);
   parameters_.Bind<float>(PARAM_B, &b_, "beta value for weight at length function", "", 0);

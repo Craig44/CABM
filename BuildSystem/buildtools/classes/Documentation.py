@@ -59,6 +59,7 @@ class Documentation:
         type_aliases_['bool']             = 'boolean'
         type_aliases_['int']              = 'integer'
         type_aliases_['string']           = 'string'
+        type_aliases_['string']           = 'std::string'
         type_aliases_['vector<double>']   = 'constant vector'
         type_aliases_['vector<float>']   = 'constant-float vector'
         type_aliases_['vector<unsigned>'] = 'non-negative integer vector'
@@ -123,7 +124,7 @@ class ClassLoader:
                         'InitialisationPhases',
                         'Likelihoods',
                         'Model', 'Observations', 'Processes',
-                        'Reports', 'Selectivities', 'TimeSteps', 'TimeVarying']
+                        'Reports', 'Selectivities', 'TimeSteps', 'TimeVarying', 'PreferenceFunctions']
         type_without_children_folders = [ 'Model', 'TimeSteps']
         type_to_exclude_third_level_children = [ '' ]
         for folder in parent_class_folders:
@@ -182,9 +183,9 @@ class ClassLoader:
                                             return Globals.PrintError('Child class ' + file + ' was not found in ' + parent_class_.name_ + ' child classes')
 
                                         sub_child_class = copy.deepcopy(parent_class_.child_classes_[file])
-                                        sub_child_class.name_ = child_file.replace('.h', '') + file
+                                        sub_child_class.name_ = child_file.replace('.h', '')
                                         sub_child_class.parent_name_ = file
-                                        print 'child file ' + sub_child_class.name_
+                                        print 'child file ' + sub_child_class.name_ + " parent file = " + file
                                         
                                         parent_class_.child_classes_[file].child_classes_[sub_child_class.name_] = sub_child_class
                                         if not VariableLoader().Load('../Source/' + folder + '/Children/' + file + '/' + child_file, sub_child_class):
@@ -280,12 +281,14 @@ class VariableLoader:
         return True
 
     def HandleParameterBindLine(self, line, class_):
-        line = line.replace('float(', '') 
+        #line = line.replace('float(', '') 
         lines = re.split('->', line)
         short_line = lines[0].replace('parameters_.Bind<', '')
         pieces = re.split(',|<|>|;|(|)', short_line)
         pieces = filter(None, pieces)
 
+        #for piece in pieces:
+        #    print "piece = " + piece
         # Check for the name of the variable we're binding too
         used_variable = pieces[2].replace('&', '').rstrip().lstrip().lower()
 
@@ -319,6 +322,7 @@ class VariableLoader:
         index += 1
         if len(pieces) > index:
             variable.default_ = pieces[index].replace(')', '').rstrip().lstrip()
+        #print "value = " + value + " description = " + variable.description_ + " default = " + variable.default_
 
         if len(lines) == 2:
             short_line = lines[1]
@@ -485,6 +489,7 @@ class Printer:
                     #self.PrintClass(file, child_class)
                     self.PrintClass(file, third_class)
             else:
+                print "Could not find any information for " + child_class_name
                 object_name = re.sub( '(?<!^)(?=[A-Z])', ' ', child_class.name_)
                 class_name = re.sub( '(?<!^)(?=[A-Z])', '\_', child_class.name_).lower()
                 parent_class = re.sub( '(?<!^)(?=[A-Z])', '\_', parent_class_.name_).lower()
@@ -501,12 +506,12 @@ class Printer:
             variable = class_.variables_[(key)]
             if variable.name_ == '':
                 continue
-            print variable.name_ + ' ' + class_.name_
             # Remove PARAMs and associated desriptions of variables that have yet to be completed in the code
             if variable.description_.startswith('TBA'):
                 continue
             # And continue as normal
-            file_.write('\\defSub{' + variable.name_ + '} {' + variable.description_ + '}\n')            
+            file_.write('\\defSub{' + variable.name_ + '} {' + variable.description_ + '}\n')    
+            print "variable type = " + variable.type_
             if variable.name_ in class_.estimables_:
                 if class_.estimables_[variable.name_ ].startswith('vector<') or class_.estimables_[variable.name_ ].startswith('map<'):
                     file_.write('\\defType{estimable vector}\n')

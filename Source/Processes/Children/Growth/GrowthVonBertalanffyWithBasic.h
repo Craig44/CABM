@@ -41,12 +41,12 @@ public:
   void                        draw_growth_param(unsigned row, unsigned col, unsigned number_of_draws, vector<vector<float>>& vec) override final;
 
 protected:
-  std::string				          l_inf_layer_label_;
-  std::string				          k_layer_label_;
+  string				              l_inf_layer_label_;
+  string				              k_layer_label_;
   niwa::layers::NumericLayer* L_inf_layer_ = nullptr;
   niwa::layers::NumericLayer* k_layer_ = nullptr;
-  std::string                 a_layer_label_;
-  std::string                 b_layer_label_;
+  string                      a_layer_label_;
+  string                      b_layer_label_;
   niwa::layers::NumericLayer* a_layer_ = nullptr;
   niwa::layers::NumericLayer* b_layer_ = nullptr;
   float                       l_inf_;

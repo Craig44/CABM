@@ -74,9 +74,40 @@ type derived_quantity
 \end{verbatim}}}
 
 \subsubsection{Process}
-This report will print all parameters that were set for a specific process and any auxiliary information that you want from the specific process.
+This report will print all parameters that were set for a specific process and any auxiliary information that you want from the specific process. Many of the processes will print extra information such as some of the mortality processes that are responsible for tag recaptures.
 {\small{\begin{verbatim}
 @report M_report
 type process
 process natural_mort
 \end{verbatim}}}
+
+
+\subsubsection{Numeric Layer}
+This report will print out the model derived numeric layers such Abundance and biomass. Useful for showing the spatial distribution of all the agents over time.
+{\small{\begin{verbatim}
+@report biomass_by_cell
+type numeric_layer
+layer_label biomass_by_cell
+years 1990:2018
+time_step Summer
+\end{verbatim}}}
+
+
+\subsubsection{Time varying}
+This report will print out all the time varying parameters and the values assumed in each year
+{\small{\begin{verbatim}
+@report time_varying_parameters
+type time)varying
+\end{verbatim}}}
+
+
+\subsubsection{Summarise Agents}
+This report will randomly print all the attributes from a user defined number of agents that can be viewed at the end of each time step. Useful looking at length weight by area, tagged fish etc.
+{\small{\begin{verbatim}
+@report agents
+type summarise_agents
+years 1990:2018
+time_step Summer
+number_of_individuals 1000
+\end{verbatim}}}
+

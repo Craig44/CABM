@@ -32,7 +32,7 @@ LogisticNormal::LogisticNormal(Model* model)  : Likelihood(model) {
   parameters_.Bind<bool>(PARAM_SEXED, &sexed_, "Will the observation be split by sex?", "",false);
   parameters_.Bind<bool>(PARAM_ROBUST, &robust_, "Robustification term for zero observations", "",false);
   parameters_.Bind<bool>(PARAM_SEPERATE_BY_SEX, &sep_by_sex_, "If data is sexed, should the covariance matrix be seperated by sex?", "",false);
-  parameters_.Bind<bool>(PARAM_SEX_LAG, &sex_lag_, "if T and data are sexed, then the AR(n) correlation structure ignores sex and sets lag = |i-j|+1, where i & j index the age or length classes in the data.  Ignored if data are not sexed.", "",false);
+  parameters_.Bind<bool>(PARAM_SEX_LAG, &sex_lag_, R("if T and data are sexed, then the AR(n) correlation structure ignores sex and sets lag = |i-j|+1, where i \& j index the age or length classes in the data.  Ignored if data are not sexed."), "",false);
 
   RegisterAsAddressable(PARAM_SIGMA, &sigma_);
   RegisterAsAddressable(PARAM_RHO, &rho_);
