@@ -1,7 +1,9 @@
 \section{\I{The report section}\label{sec:report-section}}\index{Reports}\index{Reports section}
 The report section specifies the printouts and other outputs from the model. \IBM\ does \textbf{not} produce any output unless requested by a valid \command{report} block. This important to note, as model runs can take a few minutes to run it will be in vain if there are no reports.
 
-Reports from \IBM\ can be defined to print partition and states objects at a particular point in time, observation summaries, estimated parameters and objective function values. See below for a more extensive list of report types, and an example of an observation report.
+Reports from \IBM\ can be defined to print partition and states objects at a particular point in time, observation summaries, estimated parameters and objective function values. See below for a more extensive list of report types, and an example of an observation report.\\
+
+Also remember because this is a terminal run program to write pipe out the output to file like \texttt{ibm -r > run.out} else it would print to the terminal and be fairly useless. Once you have \IBM\ output in a text file like the above example \texttt{run.out}, go to Section~\ref{sec:post-processing} for how to use the R-library for reading in and plotting information in the \R\ environment.
 
 
 \subsubsection{Initialisation Partition}

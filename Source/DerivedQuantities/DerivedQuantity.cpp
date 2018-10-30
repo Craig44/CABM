@@ -191,9 +191,9 @@ float DerivedQuantity::GetLastValueFromInitialisation(unsigned phase) {
   LOG_FINEST() << "about to check init_values";
 
   if (initialisation_values_.size() <= phase)
-    LOG_ERROR() << "No values have been calculated for the initialisation value in phase: " << phase;
+    LOG_ERROR() << "No values have been calculated for the initialisation value in phase: " << phase << " This may mean you are asking for an SSB value before it has been calculated, check the order of your annual cycle";
   if (initialisation_values_[phase].size() == 0)
-    LOG_ERROR() << "No values have been calculated for the initialisation value in phase: " << phase;
+    LOG_ERROR() << "No values have been calculated for the initialisation value in phase: " << phase << " This may mean you are asking for an SSB value before it has been calculated, check the order of your annual cycle";
 
 
   LOG_FINE() << "returning value = " << *initialisation_values_[phase].rbegin();

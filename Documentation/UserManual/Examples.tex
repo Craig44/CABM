@@ -1,6 +1,5 @@
 
 \section{\I{Syntax conventions, examples and niceties}\label{sec:examples}}
-
 \subsection{Input File Specification}
 The file format used for \IBM\ is based on the formats used for Casal2, CASAL and SPM. It's a standard text file that contains definitions organised into blocks.
 
@@ -17,7 +16,7 @@ Some general notes about writing configuration files:
 \end{enumerate}
 
 \subsubsection{Keywords And Reserved Characters}
-In order to allow efficient creation of input files CASAL2's file format contains special keywords and characters that cannot be used for labels etc.
+In order to allow efficient creation of input files ibms file format contains special keywords and characters that cannot be used for labels etc.
 
 \paragraph*{\command Block Definitions}
 Every new block in the configuration file must start with a block definition character. The reserved character for this is the \command character\\
@@ -74,12 +73,11 @@ parameter <value_1> <value_2>
 Users can reference individual elements of a map using the \{ \} syntax, for example when estimating \subcommand{ycs\_values} you may only want to estimate a block of YCS not all of them say between 1975 and 2012.
 Example:
 {\small{\begin{verbatim}
-		@estimate YCS
+		@time_varying YCS
 		parameter process[Recruitment].ycs_values{1975:2012}
-		type uniform
-		lower_bound
-		upper_bound
-		\end{verbatim}}}
+		type constant
+		value 1
+\end{verbatim}}}
 	
 \paragraph*{':' (Range Specifier)}
 The range specifier allows you to specify a range of values at once instead of having to input them manually. Ranges can be either incremental or decremental.\\
@@ -133,34 +131,7 @@ processes recruitment ageing
 
 
 \paragraph*{\I{Parameters}\label{sec:params}}
-\IBM\ also allows parameters that are of type vector or map to be referenced and estimated partially. An example of a parameter that is type vector is \texttt{ycs\_values} in a recruitment process. Let say a recruitment block was specified as follows,
-{\small{\begin{verbatim}
-		@process WestRecruitment
-		type recruitment_beverton_holt
-		r0 400000
-		years
-		ycs_values 1 1 1 1 1 1 1 1 
-		ycs_years 1975:1983
-		An alternative specification to the sequence of values you can use an astrix to
-		shorthand repeating integers e.g.
-		
-		ycs_values 1*8
-		
-		steepness 0.9
-		age 1
-		\end{verbatim}}}
-
-Lets say we wanted to only estimate the last four years of the parameter \texttt{process[WestRecruitment].ycs\_values}. This can be done as specified in the following \command{estimate} block,
-
-{\small{\begin{verbatim}
-		@estimate
-		parameter process[WestRecruitment].ycs_values{1979:1983}
-		type uniform
-		lower_bound 0.1 0.1 0.1 0.1
-		upper_bound  10  10  10  10 
-		\end{verbatim}}}
-
-Note the first element of a vector is indexed by 1. This syntax can be applied to parameters that are of type map as well, for information on what type a parameter is see the syntax section. An example of a parameter that is of type map is \command{time\_varying}\texttt{[label].type=constant}. For the following \command{time\_varying} block,
+This syntax can be applied to parameters that are of type map as well, for information on what type a parameter is see the syntax section. An example of a parameter that is of type map is \command{time\_varying}\texttt{[label].type=constant}. For the following \command{time\_varying} block,
 
 {\small{\begin{verbatim}
 		@time_varying q_step1
@@ -170,36 +141,15 @@ Note the first element of a vector is indexed by 1. This syntax can be applied t
 		value 	0.2		0.2		0.2		0.2	
 		\end{verbatim}}}
 
-In this example a user may want to estimate only one element of the map (say 1992), but force all other years to be the same as the one estimate. This can be done in an estimate block as follows,
-{\small{\begin{verbatim}
-		@estimate
-		parameter time_varying[q_step1].value{1992}
-		same time_varying[q_step1].value{1993:1995}
-		type uniform
-		lower_bound 0.1 0.1 0.1 0.1
-		upper_bound  10  10  10  10 
-		\end{verbatim}}}
+
 \paragraph*{\I{In line declaration}\label{sec:declare}}
 In line declarations can help shorten models by passing \command{} blocks, for example 
 {\small{\begin{verbatim}
 		@observation chatCPUE
 		type biomass
 		catchability [q=6.52606e-005]
-		time_step one
-		categories male+female
-		selectivities chatFselMale chatFselFemale
-		likelihood lognormal
-		years 1992:2001
-		time_step_proportion 1.0
-		obs 1.50 1.10 0.93 1.33 1.53 0.90 0.68 0.75 0.57 1.23
-		error_value 0.35
+		...
 		
-		@estimate 
-		parameter catchability[chatTANbiomass.one].q
-		type uniform_log
-		lower_bound 1e-2
-		upper_bound 1
-		In line declaration tips
 		\end{verbatim}}}
 
 In the above code we are defining and estimating catchability without explicitly creating an \command{catchability} block.
@@ -213,11 +163,6 @@ When you do an inline declaration the new object will be created with the name o
 		@selectivity halfm.one
 		\end{verbatim}}}
 
-if there were 10 categories all with there own selectivity the $10^th$ selectivity would be labelled,
-
-{\small{\begin{verbatim}
-		@selectivity halfm.10
-		\end{verbatim}}}
 
 
 \subsection{Processes}
@@ -241,7 +186,48 @@ The trick is that you can replace the keyword \subcommand{process} with the firs
 		\end{verbatim}}}
 
 {\small{\begin{verbatim}
-		@transition Migration
-		type category
+		@movement Migration
+		type box_transfer
 		\end{verbatim}}}
-\textsl{}
+
+\subsection{An Example Configuration input}
+This example implements a very simple single species and area model, with recruitment, maturation, natural and fishing mortality, and an annual age increment. The population structure has ages $1-30^{+}$ with a single category.
+
+\IBM\ default file to search for in your current working directory is \texttt{casal2.csl2}. In this example, \texttt{casal2.csl2} specifies all the files necessary to run your \IBM\ model from your current working directory. This is done using the !\texttt{\emph{include}} command as follows.
+%\lstinputlisting[firstline=2,lastline=5]{../../Examples/Simple/config.csl2} 
+
+Breaking up a \IBM\ model into sections is recommended, as it aids in readability and error checking. \texttt{population.csl2} contains the population information. The model runs from 1975-2012 and is initialised over a 120 year period prior to  1975, which applies the following processes,
+
+\begin{enumerate}
+	\item A Beverton-Holt recruitment process, recruiting a constant number of individuals to the first age class (i.e., $age=1$).
+	\item A constant mortality process representing natural mortality$(M)$. This process is repeated in all three time steps, so that each with its own time step proportion of $M$ applied.
+	
+	\item An ageing process, where all individuals are aged by one year, and with a plus group accumulator age class at $age=30$.
+\end{enumerate}
+
+Following initialisation, the model runs from the years 1975 to 2012 iterating through two time-steps. The first time-step applies processes of recruitment, and  $\frac{1}{2} M_1 + F + \frac{1}{2} M_1$ processes, where $M_1$ is the proportion of $M$ applied in the first time step. The exploitation process (fishing) is applied in the years 1975--2012. Catches are defined in the catches table and attribute information on each fishery such as selectivity and time-step they are implemented are in the fisheries table in the \command{process} block.
+
+The second time-step applies an age increment and the remaining natural mortality.
+
+The first 28 lines of the main section of the \texttt{population.csl2} are,
+% Include config file
+%\lstinputlisting[firstline=1,lastline=28]{../../Examples/Simple/population.csl2} 
+
+To carry out a run of the model (to verify that the model runs without any syntax errors), use the command \texttt{casal2 -r}. Note that as \IBM\ looks for a file named \texttt{casal2.txt} by default, we can override this. Hypothetically speaking if our model was all written in \texttt{Mymodel.txt} we could call it using the \texttt{-c} command like \texttt{casal2 -r -c Mymodel.txt}.
+
+To run an estimation, and hence estimate the parameters defined in the file \texttt{estimation.csl2} (the catchability constant $q$, recruitment $R_0$, and the selectivity parameters $a_{50}$ and $a_{to95}$), use  \texttt{casal2 -e}. Here, we have piped the output to \texttt{estimate.log} using the command \texttt{casal2 -e > estimate.log}, reports the user defined reports \texttt{reports.csl2} from the final iteration of the estimation, and successful convergence printed to screen,
+{\small{\begin{verbatim}
+		Total elapsed time: 1 second
+		Completed
+		\end{verbatim}}}
+
+The main part of the output from the estimation run is summarised in the file \texttt{estimate.log}, and the final MPD parameter values can be piped out as a separate report, in this case named \texttt{paramaters.out}, using the command \texttt{casal2 -e -o paramaters.out > estimate.log}.
+
+A profile on the $R_0$ parameter can also be run, using \texttt{casal2 -p > profile.log}. See the examples folder for the example of the output.
+
+
+
+
+
+
+

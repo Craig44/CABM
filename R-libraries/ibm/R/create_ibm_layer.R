@@ -12,7 +12,7 @@
 #' @return void it creates a file
 #' @export
 
-create_ibm_layer = function(label, type, filename, Matrix, proporstion = FALSE) {
+create_ibm_layer = function(label, type, filename, Matrix, proportion = FALSE) {
   # check type is allowd
   allowed_types = c("numeric","numeric_meta","categorical","integer", "biomass")
   
@@ -21,7 +21,7 @@ create_ibm_layer = function(label, type, filename, Matrix, proporstion = FALSE) 
   
   cat(paste0("@layer ", label,"\n"),file = filename, append = FALSE);
   cat(paste0("type ", type,"\n"),file = filename, append = TRUE);
-  if (proporstion)
+  if (proportion)
     cat("proportions true\n",file = filename, append = TRUE);
   cat("table layer\n",file = filename, append = TRUE);
   write(t(Matrix),file = filename, append = TRUE, ncolumns  = ncol(Matrix));

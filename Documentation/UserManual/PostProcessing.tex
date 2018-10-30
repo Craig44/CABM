@@ -4,10 +4,16 @@ Hopefully when you get the bundle for this program there will be an \R\ package,
 
 \begin{itemize}
 	\item \texttt{extract.run()} imports the model's output into the \R\ environment.
-	\item \texttt{extract.ibm.file()} imports the model's configuration file into the \R\ environment
+	\item \texttt{extract.ibm.file()} imports the model's configuration file into the \R\ environment as a list where you can change inputs. Useful in simulation based studies
 	\item \texttt{write.ibm.file()} prints the a list object (that has the same characteristics as the \texttt{extract.ibm.file()})	to a text file.
 	\item \texttt{reformat.compositional.data()} converts \IBM\ compositional observation reports into a more traditional matrix.
 	\item \texttt{plot.derived\_quantities()} plot or extract derived quantities from a model run.
+	\item \texttt{create\_ibm\_layer} A function that creates a file consists of \command{layer} block with a user input matrix, useful function for setting up highly spatial models.
+	\item \texttt{csl2\_bio} turn a ibm biomass observation into a casal2 style observation
+	\item \texttt{csl2\_fishery\_age} turn a ibm fishery age observation into a casal2 style observation	
+	\item \texttt{csl2\_prop\_age} turn a ibm proportions at age observation into a casal2 style observation
+	\item \texttt{ssb\_multiple\_runs} A plotting function to plot multiple Derived Quantities in ggplot style
+	\item \texttt{plot\_numeric\_layer} a plotting function that generates a snapshot of biomass from a \subcommand{numeric\_layer} report. It generated the Figure~\ref{fig:pref}
 \end{itemize}
 
 

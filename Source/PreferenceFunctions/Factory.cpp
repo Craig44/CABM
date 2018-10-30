@@ -21,6 +21,7 @@
 #include "Model/Managers.h"
 #include "PreferenceFunctions/Manager.h"
 #include "PreferenceFunctions/Children/Logistic.h"
+#include "PreferenceFunctions/Children/InverseLogistic.h"
 #include "PreferenceFunctions/Children/DoubleNormal.h"
 #include "PreferenceFunctions/Children/Normal.h"
 
@@ -45,6 +46,8 @@ PreferenceFunction* Factory::Create(Model* model, const string& object_type, con
       result = new Logistic(model);
     else if (sub_type == PARAM_DOUBLE_NORMAL)
       result = new DoubleNormal(model);
+    else if (sub_type == PARAM_INVERSE_LOGISTIC)
+      result = new InverseLogistic(model);
     else if (sub_type == PARAM_NORMAL)
       result = new Normal(model);
 
