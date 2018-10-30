@@ -37,11 +37,11 @@ DoubleExponential::DoubleExponential(Model* model)
   parameters_.Bind<float>(PARAM_Y2, &y2_, "Y2", "");
   parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
 
-  //RegisterAsAddressable(PARAM_X0, &x0_);
-  //RegisterAsAddressable(PARAM_Y0, &y0_);
-  //RegisterAsAddressable(PARAM_Y1, &y1_);
-  //RegisterAsAddressable(PARAM_Y2, &y2_);
-  //RegisterAsAddressable(PARAM_ALPHA, &alpha_);
+  RegisterAsAddressable(PARAM_X0, &x0_);
+  RegisterAsAddressable(PARAM_Y0, &y0_);
+  RegisterAsAddressable(PARAM_Y1, &y1_);
+  RegisterAsAddressable(PARAM_Y2, &y2_);
+  RegisterAsAddressable(PARAM_ALPHA, &alpha_);
 }
 
 /**

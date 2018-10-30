@@ -34,10 +34,10 @@ DoubleNormal::DoubleNormal(Model* model)
   parameters_.Bind<float>(PARAM_SIGMA_R, &sigma_r_, "Sigma R", "");
   parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
 
-  //RegisterAsAddressable(PARAM_MU, &mu_);
-  //RegisterAsAddressable(PARAM_SIGMA_L, &sigma_l_);
-  //RegisterAsAddressable(PARAM_SIGMA_R, &sigma_r_);
-  //RegisterAsAddressable(PARAM_ALPHA, &alpha_);
+  RegisterAsAddressable(PARAM_MU, &mu_);
+  RegisterAsAddressable(PARAM_SIGMA_L, &sigma_l_);
+  RegisterAsAddressable(PARAM_SIGMA_R, &sigma_r_);
+  RegisterAsAddressable(PARAM_ALPHA, &alpha_);
 }
 
 /**
