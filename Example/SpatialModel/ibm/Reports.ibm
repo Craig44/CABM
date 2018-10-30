@@ -12,7 +12,6 @@ type summarise_agents
 number_of_individuals 20
 time_step Annual
 */
-
 # print initail state of agents
 @report init
 type initialisation_partition
@@ -21,12 +20,12 @@ type initialisation_partition
 @report world_age_freq
 type world_age_frequency
 #years 1990:2018 ## defaults to model years
-time_step Annual
+time_step Summer
 
 @report age_freq_by_cell
 type age_frequency_by_cell
 #years 1990:2018 ## defaults to model years
-time_step Annual
+time_step Summer
 
 # print SSB's
 @report derived_quants
@@ -40,6 +39,7 @@ type model_attributes
 ################
 ## Observations
 ################
+/*
 @report fishery_age_freq_by_cell
 type observation
 observation fishery_age_by_cell
@@ -48,7 +48,7 @@ observation fishery_age_by_cell
 type observation
 observation biomass_survey_post_fishing_by_cell
 
-/*
+
 @report age_length
 type observation
 observation biomass_survey_post_fishing_by_cell
@@ -57,9 +57,13 @@ observation biomass_survey_post_fishing_by_cell
 ################
 ## Processes
 ################
-@report Movement
+@report offshore_preference_movement
 type process
-process Movement
+process offshore_preference_movement
+
+@report inshore_preference_movement
+type process
+process inshore_preference_movement
 
 @report Rec
 type process
@@ -67,15 +71,7 @@ process Recruitment
 
 @report M_report
 type process
-process natural_mort
-
-@report mature_report
-type process
-process Maturation
-
-@report fishing
-type process
-process fishing
+process M
 
 /*
 @report preferenceMovement
@@ -86,8 +82,26 @@ process preferenceMovement
 ################
 ## Layers
 ################
-@report total_biomass_by_cell
+@report Summer_total_biomass_by_cell
 type numeric_layer
 layer_label biomass_by_cell
 years 1990:2018
-time_step Fishing
+time_step Summer
+
+@report Autumn_total_biomass_by_cell
+type numeric_layer
+layer_label biomass_by_cell
+years 1990:2018
+time_step Autumn
+
+@report Winter_total_biomass_by_cell
+type numeric_layer
+layer_label biomass_by_cell
+years 1990:2018
+time_step Winter
+
+@report Spring_total_biomass_by_cell
+type numeric_layer
+layer_label biomass_by_cell
+years 1990:2018
+time_step Spring

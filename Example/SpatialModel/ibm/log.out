@@ -1,0 +1,1010 @@
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: config.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Population.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/offshore_cell_movements.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/inshore_cell_movements.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Reports.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/base_layer.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/cell_layer.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_1-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_1-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_1-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_1-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_1-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_1-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_1-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_1-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_1-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_1-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_2-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_2-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_2-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_2-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_2-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_2-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_2-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_2-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_2-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_2-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_3-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_3-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_3-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_3-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_3-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_3-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_3-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_3-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_3-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_3-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_4-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_4-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_4-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_4-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_4-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_4-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_4-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_4-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_4-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_4-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_5-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_5-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_5-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_5-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_5-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_5-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_5-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_5-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_5-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_5-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_6-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_6-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_6-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_6-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_6-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_6-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_6-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_6-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_6-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_6-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_7-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_7-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_7-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_7-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_7-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_7-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_7-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_7-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_7-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_7-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_8-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_8-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_8-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_8-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_8-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_8-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_8-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_8-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_8-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_8-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_9-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_9-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_9-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_9-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_9-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_9-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_9-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_9-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_9-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_9-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_10-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_10-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_10-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_10-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_10-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_10-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_10-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_10-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_10-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Offshore/offshore_10-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_1-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_1-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_1-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_1-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_1-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_1-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_1-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_1-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_1-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_1-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_2-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_2-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_2-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_2-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_2-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_2-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_2-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_2-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_2-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_2-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_3-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_3-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_3-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_3-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_3-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_3-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_3-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_3-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_3-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_3-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_4-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_4-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_4-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_4-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_4-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_4-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_4-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_4-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_4-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_4-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_5-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_5-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_5-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_5-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_5-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_5-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_5-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_5-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_5-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_5-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_6-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_6-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_6-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_6-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_6-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_6-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_6-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_6-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_6-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_6-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_7-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_7-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_7-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_7-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_7-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_7-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_7-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_7-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_7-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_7-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_8-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_8-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_8-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_8-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_8-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_8-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_8-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_8-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_8-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_8-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_9-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_9-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_9-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_9-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_9-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_9-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_9-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_9-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_9-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_9-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_10-1.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_10-2.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_10-3.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_10-4.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_10-5.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_10-6.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_10-7.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_10-8.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_10-9.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore/inshore_10-10.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Depth.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/Inshore_pref.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/SSB_layer.ibm
+[FINE] C:\Work\Software\IBM\Source\ConfigurationLoader\File.cpp(line: 47): Opening file: Layers/recruitment_layer.ibm
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Factory.cpp(line: 38): Creating time step 
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Factory.cpp(line: 38): Creating time step 
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Factory.cpp(line: 38): Creating time step 
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Factory.cpp(line: 38): Creating time step 
+[FINE] C:\Work\Software\IBM\Source\Reports\Factory.cpp(line: 74): Creating report initialisation_partition
+[FINE] C:\Work\Software\IBM\Source\Reports\Factory.cpp(line: 74): Creating report world_age_frequency
+[FINE] C:\Work\Software\IBM\Source\Reports\Factory.cpp(line: 74): Creating report age_frequency_by_cell
+[FINE] C:\Work\Software\IBM\Source\Reports\Factory.cpp(line: 74): Creating report derived_quantity
+[FINE] C:\Work\Software\IBM\Source\Reports\Factory.cpp(line: 74): Creating report model_attributes
+[FINE] C:\Work\Software\IBM\Source\Reports\Factory.cpp(line: 74): Creating report process
+[FINE] C:\Work\Software\IBM\Source\Reports\Factory.cpp(line: 74): Creating report process
+[FINE] C:\Work\Software\IBM\Source\Reports\Factory.cpp(line: 74): Creating report process
+[FINE] C:\Work\Software\IBM\Source\Reports\Factory.cpp(line: 74): Creating report process
+[FINE] C:\Work\Software\IBM\Source\Reports\Factory.cpp(line: 74): Creating report numeric_layer
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 82): Checking 0 reports
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 158): Model: State Change to Validate
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 41): label: Summer
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 41): label: Autumn
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 41): label: Winter
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 41): label: Spring
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 82): Checking 0 reports
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 168): Model: State Change to Build
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 271): 
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 296): min lat = 20 max lat = 30 min long = 180 max lon 190
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 71): 
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 95): setting growth in time step 0 = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 95): setting growth in time step 1 = 0.25
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 95): setting growth in time step 2 = 0.1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 95): setting growth in time step 3 = 0.3
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 94): size of lats = 10 size of longs = 10 heigght = 10 width = 10
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 0-0 lat = 20.5 long = 180.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 0-1 lat = 20.5 long = 181.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 0-2 lat = 20.5 long = 182.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 0-3 lat = 20.5 long = 183.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 0-4 lat = 20.5 long = 184.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 0-5 lat = 20.5 long = 185.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 0-6 lat = 20.5 long = 186.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 0-7 lat = 20.5 long = 187.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 0-8 lat = 20.5 long = 188.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 0-9 lat = 20.5 long = 189.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 1-0 lat = 21.5 long = 180.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 1-1 lat = 21.5 long = 181.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 1-2 lat = 21.5 long = 182.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 1-3 lat = 21.5 long = 183.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 1-4 lat = 21.5 long = 184.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 1-5 lat = 21.5 long = 185.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 1-6 lat = 21.5 long = 186.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 1-7 lat = 21.5 long = 187.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 1-8 lat = 21.5 long = 188.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 1-9 lat = 21.5 long = 189.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 2-0 lat = 22.5 long = 180.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 2-1 lat = 22.5 long = 181.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 2-2 lat = 22.5 long = 182.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 2-3 lat = 22.5 long = 183.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 2-4 lat = 22.5 long = 184.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 2-5 lat = 22.5 long = 185.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 2-6 lat = 22.5 long = 186.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 2-7 lat = 22.5 long = 187.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 2-8 lat = 22.5 long = 188.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 2-9 lat = 22.5 long = 189.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 3-0 lat = 23.5 long = 180.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 3-1 lat = 23.5 long = 181.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 3-2 lat = 23.5 long = 182.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 3-3 lat = 23.5 long = 183.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 3-4 lat = 23.5 long = 184.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 3-5 lat = 23.5 long = 185.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 3-6 lat = 23.5 long = 186.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 3-7 lat = 23.5 long = 187.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 3-8 lat = 23.5 long = 188.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 3-9 lat = 23.5 long = 189.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 4-0 lat = 24.5 long = 180.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 4-1 lat = 24.5 long = 181.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 4-2 lat = 24.5 long = 182.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 4-3 lat = 24.5 long = 183.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 4-4 lat = 24.5 long = 184.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 4-5 lat = 24.5 long = 185.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 4-6 lat = 24.5 long = 186.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 4-7 lat = 24.5 long = 187.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 4-8 lat = 24.5 long = 188.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 4-9 lat = 24.5 long = 189.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 5-0 lat = 25.5 long = 180.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 5-1 lat = 25.5 long = 181.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 5-2 lat = 25.5 long = 182.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 5-3 lat = 25.5 long = 183.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 5-4 lat = 25.5 long = 184.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 5-5 lat = 25.5 long = 185.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 5-6 lat = 25.5 long = 186.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 5-7 lat = 25.5 long = 187.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 5-8 lat = 25.5 long = 188.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 5-9 lat = 25.5 long = 189.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 6-0 lat = 26.5 long = 180.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 6-1 lat = 26.5 long = 181.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 6-2 lat = 26.5 long = 182.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 6-3 lat = 26.5 long = 183.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 6-4 lat = 26.5 long = 184.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 6-5 lat = 26.5 long = 185.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 6-6 lat = 26.5 long = 186.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 6-7 lat = 26.5 long = 187.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 6-8 lat = 26.5 long = 188.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 6-9 lat = 26.5 long = 189.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 7-0 lat = 27.5 long = 180.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 7-1 lat = 27.5 long = 181.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 7-2 lat = 27.5 long = 182.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 7-3 lat = 27.5 long = 183.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 7-4 lat = 27.5 long = 184.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 7-5 lat = 27.5 long = 185.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 7-6 lat = 27.5 long = 186.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 7-7 lat = 27.5 long = 187.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 7-8 lat = 27.5 long = 188.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 7-9 lat = 27.5 long = 189.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 8-0 lat = 28.5 long = 180.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 8-1 lat = 28.5 long = 181.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 8-2 lat = 28.5 long = 182.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 8-3 lat = 28.5 long = 183.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 8-4 lat = 28.5 long = 184.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 8-5 lat = 28.5 long = 185.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 8-6 lat = 28.5 long = 186.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 8-7 lat = 28.5 long = 187.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 8-8 lat = 28.5 long = 188.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 8-9 lat = 28.5 long = 189.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 9-0 lat = 29.5 long = 180.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 9-1 lat = 29.5 long = 181.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 9-2 lat = 29.5 long = 182.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 9-3 lat = 29.5 long = 183.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 9-4 lat = 29.5 long = 184.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 9-5 lat = 29.5 long = 185.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 9-6 lat = 29.5 long = 186.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 9-7 lat = 29.5 long = 187.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 9-8 lat = 29.5 long = 188.5
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 108): Building cell 9-9 lat = 29.5 long = 189.5
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 56): Time step Summer has 5 processes
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 56): Time step Autumn has 4 processes
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 56): Time step Winter has 3 processes
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\TimeStep.cpp(line: 56): Time step Spring has 4 processes
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 41): label: Summer
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementBoxTransfer.cpp(line: 59): 
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementBoxTransfer.cpp(line: 59): 
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 62): 
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 85): brownian motion = 0 calculate on the fly? 0
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 304): 
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1990
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1991
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1992
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1993
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1994
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1995
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1996
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1997
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1998
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1999
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2001
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2002
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2003
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2004
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2005
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2006
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2007
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2008
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2009
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2010
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2011
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2012
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2013
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2014
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2015
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2016
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2017
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2018
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 62): 
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 85): brownian motion = 0 calculate on the fly? 0
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 304): 
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1990
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1991
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1992
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1993
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1994
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1995
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1996
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1997
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1998
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 1999
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2001
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2002
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2003
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2004
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2005
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2006
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2007
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2008
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2009
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2010
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2011
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2012
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2013
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2014
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2015
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2016
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2017
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 402): year = 2018
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 423): power = 1
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Recruitment\RecruitmentConstant.cpp(line: 38): 
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 51): Adding report init to state reports, with model->state() = 4
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 41): label: Summer
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 54): Adding report world_age_freq to time step reports
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 41): label: Summer
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 54): Adding report age_freq_by_cell to time step reports
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 51): Adding report derived_quants to state reports, with model->state() = 6
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 51): Adding report model_attributes to state reports, with model->state() = 6
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 51): Adding report offshore_preference_movement to state reports, with model->state() = 6
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 51): Adding report inshore_preference_movement to state reports, with model->state() = 6
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 51): Adding report Rec to state reports, with model->state() = 6
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 51): Adding report M_report to state reports, with model->state() = 6
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 41): label: Summer
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 54): Adding report total_biomass_by_cell to time step reports
+[FINE] C:\Work\Software\IBM\Source\InitialisationPhases\Manager.cpp(line: 59): Ordering initialisation phases
+[MEDIUM] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 345): setting number of threads = 1
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 82): Checking 0 reports
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 177): Model: State Change to Verify
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 82): Checking 0 reports
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 187): Preparing Reports
+[MEDIUM] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 383): 
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 390): Multi line value = 1
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 397): suffix width = 1 value = 1
+[FINE] C:\Work\Software\IBM\Source\Model\Model.cpp(line: 407): Model: State change to Initialisation
+[MEDIUM] C:\Work\Software\IBM\Source\InitialisationPhases\Children\Iterative.cpp(line: 108): 
+[FINE] C:\Work\Software\IBM\Source\InitialisationPhases\Children\Iterative.cpp(line: 130): total b0 = 120000 number = 7.17912 number of agents = 1500000
+[FINE] C:\Work\Software\IBM\Source\InitialisationPhases\Children\Iterative.cpp(line: 134): setting R0 for Recruitment = 208939
+[FINE] C:\Work\Software\IBM\Source\InitialisationPhases\Children\Iterative.cpp(line: 166): check seed = 0.15
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Mortality\MortalityConstantRate.cpp(line: 245): mean M = 0.15
+[MEDIUM] C:\Work\Software\IBM\Source\World\WorldCell.cpp(line: 125): number of bytes of an agent class 112
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 82): Checking 1 reports
+[FINE] C:\Work\Software\IBM\Source\Reports\Manager.cpp(line: 84): Checking report: init
+[FINE] C:\Work\Software\IBM\Source\Reports\Children\InitialisationPartition.cpp(line: 50):  printing report init
+[FINE] C:\Work\Software\IBM\Source\TimeSteps\Manager.cpp(line: 206): 
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 109): 
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 242): n agents in this cell = 15000
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Movement\MovementPreference.cpp(line: 293): Mergind cached world
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 145): 
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 0 col = 0 = 9987
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 0 col = 1 = 11686
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 0 col = 2 = 12106
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 0 col = 3 = 10563
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 0 col = 4 = 11160
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 0 col = 5 = 10761
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 0 col = 6 = 11652
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 0 col = 7 = 11821
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 0 col = 8 = 10887
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 0 col = 9 = 9021
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 1 col = 0 = 12715
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 1 col = 1 = 13921
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 1 col = 2 = 12806
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 1 col = 3 = 11982
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 1 col = 4 = 11778
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 1 col = 5 = 11561
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 1 col = 6 = 12503
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 1 col = 7 = 12624
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 1 col = 8 = 12244
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 1 col = 9 = 11171
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 2 col = 0 = 13344
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 2 col = 1 = 14198
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 2 col = 2 = 13718
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 2 col = 3 = 12971
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 2 col = 4 = 12553
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 2 col = 5 = 12104
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 2 col = 6 = 12608
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 2 col = 7 = 13102
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 2 col = 8 = 13180
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 2 col = 9 = 11882
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 3 col = 0 = 13030
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 3 col = 1 = 13554
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 3 col = 2 = 13950
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 3 col = 3 = 13381
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 3 col = 4 = 12969
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 3 col = 5 = 12151
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 3 col = 6 = 12861
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 3 col = 7 = 13089
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 3 col = 8 = 13273
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 3 col = 9 = 12050
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 4 col = 0 = 12914
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 4 col = 1 = 13773
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 4 col = 2 = 13486
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 4 col = 3 = 13386
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 4 col = 4 = 12842
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 4 col = 5 = 12189
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 4 col = 6 = 13059
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 4 col = 7 = 13287
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 4 col = 8 = 12989
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 4 col = 9 = 12403
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 5 col = 0 = 13593
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 5 col = 1 = 14103
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 5 col = 2 = 14137
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 5 col = 3 = 13173
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 5 col = 4 = 12681
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 5 col = 5 = 12390
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 5 col = 6 = 12901
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 5 col = 7 = 13514
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 5 col = 8 = 13397
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 5 col = 9 = 12288
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 6 col = 0 = 13018
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 6 col = 1 = 13929
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 6 col = 2 = 14313
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 6 col = 3 = 13775
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 6 col = 4 = 12471
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 6 col = 5 = 12087
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 6 col = 6 = 12781
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 6 col = 7 = 13606
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 6 col = 8 = 13320
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 6 col = 9 = 12129
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 7 col = 0 = 11236
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 7 col = 1 = 12564
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 7 col = 2 = 13370
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 7 col = 3 = 13023
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 7 col = 4 = 12058
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 7 col = 5 = 12083
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 7 col = 6 = 13038
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 7 col = 7 = 13463
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 7 col = 8 = 13014
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 7 col = 9 = 11847
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 8 col = 0 = 12877
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 8 col = 1 = 12062
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 8 col = 2 = 12125
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 8 col = 3 = 11770
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 8 col = 4 = 11528
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 8 col = 5 = 11938
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 8 col = 6 = 12578
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 8 col = 7 = 12813
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 8 col = 8 = 12269
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 8 col = 9 = 10803
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 9 col = 0 = 9968
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 9 col = 1 = 13800
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 9 col = 2 = 11773
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 9 col = 3 = 11540
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 9 col = 4 = 10676
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 9 col = 5 = 10748
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 9 col = 6 = 11673
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 9 col = 7 = 11704
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 9 col = 8 = 11054
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 149): agents to merge into row 9 col = 9 = 8780
+[FINE] C:\Work\Software\IBM\Source\World\WorldView.cpp(line: 172): finished merging world
+[MEDIUM] C:\Work\Software\IBM\Source\Processes\Children\Maturity.cpp(line: 82): 
+[MEDIUM] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 128): 
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Growth\GrowthVonBertalanffyWithBasic.cpp(line: 135): length prop = 0.35
+[FINE] C:\Work\Software\IBM\Source\Processes\Children\Recruitment\RecruitmentConstant.cpp(line: 108): Recruitment process = Recruitment
+[ERROR] C:\Work\Software\IBM\Source\DerivedQuantities\DerivedQuantity.cpp(line: 194): No values have been calculated for the initialisation value in phase: 0
