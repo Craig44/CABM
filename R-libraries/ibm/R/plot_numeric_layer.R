@@ -27,6 +27,16 @@ plot_numeric_layer = function(model, report_label, directory = "", file_name = "
     vec_data = c(vec_data,as.numeric(report[[i]]$values))
   }
   breaks = c(min(vec_data) - 1, quantile(vec_data, c(0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9)), max(vec_data) + 1)
+  dup_ndx = which(duplicated(breaks))
+  ## because ggplot needs 10 breaks I am going to do a bit of a hack
+  first_break = 0;
+  for(i in 1:length(dup_ndx)) {
+    if (i == 1)
+      first_break = breaks[dup_ndx[i]]
+    first_break = first_break + 0.1;
+    breaks[dup_ndx[i]] = first_break
+  }
+  breaks = unique(breaks)
   cols = colorRampPalette(brewer.pal(9,"YlOrRd"))(length(breaks) - 1)
   legend_lab = vector();
   for (i in 1:(length(breaks) - 1)) {
@@ -39,21 +49,16 @@ plot_numeric_layer = function(model, report_label, directory = "", file_name = "
   for (i in 1:length(report)) {
     this_data = melt(report[[i]]$values)
     brks <- cut(this_data$value,breaks)
-    brks <- gsub(","," - ",brks,fixed=TRUE)
-    this_data$brks <- sapply(brks, function(x){strsplit(x, "[( ]")[[1]][[2]]})
-
-    #if (i == 1) {
-      # add legend otherwise skip it
-      P = ggplot(this_data, aes(y = rev(Var1), x = Var2))  + geom_tile(aes(fill=brks)) +
-        scale_fill_manual("Biomass",values = cols, labels = legend_lab, guide = guide_legend(reverse=TRUE)) +
-        xlab("")+ylab("") + ggtitle(paste0(report[[i]]$year, " " , Title))
-    #} else {
-    #  P = ggplot(this_data, aes(y = rev(Var1), x = Var2))  + geom_tile(aes(fill=brks)) +
-    #    scale_fill_manual("Biomass",values = cols, labels = legend_lab, guide = guide_legend(reverse=TRUE)) +
-    #    theme(legend.position="none") +
-    #  xlab("")+ylab("")
-    #}
-
+    brks = factor(brks, levels=levels(brks))
+    this_data$brks <- brks
+    P = ggplot(this_data, aes(y = rev(Var1), x = Var2,fill=brks))  + geom_tile() +
+      #redrawing tiles to remove cross lines from legend
+      geom_tile(colour="white",size=0.25, show.legend =FALSE) +
+      ggtitle(paste0(report[[i]]$year, " " , Title))+
+      labs(x="",y="")+
+      scale_y_discrete(expand=c(0,0)) +
+      scale_x_discrete(expand=c(0,0)) + 
+      scale_fill_manual("Key", values=cols,na.value="grey90",labels = round(breaks), guide = guide_legend(reverse=T),drop = FALSE)
     ggsave(P, filename = paste0(report[[i]]$year,"_", file_name,".png"))
   }
   return (NULL);
