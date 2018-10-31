@@ -266,7 +266,7 @@ void MovementBoxTransfer::DoExecute() {
     }
   } // if (movement_type_ == MovementType::kNatal_homing)
   // merge destination agents into the actual grid
-  world_->MergeCachedGrid();
+  world_->MergeCachedGrid(true);
   LOG_FINE();
 }
 

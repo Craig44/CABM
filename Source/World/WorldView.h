@@ -68,6 +68,7 @@ public:
   vector<unsigned>            get_enabled_cols() {return enabled_cols_; };
 
   void                        MergeCachedGrid();
+  void                        MergeCachedGrid(bool update_lat_long);
   void                        get_world_age_frequency(vector<unsigned>& world_age_freq);
   void                        get_cell_element(unsigned& row, unsigned& col, const float lat, const float lon);
   // Used by methods to tell the world that time varying parameters need to be changed

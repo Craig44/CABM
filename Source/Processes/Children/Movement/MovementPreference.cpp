@@ -128,10 +128,11 @@ void MovementPreference::DoExecute() {
     lon_random_numbers_[i] = rng.normal();
   }
   LOG_FINEST() << "random numbers generatored = " << lat_random_numbers_.size();
+  unsigned current_year = model_->current_year();
 
   if (calculate_on_the_fly_ && not brownian_motion_) {
+    LOG_FINE() << "Need to do preference function calculation on the fly";
     // need to do some extra calculation before moveing through the main algorithm
-    unsigned current_year = model_->current_year();
     // calculate preference value
     for (unsigned layer_ndx = 0; layer_ndx < non_static_layer_ndx_.size(); ++layer_ndx) {
       for (unsigned row = 0; row < model_->get_height(); ++row) {
@@ -242,12 +243,18 @@ void MovementPreference::DoExecute() {
         LOG_FINE() << "n agents in this cell = " <<  origin_cell->agents_.size();
         store_infor.initial_numbers_ = origin_cell->agents_.size();
 
+        float total_v = 0;
+        float total_u = 0;
+        float total_jumps = 0;
         unsigned counter = 0;
         for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++counter, ++iter) {
           // Iterate over possible cells compare to chance()
           if ((*iter).is_alive()) {
             lat_distance = v + lat_random_numbers_[cell_offset_[row][col] + counter] * standard_deviation_;
             lon_distance = u + lon_random_numbers_[cell_offset_[row][col] + counter] * standard_deviation_;
+            total_v += lat_distance;
+            total_u += lon_distance;
+            ++total_jumps;
             LOG_FINEST() << counter<< " " << (*iter).get_lat() << " distance = " << lat_distance << " lon = " << (*iter).get_lon() << " distance = " << lon_distance << " Z = " << lon_random_numbers_[cell_offset_[row][col] + counter] << " sigma = " << standard_deviation_;
             // Check bounds and find cell destination
             if ((((*iter).get_lat() + lat_distance) <= model_->max_lat()) && (((*iter).get_lat() + lat_distance) >= model_->min_lat())) {
@@ -278,6 +285,14 @@ void MovementPreference::DoExecute() {
             }
           }
         }
+        if (model_->state() != State::kInitialise) {
+          if (total_jumps != 0) {
+            average_zonal_jump_[current_year][row][col] = total_u / total_jumps;
+            average_meridonal_jump_[current_year][row][col] = total_v / total_jumps;
+          }
+        }
+        LOG_FINE() << "average latitude jump = " << total_v / total_jumps << " row = " << row + 1 << " col = " << col + 1 << " total jumps = " << total_jumps << " total lat = " << total_v;
+        LOG_FINE() << "average longitude jump = " << total_u / total_jumps << " row = " << row + 1 << " col = " << col + 1;
 
 /*        if (model_->state() != State::kInitialise) {
           #pragma omp critical
@@ -308,11 +323,20 @@ void  MovementPreference::calculate_gradients() {
   initialisation_zonal_gradient_.resize(model_->get_height());
   vector<vector<float>> preference(model_->get_height());
   initialisation_preference_value_.resize(model_->get_height());
+  vector<vector<float>> average_zonal(model_->get_height());
+  vector<vector<float>> average_meridonal(model_->get_height());
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     initialisation_meridonal_gradient_[row].resize(model_->get_height());
     initialisation_zonal_gradient_[row].resize(model_->get_height(), 1.0);
     preference[row].resize(model_->get_height(), 1.0);
     initialisation_preference_value_[row].resize(model_->get_height(), 1.0);
+    average_meridonal[row].resize(model_->get_height(), 0.0);
+    average_zonal[row].resize(model_->get_height(),0.0);
+  }
+
+  for (auto year : model_->years()) {
+    average_zonal_jump_[year] = average_zonal;
+    average_meridonal_jump_[year] = average_meridonal;
   }
 
   // Do iniitalisation
@@ -402,6 +426,7 @@ void  MovementPreference::calculate_gradients() {
       LOG_FINE() << "year = " << year;
 
       // initialise temporary containers
+
       vector<vector<float>> zonal_gradient(model_->get_height());
       vector<vector<float>> meredional_gradient(model_->get_height());
       vector<vector<float>> preference(model_->get_height());
@@ -409,6 +434,7 @@ void  MovementPreference::calculate_gradients() {
         zonal_gradient[row].resize(model_->get_height(), 1.0);
         meredional_gradient[row].resize(model_->get_height(), 1.0);
         preference[row].resize(model_->get_height(),1.0);
+
       }
       for (unsigned layer_iter = 0; layer_iter < preference_layer_labels_.size(); ++layer_iter) {
         for (unsigned row = 0; row < model_->get_height(); ++row) {
@@ -472,7 +498,7 @@ void  MovementPreference::calculate_diffusion_parameter(float& preference_value,
 void  MovementPreference::FillReportCache(ostringstream& cache) {
   LOG_TRACE();
   // Print Preference by year
-
+  cache << "standard_dev: " << standard_deviation_ << "\n";
   // Print gradient by year.
   if (not brownian_motion_) {
     cache << "initialisation_preference " << REPORT_R_MATRIX << "\n";
@@ -518,6 +544,23 @@ void  MovementPreference::FillReportCache(ostringstream& cache) {
 
     for (auto& values : meridonal_gradient_) {
       cache << "meridonal_" << values.first << " " << REPORT_R_MATRIX << "\n";
+      for (unsigned i = 0; i < values.second.size(); ++i) {
+        for (unsigned j = 0; j < values.second[i].size(); ++j)
+          cache << values.second[i][j] << " ";
+        cache << "\n";
+      }
+    }
+
+    for (auto& values : average_zonal_jump_) {
+      cache << "average_zonal_jump_" << values.first << " " << REPORT_R_MATRIX << "\n";
+      for (unsigned i = 0; i < values.second.size(); ++i) {
+        for (unsigned j = 0; j < values.second[i].size(); ++j)
+          cache << values.second[i][j] << " ";
+        cache << "\n";
+      }
+    }
+    for (auto& values : average_meridonal_jump_) {
+      cache << "average_meridional_jump_" << values.first << " " << REPORT_R_MATRIX << "\n";
       for (unsigned i = 0; i < values.second.size(); ++i) {
         for (unsigned j = 0; j < values.second[i].size(); ++j)
           cache << values.second[i][j] << " ";

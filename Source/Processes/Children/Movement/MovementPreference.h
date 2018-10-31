@@ -68,6 +68,10 @@ protected:
   map<unsigned, vector<vector<float>>> meridonal_gradient_;
   map<unsigned, vector<vector<float>>> zonal_gradient_;
   map<unsigned, vector<vector<float>>> preference_by_year_;
+
+  map<unsigned, vector<vector<float>>> average_meridonal_jump_;
+  map<unsigned, vector<vector<float>>> average_zonal_jump_;
+
   vector<vector<float>>                initialisation_meridonal_gradient_;
   vector<vector<float>>                initialisation_zonal_gradient_;
   vector<vector<float>>                initialisation_preference_value_;

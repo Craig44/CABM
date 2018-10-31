@@ -60,6 +60,8 @@ public:
 
   vector<Agent>               agents_;
   string                      get_cell_label() {return cell_label_;};
+  float                       get_lat() {return lat_;};
+  float                       get_lon() {return lon_;};
 
 
 protected:
