@@ -61,7 +61,7 @@ for (i in 1:nrow) {
   for (j in 1:ncol) {
     Mat = matrix(0,nrow = nrow, ncol = ncol)
     if (j <= 5) {
-      Mat[i,5:ncol] = rep(1/6,6)
+      Mat[i,6:ncol] = rep(1/5,5)
     } else {
       Mat[i,j] = 1
     }
@@ -83,7 +83,7 @@ for (i in 1:nrow) {
   for (j in 1:ncol) {
     Mat = matrix(0,nrow = nrow, ncol = ncol)
     if (j >= 5) {
-      Mat[i,1:6] = rep(1/6,6)
+      Mat[i,1:5] = rep(1/5,5)
     } else {
       Mat[i,j] = 1
     }
@@ -106,6 +106,36 @@ Depth[,7] = 25
 Depth[,8] = 40
 Depth[,9] = 45
 Depth[,10] = 50
+
+## Add some pinnacles that would promote aggregation
+Depth[3,8] = 33
+Depth[4,8] = 33
+Depth[3,9] = 33
+Depth[4,9] = 33
+
+Depth[1,7] = 44
+Depth[1,8] = 44
+Depth[1,9] = 44
+Depth[1,10] = 50
+
+Depth[2,7] = 39
+Depth[2,8] = 39
+Depth[2,9] = 39
+Depth[2,10] = 39
+
+Depth[4,7] = 39
+Depth[4,8] = 39
+Depth[4,9] = 39
+Depth[4,10] = 50
+Depth[2,10] = 50
+Depth[3,10] = 50
+Depth[2,7] = 39
+Depth[3,7] = 39
+
+Depth[7,8] = 33
+Depth[8,8] = 33
+Depth[7,7] = 33
+Depth[8,7] = 33
 
 create_ibm_layer(label = "offshore_Depth", type = "numeric", filename = paste0(LayerDir,"Depth.ibm"), Matrix = Depth, proportion = F)
 layers_to_add_to_config = c(layers_to_add_to_config, "Depth.ibm")
@@ -137,8 +167,9 @@ layers_to_add_to_config = c(layers_to_add_to_config, "recruitment_layer.ibm")
 
 
 ## Now add all the !include statements to the config.ibm file
-config_file = paste0(BaseDir,"/ibm/config.ibm")
-for (i in 1:length(layers_to_add_to_config)) {
-  line = paste0("!include Layers/",layers_to_add_to_config[i])
-  write(line, file = config_file, append = T)
-}
+## delete all the other includes before running this loop
+#config_file = paste0(BaseDir,"/ibm/config.ibm")
+#for (i in 1:length(layers_to_add_to_config)) {
+#  line = paste0("!include Layers/",layers_to_add_to_config[i])
+#  write(line, file = config_file, append = T)
+#}
