@@ -1,7 +1,7 @@
 #' @title plot_overall_age_freq
 #'
 #' @description
-#' A plotting function to plot age frequency at a point in time of the world vs teh fishery
+#' A plotting function to plot age frequency at a point in time of the world vs the fishery
 #'
 #' @author Craig Marsh
 #' @param model <ibm_output> object that are generated from one of the extract() functions.

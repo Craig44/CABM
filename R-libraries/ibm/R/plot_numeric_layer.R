@@ -8,7 +8,8 @@
 #' @param model <ibm_output> object that are generated from one of the extract() functions.
 #' @param report_label <string>
 #' @param directory <string> A directory to save the files to, default is getwd();
-#' @return NULL
+#' @return a png filed in the directory, with biomass binned up so that is binned up by 10 percentiles
+#' and the legend is the midpoint of these bins.
 #' @export 
 
 plot_numeric_layer = function(model, report_label, directory = "", file_name = "", Title = "") {

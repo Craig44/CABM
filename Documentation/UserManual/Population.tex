@@ -330,14 +330,15 @@ So if we were to iterate over all the spatially available agents to this process
 $$ \text{if }U() <= P_l \text{ agent is captured and removed}$$
 $$ \text{else it survives the event}$$
 
-\subsubsection{\I{Ageing}}
+\subsubsection{Ageing}\index{Processes!Ageing}
+
 Ageing is an implicit process in the model, Each agent that is created or recruited gets assigned a birth year. This means that when ever we want to ask for the agent we just calculate \subcommand{current\_year - birth\_year}, thus there is no explicit ageing process. Note that we do return the \subcommand{max\_age} of the model, if the agent is older than that age (so we only work with the truncated age distribution).
 
 
 This means every fish automatically ages by one at the end of the year, or you could think of ageing a fish at the very beginning of the year (tomayto, tomahto), just be aware that you don't have control over this process. Something to keep in mind is that growth is not directly tied with ageing, that is a individual that ages one year does not also get a years worth of growth. This unlike most population based models that will usually have an implicit assumption of growth with ageing. Although if one puts a growth process at the beginning or end of an annual cycle this can be achieved. This is just a side note to keep in mind when trying to align this model with others you may want to test against.
 
 
-\subsubsection{\I{Maturity}}\label{subsubsec:maturity}
+\subsubsection{Maturity}\label{subsubsec:maturity}\index{Processes!Maturity}
 The process of converting an agent from immature to mature, only should be used if you link it to a mature-biomass derived quantity (Section~\ref{para:mature_biomass}). This process only changes the internal state of an agent i.e. no material change happens to the agent. This could be useful down the track if we have dynamics that only occur to mature agents and so this internal flag can be checked against for use in a different algorithm. Maturity is applied using the ogive defined in the subcommand \subcommand{maturity\_ogive\_label} in the \command{model} block, and is applied for a single agent (assuming the agent is not already mature)
 
 \begin{equation}
@@ -403,7 +404,7 @@ proportion_through_mortality_block 0.0
 So just to re-iterate the difference, you can have an explicit maturing process that is not associated with a derived quantity, or you could purely associate a derived quantity to the maturing process. This brings up a useful point in that, given there generality of the program there are more than one way to approximate dynamics and some will be more computationally quicker than others. So have a play around but try and keep the number of times we iterate over the state as small as possible, as you will get significant time saving.
 
 
-\subsubsection{\I{Recruitment}}
+\subsubsection{Recruitment}\index{Processes!Recruitment}
 Recruitment is the process where new agents are created in the system. It is also the process that defines stock structure in the model. Stocks are not an explicit attribute of \IBM\ so consideration on this process is important. How the stock is defined using the recruitment dynamic surrounds where we calculate Spawning Stock Biomass ($SSB$) and where the resulting recruits are first seeded. This means that for all recruitment types you will need to specify a $B_0$ parameter and an associated derived quantity that represents the $SSB$ for that event. This is how an $R_0$ value is calculated from the initialisation phase.
 
 \begin{equation}
@@ -418,13 +419,13 @@ R_{0,s} = \frac{N_a}{X} \frac{B_{0,s}}{\sum_s B_{0,s}}
 \end{equation}
 where, $R_{0,s}$ is the stock specific initial/equilibrium number of agents to seed, $N_a$ is the number of agents in the model world defined in the \command{initialisation\_phase} using the subcommand \subcommand{number\_of\_individuals} and $B_{0,s}$ is the user defined stock specific equilibrium spawning stock biomass.
 
-\paragraph{\I{Constant recruitment}}\label{subsubsec:constant-recruitment}
+\paragraph{Constant recruitment}\label{subsubsec:constant-recruitment}\index{Processes!Recruitment!Constant recruitment}
 
 \begin{equation}
 	R_{y,s} = R_{0,s}
 \end{equation}
 
-\paragraph{\I{Beverton-Holt recruitment}}\label{subsubsec:bev-holt-recruitment}
+\paragraph{Beverton-Holt recruitment}\label{subsubsec:bev-holt-recruitment}\index{Processes!Recruitment!Beverton-Holt recruitment}
 
 We have taken the parametrisation akin to \cite{mace_doonan_88} that is a population based formula. There is room to make this a more pure agent based model where we look at probability of finding a mate and etc, but for know this is all we have.
 \begin{equation}
@@ -437,7 +438,7 @@ R_{y,s,c} = R_{y,s} \times p_c
 \end{equation}
 where $R_{y,s,c}$ is the resulting agents in cell $c$ with proportion $p_c$ there is no stochastic behaviour in this process unlike other processes.
 
-\subsubsection{\I{Mortality}\label{sec:mortality}}
+\subsubsection{Mortality}\label{sec:mortality}\index{Processes!Mortality}
 Mortality processes remove agents from the model domain, and do not allow them to be available to processes or summaries. Mortality that are associated with fishing or anthropogenic removals are also responsible for tag-recaptures.
 
 \paragraph{Constant mortality rate}
@@ -505,7 +506,7 @@ years 1990 1991 1992 1993
 \end{figure}
 
 
-\paragraph{Event-Biomass}\label{para:event_mort}
+\paragraph{Event-Biomass}\label{para:event_mort}\index{Processes!Mortality!Event-Biomass}
 This is a removal event such as fishing, where we iterate over a range of cells and remove agents based on some selectivity or spatial vulnerability. This is the simplest way to remove individuals from an anthropogenic process, however it is quite annoying to set up for a spatial model with a fine spatial resolution as you need to specify a catch for each cell. An example of how this process is set up is specified below, if you want an alternative fishing process that is based in theoretiical spatial fishing distributions see the next section (Section~\ref{para:effort_based_F}). Advantages over using this mortality process say over the Baranov method (next paragraph~\ref{para:baranov}) is that it allows for agents to have multiple encounters with a fishery, but the negatives is that you cannot simply incorporate simultaneously natural mortality processes, and may be more suited for pulse fisheries.\\
 
 \textbf{The algorithm}
@@ -520,7 +521,7 @@ This is a removal event such as fishing, where we iterate over a range of cells 
 The key here is that an agent can interact with fishery many times during a fishing event, but there is no natural mortality.
 
 
-\paragraph{Baranov}\label{para:baranov}
+\paragraph{Baranov}\label{para:baranov}\index{Processes!Mortality!Baranov}
 This process applies both natural mortality and fishing mortality
 
 \textbf{The algorithm}
@@ -534,7 +535,7 @@ This process applies both natural mortality and fishing mortality
 So from the algorithm above we can see that agents are exposed to both M and F, however the negative is that this assumes only a single interaction with the fishery which is an unlikely assumption. However I added this process because it both takes M and F simultaneously and may actually be faster than an event biomass dynamic (previous paragraph~\ref{para:event_mort}).
 
 
-\paragraph{Effort-Based F}\label{para:effort_based_F}
+\paragraph{Effort-Based F}\label{para:effort_based_F}\index{Processes!Mortality!Effort-Based F}
 A lot of this process was inspired by \cite{truesdell2017effects}, where users can specify some theoretical fishing distribution, currently only Ideal Free Distribution is allowed (but I am hoping to add a weighted ideal free distribution with user defined weights) and a total catch. \IBM\ will then go evaluate the relative effort based on the biomass and soon user defined weighting matrix.
 
 \begin{equation}
@@ -544,8 +545,8 @@ A lot of this process was inspired by \cite{truesdell2017effects}, where users c
 
 
 
-\subsubsection{\I{Movement}}
-\paragraph{\I{Box Transfer}}\label{subsubsec:box_transfer}
+\subsubsection{Movement}\index{Processes!Movement}
+\paragraph{Box Transfer}\label{subsubsec:box_transfer}\index{Processes!Movement!Box Transfer}
 The box transfer movement process is a simple movement process that is commonly applied in stock assessments. It describes a proportion of individuals moving from a cell to all other cells. This is applied by drawing from a multinomial distribution where an individual will end up. There are two types of movement that users can select for this method; \subcommand{markovian} and \subcommand{natal\_homing}. The difference is with markovian movement the \subcommand{origin\_cell} refers to the cell an individual is currently in, where as if the movement type is natal homing the \subcommand{origin\_cell} refers to the cell that the individual was born in. These are subtle in application but a quite different movement assumptions. A practical note about the two methods natal homing is difficult to thread so may be quite a lot slower (disclaimer I haven't tested it, but I have turned off threading in this process). The probability is not age or length specific and so applies equally to all individuals in a cell. An example of syntax of how you would set this process up for a 3 area model is below.
 
 
@@ -607,7 +608,7 @@ The above assumes that the probability of movement from one cell to another does
 You can see from the above example that the movement from cell 1 to all other cells has different probabilities from before 2000 and after 2000. The above example could be generalised furthur having a different probability matrix for every year, I kept it simple for illustration.
 
 
-\paragraph{\I{Preference Based movement}}\label{subsubsec:pref_movement}
+\paragraph{Preference Based movement}\label{subsubsec:pref_movement}\index{Processes!Movement!Preference Based movement}
 
 The preference in cell $i$ for preference variable $x$ can be described as,
 \begin{equation}
@@ -656,9 +657,9 @@ Where $t$ is the time steps we have applied the preference movement in annual cy
 
 
 
-\subsubsection{\I{Growth}\label{sec:age-at-age}}
+\subsubsection{Growth}\label{sec:age-at-age}\index{Processes!Growth}
 Growth is the process where \IBM\ updates both length and weight for an agent, and the same growth process can be applied over multiple time steps.
-\paragraph{\I{Von Bertalanffy with Basic}}\label{subsubsec:vonbert_basic}
+\paragraph{Von Bertalanffy with Basic}\label{subsubsec:vonbert_basic}\index{Processes!Growth!Von Bertalanffy with Basic}
 This process assumes that weight is an allometric function of length (Equation~\ref{mean_weight}) and that length is an incremental function of time that follows the Von Bertalanffy growth formula. Currently it is also the default growth function used to initialise the equilibrium partition structure. The length from going from one year to the next ($t$ represents a year) follows,
 
 \begin{equation}\label{VB}
@@ -718,7 +719,7 @@ When an agent is created (either in initialisation or through a recruitment proc
 	\includegraphics[scale=0.6]{Figures/age-length.png}%
 	\caption{An example of the age length relationship from 1000 randomly sampled agents (black dots), red dots signify the assumed deterministic age length relationship.}
 \end{figure}
-\subsubsection{\I{Tagging}}
+\subsubsection{Tagging}\index{Processes!Tagging}
 Tagging is a process where by agents get tagged and is a tag release event. This is a simple process where a user defines a selectivity that describes the probability of being captured for tagging, and also a number of tags that are released in each spatial cell. I have usually applied tagging before a mortality process which is where tag recaptures occur (Section~\ref{sec:mortality}).
 
 {\small{\begin{verbatim}

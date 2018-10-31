@@ -2,7 +2,7 @@
 This section describes the observations that \IBM\ can generate during run time. \IBM\ calculates expectations of all the agents that are user defined, and then adds observation error via simulating through a distribution with a user defined observation error value.
 \subsection{\I{Observations}\label{sec:Observations}\index{Observations}}
 
-\subsubsection{\I{Process Removals By Age}\label{subsubsec:catch_at_age}}
+\subsubsection{Process Removals By Age}\label{subsubsec:catch_at_age}\index{Observations!Process Removals By Age}
 This observation class aggregates age frequency over a user defined spatial are from a \subcommand{mortality\_event\_biomass} and \subcommand{mortality\_baranov} process. This class can add ageing error onto the expectation, to account for ageing error which is a source of uncertainty in ageing fish. An example of how you would set this observation up and show some of the flexibilities in the spatial resolution see the syntax below for a 6 area model.
 
 {\small{\begin{verbatim}
@@ -71,7 +71,7 @@ end_table
 
 Hopefully the above example illustrates how much control the user has in specifying what information they want to extract.
 
-\subsubsection{\I{Biomass}\label{subsubsec:biomass}}
+\subsubsection{Biomass}\label{subsubsec:biomass}\index{Observations!Biomass}
 This observation summarises the biomass over a selected number of agents in a time step over the mortality block (Section~\ref{sec:mortality_block})
 
 {\small{\begin{verbatim}
@@ -88,7 +88,7 @@ cell_layer cells
 cells r1-c1 r2-c1 r3-c1 
 \end{verbatim}}}
 
-\subsubsection{\I{Proportions at age}\label{subsubsec:Proportions_at_age}}
+\subsubsection{Proportions at age}\label{subsubsec:Proportions_at_age}\index{Observations!Proportions at age}
 This observation summarises the proportions at age for selected number of agents in a time step over the mortality block (Section~\ref{sec:mortality_block})
 
 {\small{\begin{verbatim}
