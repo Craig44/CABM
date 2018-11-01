@@ -58,7 +58,7 @@ number_of_individuals 1000000 ## initial number of agents
 # -- M
 
 @time_step Summer
-processes inshore_preference_movement Maturation Growth M
+processes inshore_preference_movement Maturation Growth M summer_fishery
 
 @time_step Autumn
 processes Recruitment Growth Move_offshore offshore_preference_movement M
@@ -103,16 +103,18 @@ cv 0.0001
 selectivity_label One
 time_step_ratio 0.25 0.25 0.25 0.25
 
-/*
+@minimiser minimiser_for_summer_fishery
+type numerical_differences
+
 # Fishing Mortality
-@process fishing
-type mortality_event_biomass
-years 1990:2010
-catch_layers catch_1990 catch_1991 catch_1992 catch_1993 catch_1994 catch_1995 catch_1996 catch_1997 catch_1998 catch_1999 catch_2000 catch_2001 catch_2002 catch_2003 catch_2004 catch_2005 catch_2006 catch_2007 catch_2008 catch_2009 catch_2010
+@process summer_fishery
+type mortality_effort_based_baranov
+years 1991
+catches 2000
 selectivity trawl_selectivity
-minimum_legel_length 20
-handling_mortality 0.0
-*/
+#catchability 0.002
+minimiser minimiser_for_summer_fishery
+effort_values 0.08 0.09 0.22 0.1 0.11 0.24 0.13 0.05 0.07 0.08 0.18 0.12 0.12 0.11 0.08 0.24 0.13 0.04 0.14 0.08 0.06 0.09 0.06 0.07 0.07 0.04 0.15 0.11 0.06 0.19 0.12 0.09 0.16 0.16 0.15 0.14 0.13 0.1 0.09 0.08 0.07 0.09 0.05 0.3 0.18 0.06 0.08 0.08 0.15 0.1 0.11 0.1 0.1 0.2 0.09 0.21 0.05 0.13 0.11 0.11 0.12 0.08 0.08 0.06 0.06 0.12 0.13 0.1 0.16 0.28 0.08 0.03 0.17 0.07 0.07 0.17 0.09 0.05 0.11 0.09 0.1 0.12 0.08 0.14 0.09 0.12 0.17 0.12 0.09 0.18 0.16 0.13 0.11 0.07 0.2 0.07 0.3 0.22 0.09 0.06
 
 #-------------
 # Movement

@@ -92,6 +92,9 @@ process Move_inshore
 type process
 process Move_offshore
 
+@report summer_fishery
+type process
+process summer_fishery
 
 @report Rec
 type process

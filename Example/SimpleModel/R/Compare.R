@@ -1,5 +1,4 @@
 ## Read in Casal2 output
-detach("package:Casal2", unload=TRUE)
 detach("package:ibm", unload=TRUE)
 
 ## this script is just comparing, steady state models just constant recruitment and M
