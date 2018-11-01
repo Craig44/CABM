@@ -150,18 +150,18 @@ vector<Recruitment*> Manager::GetRecruitmentProcesses() {
 }
 /**
  * Return the baranov process with the name passed in as a parameter.
- * If no process is found then an empty pointer will
+ * A believe this gets a special accessor as this gets passed to the minimiser.
  * be returned.
  *
  * @param label The name of the process to find
  * @return A pointer to the process or empty pointer
  */
-MortalityEffortBasedBaranov* Manager::GetBaranovProcess() {
+MortalityEffortBased* Manager::GetBaranovProcess() {
   LOG_TRACE();
-  MortalityEffortBasedBaranov* mortality_ptr = nullptr;
+  MortalityEffortBased* mortality_ptr = nullptr;
   for (auto process : objects_) {
-    if ((process->type() == PARAM_MORTALITY_EFFORT_BASED_BARANOV) && (process->process_type() == ProcessType::kMortality)) {
-      mortality_ptr = dynamic_cast<MortalityEffortBasedBaranov*>(process);
+    if ((process->type() == PARAM_MORTALITY_EFFORT_BASED) && (process->process_type() == ProcessType::kMortality)) {
+      mortality_ptr = dynamic_cast<MortalityEffortBased*>(process);
       return mortality_ptr;
     }
   }

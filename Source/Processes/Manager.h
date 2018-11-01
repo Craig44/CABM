@@ -23,7 +23,7 @@
 #include "Processes/Children/Growth.h"
 #include "Processes/Children/Mortality.h"
 #include "Processes/Children/Recruitment.h"
-#include "Processes/Children/Mortality/MortalityEffortBasedBaranov.h"
+#include "Processes/Children/Mortality/MortalityEffortBased.h"
 
 // Namespaces
 namespace niwa {
@@ -48,8 +48,8 @@ public:
   Process*                    GetProcess(const string& label);
   Growth*                     GetGrowthProcess(const string& label);
   Mortality*                  GetMortalityProcess(const string& label);
-  MortalityEffortBasedBaranov*         GetBaranovProcess();
-  vector<Recruitment*>       GetRecruitmentProcesses();
+  MortalityEffortBased*       GetBaranovProcess();
+  vector<Recruitment*>        GetRecruitmentProcesses();
 
 protected:
   // methods

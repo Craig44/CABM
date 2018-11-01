@@ -1,5 +1,5 @@
 /**
- * @file MortalityEffortBasedBaranov.cpp
+ * @file MortalityEffortBased.cpp
  * @author C.Marsh
  * @github https://github.com/Craig44
  * @date 10/09/2018
@@ -11,7 +11,7 @@
  */
 
 // headers
-#include "MortalityEffortBasedBaranov.h"
+#include "MortalityEffortBased.h"
 
 #include "Layers/Manager.h"
 #include "Selectivities/Manager.h"
@@ -32,7 +32,7 @@ namespace math = niwa::utilities::math;
 /**
  * constructor
  */
-MortalityEffortBasedBaranov::MortalityEffortBasedBaranov(Model* model) : Mortality(model) {
+MortalityEffortBased::MortalityEffortBased(Model* model) : Mortality(model) {
   parameters_.Bind<string>(PARAM_SELECTIVITY, &selectivity_label_, "Selectivity label", "");
   parameters_.Bind<string>(PARAM_MINIMIZER, &minimiser_label_, "Label of the minimser to solve the problem", "");
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "years to apply the process", "");
@@ -48,7 +48,7 @@ MortalityEffortBasedBaranov::MortalityEffortBasedBaranov(Model* model) : Mortali
 /**
  * Do some initial checks of user supplied parameters.
  */
-void MortalityEffortBasedBaranov::DoValidate() {
+void MortalityEffortBased::DoValidate() {
   LOG_TRACE();
   if (years_.size() != catches_.size())
     LOG_ERROR_P(PARAM_YEARS) << "you must specify a layer label for each year. You have supplied '" << years_.size() << "' years but '" << catches_.size() << "' catches, please sort this out.";
@@ -57,7 +57,7 @@ void MortalityEffortBasedBaranov::DoValidate() {
 /**
  * DoBuild
  */
-void MortalityEffortBasedBaranov::DoBuild() {
+void MortalityEffortBased::DoBuild() {
   LOG_FINE();
 
   if (parameters_.Get(PARAM_EFFORT_VALUES)->has_been_defined() & parameters_.Get(PARAM_EFFORT_LAYER_LABEL)->has_been_defined())
@@ -66,15 +66,25 @@ void MortalityEffortBasedBaranov::DoBuild() {
   if (!parameters_.Get(PARAM_EFFORT_VALUES)->has_been_defined() & !parameters_.Get(PARAM_EFFORT_LAYER_LABEL)->has_been_defined())
     LOG_FATAL_P(PARAM_LABEL) << "You need to supply either " << PARAM_EFFORT_VALUES << " or " << PARAM_EFFORT_LAYER_LABEL << " inputs, you have not supplied either.";
 
+  vulnerable_biomass_vector_format_.resize(model_->get_height() * model_->get_width(), 0.0);
+  effort_organised_vector_format_.resize(model_->get_height() * model_->get_width(), 0.0);
+
   if (parameters_.Get(PARAM_EFFORT_VALUES)->has_been_defined()) {
     effort_layer_based_ = false;
     // Order the effort vector so it
     sort (effort_input_.begin(), effort_input_.end());  // low -> high
-    vulnerable_biomass_vector_format_.resize(model_->get_height() * model_->get_width(), 0.0);
 
   } else if (parameters_.Get(PARAM_EFFORT_LAYER_LABEL)->has_been_defined()) {
     effort_layer_based_ = true;
+    effort_input_.resize(model_->get_height() * model_->get_width(), 0.0);
+    // Get a pointer to the layer
+    effort_layer_ = model_->managers().layer()->GetNumericLayer(effort_layer_label_);
+    if (!effort_layer_) {
+      LOG_ERROR_P(PARAM_EFFORT_LAYER_LABEL) << "could not find the layer '" << effort_layer_label_ << "', please make sure it exists and that it is type 'numeric'";
+    }
 
+  } else {
+    LOG_CODE_ERROR() << "Effort based F logical error (not surprising given I am in charge of the code). apologies about this, I have not coded something correctly";
   }
 
   // allocate memory for runtime containers.
@@ -169,7 +179,7 @@ void MortalityEffortBasedBaranov::DoBuild() {
 /**
  * DoExecute
  */
-void MortalityEffortBasedBaranov::DoExecute() {
+void MortalityEffortBased::DoExecute() {
   LOG_FINE() << "DoExecute";
   if (first_execute_) {
     // Bit of an annoying hack, but cannot check at build because of Building mortality classes before World, blah TODO move this process into the PreWorldProcessBuild in Process Manager.
@@ -196,9 +206,14 @@ void MortalityEffortBasedBaranov::DoExecute() {
           if (cell->is_enabled()) {
             cell_offset_[row][col] = n_agents_;
             n_agents_ += cell->agents_.size();
+            if (effort_layer_based_)
+              effort_input_[row * model_->get_width() + col] = effort_layer_->get_value(row, col, model_->current_year());
           }
         }
       }
+      if (effort_layer_based_)
+        sort(effort_input_.begin(),effort_input_.end());
+
       vulnerable_biomass_by_year_[model_->current_year()] = 0;
       // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
       random_numbers_.resize(n_agents_ + 1);
@@ -225,15 +240,19 @@ void MortalityEffortBasedBaranov::DoExecute() {
             }
             vulnerable_biomass_by_year_[model_->current_year()] += vulnerable_by_cell_[row][col];
             vulnerable_biomass_vector_format_[row * model_->get_width() + col] = vulnerable_by_cell_[row][col];
-            effort_by_cell_[row][col] = vulnerable_by_cell_[row][col];// * catchability_;
+            //effort_by_cell_[row][col] = vulnerable_by_cell_[row][col];// * catchability_;
           }
         }
       }
+      //
       // Final attribute effort based on an ideal free distribution
       biomass_index_ = math::sort_indexes(vulnerable_biomass_vector_format_);
+      for(unsigned i = 0; i < vulnerable_biomass_vector_format_.size(); ++i)
+        effort_organised_vector_format_[biomass_index_[i]] = effort_input_[i];
+
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
-          effort_by_cell_[row][col] = effort_input_[biomass_index_[row * model_->get_width() + col]];
+          effort_by_cell_[row][col] = effort_organised_vector_format_[row * model_->get_width() + col];
         }
       }
 
@@ -279,6 +298,8 @@ void MortalityEffortBasedBaranov::DoExecute() {
       actual_removals_by_year_and_cell_[model_->current_year()] = removals_by_cell_;
       F_by_year_and_cell_[model_->current_year()] = F_by_cell_;
       vulnerable_by_year_and_cell_[model_->current_year()] = vulnerable_by_cell_;
+      effort_by_year_and_cell_[model_->current_year()] = effort_by_cell_;
+
     } // year
   } // initialisation
 } // DoExecute
@@ -286,7 +307,7 @@ void MortalityEffortBasedBaranov::DoExecute() {
 /**
  * Evaluate SSE for catch using the baranov catch equation
  */
-double MortalityEffortBasedBaranov::SolveBaranov() {
+double MortalityEffortBased::SolveBaranov() {
   LOG_FINE();
   catch_based_on_baranov_ = 0;
   for (unsigned row = 0; row < model_->get_height(); ++row) {
@@ -316,7 +337,7 @@ double MortalityEffortBasedBaranov::SolveBaranov() {
 
 // FillReportCache, called in the report class, it will print out additional information that is stored in
 // containers in this class.
-void  MortalityEffortBasedBaranov::FillReportCache(ostringstream& cache) {
+void  MortalityEffortBased::FillReportCache(ostringstream& cache) {
   cache << "actual_catch: ";
   for(auto& val : actual_catch_by_year_)
     cache << val.second << " ";
@@ -347,6 +368,16 @@ void  MortalityEffortBasedBaranov::FillReportCache(ostringstream& cache) {
       cache << "\n";
     }
   }
+
+  for (auto& values : effort_by_year_and_cell_) {
+    cache << "effort_by_cell_" << values.first << " " << REPORT_R_MATRIX << "\n";
+    for (unsigned i = 0; i < values.second.size(); ++i) {
+      for (unsigned j = 0; j < values.second[i].size(); ++j)
+        cache << values.second[i][j] << " ";
+      cache << "\n";
+    }
+  }
+
   for (auto& values : vulnerable_by_year_and_cell_) {
     cache << "vulnerable_by_cell_" << values.first << " " << REPORT_R_MATRIX << "\n";
     for (unsigned i = 0; i < values.second.size(); ++i) {

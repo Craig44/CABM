@@ -370,7 +370,7 @@
 #define PARAM_MORTALITY                           "mortality"
 #define PARAM_MORTALITY_BARANOV                   "mortality_baranov"
 #define PARAM_MORTALITY_CONSTANT_RATE             "mortality_constant_rate"
-#define PARAM_MORTALITY_EFFORT_BASED_BARANOV      "mortality_effort_based_baranov"
+#define PARAM_MORTALITY_EFFORT_BASED              "mortality_effort_based"
 #define PARAM_MORTALITY_EVENT                     "mortality_event"
 #define PARAM_MORTALITY_EVENT_BIOMASS             "mortality_event_biomass"
 #define PARAM_MORTALITY_INSTANTANEOUS             "mortality_instantaneous"

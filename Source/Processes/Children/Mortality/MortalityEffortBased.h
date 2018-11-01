@@ -1,5 +1,5 @@
 /**
- * @file MortalityEffortBasedBaranov.h
+ * @file MortalityEffortBased.h
  * @author C.Marsh
  * @github https://github.com/Craig44
  * @date 10/09/2018
@@ -10,8 +10,8 @@
  *
  * This is a child mortality that applies a fishing event
  */
-#ifndef SOURCE_PROCESSES_CHILDREN_MORTALITY_EFFORT_BASED_BARANOV_H_
-#define SOURCE_PROCESSES_CHILDREN_MORTALITY_EFFORT_BASED_BARANOV_H_
+#ifndef SOURCE_PROCESSES_CHILDREN_MORTALITY_EFFORT_BASED_H_
+#define SOURCE_PROCESSES_CHILDREN_MORTALITY_EFFORT_BASED_H_
 
 // headers
 #include "Processes/Children/Mortality.h"
@@ -33,11 +33,11 @@ using std::string;
 /**
  * Class definition
  */
-class MortalityEffortBasedBaranov : public Mortality {
+class MortalityEffortBased : public Mortality {
 public:
   // methods
-  explicit MortalityEffortBasedBaranov(Model* model);
-  virtual                     ~MortalityEffortBasedBaranov() = default;
+  explicit MortalityEffortBased(Model* model);
+  virtual                     ~MortalityEffortBased() = default;
   virtual void                        DoValidate() override final;
   virtual void                        DoBuild() override final;
   virtual void                        DoReset() override final { };
@@ -79,10 +79,14 @@ protected:
   map<unsigned,vector<vector<double>>>  actual_removals_by_year_and_cell_;
   map<unsigned,vector<vector<double>>>  F_by_year_and_cell_;
   map<unsigned,vector<vector<double>>>  vulnerable_by_year_and_cell_;
+  map<unsigned,vector<vector<double>>>   effort_by_year_and_cell_;
+  vector<size_t>                      biomass_index_;
+  vector<float>                       vulnerable_biomass_vector_format_;
+  vector<float>                       effort_organised_vector_format_;
 
-  //
   vector<float>                       effort_input_;
   string                              effort_layer_label_;
+  layers::NumericLayer*               effort_layer_ = nullptr;
 
   // For reporting
   map<unsigned, float>                actual_removals_by_year_;
@@ -95,8 +99,6 @@ protected:
   map<unsigned, time_t>               time_by_year_;
   map<unsigned, string>               message_by_year_;
   bool                                effort_layer_based_;
-  vector<size_t>                      biomass_index_;
-  vector<float>                       vulnerable_biomass_vector_format_;
   bool                                first_execute_ = true;
 
 
@@ -105,4 +107,4 @@ protected:
 } /* namespace processes */
 } /* namespace niwa */
 
-#endif /* SOURCE_PROCESSES_CHILDREN_MORTALITY_EFFORT_BASED_BARANOV_H_ */
+#endif /* SOURCE_PROCESSES_CHILDREN_MORTALITY_EFFORT_BASED_H_ */
