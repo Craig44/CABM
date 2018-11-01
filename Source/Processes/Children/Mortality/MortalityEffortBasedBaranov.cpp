@@ -17,13 +17,17 @@
 #include "Selectivities/Manager.h"
 #include "Minimisers/Manager.h"
 #include "Utilities/RandomNumberGenerator.h"
+#include "Utilities/Math.h"
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
+
 
 
 // namespaces
 namespace niwa {
 namespace processes {
+
+namespace math = niwa::utilities::math;
 
 /**
  * constructor
@@ -62,17 +66,30 @@ void MortalityEffortBasedBaranov::DoBuild() {
   if (!parameters_.Get(PARAM_EFFORT_VALUES)->has_been_defined() & !parameters_.Get(PARAM_EFFORT_LAYER_LABEL)->has_been_defined())
     LOG_FATAL_P(PARAM_LABEL) << "You need to supply either " << PARAM_EFFORT_VALUES << " or " << PARAM_EFFORT_LAYER_LABEL << " inputs, you have not supplied either.";
 
+  if (parameters_.Get(PARAM_EFFORT_VALUES)->has_been_defined()) {
+    effort_layer_based_ = false;
+    // Order the effort vector so it
+    sort (effort_input_.begin(), effort_input_.end());  // low -> high
+    vulnerable_biomass_vector_format_.resize(model_->get_height() * model_->get_width(), 0.0);
+
+  } else if (parameters_.Get(PARAM_EFFORT_LAYER_LABEL)->has_been_defined()) {
+    effort_layer_based_ = true;
+
+  }
 
   // allocate memory for runtime containers.
   cell_offset_for_selectivity_.resize(model_->get_height());
   cell_offset_.resize(model_->get_height());
   effort_by_cell_.resize(model_->get_height());
   vulnerable_by_cell_.resize(model_->get_height());
+  F_by_cell_.resize(model_->get_height());
   removals_by_cell_.resize(model_->get_height());
+
   for (unsigned i = 0; i < model_->get_height(); ++i) {
     cell_offset_[i].resize(model_->get_width());
     cell_offset_for_selectivity_[i].resize(model_->get_width());
     effort_by_cell_[i].resize(model_->get_width(),0.0);
+    F_by_cell_[i].resize(model_->get_width(),0.0);
     vulnerable_by_cell_[i].resize(model_->get_width(),0.0);
     removals_by_cell_[i].resize(model_->get_width(),0.0);
   }
@@ -146,9 +163,6 @@ void MortalityEffortBasedBaranov::DoBuild() {
       LOG_FATAL_P(PARAM_STARTING_VALUE_FOR_LAMBDA) << "Can only supply a single value for this parameter, you have specified " << start_value_for_lambda_.size();
     minimiser_->PassStartValueBaranov(start_value_for_lambda_);
   }
-  //minimiser_->Execute();
-  // Prepare the model to solve the baranov catch equation.
-  //model_->prepare_for_effort_based_baranov(label_);
 
 }
 
@@ -157,7 +171,13 @@ void MortalityEffortBasedBaranov::DoBuild() {
  */
 void MortalityEffortBasedBaranov::DoExecute() {
   LOG_FINE() << "DoExecute";
-
+  if (first_execute_) {
+    // Bit of an annoying hack, but cannot check at build because of Building mortality classes before World, blah TODO move this process into the PreWorldProcessBuild in Process Manager.
+    if (world_->get_enabled_cells() != effort_input_.size()) {
+      LOG_FATAL_P(PARAM_EFFORT_VALUES) << "You must specify an effort value for each enabled (Base layer > 0) cell, there are " << world_->get_enabled_cells() << " Base cells, but you have supplied " << effort_input_.size() << ". Can you please sort this descrepency out";
+    }
+    first_execute_ = false;
+  }
   auto iter = years_.begin();
   if (model_->state() != State::kInitialise) {
     if (find(iter, years_.end(), model_->current_year()) != years_.end()) {
@@ -204,10 +224,19 @@ void MortalityEffortBasedBaranov::DoExecute() {
                 vulnerable_by_cell_[row][col] += (*agent_iter).get_weight() * (*agent_iter).get_scalar() * cell_offset_for_selectivity_[row][col][(*agent_iter).get_sex() * model_->age_spread() + (*agent_iter).get_age_index()];
             }
             vulnerable_biomass_by_year_[model_->current_year()] += vulnerable_by_cell_[row][col];
+            vulnerable_biomass_vector_format_[row * model_->get_width() + col] = vulnerable_by_cell_[row][col];
             effort_by_cell_[row][col] = vulnerable_by_cell_[row][col];// * catchability_;
           }
         }
       }
+      // Final attribute effort based on an ideal free distribution
+      biomass_index_ = math::sort_indexes(vulnerable_biomass_vector_format_);
+      for (unsigned row = 0; row < model_->get_height(); ++row) {
+        for (unsigned col = 0; col < model_->get_width(); ++col) {
+          effort_by_cell_[row][col] = effort_input_[biomass_index_[row * model_->get_width() + col]];
+        }
+      }
+
       LOG_FINE() << "about to check baranov";
       time(&start_time_);
       minimiser_->SolveBaranov();
@@ -227,7 +256,7 @@ void MortalityEffortBasedBaranov::DoExecute() {
             // iterate through and calcualte vulnerable biomass in each cell exactly, nothing random here
             unsigned counter = 0;
             double F_this_cell = lambda_ * effort_by_cell_[row][col];
-            vulnerable_by_cell_[row][col] = F_this_cell;
+            F_by_cell_[row][col] = F_this_cell;
             LOG_FINE() << "About to kill agents.";
             for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter, ++iter) {
               //LOG_MEDIUM() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " is alove = " << (*iter).is_alive() << " counter = " << counter;
@@ -248,7 +277,8 @@ void MortalityEffortBasedBaranov::DoExecute() {
       }
       actual_catch_by_year_[model_->current_year()] = actual_catch_;
       actual_removals_by_year_and_cell_[model_->current_year()] = removals_by_cell_;
-      F_by_year_and_cell_[model_->current_year()] = vulnerable_by_cell_;
+      F_by_year_and_cell_[model_->current_year()] = F_by_cell_;
+      vulnerable_by_year_and_cell_[model_->current_year()] = vulnerable_by_cell_;
     } // year
   } // initialisation
 } // DoExecute
@@ -311,6 +341,14 @@ void  MortalityEffortBasedBaranov::FillReportCache(ostringstream& cache) {
 
   for (auto& values : F_by_year_and_cell_) {
     cache << "F_by_cell_" << values.first << " " << REPORT_R_MATRIX << "\n";
+    for (unsigned i = 0; i < values.second.size(); ++i) {
+      for (unsigned j = 0; j < values.second[i].size(); ++j)
+        cache << values.second[i][j] << " ";
+      cache << "\n";
+    }
+  }
+  for (auto& values : vulnerable_by_year_and_cell_) {
+    cache << "vulnerable_by_cell_" << values.first << " " << REPORT_R_MATRIX << "\n";
     for (unsigned i = 0; i < values.second.size(); ++i) {
       for (unsigned j = 0; j < values.second[i].size(); ++j)
         cache << values.second[i][j] << " ";

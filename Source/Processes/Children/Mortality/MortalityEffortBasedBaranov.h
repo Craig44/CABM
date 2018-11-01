@@ -74,9 +74,11 @@ protected:
 
   vector<vector<double>>              effort_by_cell_;
   vector<vector<double>>              vulnerable_by_cell_;
+  vector<vector<double>>              F_by_cell_;
   vector<vector<double>>              removals_by_cell_;
   map<unsigned,vector<vector<double>>>  actual_removals_by_year_and_cell_;
   map<unsigned,vector<vector<double>>>  F_by_year_and_cell_;
+  map<unsigned,vector<vector<double>>>  vulnerable_by_year_and_cell_;
 
   //
   vector<float>                       effort_input_;
@@ -92,6 +94,11 @@ protected:
   time_t                              start_time_;
   map<unsigned, time_t>               time_by_year_;
   map<unsigned, string>               message_by_year_;
+  bool                                effort_layer_based_;
+  vector<size_t>                      biomass_index_;
+  vector<float>                       vulnerable_biomass_vector_format_;
+  bool                                first_execute_ = true;
+
 
 };
 
