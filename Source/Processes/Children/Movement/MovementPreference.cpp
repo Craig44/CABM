@@ -17,7 +17,7 @@
 #include "Layers/Manager.h"
 #include "PreferenceFunctions/Manager.h"
 
-//#include "Selectivities/Manager.h"
+#include "Selectivities/Manager.h"
 #include "Utilities/RandomNumberGenerator.h"
 #include "Utilities/To.h"
 
@@ -45,6 +45,8 @@ MovementPreference::MovementPreference(Model* model) : Movement(model) {
   parameters_.Bind<bool>(PARAM_BROWNIAN_MOTION, &brownian_motion_, "Just apply random movement, undirected movement", "", false);
   parameters_.Bind<string>(PARAM_PREFERENCE_FUNCTIONS, &preference_function_labels_, "The preference functions to apply", "", true);
   parameters_.Bind<string>(PARAM_PREFERENCE_LAYERS, &preference_layer_labels_, "The preference functions to apply", "", true);
+  parameters_.Bind<string>(PARAM_SELECTIVITY_LABEL, &selectivity_label_, "Label for the selectivity block", "");
+
 }
 
 /*
@@ -96,9 +98,37 @@ void MovementPreference::DoBuild() {
   }
 
   cell_offset_.resize(model_->get_height());
-  for (unsigned i = 0; i < model_->get_height(); ++i)
+  for (unsigned i = 0; i < model_->get_height(); ++i) {
     cell_offset_[i].resize(model_->get_width());
+  }
 
+
+  LOG_FINEST() << "selectivities supplied = " << selectivity_label_.size();
+  // Build selectivity links
+  if (selectivity_label_.size() == 1)
+    selectivity_label_.assign(2, selectivity_label_[0]);
+
+  if (selectivity_label_.size() > 2) {
+    LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << "You suppled " << selectivity_label_.size()  << " Selectiviites, you can only have one for each sex max = 2";
+  }
+  LOG_FINEST() << "selectivities supplied = " << selectivity_label_.size();
+
+  bool first = true;
+  for (string label : selectivity_label_) {
+    Selectivity* temp_selectivity = model_->managers().selectivity()->GetSelectivity(label);
+    if (!temp_selectivity)
+      LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << ": selectivity " << label << " does not exist. Have you defined it?";
+
+    selectivity_.push_back(temp_selectivity);
+    if (first) {
+      first = false;
+      selectivity_length_based_ = temp_selectivity->is_length_based();
+    } else {
+      if (selectivity_length_based_ != temp_selectivity->is_length_based()) {
+        LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << "The selectivity  " << label << " was not the same type (age or length based) as the previous selectivity label";
+      }
+    }
+  }
 }
 
 
@@ -247,40 +277,88 @@ void MovementPreference::DoExecute() {
         float total_u = 0;
         float total_jumps = 0;
         unsigned counter = 0;
-        for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++counter, ++iter) {
-          // Iterate over possible cells compare to chance()
-          if ((*iter).is_alive()) {
-            lat_distance = v + lat_random_numbers_[cell_offset_[row][col] + counter] * standard_deviation_;
-            lon_distance = u + lon_random_numbers_[cell_offset_[row][col] + counter] * standard_deviation_;
-            total_v += lat_distance;
-            total_u += lon_distance;
-            ++total_jumps;
-            LOG_FINEST() << counter<< " " << (*iter).get_lat() << " distance = " << lat_distance << " lon = " << (*iter).get_lon() << " distance = " << lon_distance << " Z = " << lon_random_numbers_[cell_offset_[row][col] + counter] << " sigma = " << standard_deviation_;
-            // Check bounds and find cell destination
-            if ((((*iter).get_lat() + lat_distance) <= model_->max_lat()) && (((*iter).get_lat() + lat_distance) >= model_->min_lat())) {
-              (*iter).set_lat((*iter).get_lat() + lat_distance);
-            } // else they stay as it would be jumping out of bounds
+        if (selectivity_length_based_) {
+          LOG_FINE() << "Length based preference movement";
+          for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++counter, ++iter) {
+            // Iterate over possible cells compare to chance()
+            if ((*iter).is_alive()) {
+              if (rng.chance() <= selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())) {
+                lat_distance = v + lat_random_numbers_[cell_offset_[row][col] + counter] * standard_deviation_;
+                lon_distance = u + lon_random_numbers_[cell_offset_[row][col] + counter] * standard_deviation_;
+                total_v += lat_distance;
+                total_u += lon_distance;
+                ++total_jumps;
+                LOG_FINEST() << counter<< " " << (*iter).get_lat() << " distance = " << lat_distance << " lon = " << (*iter).get_lon() << " distance = " << lon_distance << " Z = " << lon_random_numbers_[cell_offset_[row][col] + counter] << " sigma = " << standard_deviation_;
+                // Check bounds and find cell destination
+                if ((((*iter).get_lat() + lat_distance) <= model_->max_lat()) && (((*iter).get_lat() + lat_distance) >= model_->min_lat())) {
+                  (*iter).set_lat((*iter).get_lat() + lat_distance);
+                } // else they stay as it would be jumping out of bounds
 
-            if ((((*iter).get_lon() + lon_distance) <= model_->max_lon()) && (((*iter).get_lon() + lon_distance) >= model_->min_lon())) {
-              (*iter).set_lon((*iter).get_lon() + lon_distance);
-            } // else they stay as it would be jumping out of bounds
+                if ((((*iter).get_lon() + lon_distance) <= model_->max_lon()) && (((*iter).get_lon() + lon_distance) >= model_->min_lon())) {
+                  (*iter).set_lon((*iter).get_lon() + lon_distance);
+                } // else they stay as it would be jumping out of bounds
 
-            world_->get_cell_element(destination_row, destination_col, (*iter).get_lat(), (*iter).get_lon()); // very difficult to thread this...
+                world_->get_cell_element(destination_row, destination_col, (*iter).get_lat(), (*iter).get_lon()); // very difficult to thread this...
 
-            LOG_FINEST() << (*iter).get_lat() << " " << (*iter).get_lon() << " " << destination_row << " " << destination_col << " " << row << " " << col;
+                LOG_FINEST() << (*iter).get_lat() << " " << (*iter).get_lon() << " " << destination_row << " " << destination_col << " " << row << " " << col;
 
-            if (destination_row == row && destination_col == col) {
-              store_infor.destination_of_agents_moved_[destination_row][destination_col]++;
-            } else {
-              destination_cell = world_->get_cached_square(destination_row, destination_col);
-              if (destination_cell->is_enabled()) {
-                // We are moving 'splice' this agent to the destination cache cell
-                store_infor.destination_of_agents_moved_[destination_row][destination_col]++;
-                //#pragma omp critical
-                {
-                  destination_cell->agents_.push_back(*iter);
+                if (destination_row == row && destination_col == col) {
+                  store_infor.destination_of_agents_moved_[destination_row][destination_col]++;
+                } else {
+                  destination_cell = world_->get_cached_square(destination_row, destination_col);
+                  if (destination_cell->is_enabled()) {
+                    // We are moving 'splice' this agent to the destination cache cell
+                    store_infor.destination_of_agents_moved_[destination_row][destination_col]++;
+                    //#pragma omp critical
+                    {
+                      destination_cell->agents_.push_back(*iter);
+                    }
+                    (*iter).dies();
+                  }
                 }
-                (*iter).dies();
+              }
+            }
+          }
+        } else {
+          LOG_FINE() << "Age based preference movement";
+          for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++counter, ++iter) {
+            // Iterate over possible cells compare to chance()
+            if ((*iter).is_alive()) {
+              if (rng.chance() <= selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index())) {
+
+                lat_distance = v + lat_random_numbers_[cell_offset_[row][col] + counter] * standard_deviation_;
+                lon_distance = u + lon_random_numbers_[cell_offset_[row][col] + counter] * standard_deviation_;
+                total_v += lat_distance;
+                total_u += lon_distance;
+                ++total_jumps;
+                LOG_FINEST() << counter<< " " << (*iter).get_lat() << " distance = " << lat_distance << " lon = " << (*iter).get_lon() << " distance = " << lon_distance << " Z = " << lon_random_numbers_[cell_offset_[row][col] + counter] << " sigma = " << standard_deviation_;
+                // Check bounds and find cell destination
+                if ((((*iter).get_lat() + lat_distance) <= model_->max_lat()) && (((*iter).get_lat() + lat_distance) >= model_->min_lat())) {
+                  (*iter).set_lat((*iter).get_lat() + lat_distance);
+                } // else they stay as it would be jumping out of bounds
+
+                if ((((*iter).get_lon() + lon_distance) <= model_->max_lon()) && (((*iter).get_lon() + lon_distance) >= model_->min_lon())) {
+                  (*iter).set_lon((*iter).get_lon() + lon_distance);
+                } // else they stay as it would be jumping out of bounds
+
+                world_->get_cell_element(destination_row, destination_col, (*iter).get_lat(), (*iter).get_lon()); // very difficult to thread this...
+
+                LOG_FINEST() << (*iter).get_lat() << " " << (*iter).get_lon() << " " << destination_row << " " << destination_col << " " << row << " " << col;
+
+                if (destination_row == row && destination_col == col) {
+                  store_infor.destination_of_agents_moved_[destination_row][destination_col]++;
+                } else {
+                  destination_cell = world_->get_cached_square(destination_row, destination_col);
+                  if (destination_cell->is_enabled()) {
+                    // We are moving 'splice' this agent to the destination cache cell
+                    store_infor.destination_of_agents_moved_[destination_row][destination_col]++;
+                    //#pragma omp critical
+                    {
+                      destination_cell->agents_.push_back(*iter);
+                    }
+                    (*iter).dies();
+                  }
+                }
               }
             }
           }

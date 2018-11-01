@@ -67,7 +67,7 @@ void Selectivity::Reset() {
 
 float Selectivity::GetResult(unsigned age_or_length) {
   if (not length_based_)
-    return values_[age_or_length - min_index_];
+    return values_[age_or_length];
   else
     return length_values_[age_or_length];
 }

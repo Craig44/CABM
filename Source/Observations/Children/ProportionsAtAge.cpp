@@ -281,7 +281,7 @@ void ProportionsAtAge::PreExecute() {
               float probability;
               for (Agent& agent : cell->agents_) {
                 if (agent.is_alive()) {
-                  probability = selectivities_[agent.get_sex()]->GetResult(agent.get_age());
+                  probability = selectivities_[agent.get_sex()]->GetResult(agent.get_age_index());
                   if (rng.chance() <= probability) {
                     pre_age_freq_[cell_label][agent.get_age_index()] += agent.get_scalar();
                   }
@@ -361,7 +361,7 @@ void ProportionsAtAge::Execute() {
                 LOG_FINE() << "observation is sexed specific";
                 for (Agent& agent : cell->agents_) {
                   if (agent.is_alive()) {
-                    if (rng.chance() <= selectivities_[agent.get_sex()]->GetResult(agent.get_age())) {
+                    if (rng.chance() <= selectivities_[agent.get_sex()]->GetResult(agent.get_age_index())) {
                       //LOG_FINEST() << "index = " << agent.get_age_index() << " scalar = " <<  agent.get_scalar() << agent.get_sex() << " sex = " << agent.get_sex() << " age = " << agent.get_age();
                       age_freq_[cell_label][agent.get_age_index() + agent.get_sex() * model_age_spread] += agent.get_scalar();
                     }
@@ -370,7 +370,7 @@ void ProportionsAtAge::Execute() {
               } else {
                 for (Agent& agent : cell->agents_) {
                   if (agent.is_alive()) {
-                    if (rng.chance() <= selectivities_[agent.get_sex()]->GetResult(agent.get_age())) {
+                    if (rng.chance() <= selectivities_[agent.get_sex()]->GetResult(agent.get_age_index())) {
                       //LOG_FINEST() << "index = " << agent.get_age_index() << " scalar = " <<  agent.get_scalar() << agent.get_sex() << " sex = " << agent.get_sex() << " age = " << agent.get_age();
                       age_freq_[cell_label][agent.get_age_index()] += agent.get_scalar();
                     }

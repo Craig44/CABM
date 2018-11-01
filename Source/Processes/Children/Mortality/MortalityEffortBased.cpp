@@ -139,14 +139,12 @@ void MortalityEffortBased::DoBuild() {
   }
 
 
-
   if (selectivity_length_based_) {
-    LOG_FATAL_P(PARAM_SELECTIVITY_LABEL) << "haven't coded for length based selectivity in this process.";
     for (unsigned i = 0; i < model_->get_height(); ++i) {
       for (unsigned j = 0; j < model_->get_width(); ++j) {
         for (unsigned ogive = 0; ogive < selectivity_label_.size(); ++ogive) {
-          for (auto len : model_->length_bins())
-            cell_offset_for_selectivity_[i][j].push_back(selectivity_[ogive]->GetResult(len));
+          for (unsigned len_ndx = 0; len_ndx < model_->length_bins().size(); ++len_ndx)
+            cell_offset_for_selectivity_[i][j].push_back(selectivity_[ogive]->GetResult(len_ndx));
         }
       }
     }
@@ -154,12 +152,13 @@ void MortalityEffortBased::DoBuild() {
     for (unsigned i = 0; i < model_->get_height(); ++i) {
       for (unsigned j = 0; j < model_->get_width(); ++j) {
         for (unsigned ogive = 0; ogive < selectivity_label_.size(); ++ogive) {
-          for (auto age = model_->min_age(); age <= model_->max_age(); ++age)
-          cell_offset_for_selectivity_[i][j].push_back(selectivity_[ogive]->GetResult(age));
+          for (unsigned age_ndx = 0; age_ndx < model_->age_spread(); ++age_ndx)
+          cell_offset_for_selectivity_[i][j].push_back(selectivity_[ogive]->GetResult(age_ndx));
         }
       }
     }
   }
+
   // Build GammaDiff
   minimiser_ =  model_->managers().minimiser()->get_minimiser(minimiser_label_);
   if (!minimiser_) {

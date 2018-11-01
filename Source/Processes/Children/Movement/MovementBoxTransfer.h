@@ -21,7 +21,7 @@
 
 // namespaces
 namespace niwa {
-//class Selectivity;
+class Selectivity;
 namespace processes {
 
 
@@ -61,6 +61,11 @@ protected:
   vector<float>                       random_numbers_;
   unsigned                            n_agents_;
   vector<vector<unsigned>>            cell_offset_;
+
+  // Selectivity
+  vector<string>                      selectivity_label_;
+  vector<Selectivity*>                selectivity_;
+  bool                                selectivity_length_based_;
 
 
 
