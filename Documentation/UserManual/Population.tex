@@ -527,8 +527,8 @@ This process applies both natural mortality and fishing mortality
 \textbf{The algorithm}
 \begin{itemize}
 	\item iterate over every individual in the partition or spatial cell
-	\item See if the fish dies by comparing total mortality survivor ship $U() \leq 1 - e^{- M + F}$
-	\item If fish dies see if it was from $M$ or $F$ if $U() < \frac{F}{F + M}$ then it was removed from an fishing event and is included in fishing specific observations.
+	\item See if the fish dies by comparing total mortality survivor ship $U() \leq 1 - e^{- M_a + F_a}$ assuming $M$ and $F$ are both age based, but they can be length based ($M_l$, $F_l$) or a combination
+	\item If fish dies see if it was from $M_a$ or $F_a$ if ($U() < \frac{F_a}{F_a + M_a}$) then it was removed from an fishing event and is included in fishing specific observations.
 	\item we also can apply MLS and handling survivor ship
 	\item we can also choose to check for tag-recaptures
 \end{itemize}
@@ -536,12 +536,33 @@ So from the algorithm above we can see that agents are exposed to both M and F, 
 
 
 \paragraph{Effort-Based F}\label{para:effort_based_F}\index{Processes!Mortality!Effort-Based F}
-A lot of this process was inspired by \cite{truesdell2017effects}, where users can specify some theoretical fishing distribution, currently only Ideal Free Distribution is allowed (but I am hoping to add a weighted ideal free distribution with user defined weights) and a total catch. \IBM\ will then go evaluate the relative effort based on the biomass and soon user defined weighting matrix.
+A lot of this process was inspired by \cite{truesdell2017effects}, where users can specify some theoretical fishing distribution, currently only Ideal Free Distribution is allowed (but I am hoping to add a weighted ideal free distribution with user defined weights) and a total catch. \IBM\ applies this process by calculating the vulnerable biomass over all spatial cells ($V_{row,col}$), where each individual contributing to the vulnerable biomass is done deterministically \textbf{unlike} most other systems in the model (the stochastic nature comes later Equation~\ref{eq:catch}),
 
 \begin{equation}
-	E_{row,col} = B_{row,col} * col
+	V_{row,col} = \sum_{i\in(row,col)} \bar{w_i} \times s_i \times P_c
+\end{equation}
+where, $P_c$ is the probability of capture which can be length or age based, $i$ indexes all the available agents in cell $row, col$, and $\bar{w_i}$  $s_i$ are the weight and scalar of the agent respectively, $()\text{I}$ is the identity function based on the outcome of the Bernoulli trial. Once we have the vulnerable biomass by cell we want to allocate our theoretical effort. The user can specify effort two ways. The user can specify a vector of expected effort one for each enabled cell, this would mean that effort was time-invariant. The second is that user could specify a numeric layer of efforts for each year (the order is not important because \IBM\ will align them based on the theoretical distribution). \textbf{Note} units of effort could be important for solving $\lambda$ look at the end of this section to see technical details on this. Once we have effort ($E_{row,col}$) and vulnerable ($V_{row,col}$), the \IBM\ will align the highest effort value with the cell with the highest biomass, for the ideal free distribution. Once we have effort and vulnerable biomass we need to estimate a parameter $\lambda_y$ so that we solve for catch.
+
+\begin{equation}\label{eq:catch}
+\hat{C}_{y,row,col} = \sum_{i\in(row,col)} (U() \leq 1- e^{\lambda_y E_{row,col} P_c})\text{I } \bar{w_i} \times s_i
 \end{equation}
 
+A note from the above equation the uniform random draw $U()$ is set once for all agents and is not re-drawn every time we iterate over this equation to minimise the Equation~\ref{eq:minimise} below to solve for $\lambda_y$.
+\begin{equation}
+\hat{C}_{y} = \sum_{row}\sum_{col} \hat{C}_{y,row,col} 
+\end{equation}
+
+
+
+We then minimiser the sum of square of the following expression to solve for $\lambda_y$,
+
+\begin{equation}\label{eq:minimise}
+	\hat{\lambda}_y = argmin_{\lambda}(C_y - \hat{C}_{y})^2
+\end{equation}
+
+where, $C_y$ is the user catch, in this case $\hat{F}_y =\hat{\lambda}_y E_{row,col}$. We finally removals with our estimated $F$ using the normal survivor ship process, Bernoulli trial if $U() \leq 1- e^{\hat{F}_y P_c}$ then the agent dies.\\
+
+A technical note to consider, is that the $\lambda$ parameter is assumed to $\lambda \in (0.0000001, 100)$. So you will need to scale and check your Effort units so that, with the above constraint and your effort we can solve for the Catch in that year. Also there is an option to specify the starting value when solving for $\lambda$ using the subcommand \subcommand{starting\_value\_for\_lambda}. If you print this process it should tell you how long it takes in seconds to solve for lambda for each year.
 
 
 
@@ -1052,13 +1073,16 @@ where $\delta_y$ is the shift or deviation in parameter $\theta_y$ in year $y$ t
 \subsection{\I{Tips setting up configuration files}\label{sec:tips}}
 \IBM\ can take a while if you have a complex spatial model and complex life history. So there are some tips and tricks that I have come found can be useful when setting up configuration files.
 
+\subsubsection*{Debugging a model}
+When initially setting up a model set initialisation years low and number of agents low, because there is a lot going on in this model it is best to get up and run (which is a good feeling). Also I would advice setting up the population and report components, only once you are happy with that that I would suggest bringing in Observations. Advice I always struggle to keep to is, start very basic and build complexity, otherwise say good bye to time and hello to frustration. Once you are happy with your model then I would suggest increase initialisation years and number of agents.
+
 \subsubsection*{The initialisation Phase}
 The first thing you wont to nail down before getting gun hoe on the configuration and complex dynamics you want to get a model that reaches an appropriate initialisation state \emph{quickly!}. So my suggestion is to not worry about fishing in the first instance, set the \subcommand{start\_year} and \subcommand{final\_year} one year apart and play with the initialisation phase commands to see how to efficiently reach a desired initial state. The parameters I am talking about are the subcommands \subcommand{years} and \subcommand{layer\_label}. The \subcommand{years} parameter sets how many annual cycles to run through to set your initialisation state, you want this as small as possible. So my advice is run the model with a range of \subcommand{years} say 5, 10, 20, 30, 40, 50 and 100 to find out how sensitive your initial state is to this. You find that you have to make a compromise between speed and accuracy, unfortunately life is full of such compromises. To see some example \R\ code on how I compare initialisation see Section~\ref{sec:post-processing}.
 
 Along with the \subcommand{years} parameter you can also set the spatial distribution of the initial seeding of agents through the \subcommand{layer\_label}, if you have a spatial model with movement this would be an interesting one to play with. So pretty much my advice is tweak these initialisation parameters as much as you can before you move onto fishing and generate observations, it will be well worth your while if you treasure time.
 
 \subsubsection*{The number of agents in the system} 
-This one should be obvious and we suggest that you play with the initialisation parameter \subcommand{number\_of\_agents} to see how sensitive model outputs are to this parameter. The less agents in the system the faster your model run, however the less agents the more coarse you model becomes because then an entity all of a sudden represents 1000 entities, so once again we return to a compromise.
+This one should be obvious and we suggest that you play with the initialisation parameter \subcommand{number\_of\_agents} to see how sensitive model outputs are to this parameter. The less agents in the system the faster your model will run, however the less agents the more coarse you model becomes because then an entity all of a sudden represents 1000 if not 10000 entities, so once again we return to a compromise.
 
 \subsubsection*{The number of threads available}
 \textbf{Disabled} was not implemented correctly the first time, still to many shared resources.. 
