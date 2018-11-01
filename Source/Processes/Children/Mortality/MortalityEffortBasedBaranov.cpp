@@ -19,6 +19,8 @@
 #include "Utilities/RandomNumberGenerator.h"
 #include "World/WorldCell.h"
 #include "World/WorldView.h"
+
+
 // namespaces
 namespace niwa {
 namespace processes {
@@ -28,10 +30,15 @@ namespace processes {
  */
 MortalityEffortBasedBaranov::MortalityEffortBasedBaranov(Model* model) : Mortality(model) {
   parameters_.Bind<string>(PARAM_SELECTIVITY, &selectivity_label_, "Selectivity label", "");
+  parameters_.Bind<string>(PARAM_MINIMIZER, &minimiser_label_, "Label of the minimser to solve the problem", "");
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "years to apply the process", "");
   parameters_.Bind<float>(PARAM_CATCHES, &catches_, "Total catch by year","");
-  parameters_.Bind<float>(PARAM_CATCHABILITY, &catchability_, "An arbiturary scalar to get the effort value","");
+  parameters_.Bind<float>(PARAM_EFFORT_VALUES, &effort_input_, "A vector of effort values, one for each enabled cell of the model","",true);
+  parameters_.Bind<string>(PARAM_EFFORT_LAYER_LABEL, &effort_layer_label_, "A layer label that is a numeric layer label that contains effort values for each year.","","");
+  parameters_.Bind<double>(PARAM_STARTING_VALUE_FOR_LAMBDA, &start_value_for_lambda_, "Total catch by year","", true);
 
+
+  //parameters_.Bind<float>(PARAM_CATCHABILITY, &catchability_, "An arbiturary scalar to get the effort value","");
 }
 
 /**
@@ -48,6 +55,13 @@ void MortalityEffortBasedBaranov::DoValidate() {
  */
 void MortalityEffortBasedBaranov::DoBuild() {
   LOG_FINE();
+
+  if (parameters_.Get(PARAM_EFFORT_VALUES)->has_been_defined() & parameters_.Get(PARAM_EFFORT_LAYER_LABEL)->has_been_defined())
+    LOG_FATAL_P(PARAM_EFFORT_VALUES) << "You have supplied both parameters " << PARAM_EFFORT_VALUES << " and " << PARAM_EFFORT_LAYER_LABEL << ", you can only supply one of these parameters.";
+
+  if (!parameters_.Get(PARAM_EFFORT_VALUES)->has_been_defined() & !parameters_.Get(PARAM_EFFORT_LAYER_LABEL)->has_been_defined())
+    LOG_FATAL_P(PARAM_LABEL) << "You need to supply either " << PARAM_EFFORT_VALUES << " or " << PARAM_EFFORT_LAYER_LABEL << " inputs, you have not supplied either.";
+
 
   // allocate memory for runtime containers.
   cell_offset_for_selectivity_.resize(model_->get_height());
@@ -120,13 +134,18 @@ void MortalityEffortBasedBaranov::DoBuild() {
     }
   }
   // Build GammaDiff
-  minimiser_ =  model_->managers().minimiser()->active_minimiser();
+  minimiser_ =  model_->managers().minimiser()->get_minimiser(minimiser_label_);
   if (!minimiser_) {
-    LOG_FATAL_P(PARAM_LABEL) << "you need to declare a @minimiser block to use this process, and it needs to be of type gamma_diff. See the manual for more information";
+    LOG_FATAL_P(PARAM_MINIMIZER) << "Could not find the @minimiser block labelled " << minimiser_label_ << " please make sure that it exists.";
   }
   LOG_FINE() << "about to call execute on the minimsier";
   minimiser_->PassBaranovProcess(label_);
 
+  if (parameters_.Get(PARAM_STARTING_VALUE_FOR_LAMBDA)->has_been_defined()) {
+    if (start_value_for_lambda_.size() != 1)
+      LOG_FATAL_P(PARAM_STARTING_VALUE_FOR_LAMBDA) << "Can only supply a single value for this parameter, you have specified " << start_value_for_lambda_.size();
+    minimiser_->PassStartValueBaranov(start_value_for_lambda_);
+  }
   //minimiser_->Execute();
   // Prepare the model to solve the baranov catch equation.
   //model_->prepare_for_effort_based_baranov(label_);
@@ -160,7 +179,7 @@ void MortalityEffortBasedBaranov::DoExecute() {
           }
         }
       }
-
+      vulnerable_biomass_by_year_[model_->current_year()] = 0;
       // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
       random_numbers_.resize(n_agents_ + 1);
       discard_random_numbers_.resize(n_agents_ + 1);
@@ -181,16 +200,21 @@ void MortalityEffortBasedBaranov::DoExecute() {
             unsigned counter = 0;
             for (auto agent_iter = cell->agents_.begin(); agent_iter != cell->agents_.end(); ++counter,++agent_iter) {
               //LOG_FINE() << "counter = " << counter;
-              vulnerable_by_cell_[row][col] += (*agent_iter).get_weight() * (*agent_iter).get_scalar() * cell_offset_for_selectivity_[row][col][(*agent_iter).get_sex() * model_->age_spread() + (*agent_iter).get_age_index()];
+              if ((*agent_iter).is_alive())
+                vulnerable_by_cell_[row][col] += (*agent_iter).get_weight() * (*agent_iter).get_scalar() * cell_offset_for_selectivity_[row][col][(*agent_iter).get_sex() * model_->age_spread() + (*agent_iter).get_age_index()];
             }
-            effort_by_cell_[row][col] = vulnerable_by_cell_[row][col] * catchability_;
+            vulnerable_biomass_by_year_[model_->current_year()] += vulnerable_by_cell_[row][col];
+            effort_by_cell_[row][col] = vulnerable_by_cell_[row][col];// * catchability_;
           }
         }
       }
-      LOG_FINE() << "about to ckech baranov";
+      LOG_FINE() << "about to check baranov";
+      time(&start_time_);
       minimiser_->SolveBaranov();
-      LOG_FINE() << "Finished temp value";
-      catch_based_on_baranov__by_year_[model_->current_year()] = catch_based_on_baranov_;
+      time_by_year_[model_->current_year()] = (time(NULL) - start_time_); // seconds
+      message_by_year_[model_->current_year()] = minimiser_->get_message();
+      LOG_MEDIUM() << "Finished minimsation lambda value = " << lambda_  << " time now = " << time(NULL) << " start time = " << start_time_;
+      catch_based_on_baranov_by_year_[model_->current_year()] = catch_based_on_baranov_;
       lambda_by_year_[model_->current_year()] = lambda_;
 
       // Now apply Mortality with probability with F as we do with M in mortality constant
@@ -204,20 +228,21 @@ void MortalityEffortBasedBaranov::DoExecute() {
             unsigned counter = 0;
             double F_this_cell = lambda_ * effort_by_cell_[row][col];
             vulnerable_by_cell_[row][col] = F_this_cell;
-            unsigned initial_size = cell->agents_.size();
-            LOG_FINEST() << initial_size << " initial agents";
-            for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter) {
-              //LOG_FINEST() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " survivorship = " << (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()])) << " M = " << (*iter).get_m();
-              if (random_numbers_[cell_offset_[row][col] + counter]
-                  <= (1.0 - std::exp(-F_this_cell * cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]))) {
-                actual_catch_ += (*iter).get_weight() * (*iter).get_scalar();
-                removals_by_cell_[row][col] += (*iter).get_weight() * (*iter).get_scalar();
-                iter = cell->agents_.erase(iter);
-                initial_size--;
-              } else
-                ++iter;
+            LOG_FINE() << "About to kill agents.";
+            for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter, ++iter) {
+              //LOG_MEDIUM() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " is alove = " << (*iter).is_alive() << " counter = " << counter;
+              if ((*iter).is_alive()) {
+                if (random_numbers_[cell_offset_[row][col] + counter]
+                    <= (1.0 - std::exp(-F_this_cell * cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]))) {
+                  actual_catch_ += (*iter).get_weight() * (*iter).get_scalar();
+                  removals_by_cell_[row][col] += (*iter).get_weight() * (*iter).get_scalar();
+                  (*iter).dies();
+                }
+              }
             }
-            LOG_FINEST() << initial_size << " after mortality";
+            LOG_FINE() << "Applied mortality";
+
+            //LOG_FINEST() << initial_size << " after mortality";
           }
         }
       }
@@ -242,15 +267,19 @@ double MortalityEffortBasedBaranov::SolveBaranov() {
         double F_this_cell = lambda_ * effort_by_cell_[row][col];
         for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter, ++counter) {
           //LOG_FINEST() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " survivorship = " << (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()])) << " M = " << (*iter).get_m();
-          if (random_numbers_[cell_offset_[row][col] + counter]
-              <= (1.0 - std::exp(-F_this_cell * cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]))) {
-            catch_based_on_baranov_ += (*iter).get_weight() * (*iter).get_scalar();
+          if ((*iter).is_alive()) {
+            if (random_numbers_[cell_offset_[row][col] + counter]
+                <= (1.0 - std::exp(-F_this_cell * cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]))) {
+              catch_based_on_baranov_ += (*iter).get_weight() * (*iter).get_scalar();
+            }
           }
         }
       }
     }
   }
   //
+  LOG_FINE() << "estimated catch = " << catch_based_on_baranov_ << " SSE = " << pow(catches_by_year_[model_->current_year()] - catch_based_on_baranov_,2);
+
   return pow(catches_by_year_[model_->current_year()] - catch_based_on_baranov_,2);
 }
 
@@ -262,12 +291,23 @@ void  MortalityEffortBasedBaranov::FillReportCache(ostringstream& cache) {
   for(auto& val : actual_catch_by_year_)
     cache << val.second << " ";
   cache << "\ncatch_based_on_baranov: ";
-  for(auto& val : catch_based_on_baranov__by_year_)
+  for(auto& val : catch_based_on_baranov_by_year_)
+    cache << val.second << " ";
+  cache << "\nvulnerable_biomass: ";
+  for(auto& val : vulnerable_biomass_by_year_)
+    cache << val.second << " ";
+  cache << "\nseconds_to_minimise: ";
+  for(auto& val : time_by_year_)
     cache << val.second << " ";
   cache << "\nlambda: ";
   for(auto& val : lambda_by_year_)
     cache << val.second << " ";
   cache << "\n";
+
+  for(auto& val : message_by_year_) {
+    cache << val.first  << "_message " << REPORT_R_STRING_VECTOR << "\n";
+    cache << val.second << "\n";
+  }
 
   for (auto& values : F_by_year_and_cell_) {
     cache << "F_by_cell_" << values.first << " " << REPORT_R_MATRIX << "\n";

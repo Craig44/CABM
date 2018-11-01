@@ -132,7 +132,7 @@ void GrowthVonBertalanffyWithBasic::DoExecute() {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
         float length_prop = time_step_ratios_[model_->managers().time_step()->current_time_step()];
-        LOG_FINE() << "length prop = " << length_prop;
+        //LOG_FINE() << "length prop = " << length_prop;
         for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter) {
           if ((*iter).is_alive()) {
             //LOG_FINEST() << "length = " << (*iter).get_length() << " weight = " << (*iter).get_weight() << " L-inf " << (*iter).get_first_age_length_par() << " k = " << (*iter).get_second_age_length_par() << " prop = " << length_prop;

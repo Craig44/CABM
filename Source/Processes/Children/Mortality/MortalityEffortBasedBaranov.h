@@ -19,6 +19,8 @@
 #include "Layers/Children/NumericLayer.h"
 #include <omp.h>
 
+#include <ctime>
+
 // Includes for the GammaDiff minimiser
 #include "Minimisers/Minimiser.h"
 
@@ -55,9 +57,10 @@ protected:
   float                               catchability_;
   double                              actual_catch_;
   map<unsigned,double>                actual_catch_by_year_;
+  map<unsigned,double>                vulnerable_biomass_by_year_;
 
   double                              catch_based_on_baranov_;
-  map<unsigned,double>                catch_based_on_baranov__by_year_;
+  map<unsigned,double>                catch_based_on_baranov_by_year_;
 
   map<unsigned,double>                lambda_by_year_;
   // objects for thread safety of rng
@@ -75,12 +78,20 @@ protected:
   map<unsigned,vector<vector<double>>>  actual_removals_by_year_and_cell_;
   map<unsigned,vector<vector<double>>>  F_by_year_and_cell_;
 
+  //
+  vector<float>                       effort_input_;
+  string                              effort_layer_label_;
+
   // For reporting
   map<unsigned, float>                actual_removals_by_year_;
   map<unsigned, float>                removals_by_year_;
   Minimiser*                          minimiser_ = nullptr;
+  string                              minimiser_label_;
+  vector<double>                      start_value_for_lambda_;
 
-
+  time_t                              start_time_;
+  map<unsigned, time_t>               time_by_year_;
+  map<unsigned, string>               message_by_year_;
 
 };
 
