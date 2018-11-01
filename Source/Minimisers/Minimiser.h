@@ -50,7 +50,9 @@ public:
   virtual void                DoReset() = 0;
   virtual void                Execute() = 0;
   virtual void                SolveBaranov() {};
+  virtual void                PassStartValueBaranov(vector<double> start_value) {};
   virtual void                PassBaranovProcess(string label);
+  virtual string              get_message() {return "";};
 
   // Acessors
   bool                        active() const { return active_; }

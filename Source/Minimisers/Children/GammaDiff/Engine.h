@@ -36,6 +36,7 @@ public:
   double optimise_finite_differences(gammadiff::CallbackBaranov& objective, vector<double>& StartValues, vector<double>& LowerBounds,
       vector<double>& UpperBounds, int& convergence, int& iMaxIter, int& iMaxFunc, double dGradTol,
       double **pOptimiseHessian, int untransformedHessians, double dStepSize);
+  string                      get_message() {return message_;};
 private:
   // Variables
   vector<double>              vStartValues;
@@ -45,6 +46,7 @@ private:
   vector<double>              vCurrentValues;
   vector<double>              vGradientValues;
   double                      dPenalty;
+  string                      message_ = "";
 
   // Functions
   void                        buildScaledValues();

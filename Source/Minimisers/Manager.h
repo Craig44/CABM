@@ -36,6 +36,9 @@ public:
   void                        Validate() override final;
 
   // Accessors
+  Minimiser*                  get_minimiser(string label);
+
+  // Not sure this methods is needed any more, as we can have many minimisers.
   Minimiser*                  active_minimiser() {LOG_FINE() << "passing minimiser " <<  active_minimiser_->label(); return active_minimiser_; }
 
 protected:

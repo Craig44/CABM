@@ -218,11 +218,15 @@ double Engine::optimise_finite_differences(gammadiff::CallBack& objective, vecto
 
   if (clMinimiser.getResult() == -3) {
     LOG_MEDIUM() << GAMMADIFF_CONVERGENCE_UNCLEAR;
+    message_ = GAMMADIFF_CONVERGENCE_UNCLEAR;
   } else if (clMinimiser.getResult() == -2) {
     LOG_MEDIUM() << GAMMADIFF_EVALUATIONS_MAX;
+    message_ = GAMMADIFF_EVALUATIONS_MAX;
   } else if (clMinimiser.getResult() == -1) {
+    message_ = GAMMADIFF_CONVERGENCE_SUCCESSFUL;
     LOG_MEDIUM() << GAMMADIFF_CONVERGENCE_SUCCESSFUL;
   } else {
+    message_ = GAMMADIFF_RETURN_VALUE_UNKNOWN;
     LOG_MEDIUM() << GAMMADIFF_RETURN_VALUE_UNKNOWN << clMinimiser.getResult();
   }
 
@@ -407,11 +411,15 @@ double Engine::optimise_finite_differences(gammadiff::CallbackBaranov& objective
 
   if (clMinimiser.getResult() == -3) {
     LOG_MEDIUM() << GAMMADIFF_CONVERGENCE_UNCLEAR;
+    message_ = GAMMADIFF_CONVERGENCE_UNCLEAR;
   } else if (clMinimiser.getResult() == -2) {
     LOG_MEDIUM() << GAMMADIFF_EVALUATIONS_MAX;
+    message_ = GAMMADIFF_EVALUATIONS_MAX;
   } else if (clMinimiser.getResult() == -1) {
+    message_ = GAMMADIFF_CONVERGENCE_SUCCESSFUL;
     LOG_MEDIUM() << GAMMADIFF_CONVERGENCE_SUCCESSFUL;
   } else {
+    message_ = GAMMADIFF_RETURN_VALUE_UNKNOWN;
     LOG_MEDIUM() << GAMMADIFF_RETURN_VALUE_UNKNOWN << clMinimiser.getResult();
   }
 

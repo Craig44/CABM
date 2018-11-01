@@ -46,5 +46,13 @@ void Manager::Validate() {
   }
 }
 
+Minimiser* Manager::get_minimiser(string label) {
+  for (auto this_minimiser : objects_) {
+    if (this_minimiser->label() == label)
+      return this_minimiser;
+  }
+  return nullptr;
+}
+
 } /* namespace minimisers */
 } /* namespace niwa */

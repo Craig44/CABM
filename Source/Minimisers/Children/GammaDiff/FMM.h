@@ -17,6 +17,7 @@
 #define MINIMISERS_GAMMADIFF_FMM_H_
 
 #include <vector>
+#include <string>
 
 // namespaces
 namespace niwa {
@@ -38,6 +39,7 @@ public:
   double                      getHessianValue(int i, int j) { return pHessianConstruct[i][j]; }
   int                         getIters() { return iIters; }
   int                         getEvals() { return iEvals; }
+  std::string                 get_message() { return message_; }
 
 private:
   // Functions
@@ -84,6 +86,7 @@ private:
   long double                 *pTemp;
   long double                 dRelLength;
   long double                 dDisc;
+  std::string                      message_;
   //rellength,disc;
 };
 

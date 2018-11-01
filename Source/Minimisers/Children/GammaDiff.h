@@ -37,6 +37,8 @@ public:
   void                        DoReset() override final { };
   void                        Execute() override final;
   void                        SolveBaranov() override final;
+  void                        PassStartValueBaranov(vector<double> start_value) override final {start_value_ = start_value;};
+  string                      get_message() override final {return message_;};
 
 private:
   // Members
@@ -44,6 +46,8 @@ private:
   int                         max_evaluations_;
   double                      gradient_tolerance_;
   double                      step_size_;
+  vector<double>              start_value_ = {0.003};
+  string                      message_ = "";
 };
 
 } /* namespace minimisers */

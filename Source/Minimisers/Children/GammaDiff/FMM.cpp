@@ -271,7 +271,7 @@ void FMM::fMin(vector<double>& Candidates, double& Score, vector<double>& Gradie
     if (iEvals > iMaxFunc) {
       iRet = -2;
       LOG_MEDIUM() << "FMM: Too many function evaluations (" << iEvals << ")";
-
+      message_ = "FMM: Too many function evaluations";
       for (int i = 0; i < iVectorSize; ++i)
         Candidates[i] = pPreviousCandidates[i];
 
@@ -282,6 +282,7 @@ void FMM::fMin(vector<double>& Candidates, double& Score, vector<double>& Gradie
     if (iLinearSearchIters > iMaxSteps) {
       iRet = -3;
       LOG_MEDIUM() << "FMM: Too many loops in linear search (" << iLinearSearchIters << ")";
+      message_ = "FMM: Too many loops in linear search";
 
       // Go back to last accepted candidates
       for (int i = 0; i < iVectorSize; ++i)
@@ -311,6 +312,8 @@ void FMM::fMin(vector<double>& Candidates, double& Score, vector<double>& Gradie
     if (dLambda < dLambdaMin) {
       iRet = -3;
       LOG_MEDIUM() << "FMM Linear step size too small (" << (double)dLambda << ")";
+      message_ = "FMM Linear step size too small";
+
       return;
     }
 
@@ -367,6 +370,7 @@ void FMM::fMin(vector<double>& Candidates, double& Score, vector<double>& Gradie
     if (iIters > iMaxQuasiSteps) { // have exceeded maximum no. of iterations
       iRet = -2;
       LOG_MEDIUM() << "FMM: Too many quasi newton iterations  (" << iIters << ")";
+      message_ = "FMM: Too many quasi newton iterations";
       return;
     }
 
@@ -384,6 +388,7 @@ void FMM::fMin(vector<double>& Candidates, double& Score, vector<double>& Gradie
       iConsecutiveMaxSteps++;
 
       if (iConsecutiveMaxSteps == 5) {
+        message_ = "FMM: Max newton steps (5)";
         LOG_MEDIUM() << "FMM: Max newton steps (5)";
         iRet = -3;
         return;
@@ -429,6 +434,7 @@ void FMM::fMin(vector<double>& Candidates, double& Score, vector<double>& Gradie
       }
 
       if (dCurrentTolerance <= dStepTol) {
+        message_ = "FMM: Small step size convergence";
         LOG_MEDIUM() << "FMM: Small step size convergence";
         iRet = -1;
         return;
