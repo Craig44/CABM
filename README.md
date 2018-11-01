@@ -8,10 +8,11 @@ which formulated the basis of the core code for error handling, parameter struct
 via the model found [here](https://github.com/trophia/sna1), where some idea's have been brought across. And finally to the SPM  team found [here](https://github.com/NIWAFisheriesModelling/SPM),
 where most of the spatial code structure comes from.
 
-This is an open source project and if anyone is interested in this project please get in touch the more input the better. I am interested in adding features that are being used in recent applications of IBM's such as; [energetic functionality](https://www.sciencedirect.com/science/article/pii/S0304380018301327) 
+This is an open source project and if anyone is interested in this project please get in touch the more input the better. Because I will be using this as an operating model during my PhD, I would really appreciate
+if people who use this tool get in touch to minimize over lap and also to just share ideas. I am interested in adding features that are being used in recent applications of IBM's such as; [energetic functionality](https://www.sciencedirect.com/science/article/pii/S0304380018301327) 
 habitat based movement, via currents and active gradient searches like in [this paper](https://www.sciencedirect.com/science/article/pii/S0079661117302896)
 Also make it a full life cycle model so that we can do [end to end model](https://www-sciencedirect-com.ezproxy.auckland.ac.nz/science/article/pii/S0079661115000233)
-It would also need to simulate data that could easily be assess in a stock assessment model for management strategy evaluation.
+It would also need to simulate data that could easily be used in a stock assessment model for management strategy evaluation.
 
 IBM's are notorious for being limited by CPU, so a big emphasis is to make it as modular and thread safe as possible. It is currently
 coded to be used on a desktop (as apposed to HPC) as I belief that is where most users will apply it, although because we use the OpenMP C++ 
@@ -20,7 +21,7 @@ library in theory you could make it highly spatial and it should be work fine on
 This IBM has a forced spatial structure, where users must define at least one spatial area. The reason I have gone down this road
 is mainly because I am interested in spatial characteristics and I believe they are fundamental to IBM's. This means for simple 
 spatial models (single area models) the model could be a bit lousy, But when you start having high spatial resolution and spatial
-processes such as fishing. The spatial memory management will benefit massively in efficiency's it also allows easier threading.
+processes such as fishing. The spatial memory management will benefit massively in efficiency's it will also allow easier threading.
 
 
 ### Current Status of Repo
