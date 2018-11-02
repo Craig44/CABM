@@ -45,32 +45,11 @@ void Maturity::DoBuild() {
     selectivity_.push_back(temp_selectivity);
   }
 
-  cell_offset_for_selectivity_.resize(model_->get_height());
   cell_offset_.resize(model_->get_height());
   for (unsigned i = 0; i < model_->get_height(); ++i) {
     cell_offset_[i].resize(model_->get_width());
-    cell_offset_for_selectivity_[i].resize(model_->get_width());
   }
 
-  if (length_based_selectivity_) {
-    for (unsigned i = 0; i < model_->get_height(); ++i) {
-      for (unsigned j = 0; j < model_->get_width(); ++j) {
-        for (unsigned ogive = 0; ogive < selectivity_label_.size(); ++ogive) {
-          for (unsigned len_ndx = 0; len_ndx < model_->length_bins().size(); ++len_ndx)
-            cell_offset_for_selectivity_[i][j].push_back(selectivity_[ogive]->GetResult(len_ndx));
-        }
-      }
-    }
-  } else {
-    for (unsigned i = 0; i < model_->get_height(); ++i) {
-      for (unsigned j = 0; j < model_->get_width(); ++j) {
-        for (unsigned ogive = 0; ogive < selectivity_label_.size(); ++ogive) {
-          for (unsigned age_ndx = 0; age_ndx < model_->age_spread(); ++age_ndx)
-          cell_offset_for_selectivity_[i][j].push_back(selectivity_[ogive]->GetResult(age_ndx));
-        }
-      }
-    }
-  }
 }
 
 
@@ -109,7 +88,7 @@ void Maturity::DoExecute() {
           unsigned counter = 0;
           for (Agent& agent : cell->agents_) {
             if (not agent.get_maturity()) {
-              if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_sex() * model_->age_spread() + agent.get_age() - model_->min_age()]) {
+              if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index())) {
                 agent.set_maturity(true);
                 ++mature_conversion;
               }
@@ -129,7 +108,7 @@ void Maturity::DoExecute() {
           unsigned counter = 0;
           for (Agent& agent : cell->agents_) {
             if (not agent.get_maturity()) {
-              if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_sex() * model_->length_bins().size() + agent.get_length_bin_index()]) {
+              if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index())) {
                 agent.set_maturity(true);
                 ++mature_conversion;
               }

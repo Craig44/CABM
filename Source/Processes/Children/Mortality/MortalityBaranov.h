@@ -81,7 +81,6 @@ protected:
   vector<vector<float>>               discard_by_space_;
   vector<vector<unsigned>>            current_year_by_space_;
   vector<vector<unsigned>>            current_time_step_by_space_;
-  vector<vector<vector<float>>>       cell_offset_for_selectivity_;
   unsigned                            n_agents_;
 
 

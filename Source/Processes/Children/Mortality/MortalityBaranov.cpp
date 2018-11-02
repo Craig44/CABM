@@ -171,7 +171,6 @@ void MortalityBaranov::DoBuild() {
     }
   }
 
-  cell_offset_for_selectivity_.resize(model_->get_height());
   cell_offset_.resize(model_->get_height());
   model_length_bins_.resize(model_->get_height());
   model_age_bins_.resize(model_->get_height());
@@ -183,7 +182,6 @@ void MortalityBaranov::DoBuild() {
   F_by_cell_year_.resize(model_->get_height());
   for (unsigned i = 0; i < model_->get_height(); ++i) {
     cell_offset_[i].resize(model_->get_width());
-    cell_offset_for_selectivity_[i].resize(model_->get_width());
     model_length_bins_[i].resize(model_->get_width(), model_->length_bins().size());
     model_age_bins_[i].resize(model_->get_width(), model_->age_spread());
     mls_by_space_[i].resize(model_->get_width(), mls_);

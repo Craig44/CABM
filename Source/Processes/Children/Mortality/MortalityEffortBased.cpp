@@ -88,7 +88,6 @@ void MortalityEffortBased::DoBuild() {
   }
 
   // allocate memory for runtime containers.
-  cell_offset_for_selectivity_.resize(model_->get_height());
   cell_offset_.resize(model_->get_height());
   effort_by_cell_.resize(model_->get_height());
   vulnerable_by_cell_.resize(model_->get_height());
@@ -97,7 +96,6 @@ void MortalityEffortBased::DoBuild() {
 
   for (unsigned i = 0; i < model_->get_height(); ++i) {
     cell_offset_[i].resize(model_->get_width());
-    cell_offset_for_selectivity_[i].resize(model_->get_width());
     effort_by_cell_[i].resize(model_->get_width(),0.0);
     F_by_cell_[i].resize(model_->get_width(),0.0);
     vulnerable_by_cell_[i].resize(model_->get_width(),0.0);
@@ -134,27 +132,6 @@ void MortalityEffortBased::DoBuild() {
     } else {
       if (selectivity_length_based_ != temp_selectivity->is_length_based()) {
         LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << "The selectivity  " << label << " was not the same type (age or length based) as the previous selectivity label";
-      }
-    }
-  }
-
-
-  if (selectivity_length_based_) {
-    for (unsigned i = 0; i < model_->get_height(); ++i) {
-      for (unsigned j = 0; j < model_->get_width(); ++j) {
-        for (unsigned ogive = 0; ogive < selectivity_label_.size(); ++ogive) {
-          for (unsigned len_ndx = 0; len_ndx < model_->length_bins().size(); ++len_ndx)
-            cell_offset_for_selectivity_[i][j].push_back(selectivity_[ogive]->GetResult(len_ndx));
-        }
-      }
-    }
-  } else {
-    for (unsigned i = 0; i < model_->get_height(); ++i) {
-      for (unsigned j = 0; j < model_->get_width(); ++j) {
-        for (unsigned ogive = 0; ogive < selectivity_label_.size(); ++ogive) {
-          for (unsigned age_ndx = 0; age_ndx < model_->age_spread(); ++age_ndx)
-          cell_offset_for_selectivity_[i][j].push_back(selectivity_[ogive]->GetResult(age_ndx));
-        }
       }
     }
   }
@@ -232,11 +209,20 @@ void MortalityEffortBased::DoExecute() {
             LOG_FINE() << "checking cell in row " << row + 1 << " col = " << col + 1;
             // iterate through and calcualte vulnerable biomass in each cell exactly, nothing random here
             unsigned counter = 0;
-            for (auto agent_iter = cell->agents_.begin(); agent_iter != cell->agents_.end(); ++counter,++agent_iter) {
-              //LOG_FINE() << "counter = " << counter;
-              if ((*agent_iter).is_alive())
-                vulnerable_by_cell_[row][col] += (*agent_iter).get_weight() * (*agent_iter).get_scalar() * cell_offset_for_selectivity_[row][col][(*agent_iter).get_sex() * model_->age_spread() + (*agent_iter).get_age_index()];
+            if (selectivity_length_based_) {
+              for (auto agent_iter = cell->agents_.begin(); agent_iter != cell->agents_.end(); ++counter,++agent_iter) {
+                //LOG_FINE() << "counter = " << counter;
+                if ((*agent_iter).is_alive())
+                  vulnerable_by_cell_[row][col] += (*agent_iter).get_weight() * (*agent_iter).get_scalar() * selectivity_[(*agent_iter).get_sex()]->GetResult((*agent_iter).get_length_bin_index());
+              }
+            } else {
+              for (auto agent_iter = cell->agents_.begin(); agent_iter != cell->agents_.end(); ++counter,++agent_iter) {
+                //LOG_FINE() << "counter = " << counter;
+                if ((*agent_iter).is_alive())
+                  vulnerable_by_cell_[row][col] += (*agent_iter).get_weight() * (*agent_iter).get_scalar() * selectivity_[(*agent_iter).get_sex()]->GetResult((*agent_iter).get_age_index());
+              }
             }
+
             vulnerable_biomass_by_year_[model_->current_year()] += vulnerable_by_cell_[row][col];
             vulnerable_biomass_vector_format_[row * model_->get_width() + col] = vulnerable_by_cell_[row][col];
             //effort_by_cell_[row][col] = vulnerable_by_cell_[row][col];// * catchability_;
@@ -276,14 +262,28 @@ void MortalityEffortBased::DoExecute() {
             double F_this_cell = lambda_ * effort_by_cell_[row][col];
             F_by_cell_[row][col] = F_this_cell;
             LOG_FINE() << "About to kill agents.";
-            for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter, ++iter) {
-              //LOG_MEDIUM() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " is alove = " << (*iter).is_alive() << " counter = " << counter;
-              if ((*iter).is_alive()) {
-                if (random_numbers_[cell_offset_[row][col] + counter]
-                    <= (1.0 - std::exp(-F_this_cell * cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]))) {
-                  actual_catch_ += (*iter).get_weight() * (*iter).get_scalar();
-                  removals_by_cell_[row][col] += (*iter).get_weight() * (*iter).get_scalar();
-                  (*iter).dies();
+            if (selectivity_length_based_) {
+              for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter, ++iter) {
+                //LOG_MEDIUM() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " is alove = " << (*iter).is_alive() << " counter = " << counter;
+                if ((*iter).is_alive()) {
+                  if (random_numbers_[cell_offset_[row][col] + counter]
+                      <= (1.0 - std::exp(-F_this_cell * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())))) {
+                    actual_catch_ += (*iter).get_weight() * (*iter).get_scalar();
+                    removals_by_cell_[row][col] += (*iter).get_weight() * (*iter).get_scalar();
+                    (*iter).dies();
+                  }
+                }
+              }
+            } else {
+              for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter, ++iter) {
+                //LOG_MEDIUM() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " is alove = " << (*iter).is_alive() << " counter = " << counter;
+                if ((*iter).is_alive()) {
+                  if (random_numbers_[cell_offset_[row][col] + counter]
+                      <= (1.0 - std::exp(-F_this_cell * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index())))) {
+                    actual_catch_ += (*iter).get_weight() * (*iter).get_scalar();
+                    removals_by_cell_[row][col] += (*iter).get_weight() * (*iter).get_scalar();
+                    (*iter).dies();
+                  }
                 }
               }
             }
@@ -315,12 +315,24 @@ double MortalityEffortBased::SolveBaranov() {
       if (cell->is_enabled()) {
         unsigned counter = 0;
         double F_this_cell = lambda_ * effort_by_cell_[row][col];
-        for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter, ++counter) {
-          //LOG_FINEST() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " survivorship = " << (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()])) << " M = " << (*iter).get_m();
-          if ((*iter).is_alive()) {
-            if (random_numbers_[cell_offset_[row][col] + counter]
-                <= (1.0 - std::exp(-F_this_cell * cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]))) {
-              catch_based_on_baranov_ += (*iter).get_weight() * (*iter).get_scalar();
+        if (selectivity_length_based_) {
+          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter, ++counter) {
+            //LOG_FINEST() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " survivorship = " << (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()])) << " M = " << (*iter).get_m();
+            if ((*iter).is_alive()) {
+              if (random_numbers_[cell_offset_[row][col] + counter]
+                  <= (1.0 - std::exp(-F_this_cell * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())))) {
+                catch_based_on_baranov_ += (*iter).get_weight() * (*iter).get_scalar();
+              }
+            }
+          }
+        } else {
+          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter, ++counter) {
+            //LOG_FINEST() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " survivorship = " << (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()])) << " M = " << (*iter).get_m();
+            if ((*iter).is_alive()) {
+              if (random_numbers_[cell_offset_[row][col] + counter]
+                  <= (1.0 - std::exp(-F_this_cell * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index())))) {
+                catch_based_on_baranov_ += (*iter).get_weight() * (*iter).get_scalar();
+              }
             }
           }
         }

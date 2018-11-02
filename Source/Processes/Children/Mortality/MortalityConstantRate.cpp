@@ -118,32 +118,11 @@ void MortalityConstantRate::DoBuild() {
 
   model_->set_m(m_);
 
-  cell_offset_for_selectivity_.resize(model_->get_height());
   cell_offset_.resize(model_->get_height());
   for (unsigned i = 0; i < model_->get_height(); ++i) {
     cell_offset_[i].resize(model_->get_width());
-    cell_offset_for_selectivity_[i].resize(model_->get_width());
   }
 
-  if (selectivity_length_based_) {
-    for (unsigned i = 0; i < model_->get_height(); ++i) {
-      for (unsigned j = 0; j < model_->get_width(); ++j) {
-        for (unsigned ogive = 0; ogive < selectivity_label_.size(); ++ogive) {
-          for (unsigned len_ndx = 0; len_ndx < model_->length_bins().size(); ++len_ndx)
-            cell_offset_for_selectivity_[i][j].push_back(selectivity_[ogive]->GetResult(len_ndx));
-        }
-      }
-    }
-  } else {
-    for (unsigned i = 0; i < model_->get_height(); ++i) {
-      for (unsigned j = 0; j < model_->get_width(); ++j) {
-        for (unsigned ogive = 0; ogive < selectivity_label_.size(); ++ogive) {
-          for (unsigned age_ndx = 0; age_ndx < model_->age_spread(); ++age_ndx)
-          cell_offset_for_selectivity_[i][j].push_back(selectivity_[ogive]->GetResult(age_ndx));
-        }
-      }
-    }
-  }
 }
 
 /**
@@ -186,7 +165,7 @@ void MortalityConstantRate::DoExecute() {
           for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter,++iter) {
             if ((*iter).is_alive()) {
               //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
-              if (random_numbers_[cell_offset_[row][col] + counter] <= (1 - std::exp(- ratio * (*iter).get_m() * cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->length_bins().size() + (*iter).get_length_bin_index()]))) {
+              if (random_numbers_[cell_offset_[row][col] + counter] <= (1 - std::exp(- ratio * (*iter).get_m() * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())))) {
                 (*iter).dies();
                 initial_size--;
                 agents_removed++;
@@ -213,8 +192,7 @@ void MortalityConstantRate::DoExecute() {
           for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter,++iter) {
             if ((*iter).is_alive()) {
               //LOG_FINEST() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " survivorship = " << (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()])) << " M = " << (*iter).get_m();
-              if (random_numbers_[cell_offset_[row][col] + counter] <= (1.0 - std::exp(- ratio * (*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()]))) {
-                (*iter).dies();
+              if (random_numbers_[cell_offset_[row][col] + counter] <= (1.0 - std::exp(- ratio * (*iter).get_m() * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index())))) {
                 initial_size--;
                 agents_removed++;
               }

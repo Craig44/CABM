@@ -111,7 +111,6 @@ void MortalityEventBiomass::DoBuild() {
     }
   }
 
-  cell_offset_for_selectivity_.resize(model_->get_height());
   cell_offset_.resize(model_->get_height());
   model_length_bins_.resize(model_->get_height());
   model_age_bins_.resize(model_->get_height());
@@ -122,7 +121,6 @@ void MortalityEventBiomass::DoBuild() {
   current_time_step_by_space_.resize(model_->get_height());
   for (unsigned i = 0; i < model_->get_height(); ++i) {
     cell_offset_[i].resize(model_->get_width());
-    cell_offset_for_selectivity_[i].resize(model_->get_width());
     model_length_bins_[i].resize(model_->get_width(), model_->length_bins().size());
     model_age_bins_[i].resize(model_->get_width(), model_->age_spread());
     mls_by_space_[i].resize(model_->get_width(), mls_);
@@ -130,26 +128,6 @@ void MortalityEventBiomass::DoBuild() {
     discard_by_space_[i].resize(model_->get_width(), discard_mortality_);
     scanning_prop_year_by_space_[i].resize(model_->get_width(), 0.0);
     current_time_step_by_space_[i].resize(model_->get_width(), 1);
-  }
-
-  if (selectivity_length_based_) {
-    for (unsigned i = 0; i < model_->get_height(); ++i) {
-      for (unsigned j = 0; j < model_->get_width(); ++j) {
-        for (unsigned ogive = 0; ogive < selectivity_label_.size(); ++ogive) {
-          for (unsigned len_ndx = 0; len_ndx < model_->length_bins().size(); ++len_ndx)
-            cell_offset_for_selectivity_[i][j].push_back(selectivity_[ogive]->GetResult(len_ndx));
-        }
-      }
-    }
-  } else {
-    for (unsigned i = 0; i < model_->get_height(); ++i) {
-      for (unsigned j = 0; j < model_->get_width(); ++j) {
-        for (unsigned ogive = 0; ogive < selectivity_label_.size(); ++ogive) {
-          for (unsigned age_ndx = 0; age_ndx < model_->age_spread(); ++age_ndx)
-          cell_offset_for_selectivity_[i][j].push_back(selectivity_[ogive]->GetResult(age_ndx));
-        }
-      }
-    }
   }
 }
 
@@ -219,7 +197,7 @@ void MortalityEventBiomass::DoExecute() {
       float world_catch_to_take = 0;
       if (not selectivity_length_based_) {
         // Thread out each loop
-        #pragma omp parallel for collapse(2)
+        // #pragma omp parallel for collapse(2)
         for (unsigned row = 0; row < model_->get_height(); ++row) {
           for (unsigned col = 0; col < model_->get_width(); ++col) {
             unsigned catch_attempts = 1;
@@ -227,12 +205,9 @@ void MortalityEventBiomass::DoExecute() {
             WorldCell* cell = nullptr;
             float catch_taken = 0;
             float actual_catch_this_cell = 0;
-            #pragma omp critical
-            {
-              cell = world_->get_base_square(row, col); // Shared resource...
-              catch_taken = catch_layer_[catch_ndx]->get_value(row, col);
-              world_catch_to_take += catch_taken;
-            }
+            cell = world_->get_base_square(row, col); // Shared resource...
+            catch_taken = catch_layer_[catch_ndx]->get_value(row, col);
+            world_catch_to_take += catch_taken;
             if (cell->is_enabled()) {
               unsigned counter = 0;
               if (catch_taken > 0) {
@@ -249,9 +224,9 @@ void MortalityEventBiomass::DoExecute() {
                   ++catch_attempts;
                   auto& this_agent = cell->agents_[random_numbers_[cell_offset_[row][col] + counter] * cell->agents_.size()];
                   if (this_agent.is_alive()) {
-                    LOG_FINEST() << "attempt "<< catch_attempts << " catch_taken = " << catch_taken << " age = " << this_agent.get_age_index() << " random number = " << selectivity_random_numbers_[cell_offset_[row][col] + counter]  << " selectivity = " << cell_offset_for_selectivity_[row][col][this_agent.get_sex() * model_->age_spread() + this_agent.get_age_index()];
+                    //LOG_FINEST() << "attempt "<< catch_attempts << " catch_taken = " << catch_taken << " age = " << this_agent.get_age_index() << " random number = " << selectivity_random_numbers_[cell_offset_[row][col] + counter]  << " selectivity = " << cell_offset_for_selectivity_[row][col][this_agent.get_sex() * model_->age_spread() + this_agent.get_age_index()];
                     // See if this agent is unlucky
-                    if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][this_agent.get_sex() *model_age_bins_[row][col] + this_agent.get_age_index()]) {
+                    if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[this_agent.get_sex()]->GetResult(this_agent.get_age_index())) {
                       //LOG_FINEST() << "vulnerable to gear catch_taken = " << catch_taken << " age = " << this_agent.get_age_index() << " individual weight = " << this_agent.get_weight() << " scalar = " <<  this_agent.get_scalar();
                       if (this_agent.get_length() < mls_by_space_[row][col]) {
                         if (discard_random_numbers_[cell_offset_[row][col] + counter] <= discard_by_space_[row][col]) {
@@ -349,7 +324,7 @@ void MortalityEventBiomass::DoExecute() {
                   auto& this_agent = cell->agents_[random_numbers_[cell_offset_[row][col] + counter] * cell->agents_.size()];
                   if (this_agent.is_alive()) {
                       // See if this agent is unlucky
-                    if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][this_agent.get_sex() * model_length_bins_[row][col] + this_agent.get_length_bin_index()]) {
+                    if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[this_agent.get_sex()]->GetResult(this_agent.get_length_bin_index())) {
                       if (this_agent.get_length() < mls_by_space_[row][col]) {
                         if (discard_random_numbers_[cell_offset_[row][col] + counter] <= discard_by_space_[row][col]) {
                           this_agent.dies();
