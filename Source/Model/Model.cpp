@@ -70,7 +70,7 @@ Model::Model() {
   parameters_.Bind<string>(PARAM_MATRUITY_OGIVE_LABEL, &maturity_ogives_, "Maturity ogive label for each sex (male female) order is important", "", false);
   parameters_.Bind<string>(PARAM_GROWTH_PROCESS_LABEL, &growth_process_label_, "Label for the growth process in the annual cycle", "");
   parameters_.Bind<string>(PARAM_NATURAL_MORTALITY_PROCESS_LABEL, &natural_mortality_label_, "Label for the natural mortality process in the annual cycle", "");
-  parameters_.Bind<unsigned>(PARAM_MAX_THREADS_TO_USE, &max_threads_, "The maxiumum threads you want to give access to this program", "",1);
+  //parameters_.Bind<unsigned>(PARAM_MAX_THREADS_TO_USE, &max_threads_, "The maxiumum threads you want to give access to this program", "",1);
 
 
   global_configuration_ = new GlobalConfiguration();
