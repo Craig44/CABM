@@ -7,7 +7,7 @@
 # Single stock
 @model
 start_year 1990
-final_year 2000#2018
+final_year 2018
 min_age 0
 max_age 20
 age_plus true # other acceptable inputs for bool are '1' and 'yes'
@@ -30,9 +30,9 @@ ncols 10
 # --------------
 @initialisation_phase Iterative
 type iterative
-years 20
-number_of_individuals 500000 ## initial number of agents
-#recruitment_layer_label  Recruitment_label
+years 50
+number_of_individuals 1000000 ## initial number of agents
+#recruitment_layer_label  Recruitment_label not neede only a single stock in this model
 
 # --------------
 # Time Sequence
@@ -40,7 +40,8 @@ number_of_individuals 500000 ## initial number of agents
 # - Summer
 # -- Ageing (implicit)
 # -- Growth (0.35)
-# -- Summer Fishery + M
+# -- M
+# -- Summer Fishery
 # -- Spawning
 # - Autumn
 # -- Recruitment
@@ -73,10 +74,12 @@ processes Growth Move_inshore inshore_preference_movement M
 # --------------
 # Process definitions
 # --------------
-@process Nop 
+@process Nop  ## no process a placeholder process (every time step needs at least one process) if I want to investigate derived quantities or observations
 type nop
 
+#---
 # Growth
+#---
 @process Growth
 type growth_von_bertalanffy_with_basic_weight
 linf 101.8
@@ -85,48 +88,57 @@ a 4.79e-09
 b 2.89 
 update_growth_parameters false
 distribution normal
-cv 0.0001 ## low variability
-time_step_proportions 0.35 0.25 0.1 0.3
+cv 0.1 ## low variability
+time_step_proportions 0.35 0.25 0.1 0.3 ## increment in each time step
 
+#---
 # Maturity
+#---
 @process Maturation
 type maturation
 
-# Natural Mortality
+#-------------
+# Mortality
+#-------------
 @process M
 type mortality_constant_rate
 #m_multiplier_layer_label Base
 m 0.15
 update_mortality_parameters false
 distribution normal
-cv 0.0001
+cv 0.05
 selectivity_label One
 time_step_ratio 0.25 0.25 0.25 0.25
 
+## minimsier for effort based mortality
 @minimiser minimiser_for_summer_fishery
 type numerical_differences
-
+step_size 0.002
+tolerance 0.02 ## threshold for a minimum
+iterations 2000
+evaluations 5000
 # Fishing Mortality
 @process summer_fishery
 type mortality_effort_based
-years 1991
-catches 2000
+years 1991:2018
+catches 831.9 1430.9 2467.6 2521.2 3038.8 4014.5 4138.3 4120.5 4793.9 7866.3 8367.2 8107.9 8120.2 8033.2 7833.2 8536.1 8149.4 7410 8210.4 7858.2 1679.7 1934.6 1692.2 1781.3 1812.5 1494 2251.3 2046
 selectivity trawl_selectivity
-#catchability 0.002
 minimiser minimiser_for_summer_fishery
 effort_values 0.076 0.089 0.219 0.104 0.107 0.236 0.126 0.053 0.071 0.08 0.185 0.12 0.123 0.106 0.076 0.245 0.129 0.038 0.142 0.079 0.059 0.09 0.06 0.07 0.073 0.043 0.152 0.108 0.057 0.188 0.124 0.087 0.157 0.156 0.151 0.141 0.132 0.097 0.086 0.083 0.071 0.09 0.053 0.297 0.183 0.057 0.082 0.079 0.148 0.096 0.114 0.099 0.098 0.199 0.09 0.214 0.046 0.134 0.107 0.112 0.121 0.078 0.085 0.06 0.059 0.117 0.125 0.103 0.159 0.279 0.078 0.032 0.166 0.07 0.071 0.167 0.087 0.054 0.11 0.094 0.101 0.122 0.083 0.138 0.09 0.118 0.173 0.125 0.085 0.178 0.165 0.132 0.113 0.073 0.198 0.074 0.299 0.216 0.089 0.06
-
-#-------------
+starting_value_for_lambda 0.3 ## I found this out by running the model once and taking the average of the lambda
+#---
 # Movement
-#-------------
+#---
 ## Inshore offshore movement
 @process Move_offshore
 type movement_box_transfer
 !include Layers/offshore_cell_movements.ibm
+selectivity_label One
 
 @process Move_inshore
 type movement_box_transfer
 !include Layers/inshore_cell_movements.ibm
+selectivity_label One
 
 ## Preference movement
 @process inshore_preference_movement
@@ -136,6 +148,7 @@ time_intervals 0.5
 zeta 0.05 # 0.1 don't move far if in a prefereable place, 1 move quiet a bit even if in a prefereable place
 preference_functions inshore_pref_fun
 preference_layers inshore_pref
+selectivity_label One
 
 @process offshore_preference_movement
 type preference_movement
@@ -144,6 +157,7 @@ time_intervals 0.5
 zeta 0.05
 preference_functions depth_fun
 preference_layers offshore_Depth
+selectivity_label One
 
 ## Preference Functions
 @preference_function inshore_pref_fun
@@ -157,14 +171,16 @@ mu 33
 sigma 9.5
 
 
-#-------------
+#---
 # Recruitment
-#-------------
+#---
 @process Recruitment
-type recruitment_constant
+type recruitment_beverton_holt
 recruitment_layer_label recruit_layer
 b0 120000
 ssb SSB
+steepness 0.75
+ycs_values 0.46 1.72 1.09 0.73 1.41 1.4 1.35 1.26 1.17 0.83 0.72 0.69 0.58 0.76 0.43 2.85 1.68 0.46 0.69 0.66 1.32 0.82 0.99 0.84 0.84 1.83 0.76 1.99 0.36
 
 # -------------------
 # Define selectivities
@@ -178,14 +194,16 @@ y1 0.6
 y0 0.1
 y2 0.4
 
-@selectivity One
+@selectivity One ## Basically no selectivity
 type constant
 c 1
 
 @selectivity mature_ogive
-type logistic
+type logistic_producing
 a50 4
 ato95 4
+h 20
+l 1
 
 @selectivity trawl_selectivity
 type logistic
@@ -194,7 +212,7 @@ ato95 8
 
 @selectivity survey_selectivity
 type double_normal
-mu 4.5
+mu 3.5
 sigma_l 2
 sigma_r 12.5 
 
@@ -208,7 +226,7 @@ time_step Summer
 proportion_through_mortality_block 1.0
 
 # --------------
-# non-staic layers
+# non-staic layers-Used in reporting
 # --------------
 @layer biomass_by_cell
 type biomass
