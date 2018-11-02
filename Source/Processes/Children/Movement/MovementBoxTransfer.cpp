@@ -249,38 +249,6 @@ void MovementBoxTransfer::DoExecute() {
               }
             }
           }
-          for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++iter) {
-            if ((*iter).is_alive()) {
-              LOG_FINEST() << "row = " << row << " home row = "<< (*iter).get_home_col() << " col = " << col << " home col = " << (*iter).get_home_col();
-              ++counter;
-              // Iterate over possible cells compare to chance()
-              temp_sum = 0;
-              // Calcualte a multinomial via the following algorithm
-              // compare a random standard uniform value to the cumulative sums of the probabilities and return the first index for which
-              // the cumulative sum is greater than the random uniform
-              for (unsigned potential_destination = 0; potential_destination < possible_rows_.size(); ++potential_destination) {
-                temp_sum += probability_layers_[origin_element]->get_value(possible_rows_[potential_destination], possible_cols_[potential_destination]);
-                if (temp_sum > random_numbers_[cell_offset_[row][col] + counter]) {
-                  ++counter_jump;
-                  LOG_FINEST() << counter  << " cum prob = " << temp_sum << " random = " << random_numbers_[cell_offset_[row][col] + counter] << " current row = " << row << " home row = " << (*iter).get_home_row() << " current col = " << col << " home row = " << (*iter).get_home_col() << " destination row = " << possible_rows_[potential_destination] << " destination col = " << possible_cols_[potential_destination];
-                  //LOG_FINEST() << counter << " removals = " << counter_junp <<   " iter distance = " << distance(origin_cell->agents_.begin(), iter) << " cum prob = " << temp_sum << " random = " << random << " current row = " << row << " current col = " << col << "destination row = " << possible_rows_[potential_destination] << " destination col = " << possible_cols_[potential_destination];
-                  store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]]++;
-                  // if we are moving to this cell lets not move in memory
-                  if ((possible_rows_[potential_destination] == row) && (possible_cols_[potential_destination] == col)) {
-
-                    break;
-                  }
-                  // Make a synchronisation point don't want multiple threads accessing the same pointer simultaneously and splicing to it
-
-                  destination_cell = world_->get_cached_square(possible_rows_[potential_destination], possible_cols_[potential_destination]);
-                  destination_cell->agents_.push_back((*iter));
-                  // Essentially we have to kill an individual here as it is gone off to be merged
-                  (*iter).dies();
-                  break;
-                }
-              }
-            }
-          }
           unsigned total = 0;
           for (unsigned i = 0; i < store_infor.destination_of_agents_moved_.size(); ++i) {
             for (unsigned j = 0; j < store_infor.destination_of_agents_moved_[i].size(); ++j )

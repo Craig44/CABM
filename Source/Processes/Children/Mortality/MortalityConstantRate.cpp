@@ -193,6 +193,7 @@ void MortalityConstantRate::DoExecute() {
             if ((*iter).is_alive()) {
               //LOG_FINEST() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " survivorship = " << (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()])) << " M = " << (*iter).get_m();
               if (random_numbers_[cell_offset_[row][col] + counter] <= (1.0 - std::exp(- ratio * (*iter).get_m() * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index())))) {
+                (*iter).dies();
                 initial_size--;
                 agents_removed++;
               }
