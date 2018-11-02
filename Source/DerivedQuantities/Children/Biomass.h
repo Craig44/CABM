@@ -37,9 +37,8 @@ public:
 protected:
   string                      biomass_layer_label_;
   niwa::layers::IntLayer*     biomass_layer_ = nullptr;
-  string                      selectivity_label_;
-  Selectivity*                selectivity_ = nullptr;
-  vector<vector<vector<float>>> cell_offset_for_selectivity_;
+  vector<string>                      selectivity_label_;
+  vector<Selectivity*>                selectivity_;
   bool                        length_based_selectivity_ = false;
 };
 

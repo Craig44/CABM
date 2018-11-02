@@ -51,36 +51,38 @@ void Biomass::DoBuild() {
     LOG_ERROR_P(PARAM_BIOMASS_LAYER_LABEL) << "Could not find the layer '" << biomass_layer_label_ << "', please check there is a @layer defined for this layer and that it is type = 'integer'";
   }
 
-  selectivity_ = model_->managers().selectivity()->GetSelectivity(selectivity_label_);
-  if (!selectivity_) {
-    LOG_ERROR_P(PARAM_SELECTIVITY) << "Could not find the selectivity '" << selectivity_label_ << "', please check it exists";
-  }
-
   // create offset contianers to help with threading
-  cell_offset_for_selectivity_.resize(model_->get_height());
   cell_offset_.resize(model_->get_height());
   for (unsigned i = 0; i < model_->get_height(); ++i) {
     cell_offset_[i].resize(model_->get_width());
-    cell_offset_for_selectivity_[i].resize(model_->get_width());
   }
 
-  if (selectivity_->is_length_based()) {
-    length_based_selectivity_ = true;
-    for (unsigned i = 0; i < model_->get_height(); ++i) {
-      for (unsigned j = 0; j < model_->get_width(); ++j) {
-        for (auto len : model_->length_bins())
-          cell_offset_for_selectivity_[i][j].push_back(selectivity_->GetResult(len));
-      }
-    }
-  } else {
-    for (unsigned i = 0; i < model_->get_height(); ++i) {
-      for (unsigned j = 0; j < model_->get_width(); ++j) {
-        for (auto age = model_->min_age(); age <= model_->max_age(); ++age)
-          cell_offset_for_selectivity_[i][j].push_back(selectivity_->GetResult(age));
+  LOG_FINEST() << "selectivities supplied = " << selectivity_label_.size();
+  // Build selectivity links
+  if (selectivity_label_.size() == 1)
+    selectivity_label_.assign(2, selectivity_label_[0]);
+
+  if (selectivity_label_.size() > 2) {
+    LOG_ERROR_P(PARAM_SELECTIVITY) << "You suppled " << selectivity_label_.size()  << " Selectiviites, you can only have one for each sex max = 2";
+  }
+  LOG_FINEST() << "selectivities supplied = " << selectivity_label_.size();
+
+  bool first = true;
+  for (auto label : selectivity_label_) {
+    Selectivity* temp_selectivity = model_->managers().selectivity()->GetSelectivity(label);
+    if (!temp_selectivity)
+      LOG_ERROR_P(PARAM_SELECTIVITY) << ": selectivity " << label << " does not exist. Have you defined it?";
+
+    selectivity_.push_back(temp_selectivity);
+    if (first) {
+      first = false;
+      length_based_selectivity_ = temp_selectivity->is_length_based();
+    } else {
+      if (length_based_selectivity_ != temp_selectivity->is_length_based()) {
+        LOG_ERROR_P(PARAM_SELECTIVITY) << "The selectivity  " << label << " was not the same type (age or length based) as the previous selectivity label";
       }
     }
   }
-
 }
 
 /**
@@ -126,7 +128,7 @@ void Biomass::PreExecute() {
           unsigned counter = 0;
           for (Agent& agent : cell->agents_) {
             if (agent.is_alive()) {
-              if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_age() - model_->min_age()]) {
+              if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index())) {
                 cache_value_ += agent.get_weight() * agent.get_scalar();
               }
             }
@@ -147,7 +149,7 @@ void Biomass::PreExecute() {
           unsigned counter = 0;
           for (Agent& agent : cell->agents_) {
             if (agent.is_alive()) {
-              if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_length_bin_index()]) {
+              if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index())) {
                 cache_value_ += agent.get_weight() * agent.get_scalar();
               }
             }
@@ -207,7 +209,7 @@ void Biomass::Execute() {
             unsigned counter = 0;
             for (Agent& agent : cell->agents_) {
               if (agent.is_alive()) {
-                if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_age() - model_->min_age()]) {
+                if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index())) {
                   value += agent.get_weight() * agent.get_scalar();
                 }
               }
@@ -228,7 +230,7 @@ void Biomass::Execute() {
             unsigned counter = 0;
             for (Agent& agent : cell->agents_) {
               if (agent.is_alive()) {
-                if (random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][agent.get_length_bin_index()]) {
+                if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index())) {
                   value += agent.get_weight() * agent.get_scalar();
                 }
               }
