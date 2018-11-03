@@ -21,6 +21,7 @@
 #include "Observations/Children/ProportionsAtAge.h"
 #include "Observations/Children/ProcessRemovalsByAge.h"
 #include "Observations/Children/ProcessRemovalsByLength.h"
+#include "Observations/Children/MortalityScaledAgeFrequency.h"
 
 
 
@@ -42,6 +43,8 @@ Observation* Factory::Create(Model* model, const string& object_type, const stri
 
     if (sub_type == PARAM_PROCESS_REMOVALS_BY_AGE)
       result = new ProcessRemovalsByAge(model);
+    if (sub_type == PARAM_MORTALITY_SCALES_AGE_FREQUENCY)
+      result = new MortalityScaledAgeFrequency(model);
     if (sub_type == PARAM_PROPORTIONS_AT_AGE)
       result = new ProportionsAtAge(model);
     else if (sub_type == PARAM_PROCESS_REMOVALS_BY_LENGTH)

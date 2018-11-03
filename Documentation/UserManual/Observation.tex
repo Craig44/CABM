@@ -3,7 +3,7 @@ This section describes the observations that \IBM\ can generate during run time.
 \subsection{\I{Observations}\label{sec:Observations}\index{Observations}}
 
 \subsubsection{Process Removals By Age}\label{subsubsec:catch_at_age}\index{Observations!Process Removals By Age}
-This observation class aggregates age frequency over a user defined spatial are from a \subcommand{mortality\_event\_biomass} and \subcommand{mortality\_baranov} process. This class can add ageing error onto the expectation, to account for ageing error which is a source of uncertainty in ageing fish. An example of how you would set this observation up and show some of the flexibilities in the spatial resolution see the syntax below for a 6 area model.
+This observation class aggregates age frequency over a user defined spatial area from a \subcommand{mortality\_event\_biomass} and \subcommand{mortality\_baranov} process. This class can add ageing error onto the expectation, to account for ageing error which is a source of uncertainty in ageing fish. An example of how you would set this observation up and show some of the flexibilities in the spatial resolution see the syntax below for a 6 area model.
 
 {\small{\begin{verbatim}
 @process fishing
@@ -72,7 +72,7 @@ end_table
 Hopefully the above example illustrates how much control the user has in specifying what information they want to extract.
 
 \subsubsection{Biomass}\label{subsubsec:biomass}\index{Observations!Biomass}
-This observation summarises the biomass over a selected number of agents in a time step over the mortality block (Section~\ref{sec:mortality_block})
+This observation summarises the biomass over a selected number of agents in a time step over the mortality block (Section~\ref{sec:mortality_block}), for user defined spatial areas. \IBM\ does an interpolation similar to the derived quantities if the user wishes to extract a biomass observation that represents a proportion of mortality being taken.
 
 {\small{\begin{verbatim}
 @observation survey_index

@@ -378,6 +378,7 @@
 #define PARAM_MORTALITY_INITIALISATION_EVENT_BIOMSS "mortality_initialisation_event_biomass"
 #define PARAM_MORTALITY_INSTANTANEOUS_PROCESS     "mortality_instantaneous_process"
 #define PARAM_MORTALITY_HOLLING_RATE              "mortality_holling_rate"
+#define PARAM_MORTALITY_SCALES_AGE_FREQUENCY      "mortality_scaled_age_frequency"
 #define PARAM_MOVEMENT_BOX_TRANSFER               "movement_box_transfer"
 #define PARAM_MOVEMENT_TYPE                       "movement_type"
 #define PARAM_MPD                                 "mpd"
