@@ -41,11 +41,12 @@ struct census_data {
   unsigned year_;
   unsigned row_;
   unsigned col_;
+  float    biomass_; // Total biomass
   vector<unsigned> age_ndx_;
   vector<unsigned> length_ndx_;
   vector<float> scalar_;
   census_data(unsigned year, unsigned row, unsigned col) : year_(year),
-      row_(row), col_(col) {}
+      row_(row), col_(col) { biomass_ = 0.0; }
 };
 
 // Tag Recapture class

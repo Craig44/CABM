@@ -334,6 +334,8 @@ void MortalityBaranov::DoExecute() {
                     census_fishery.age_ndx_.push_back((*iter).get_age_index());
                     census_fishery.length_ndx_.push_back((*iter).get_length_bin_index());
                     census_fishery.scalar_.push_back((*iter).get_scalar());
+                    census_fishery.biomass_+= (*iter).get_weight() * (*iter).get_scalar();
+
                     if (scanning) {
                       // Probability of scanning agent
                       if (rng.chance() <= scanning_proportion_[scanning_ndx]) {
@@ -402,6 +404,8 @@ void MortalityBaranov::DoExecute() {
                     census_fishery.age_ndx_.push_back((*iter).get_age_index());
                     census_fishery.length_ndx_.push_back((*iter).get_length_bin_index());
                     census_fishery.scalar_.push_back((*iter).get_scalar());
+                    census_fishery.biomass_+= (*iter).get_weight() * (*iter).get_scalar();
+
                     if (scanning) {
                       // Probability of scanning agent
                       if (rng.chance() <= scanning_proportion_[scanning_ndx]) {
@@ -469,6 +473,8 @@ void MortalityBaranov::DoExecute() {
                     census_fishery.age_ndx_.push_back((*iter).get_age_index());
                     census_fishery.length_ndx_.push_back((*iter).get_length_bin_index());
                     census_fishery.scalar_.push_back((*iter).get_scalar());
+                    census_fishery.biomass_+= (*iter).get_weight() * (*iter).get_scalar();
+
                     if (scanning) {
                       // Probability of scanning agent
                       if (rng.chance() <= scanning_proportion_[scanning_ndx]) {
@@ -536,6 +542,7 @@ void MortalityBaranov::DoExecute() {
                     census_fishery.age_ndx_.push_back((*iter).get_age_index());
                     census_fishery.length_ndx_.push_back((*iter).get_length_bin_index());
                     census_fishery.scalar_.push_back((*iter).get_scalar());
+                    census_fishery.biomass_+= (*iter).get_weight() * (*iter).get_scalar();
                     if (scanning) {
                       // Probability of scanning agent
                       if (rng.chance() <= scanning_proportion_[scanning_ndx]) {

@@ -241,6 +241,8 @@ void MortalityEventBiomass::DoExecute() {
                         census_fishery.age_ndx_.push_back(this_agent.get_age_index());
                         census_fishery.length_ndx_.push_back(this_agent.get_length_bin_index());
                         census_fishery.scalar_.push_back(this_agent.get_scalar());
+                        census_fishery.biomass_+= this_agent.get_weight() * this_agent.get_scalar();
+
                         if (scanning) {
                           // Probability of scanning agent
                           if (scanning_random_numbers_[cell_offset_[row][col] + counter] <= scanning_prop_year_by_space_[row][col]) {
@@ -337,6 +339,7 @@ void MortalityEventBiomass::DoExecute() {
                         census_fishery.age_ndx_.push_back(this_agent.get_age_index());
                         census_fishery.length_ndx_.push_back(this_agent.get_length_bin_index());
                         census_fishery.scalar_.push_back(this_agent.get_scalar());
+                        census_fishery.biomass_+= this_agent.get_weight() * this_agent.get_scalar();
                         if (scanning) {
                           // Probability of scanning agent
                           if (scanning_random_numbers_[cell_offset_[row][col] + counter] <= scanning_prop_year_by_space_[row][col]) {
