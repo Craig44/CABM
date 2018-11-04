@@ -47,6 +47,7 @@ public:
   void                        set_enabled(bool enabled) {enabled_ = enabled; };
   bool                        is_enabled() {return enabled_; };
   void                        set_area(float area) {area_ = area;}
+  float                       get_area() {return area_;}
   void                        seed_agents(unsigned number_agents_to_seed, const float& seed_z);
   void                        birth_agents(unsigned number_agents_to_birth, float scalar);
   void                        set_scalar();
