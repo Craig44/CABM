@@ -7,7 +7,7 @@
 # Single stock
 @model
 start_year 1990
-final_year 2018
+final_year 1992
 min_age 0
 max_age 20
 age_plus true # other acceptable inputs for bool are '1' and 'yes'
@@ -30,8 +30,8 @@ ncols 10
 # --------------
 @initialisation_phase Iterative
 type iterative
-years 50
-number_of_individuals 1000000 ## initial number of agents
+years 10
+number_of_individuals 500000 ## initial number of agents
 #recruitment_layer_label  Recruitment_label not neede only a single stock in this model
 
 # --------------
@@ -180,7 +180,7 @@ recruitment_layer_label recruit_layer
 b0 120000
 ssb SSB
 steepness 0.75
-ycs_values 0.46 1.72 1.09 0.73 1.41 1.4 1.35 1.26 1.17 0.83 0.72 0.69 0.58 0.76 0.43 2.85 1.68 0.46 0.69 0.66 1.32 0.82 0.99 0.84 0.84 1.83 0.76 1.99 0.36
+ycs_values 0.46 1.72 1.09 #0.73 1.41 1.4 1.35 1.26 1.17 0.83 0.72 0.69 0.58 0.76 0.43 2.85 1.68 0.46 0.69 0.66 1.32 0.82 0.99 0.84 0.84 1.83 0.76 1.99 0.36
 
 # -------------------
 # Define selectivities

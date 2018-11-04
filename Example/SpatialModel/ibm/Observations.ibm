@@ -13,6 +13,7 @@ year    Inshore    Offshore
 1991    600        300
 end_table
 simulation_likelihood multinomial
+
 /*
 ## fishery age compositional data
 @observation fishery_age_by_cell

@@ -58,11 +58,11 @@ type model_attributes
 ################
 ## Observations
 ################
-/*
-@report fishery_age_freq_by_cell
-type observation
-observation fishery_age_by_cell
 
+@report summer_fishery_scaled_age_freq
+type observation
+observation scaled_age_freq
+/*
 @report survey_biomass
 type observation
 observation biomass_survey_post_fishing_by_cell

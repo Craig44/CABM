@@ -64,6 +64,7 @@ protected:
   map<string,float>               stratum_biomass_;
   WorldView*                      world_ = nullptr;
 
+  map<string,vector<unsigned>>    stratum_age_frequency_;
 
   parameters::Table*              sample_table_ = nullptr;
   map<unsigned, map<string, unsigned>>  samples_by_year_and_stratum_;

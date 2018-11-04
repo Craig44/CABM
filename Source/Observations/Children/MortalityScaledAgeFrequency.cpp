@@ -239,9 +239,9 @@ void MortalityScaledAgeFrequency::Simulate() {
   vector<processes::composition_data>& length_frequency = mortality_process_->get_removals_by_length();
 
   vector<unsigned> census_stratum_ndx;
-  bool apply_ageing_error = false;
+  bool apply_ageing_error = true;
   if (!ageing_error_) {
-    apply_ageing_error = true;
+    apply_ageing_error = false;
   }
   for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     LOG_FINE() << "About to sort our info for year " << years_[year_ndx];
@@ -275,6 +275,8 @@ void MortalityScaledAgeFrequency::Simulate() {
         ++census_ndx;
       }
       unsigned samples_to_take = samples_by_year_and_stratum_[years_[year_ndx]][cells_[stratum_ndx]];
+
+      LOG_FINE() << "objects from the mortality process that are available for this stratum = " << census_stratum_ndx.size();
       // Some containers to make sure that we are doing sampling WITHOUT replacement
       // This will slow it down, but worth it I believe
       vector<unsigned> census_sampled;
@@ -288,14 +290,29 @@ void MortalityScaledAgeFrequency::Simulate() {
        * -TODO add the proportional and equal methods for allocating
        * ages across a length disribution
       */
-      for (unsigned sample_attempt = 0; sample_attempt < samples_to_take;) {
+      LOG_FINE() << "about to build Age length key";
+      unsigned max_iters = samples_to_take * 10;
+      unsigned iter_to_check_max = 0;
+      for (unsigned sample_attempt = 0; sample_attempt < samples_to_take; ++iter_to_check_max) {
+        //LOG_FINE() <<
+        if (iter_to_check_max >= max_iters) {
+          LOG_WARNING() << "in the observation " << label_ << " for year = " << years_[year_ndx] << " and stratum = " << cells_[stratum_ndx] << ", we were trying to sample for too long to build an age-length key. Most likely due to a configuration error. I have exited this observation early as not to run the output. Please check results and configuration set up";
+          break;
+        }
         // Randomly select a cell that a stratum belons to
         census_ndx = rng.chance() * census_stratum_ndx.size();
         processes::census_data& this_census = census_data[census_ndx];
         // Randomly select an agent in that cell
         agent_ndx = this_census.age_ndx_.size() * rng.chance();
+        LOG_FINE() << "census index = " << census_ndx << " agent ndx = " << agent_ndx << " attempt = " << sample_attempt;
         if ((find(census_sampled.begin(), census_sampled.end(),census_ndx) != census_sampled.end()) && (find(agents_sampled.begin(), agents_sampled.end(),agent_ndx) != agents_sampled.end())) {
           // If we have sampled this fish in this cell try again with out counting this as a sample
+          //LOG_FINE() << "we have sampled this agent already, try again";
+          continue;
+        }
+        // no agents to sample from this cell try again
+        if (this_census.age_ndx_.size() <= 0) {
+          //LOG_FINE() << "No agents in this cell so try again";
           continue;
         }
         // else lets remember that we have sampled this fish
@@ -305,6 +322,7 @@ void MortalityScaledAgeFrequency::Simulate() {
         // Are we applying ageing error which will be a multinomial process
         age_ndx = this_census.age_ndx_[agent_ndx];
         length_ndx = this_census.length_ndx_[agent_ndx];
+        //LOG_FINE() << "Agent age = " << age_ndx << " length_ndx = " << length_ndx;
         if (apply_ageing_error) {
           vector<vector<float>> &mis_matrix = ageing_error_->mis_matrix();
           vector<float> prob_mis_classification = mis_matrix[age_ndx];
@@ -320,12 +338,20 @@ void MortalityScaledAgeFrequency::Simulate() {
       }
       /*
        * Calculate the age-frequency by passing the length frequency through the Age-Length key.
-       * if Bootstrap=true, do a sample with replacement procedure to calculate C.V for each age bin
+       * if Bootstrap=true, do a sample with replacement from the age length key to calculate C.V for each age bin
       */
+      LOG_FINE() << "about to calculate a frequency via age length key";
+      stratum_age_frequency_[cells_[stratum_ndx]].resize(model_->age_spread(),0.0);
+      for (unsigned age_bin_ndx = 0; age_bin_ndx < model_->age_spread(); ++age_bin_ndx) {
+        for (unsigned length_bin_ndx = 0; length_bin_ndx < stratum_length_frequency.size(); ++length_bin_ndx) {
+          stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx] += age_length_key[age_bin_ndx][length_bin_ndx] * stratum_length_frequency[length_bin_ndx];
+        }
+        SaveComparison(age_bin_ndx + model_->min_age(), 0, cells_[stratum_ndx], stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx], 0.0, 0, years_[year_ndx]);
+      }
 
-    }
-  }
-}
+    } // Stratum loop
+  } // year loop
+} // DoExecute
 
 } /* namespace observations */
 } /* namespace niwa */
