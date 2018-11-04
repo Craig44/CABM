@@ -331,7 +331,9 @@ void MortalityBaranov::DoExecute() {
                     total_catch += (*iter).get_weight() * (*iter).get_scalar();
                     age_freq.frequency_[(*iter).get_age_index()]+= (*iter).get_scalar(); //TODO do we need to multiple this by scalar for true numbers
                     length_freq.frequency_[(*iter).get_length_bin_index()]+= (*iter).get_scalar();
-
+                    census_fishery.age_ndx_.push_back((*iter).get_age_index());
+                    census_fishery.length_ndx_.push_back((*iter).get_length_bin_index());
+                    census_fishery.scalar_.push_back((*iter).get_scalar());
                     if (scanning) {
                       // Probability of scanning agent
                       if (rng.chance() <= scanning_proportion_[scanning_ndx]) {
@@ -397,7 +399,9 @@ void MortalityBaranov::DoExecute() {
                     total_catch += (*iter).get_weight() * (*iter).get_scalar();
                     age_freq.frequency_[(*iter).get_age_index()]+= (*iter).get_scalar();
                     length_freq.frequency_[(*iter).get_length_bin_index()]+= (*iter).get_scalar();
-
+                    census_fishery.age_ndx_.push_back((*iter).get_age_index());
+                    census_fishery.length_ndx_.push_back((*iter).get_length_bin_index());
+                    census_fishery.scalar_.push_back((*iter).get_scalar());
                     if (scanning) {
                       // Probability of scanning agent
                       if (rng.chance() <= scanning_proportion_[scanning_ndx]) {
@@ -462,7 +466,9 @@ void MortalityBaranov::DoExecute() {
                     total_catch += (*iter).get_weight() * (*iter).get_scalar();
                     age_freq.frequency_[(*iter).get_age_index()]+= (*iter).get_scalar();
                     length_freq.frequency_[(*iter).get_length_bin_index()]+= (*iter).get_scalar();
-
+                    census_fishery.age_ndx_.push_back((*iter).get_age_index());
+                    census_fishery.length_ndx_.push_back((*iter).get_length_bin_index());
+                    census_fishery.scalar_.push_back((*iter).get_scalar());
                     if (scanning) {
                       // Probability of scanning agent
                       if (rng.chance() <= scanning_proportion_[scanning_ndx]) {
@@ -527,7 +533,9 @@ void MortalityBaranov::DoExecute() {
                     total_catch += (*iter).get_weight() * (*iter).get_scalar();
                     age_freq.frequency_[(*iter).get_age_index()]+= (*iter).get_scalar();
                     length_freq.frequency_[(*iter).get_length_bin_index()]+= (*iter).get_scalar();
-
+                    census_fishery.age_ndx_.push_back((*iter).get_age_index());
+                    census_fishery.length_ndx_.push_back((*iter).get_length_bin_index());
+                    census_fishery.scalar_.push_back((*iter).get_scalar());
                     if (scanning) {
                       // Probability of scanning agent
                       if (rng.chance() <= scanning_proportion_[scanning_ndx]) {
@@ -670,13 +678,13 @@ void  MortalityBaranov::FillReportCache(ostringstream& cache) {
     for (auto& census : removals_census_) {
       cache << "census_info-" << census.year_ << "-" << census.row_ << "-" << census.col_ << " " << REPORT_R_MATRIX << "\n";
       //cache << "age length scalar\n";
-      for (unsigned ndx = 0; ndx < census.age_.size(); ++ndx)
-        cache << census.age_[ndx] << " ";
+      for (unsigned ndx = 0; ndx < census.age_ndx_.size(); ++ndx)
+        cache << census.age_ndx_[ndx] + model_->min_age() << " ";
       cache << "\n";
-      for (unsigned ndx = 0; ndx < census.age_.size(); ++ndx)
-        cache << census.length_[ndx] << " ";
+      for (unsigned ndx = 0; ndx < census.age_ndx_.size(); ++ndx)
+        cache << model_->length_bin_mid_points()[census.length_ndx_[ndx]] << " ";
       cache << "\n";
-      for (unsigned ndx = 0; ndx < census.age_.size(); ++ndx)
+      for (unsigned ndx = 0; ndx < census.age_ndx_.size(); ++ndx)
         cache << census.scalar_[ndx] << " ";
       cache << "\n";
     }

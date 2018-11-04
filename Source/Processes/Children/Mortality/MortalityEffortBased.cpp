@@ -276,8 +276,8 @@ void MortalityEffortBased::DoExecute() {
                     removals_by_cell_[row][col] += (*iter).get_weight() * (*iter).get_scalar();
                     age_freq.frequency_[(*iter).get_age_index()] += (*iter).get_scalar(); // This catch actually represents many individuals.
                     length_freq.frequency_[(*iter).get_length_bin_index()] += (*iter).get_scalar();
-                    census_fishery.age_.push_back((*iter).get_age());
-                    census_fishery.length_.push_back((*iter).get_length());
+                    census_fishery.age_ndx_.push_back((*iter).get_age_index());
+                    census_fishery.length_ndx_.push_back((*iter).get_length_bin_index());
                     census_fishery.scalar_.push_back((*iter).get_scalar());
                     (*iter).dies();
                   }
@@ -293,8 +293,8 @@ void MortalityEffortBased::DoExecute() {
                     removals_by_cell_[row][col] += (*iter).get_weight() * (*iter).get_scalar();
                     age_freq.frequency_[(*iter).get_age_index()] += (*iter).get_scalar(); // This catch actually represents many individuals.
                     length_freq.frequency_[(*iter).get_length_bin_index()] += (*iter).get_scalar();
-                    census_fishery.age_.push_back((*iter).get_age());
-                    census_fishery.length_.push_back((*iter).get_length());
+                    census_fishery.age_ndx_.push_back((*iter).get_age_index());
+                    census_fishery.length_ndx_.push_back((*iter).get_length_bin_index());
                     census_fishery.scalar_.push_back((*iter).get_scalar());
                     (*iter).dies();
                   }
@@ -421,6 +421,17 @@ void  MortalityEffortBased::FillReportCache(ostringstream& cache) {
       cache << "\n";
     }
   }
+}
+
+
+// true means all years are found, false means there is a mismatch in years
+bool MortalityEffortBased::check_years(vector<unsigned> years_to_check_) {
+  LOG_FINE();
+  for (unsigned year_ndx = 0; year_ndx < years_to_check_.size(); ++year_ndx) {
+    if (find(years_.begin(), years_.end(), years_to_check_[year_ndx]) == years_.end())
+      return false;
+  }
+  return true;
 }
 
 } /* namespace processes */

@@ -238,8 +238,8 @@ void MortalityEventBiomass::DoExecute() {
                         actual_catch_this_cell += this_agent.get_weight() * this_agent.get_scalar();
                         age_freq.frequency_[this_agent.get_age_index()] += this_agent.get_scalar(); // This catch actually represents many individuals.
                         length_freq.frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
-                        census_fishery.age_.push_back(this_agent.get_age());
-                        census_fishery.length_.push_back(this_agent.get_length());
+                        census_fishery.age_ndx_.push_back(this_agent.get_age_index());
+                        census_fishery.length_ndx_.push_back(this_agent.get_length_bin_index());
                         census_fishery.scalar_.push_back(this_agent.get_scalar());
                         if (scanning) {
                           // Probability of scanning agent
@@ -334,8 +334,8 @@ void MortalityEventBiomass::DoExecute() {
                         actual_catch_this_cell += this_agent.get_weight() * this_agent.get_scalar();
                         age_freq.frequency_[this_agent.get_age_index()]+= this_agent.get_scalar(); // This catch actually represents many individuals.
                         length_freq.frequency_[this_agent.get_length_bin_index()]+= this_agent.get_scalar();
-                        census_fishery.age_.push_back(this_agent.get_age());
-                        census_fishery.length_.push_back(this_agent.get_length());
+                        census_fishery.age_ndx_.push_back(this_agent.get_age_index());
+                        census_fishery.length_ndx_.push_back(this_agent.get_length_bin_index());
                         census_fishery.scalar_.push_back(this_agent.get_scalar());
                         if (scanning) {
                           // Probability of scanning agent
@@ -448,13 +448,13 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
     for (auto& census : removals_census_) {
       cache << "census_info-" << census.year_ << "-" << census.row_ << "-" << census.col_ << " " << REPORT_R_MATRIX << "\n";
       //cache << "age length scalar\n";
-      for (unsigned ndx = 0; ndx < census.age_.size(); ++ndx)
-        cache << census.age_[ndx] << " ";
+      for (unsigned ndx = 0; ndx < census.age_ndx_.size(); ++ndx)
+        cache << census.age_ndx_[ndx] + model_->min_age() << " ";
       cache << "\n";
-      for (unsigned ndx = 0; ndx < census.age_.size(); ++ndx)
-        cache << census.length_[ndx] << " ";
+      for (unsigned ndx = 0; ndx < census.age_ndx_.size(); ++ndx)
+        cache << model_->length_bin_mid_points()[census.length_ndx_[ndx]] << " ";
       cache << "\n";
-      for (unsigned ndx = 0; ndx < census.age_.size(); ++ndx)
+      for (unsigned ndx = 0; ndx < census.age_ndx_.size(); ++ndx)
         cache << census.scalar_[ndx] << " ";
       cache << "\n";
     }
