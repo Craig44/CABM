@@ -52,12 +52,18 @@ protected:
   string                          layer_label_;
   AgeingError*                    ageing_error_ = nullptr;
   string                          ageing_error_label_;
+  string                          ageing_allocation_;
+  unsigned                        number_of_bootstraps_;
 
   Mortality*                      mortality_process_ = nullptr;
   string                          process_label_;
   string                          stratum_weight_method_;
   map<string,vector<unsigned>>    stratum_rows_;
   map<string,vector<unsigned>>    stratum_cols_;
+  map<string,float>               stratum_area_;
+  map<string,float>               stratum_biomass_;
+  WorldView*                      world_ = nullptr;
+
 
   parameters::Table*              sample_table_ = nullptr;
   map<unsigned, map<string, unsigned>>  samples_by_year_and_stratum_;

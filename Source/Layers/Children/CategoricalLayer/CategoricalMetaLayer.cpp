@@ -70,14 +70,19 @@ void CategoricalMetaLayer::DoBuild() {
 // get value
 //**********************************************************************
 string CategoricalMetaLayer::get_value(unsigned RowIndex, unsigned ColIndex) {
+  LOG_FINEST();
   string value = "";
-  if (model_->state() == State::kInitialise)
+  if ((model_->current_year() == 0) || (model_->state() == State::kInitialise)) {
+    LOG_FINEST() << "return default value";
     return default_layer_->get_value(RowIndex, ColIndex);
+  }
+  LOG_FINEST() << "return value from year " << model_->current_year();
   value = years_layer_[model_->current_year()]->get_value(RowIndex, ColIndex);
   return value;
 }
 
 string CategoricalMetaLayer::get_value(unsigned RowIndex, unsigned ColIndex, unsigned year) {
+  LOG_FINEST();
   string value = "";
   if ((year == 0) || (find(years_.begin(),years_.end(),year) == years_.end()))
     return default_layer_->get_value(RowIndex, ColIndex);

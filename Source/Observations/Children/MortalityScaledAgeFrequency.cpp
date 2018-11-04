@@ -40,8 +40,10 @@ MortalityScaledAgeFrequency::MortalityScaledAgeFrequency(Model* model) : Observa
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "The years of the observed values", "");
   parameters_.Bind<string>(PARAM_AGEING_ERROR, &ageing_error_label_, "Label of ageing error to use", "", PARAM_NONE);
   parameters_.Bind<string>(PARAM_PROCESS_LABEL, &process_label_, "Label of of removal process", "", "");
+  parameters_.Bind<string>(PARAM_AGEING_ALLOCATION_METHOD, &ageing_allocation_, "The method used to allocate aged individuals across the length distribution", "", PARAM_RANDOM)->set_allowed_values({PARAM_RANDOM}); // TODO add PARAM_PROPORTIONAL and PARAM_EQUAL
+  parameters_.Bind<unsigned>(PARAM_NUMBER_OF_BOOTSTRAPS, &number_of_bootstraps_, "Number of bootstraps to conduct for each stratum to calculate Pooled CV's for each stratum and total age frequency", "", 50);
 
-  parameters_.Bind<string>(PARAM_STRATUM_WEIGHT_METHOD, &stratum_weight_method_, "Method to weight stratum estimates by", "", PARAM_BIOMASS)->set_allowed_values({PARAM_BIOMASS,PARAM_AREA});
+  parameters_.Bind<string>(PARAM_STRATUM_WEIGHT_METHOD, &stratum_weight_method_, "Method to weight stratum estimates by", "", PARAM_BIOMASS)->set_allowed_values({PARAM_BIOMASS, PARAM_AREA, PARAM_NONE});
   parameters_.Bind<string>(PARAM_LAYER_OF_STRATUM_DEFINITIONS, &layer_label_, "The layer that indicates what the stratum boundaries are.", "");
   parameters_.Bind<string>(PARAM_STRATUMS_TO_INCLUDE, &cells_, "The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer", "", true);
 
@@ -85,6 +87,10 @@ void MortalityScaledAgeFrequency::DoBuild() {
     LOG_WARNING() << "You are suppling a an age based observation with no ageing_misclassification";
   }
 
+  world_ = model_->world_view();
+  if (!world_)
+    LOG_CODE_ERROR() << "!world_ could not create pointer to world viw model, something is wrong";
+
   mortality_process_ = model_->managers().process()->GetMortalityProcess(process_label_);
   if (!mortality_process_)
     LOG_FATAL_P(PARAM_PROCESS_LABEL)<< "could not find the process " << process_label_ << ", please make sure it exists";
@@ -99,6 +105,7 @@ void MortalityScaledAgeFrequency::DoBuild() {
     // Check all the cells supplied are in the layer
     for (auto cell : cells_) {
       LOG_FINE() << "checking cell " << cell << " exists in layer";
+      stratum_area_[cell] = 0.0;
       bool cell_found = false;
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
@@ -108,6 +115,12 @@ void MortalityScaledAgeFrequency::DoBuild() {
             cell_found = true;
             stratum_rows_[cell].push_back(row);
             stratum_cols_[cell].push_back(col);
+
+            if (stratum_weight_method_ == PARAM_AREA) {
+              WorldCell* world_cell = world_->get_base_square(row, col);
+              if (world_cell->is_enabled())
+                stratum_area_[cell] = world_cell->get_area();
+            }
           }
         }
       }
@@ -123,6 +136,11 @@ void MortalityScaledAgeFrequency::DoBuild() {
         stratum_cols_[temp_cell].push_back(col);
         if (find(cells_.begin(), cells_.end(), temp_cell) == cells_.end())
           cells_.push_back(temp_cell);
+        if (stratum_weight_method_ == PARAM_AREA) {
+          WorldCell* world_cell = world_->get_base_square(row, col);
+          if (world_cell->is_enabled())
+            stratum_area_[temp_cell] = world_cell->get_area();
+        }
       }
     }
   }
@@ -217,27 +235,43 @@ void MortalityScaledAgeFrequency::Simulate() {
   age_length_key.resize(model_->age_spread());
   for (unsigned i = 0; i < model_->age_spread(); ++i)
     age_length_key[i].resize(model_->length_bins().size(),0.0);
-
   vector<processes::census_data>& census_data = mortality_process_->get_census_data();
-  vector<unsigned> census_stratum_ndx;
+  vector<processes::composition_data>& length_frequency = mortality_process_->get_removals_by_length();
 
+  vector<unsigned> census_stratum_ndx;
   bool apply_ageing_error = false;
   if (!ageing_error_) {
     apply_ageing_error = true;
   }
-
   for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     LOG_FINE() << "About to sort our info for year " << years_[year_ndx];
     for (unsigned stratum_ndx = 0; stratum_ndx < cells_.size(); ++stratum_ndx) {
       LOG_FINE() << "About to sort our info for stratum " << cells_[stratum_ndx];
+      vector<float> stratum_length_frequency(model_->length_bins().size(),0.0);
       census_stratum_ndx.clear();
       for (unsigned i = 0; i < model_->age_spread(); ++i)
         age_length_key[i].resize(model_->length_bins().size(),0.0);
 
+      stratum_biomass_[cells_[stratum_ndx]] = 0.0;
+      // Calculate stratum total length frequency
+      // TODO: add a non census component here or some bias in the future
+      // The important thing is this a representative sample ...
+      for (unsigned stratum_cell_index = 0; stratum_cell_index < stratum_rows_[cells_[stratum_ndx]].size(); ++stratum_cell_index) {
+        for (processes::composition_data& length_data : length_frequency) {
+          if((stratum_rows_[cells_[stratum_ndx]][stratum_cell_index] ==  length_data.row_) &&  (stratum_cols_[cells_[stratum_ndx]][stratum_cell_index] ==  length_data.col_)) {
+            for (unsigned length_bin_ndx = 0; length_bin_ndx < length_data.frequency_.size(); ++length_bin_ndx)
+              stratum_length_frequency[length_bin_ndx] += length_data.frequency_[length_bin_ndx];
+          }
+        }
+      }
+
       unsigned census_ndx = 0;
       for (processes::census_data& census : census_data) {
-        if ((census.year_ == years_[year_ndx]) && (find(stratum_rows_[cells_[stratum_ndx]].begin(),stratum_rows_[cells_[stratum_ndx]].end(), census.row_) != stratum_rows_[cells_[stratum_ndx]].end()) && (find(stratum_cols_[cells_[stratum_ndx]].begin(),stratum_cols_[cells_[stratum_ndx]].end(), census.col_) != stratum_cols_[cells_[stratum_ndx]].end()))
+        if ((census.year_ == years_[year_ndx]) && (find(stratum_rows_[cells_[stratum_ndx]].begin(),stratum_rows_[cells_[stratum_ndx]].end(), census.row_) != stratum_rows_[cells_[stratum_ndx]].end()) && (find(stratum_cols_[cells_[stratum_ndx]].begin(),stratum_cols_[cells_[stratum_ndx]].end(), census.col_) != stratum_cols_[cells_[stratum_ndx]].end())) {
           census_stratum_ndx.push_back(census_ndx);
+          if (stratum_weight_method_ == PARAM_BIOMASS)
+            stratum_biomass_[cells_[stratum_ndx]] += census.biomass_;
+        }
         ++census_ndx;
       }
       unsigned samples_to_take = samples_by_year_and_stratum_[years_[year_ndx]][cells_[stratum_ndx]];
@@ -251,6 +285,8 @@ void MortalityScaledAgeFrequency::Simulate() {
       unsigned length_ndx = 0;
       /*
        * Generate an age-length-key for this stratum
+       * -TODO add the proportional and equal methods for allocating
+       * ages across a length disribution
       */
       for (unsigned sample_attempt = 0; sample_attempt < samples_to_take;) {
         // Randomly select a cell that a stratum belons to
@@ -286,6 +322,7 @@ void MortalityScaledAgeFrequency::Simulate() {
        * Calculate the age-frequency by passing the length frequency through the Age-Length key.
        * if Bootstrap=true, do a sample with replacement procedure to calculate C.V for each age bin
       */
+
     }
   }
 }

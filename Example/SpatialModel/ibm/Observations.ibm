@@ -3,16 +3,17 @@
 @observation scaled_age_freq
 type mortality_scaled_age_frequency
 years 1991
-process_label fishing
-ageing_error None
+process_label summer_fishery
+ageing_error none
 stratum_weighting_method biomass
 layer_of_stratum_definitions summer_fishery_stratum_meta
 stratums_to_include Inshore Offshore
 table samples ## number of individuals randomly selected to calculate age-length key for scaling age frequency
 year    Inshore    Offshore
-1990    600        300
+1991    600        300
 end_table
-
+simulation_likelihood multinomial
+/*
 ## fishery age compositional data
 @observation fishery_age_by_cell
 type process_removals_by_age
@@ -62,7 +63,7 @@ error_value 0.2 * 29
 selectivities survey_selectivity
 cell_layer cells
 cells r1-c1 r1-c2 r1-c3 r1-c4 r1-c5 r2-c1 r2-c2 r2-c3 r2-c4 r2-c5 r3-c1 r3-c2 r3-c3 r3-c4 r3-c5 r4-c1 r4-c2 r4-c3 r4-c4 r4-c5 r5-c1 r5-c2 r5-c3 r5-c4 r5-c5
-
+*/
 
 
 

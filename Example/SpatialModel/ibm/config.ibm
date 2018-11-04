@@ -1,6 +1,6 @@
 !include "Population.ibm"
 !include "Reports.ibm"
-#!include "Observations.ibm"
+!include "Observations.ibm"
 
 # --------------
 # Include Layers

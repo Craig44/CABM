@@ -23,6 +23,7 @@ public:
   virtual                     ~CategoricalLayer();
   virtual void                 set_value(unsigned RowIndex, unsigned ColIndex, string Value);  // TODO once we have children make this pure virtual
   virtual string               get_value(unsigned RowIndex, unsigned ColIndex);
+  virtual string               get_value(unsigned RowIndex, unsigned ColIndex, unsigned year);
 
 
 protected:

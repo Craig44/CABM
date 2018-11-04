@@ -56,7 +56,7 @@ void CategoricalLayer::DoBuild() {
    * Build our layer pointer
    */
   vector<vector<string>>& input_data = data_table_->data();
-  LOG_FINEST() << "rows = " << input_data.size() << " columns = " << input_data[0].size();
+  LOG_FINE() << "rows = " << input_data.size() << " columns = " << input_data[0].size();
   unsigned row_iter = 0;
   for (vector<string> row : input_data) {
 
@@ -67,6 +67,7 @@ void CategoricalLayer::DoBuild() {
       LOG_FATAL_P(PARAM_LAYER) << "you supplied at least '"<< row_iter + 1 << "' rows in the layer but, nrows on the @model = '" << width_ << "' these must be the same";
 
     for (unsigned i = 0; i < row.size(); ++i) {
+      LOG_FINE() << "row " <<  row_iter + 1 << "col = " << i + 1 << " value = " << row[i];
       grid_[row_iter][i] = row[i];
     }
     ++row_iter;
@@ -77,10 +78,15 @@ void CategoricalLayer::DoBuild() {
  * get_value
 */
 string CategoricalLayer::get_value(unsigned RowIndex, unsigned ColIndex) {
+  LOG_FINE();
+  return grid_[RowIndex][ColIndex];
+}
+
+/*
+ * get_value
+*/
+string CategoricalLayer::get_value(unsigned RowIndex, unsigned ColIndex, unsigned year) {
   //LOG_TRACE();
-#ifndef OPTIMIZE
-// TODO do some error catching for debugging purposes
-#endif
   return grid_[RowIndex][ColIndex];
 }
 
@@ -89,9 +95,6 @@ string CategoricalLayer::get_value(unsigned RowIndex, unsigned ColIndex) {
  * setValue
 */
 void CategoricalLayer::set_value(unsigned RowIndex, unsigned ColIndex, string Value) {
-#ifndef CategoricalLayer
-// TODO do some error catching for debugging purposes
-#endif
   grid_[RowIndex][ColIndex] = Value;
 }
 } /* namespace layers */
