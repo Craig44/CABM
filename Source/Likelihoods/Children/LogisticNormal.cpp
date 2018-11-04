@@ -7,7 +7,7 @@
 
 #include <Likelihoods/Children/LogisticNormal.h>
 
-#include "Utilities/doubleCompare.h"
+#include "Utilities/DoubleCompare.h"
 #include "Utilities/Math.h"
 #include "Utilities/RandomNumberGenerator.h"
 

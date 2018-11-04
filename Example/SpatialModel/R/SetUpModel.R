@@ -165,6 +165,8 @@ recruits[,1:4] = 1 / (4*nrow)
 create_ibm_layer(label = "recruit_layer", type = "numeric", filename = paste0(LayerDir,"recruitment_layer.ibm"), Matrix = recruits, proportion = T)
 layers_to_add_to_config = c(layers_to_add_to_config, "recruitment_layer.ibm")
 
+## Summer fishery catch at age.
+
 
 ## Now add all the !include statements to the config.ibm file
 ## delete all the other includes before running this loop

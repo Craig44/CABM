@@ -2,7 +2,7 @@
 // Name        : English.h
 // Author      : S.Rasmussen
 // Date        : 18/07/2008
-// Copyright   : Copyright NIWA Science ©2008 - www.niwa.co.nz
+// Copyright   : Copyright NIWA Science ï¿½2008 - www.niwa.co.nz
 // Description :
 // $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
 //============================================================================
@@ -514,6 +514,7 @@
 #define PARAM_S                                   "s"
 #define PARAM_SAME                                "same"
 #define PARAM_SAMPLE                              "sample"
+#define PARAM_SAMPLES                             "samples"
 #define PARAM_SB                                  "sb"
 #define PARAM_SCALING_YEARS                       "scaling_years"
 #define PARAM_SCANNED                             "scanned"
@@ -567,6 +568,7 @@
 #define PARAM_STEP_SIZE                           "step_size"
 #define PARAM_STEPS                               "steps"
 #define PARAM_STEEPNESS                           "steepness"
+#define PARAM_STRATUM_WEIGHT_METHOD               "stratum_weighting_method"
 #define PARAM_STRING                              "categorical"
 #define PARAM_SUM_TO_ONE                          "sum_to_one"
 #define PARAM_SUMMARISE_AGENTS                    "summarise_agents"

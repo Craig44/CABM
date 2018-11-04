@@ -1,5 +1,18 @@
 # Get IBM Version
-VERSION<-system("ibm.exe -v",intern=TRUE)
+VERSION = ""
+this_dir = getwd();
+if (grepl("unix", .Platform$OS.type)) {
+  setwd("../BuildSystem/bin/linux/release")
+  VERSION<-system("./ibm -v",intern=TRUE)
+  setwd(this_dir)
+} else {
+  VERSION<-system("ibm.exe -v",intern=TRUE)
+  setwd("../BuildSystem/bin/windows/release")
+  VERSION<-system("ibm -v",intern=TRUE)
+  setwd(this_dir)
+}
+
+
 version.date<-substring(VERSION,1,regexpr(" ",VERSION)-1)
 version.ibm_number<- substring(VERSION,regexpr("rev. ",VERSION) + 5,nchar(VERSION) - 1)
 version.package<- "0.1"
