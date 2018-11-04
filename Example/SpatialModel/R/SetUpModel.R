@@ -166,7 +166,11 @@ create_ibm_layer(label = "recruit_layer", type = "numeric", filename = paste0(La
 layers_to_add_to_config = c(layers_to_add_to_config, "recruitment_layer.ibm")
 
 ## Summer fishery catch at age.
-
+strata = matrix("offshore",nrow = nrow, ncol = ncol);
+strata[,1:2] = "Inshore"
+strata[,1:2] = "Inshore"
+strata[c(1,2,9,10),3] = "Inshore"
+write(t(strata), file = paste0(LayerDir,"summer_fishery_stratum_layer.ibm"))
 
 ## Now add all the !include statements to the config.ibm file
 ## delete all the other includes before running this loop

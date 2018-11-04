@@ -47,7 +47,6 @@ public:
 protected:
   // members
   vector<unsigned>                years_;
-  string                          time_step_label_ = "";
   vector<string>                  cells_;
   layers::CategoricalLayer*       layer_ = nullptr;
   string                          layer_label_;
@@ -60,7 +59,7 @@ protected:
   map<string,vector<unsigned>>    stratum_cols_;
 
   parameters::Table*              sample_table_ = nullptr;
-  map<unsigned, map<string,vector<unsigned>>>  samples_by_year_and_stratum_;;
+  map<unsigned, map<string,vector<unsigned>>>  samples_by_year_and_stratum_;
 
 
 

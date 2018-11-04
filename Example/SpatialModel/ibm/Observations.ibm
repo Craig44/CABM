@@ -1,4 +1,17 @@
 ### Observations
+## fishery age compositional data through scaled observation
+@observation scaled_age_freq
+type mortality_scaled_age_frequency
+years 1991
+process_label fishing
+ageing_error None
+stratum_weighting_method biomass
+layer_of_stratum_definitions summer_fishery_stratum_meta
+stratums_to_include Inshore Offshore
+table samples ## number of individuals randomly selected to calculate age-length key for scaling age frequency
+year    Inshore    Offshore
+1990    600        300
+end_table
 
 ## fishery age compositional data
 @observation fishery_age_by_cell

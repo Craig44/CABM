@@ -2,7 +2,7 @@
 // Name        : CNumericMetaLayer.cpp
 // Author      : S.Rasmussen
 // Date        : 16/01/2009
-// Copyright   : Copyright NIWA Science ©2009 - www.niwa.co.nz
+// Copyright   : Copyright NIWA Science ï¿½2009 - www.niwa.co.nz
 // Description :
 // $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
 //============================================================================
@@ -31,9 +31,11 @@ NumericMetaLayer::NumericMetaLayer(Model* model) : NumericLayer(model) {
 // Validate the layer
 //**********************************************************************
 void NumericMetaLayer::DoValidate() {
-  LOG_TRACE();
-  if (years_.size() != layer_names_.size())
-    LOG_ERROR_P(PARAM_LAYER_LABELS) << "there needs to be a year for each layer label, you supplied '" << years_.size() << "' but '" << layer_names_.size() << "' layer labels. Please sort this out, chairs =)";
+  LOG_FINE();
+  for (auto year : years_) {
+    if (find(model_->years().begin(), model_->years().end(), year) == model_->years().end())
+      LOG_ERROR_P(PARAM_YEARS) << "the year " << year << " could not be found in model years, for obvious reasons the year must exist between start and final year in the @model block";
+  }
 }
 
 //**********************************************************************
@@ -81,7 +83,7 @@ float NumericMetaLayer::get_value(unsigned RowIndex, unsigned ColIndex) {
 
 float NumericMetaLayer::get_value(unsigned RowIndex, unsigned ColIndex, unsigned year) {
   float value = 0.0;
-  if (year == 0)
+  if ((year == 0) || (find(years_.begin(),years_.end(),year) == years_.end()))
     return default_layer_->get_value(RowIndex, ColIndex);
   value = years_layer_[year]->get_value(RowIndex, ColIndex);
   return value;

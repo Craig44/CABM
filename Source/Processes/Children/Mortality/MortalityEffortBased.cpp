@@ -2,7 +2,7 @@
  * @file MortalityEffortBased.cpp
  * @author C.Marsh
  * @github https://github.com/Craig44
- * @date 10/09/2018
+ * @date 10/10/2018
  * @section LICENSE
  *
  *
@@ -257,6 +257,10 @@ void MortalityEffortBased::DoExecute() {
           WorldCell* cell = world_->get_base_square(row, col);
           if (cell->is_enabled()) {
             LOG_FINE() << "checking cell in row " << row + 1 << " col = " << col + 1;
+            composition_data age_freq(PARAM_AGE, model_->current_year(), row, col,  model_->age_spread());
+            composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col,  model_->age_spread());
+            census_data census_fishery(model_->current_year(), row, col);
+
             // iterate through and calcualte vulnerable biomass in each cell exactly, nothing random here
             unsigned counter = 0;
             double F_this_cell = lambda_ * effort_by_cell_[row][col];
@@ -270,6 +274,11 @@ void MortalityEffortBased::DoExecute() {
                       <= (1.0 - std::exp(-F_this_cell * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())))) {
                     actual_catch_ += (*iter).get_weight() * (*iter).get_scalar();
                     removals_by_cell_[row][col] += (*iter).get_weight() * (*iter).get_scalar();
+                    age_freq.frequency_[(*iter).get_age_index()] += (*iter).get_scalar(); // This catch actually represents many individuals.
+                    length_freq.frequency_[(*iter).get_length_bin_index()] += (*iter).get_scalar();
+                    census_fishery.age_.push_back((*iter).get_age());
+                    census_fishery.length_.push_back((*iter).get_length());
+                    census_fishery.scalar_.push_back((*iter).get_scalar());
                     (*iter).dies();
                   }
                 }
@@ -282,14 +291,20 @@ void MortalityEffortBased::DoExecute() {
                       <= (1.0 - std::exp(-F_this_cell * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index())))) {
                     actual_catch_ += (*iter).get_weight() * (*iter).get_scalar();
                     removals_by_cell_[row][col] += (*iter).get_weight() * (*iter).get_scalar();
+                    age_freq.frequency_[(*iter).get_age_index()] += (*iter).get_scalar(); // This catch actually represents many individuals.
+                    length_freq.frequency_[(*iter).get_length_bin_index()] += (*iter).get_scalar();
+                    census_fishery.age_.push_back((*iter).get_age());
+                    census_fishery.length_.push_back((*iter).get_length());
+                    census_fishery.scalar_.push_back((*iter).get_scalar());
                     (*iter).dies();
                   }
                 }
               }
             }
             LOG_FINE() << "Applied mortality";
-
-            //LOG_FINEST() << initial_size << " after mortality";
+            removals_by_length_and_area_.push_back(length_freq);
+            removals_by_age_and_area_.push_back(age_freq);
+            removals_census_.push_back(census_fishery);
           }
         }
       }

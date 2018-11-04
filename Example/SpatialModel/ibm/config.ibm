@@ -211,3 +211,5 @@
 !include Layers/Inshore_pref.ibm
 !include Layers/SSB_layer.ibm
 !include Layers/recruitment_layer.ibm
+!include Layers/summer_catch_at_age_stratum_meta.ibm
+!include Layers/summer_fishery_stratum_layer.ibm
