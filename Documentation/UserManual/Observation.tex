@@ -115,8 +115,50 @@ cells r1-c1 r2-c1 r3-c1
 
 
 
-\subsubsection{Age frequency from scaled length frequency}\label{subsubsec:Mortalitysubsamle}\index{Observations!Mortality sub sample}
-This observation class, generates a age frequency that assumes  gets all the agents removed by an F method in each cell, and returns a sub-sample of age and lengths. The user can ask for ageing-error to be applied to the ages using the \command{ageing\_error} block (see Section~\ref{subsec:ageing_error}). The user must supply a categorical layer that represents stratum to weight the final age frequency by, this weight can be biomass weighted or area weighted.
+\subsubsection{Age frequency from scaled length frequency}\label{subsubsec:Mortalitysubsamle}\index{Observations!Age frequency from scaled length frequency}
+This observation class, generates an age frequency by getting all agents removed by an F method in user defined stratum, and returns a sub-sample of age and lengths that is used to generate an age length key. The user can ask for ageing-error to be applied to when generating an age length key, using the  \command{ageing\_error} block (see Section~\ref{subsec:ageing_error}). Calculations currently follow the below equations.  
+
+\begin{equation}
+N_{n,a} = \sum_l K_{l,a,n} N_{n,l,n}
+\end{equation}
+
+where we calculate an age length key for each stratum $K_{l,a,n}$ and pass a census of numbers at length ($N_{n,l,n}$) from the mortality process to get numbers at age for each stratum $n$. The age length key is currently calculated by random sampling agents so some length bin and age groups may be sparsely sampled.
+
+\begin{equation}
+N_{a} = \sum_n \sum_s N_{n,a,s}
+\end{equation}
+
+At some point when I return to this I wont to add sex if sexual dimorphism is evident among agents, see below for more improvements that I will be adding to this class.
+
+{\small{\begin{verbatim}
+@observation scaled_age_freq
+type mortality_scaled_age_frequency
+years 1991
+process_label summer_fishery
+ageing_error none
+stratum_weighting_method biomass
+layer_of_stratum_definitions summery_fishery_catch_at_age_stratum
+stratums_to_include Inshore Offshore
+table samples ## number of individuals randomly selected to calculate age-length key
+year   Inshore    Offshore
+1991   400        200
+end_table
+simulation_likelihood multinomial
+\end{verbatim}}}
+
+
+\paragraph*{Cool things I will plan to do with this observation class}
+This will be a great class for investigating catch at age inputs, I will have to return to this as this is not yet in my scope of project but things you would need to add before this observation is useful or representative of applied protocol,
+
+\begin{itemize}
+	\item Add sex in these equations.
+	\item currently we only get stratum based information, but somehow structuring fishery data to represent tows and fleets mights be quite handy in this type of investigation.
+	\item Add a sample of length frequencies (instead of a census) and calculate scaled length frequency, with boot strapped values.
+	\item different methods for weighting, to generate scaled length frequency you would want to add the options to weight stratum by biomass, area, numbers or proportion
+	\item allocate ages across the age length key length distribution, equal ages in each length bin, proportional ages to the length frequency, random (current implementation)
+	\item Bootstrap estimates, we could boot strap ALK and Scaled length frequencies to get CV for each age bin in the frequency, and calculate an effective sample size.
+\end{itemize}
+
 
 
 \subsection{\I{Ageing error}}\label{subsec:ageing_error}

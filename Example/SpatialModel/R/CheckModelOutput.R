@@ -4,15 +4,15 @@
 #' @description This file reads in some of the initial model runs to check all is working as expected
 #' 
 #' 
-detach("package:ibm", unload=TRUE)
+detach("package:ibm", unload=TRUE);
 
-set.seed(123)
-library(ibm)
-library(ggplot2)
-library(RColorBrewer)
-library(reshape2)
-library(animation)
-setwd("..")
+set.seed(123);
+library(ibm);
+library(ggplot2);
+library(RColorBrewer);
+library(reshape2);
+library(animation);
+setwd("..");
 BaseDir = getwd();
 ibmDir = paste0(BaseDir,"/ibm/")
 LayerDir = paste0(BaseDir,"/ibm/Layers/")

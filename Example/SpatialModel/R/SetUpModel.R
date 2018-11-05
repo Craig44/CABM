@@ -21,8 +21,11 @@ create_ibm_layer(label = "Base", type = "numeric", filename = paste0(LayerDir,"b
 ## Cell layer categorical
 cell_mat = matrix(paste(paste0("r",rep(1:10,10)),paste0("C",sort(rep(1:10,10))),sep = "-"), nrow = nrow, ncol =ncol)
 layers_to_add_to_config = c(layers_to_add_to_config,"cell_layer.ibm")
-create_ibm_layer(label = "Cells", type = "numeric", filename = paste0(LayerDir,"cell_layer.ibm"), Matrix = Base_layer)
+create_ibm_layer(label = "Cells", type = "categorical", filename = paste0(LayerDir,"cell_layer.ibm"), Matrix = cell_mat)
 
+single_mat = matrix("single_cell", nrow = nrow, ncol =ncol)
+layers_to_add_to_config = c(layers_to_add_to_config,"single_cell_layer.ibm")
+create_ibm_layer(label = "single_cell", type = "categorical", filename = paste0(LayerDir,"single_cell_layer.ibm"), Matrix = single_mat)
 
 ## Annual Cycle
 # - Quartely time steps
@@ -166,11 +169,14 @@ create_ibm_layer(label = "recruit_layer", type = "numeric", filename = paste0(La
 layers_to_add_to_config = c(layers_to_add_to_config, "recruitment_layer.ibm")
 
 ## Summer fishery catch at age.
-strata = matrix("offshore",nrow = nrow, ncol = ncol);
+strata = matrix("Offshore",nrow = nrow, ncol = ncol);
 strata[,1:2] = "Inshore"
 strata[,1:2] = "Inshore"
 strata[c(1,2,9,10),3] = "Inshore"
-write(t(strata), file = paste0(LayerDir,"summer_fishery_stratum_layer.ibm"))
+write(t(strata), file = paste0(LayerDir,"summer_fishery_stratum_layer.ibm"), ncolumns = ncol)
+
+
+
 
 ## Now add all the !include statements to the config.ibm file
 ## delete all the other includes before running this loop

@@ -213,3 +213,4 @@
 !include Layers/recruitment_layer.ibm
 !include Layers/summer_catch_at_age_stratum_meta.ibm
 !include Layers/summer_fishery_stratum_layer.ibm
+!include Layers/single_cell_layer.ibm

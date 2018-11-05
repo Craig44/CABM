@@ -1,14 +1,14 @@
 @layer Cells
-type numeric
+type categorical
 table layer
-1 1 1 1 1 1 1 1 1 1
-1 1 1 1 1 1 1 1 1 1
-1 1 1 1 1 1 1 1 1 1
-1 1 1 1 1 1 1 1 1 1
-1 1 1 1 1 1 1 1 1 1
-1 1 1 1 1 1 1 1 1 1
-1 1 1 1 1 1 1 1 1 1
-1 1 1 1 1 1 1 1 1 1
-1 1 1 1 1 1 1 1 1 1
-1 1 1 1 1 1 1 1 1 1
+r1-C1 r1-C2 r1-C3 r1-C4 r1-C5 r1-C6 r1-C7 r1-C8 r1-C9 r1-C10
+r2-C1 r2-C2 r2-C3 r2-C4 r2-C5 r2-C6 r2-C7 r2-C8 r2-C9 r2-C10
+r3-C1 r3-C2 r3-C3 r3-C4 r3-C5 r3-C6 r3-C7 r3-C8 r3-C9 r3-C10
+r4-C1 r4-C2 r4-C3 r4-C4 r4-C5 r4-C6 r4-C7 r4-C8 r4-C9 r4-C10
+r5-C1 r5-C2 r5-C3 r5-C4 r5-C5 r5-C6 r5-C7 r5-C8 r5-C9 r5-C10
+r6-C1 r6-C2 r6-C3 r6-C4 r6-C5 r6-C6 r6-C7 r6-C8 r6-C9 r6-C10
+r7-C1 r7-C2 r7-C3 r7-C4 r7-C5 r7-C6 r7-C7 r7-C8 r7-C9 r7-C10
+r8-C1 r8-C2 r8-C3 r8-C4 r8-C5 r8-C6 r8-C7 r8-C8 r8-C9 r8-C10
+r9-C1 r9-C2 r9-C3 r9-C4 r9-C5 r9-C6 r9-C7 r9-C8 r9-C9 r9-C10
+r10-C1 r10-C2 r10-C3 r10-C4 r10-C5 r10-C6 r10-C7 r10-C8 r10-C9 r10-C10
 end_table

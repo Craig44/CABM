@@ -54,6 +54,17 @@ type derived_quantity
 @report model_attributes
 type model_attributes
 
+################
+## Selectivities
+################
+@report maturity_ogive
+type selectivity
+selectivity mature_ogive
+
+@report survey_selectivity
+type selectivity
+selectivity survey_selectivity
+
 
 ################
 ## Observations
@@ -62,16 +73,23 @@ type model_attributes
 @report summer_fishery_scaled_age_freq
 type observation
 observation scaled_age_freq
-/*
-@report survey_biomass
+
+@report overall_fishery_age
 type observation
-observation biomass_survey_post_fishing_by_cell
+observation overall_fishery_age
 
 
+@report overall_fishery_length
+type observation
+observation overall_fishery_length
+/*
 @report age_length
 type observation
 observation biomass_survey_post_fishing_by_cell
 */
+@report ageing_error
+type ageing_error
+ageing_error Age_misclassification
 
 ################
 ## Processes

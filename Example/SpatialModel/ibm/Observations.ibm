@@ -5,55 +5,47 @@ type mortality_scaled_age_frequency
 years 1991
 process_label summer_fishery
 ageing_error none
-stratum_weighting_method biomass
-layer_of_stratum_definitions summer_fishery_stratum_meta
-stratums_to_include Inshore Offshore
+layer_of_stratum_definitions single_cell # summer_fishery_stratum_meta
+stratums_to_include single_cell #Inshore Offshore
 table samples ## number of individuals randomly selected to calculate age-length key for scaling age frequency
-year    Inshore    Offshore
-1991    600        300
+year   single_cell 	#Inshore    Offshore
+1991   6000		#400        200
 end_table
 simulation_likelihood multinomial
 
-/*
 ## fishery age compositional data
-@observation fishery_age_by_cell
+@observation overall_fishery_age
 type process_removals_by_age
 simulation_likelihood multinomial
-process_label fishing
-years 1990:2010
+process_label summer_fishery
+years 1991#:2010
 min_age 0
-max_age 28
+max_age 20
 plus_group true
-ageing_error None
+ageing_error Age_misclassification
 table error_values
-1990 300
 1991 300
-1992 300
-1993 300
-1994 300
-1995 300
-1996 300
-1997 300
-1998 300
-1999 300
-2000 300
-2001 300
-2002 300
-2003 300
-2004 300
-2005 300
-2006 300
-2007 300
-2008 300
-2009 300
-2010 300
 end_table
-cell_layer cells
-cells r1-c1 r1-c2 r1-c3 r1-c4 r1-c5 r2-c1 r2-c2 r2-c3 r2-c4 r2-c5 r3-c1 r3-c2 r3-c3 r3-c4 r3-c5 r4-c1 r4-c2 r4-c3 r4-c4 r4-c5 r5-c1 r5-c2 r5-c3 r5-c4 r5-c5
+cell_layer single_cell
+cells single_cell
 
-@ageing_error None
+## fishery age compositional data
+@observation overall_fishery_length
+type process_removals_by_length
+simulation_likelihood multinomial
+process_label summer_fishery
+years 1991#:2010
+table error_values
+1991 300
+end_table
+cell_layer single_cell
+cells single_cell
+
+
+@ageing_error Age_misclassification
 type none
 
+/*
 @observation biomass_survey_post_fishing_by_cell
 type biomass
 years 1990:2018
