@@ -24,6 +24,7 @@ Selectivity::Selectivity(Model* model) : Report(model) {
 }
 
 void Selectivity::DoValidate() {
+
 }
 
 void Selectivity::DoBuild() {
@@ -35,7 +36,7 @@ void Selectivity::DoBuild() {
 
 
 void Selectivity::DoExecute() {
-  LOG_TRACE();
+  LOG_FINE();
   cache_ << "*"<< type_ << "[" << label_ << "]" << "\n";
   const map<string, Parameter*> parameters = selectivity_->parameters().parameters();
 
@@ -51,14 +52,18 @@ void Selectivity::DoExecute() {
 
   cache_ << "Values " << REPORT_R_VECTOR << "\n";
   if (!selectivity_->is_length_based()) {
-    LOG_FINEST() << "Printing age based selectivity";
-    for (unsigned i = model_->min_age(); i <= model_->max_age(); ++i)
-      cache_ << i << " " << selectivity_->GetResult(i) << "\n";
+    LOG_FINE() << "Printing age based selectivity";
+    for (unsigned i = 0; i < model_->age_spread(); ++i)
+      cache_ << i + model_->min_age() << " " << selectivity_->GetResult(i) << "\n";
     ready_for_writing_ = true;
   } else {
-    LOG_FINEST() << "Printing length based selectivity";
-    for (unsigned length_ndx = 0; length_ndx<  model_->length_bins().size(); ++length_ndx)
-      cache_ << model_->length_bins()[length_ndx] << " " << selectivity_->GetResult(length_ndx) << "\n";
+    LOG_FINE() << "Printing length based selectivity";
+    vector<float> length_mid_points = model_->length_bin_mid_points();
+    for (unsigned length_ndx = 0; length_ndx <  length_mid_points.size(); ++length_ndx) {
+      LOG_FINE() << "length ndx = " << length_ndx;
+      LOG_FINE()  << " mid point = " << length_mid_points[length_ndx];
+      cache_ << length_mid_points[length_ndx] << " " << selectivity_->GetResult(length_ndx) << "\n";
+    }
     ready_for_writing_ = true;
   }
 }

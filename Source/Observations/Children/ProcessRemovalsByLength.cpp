@@ -67,8 +67,8 @@ void ProcessRemovalsByLength::DoValidate() {
   }
 
   for (vector<string>& error_values_data_line : error_values_data) {
-    if (error_values_data_line.size() != 2 && error_values_data_line.size() != model_->length_bins().size()) {
-      LOG_FATAL_P(PARAM_ERROR_VALUES) << " has " << error_values_data_line.size() << " values defined, but we expected " << model_->length_bins().size()
+    if (error_values_data_line.size() != 2 && error_values_data_line.size() != model_->length_bin_mid_points().size()) {
+      LOG_FATAL_P(PARAM_ERROR_VALUES) << " has " << error_values_data_line.size() << " values defined, but we expected " << model_->length_bin_mid_points().size()
           << " to match the model length bins";
     }
 
@@ -91,11 +91,11 @@ void ProcessRemovalsByLength::DoValidate() {
       error_values_by_year_[year].push_back(value);
     }
     if (error_values_by_year_[year].size() == 1) {
-      error_values_by_year_[year].assign(model_->length_bins().size(), error_values_by_year_[year][0]);
+      error_values_by_year_[year].assign(model_->length_bin_mid_points().size(), error_values_by_year_[year][0]);
     }
     LOG_FINEST() << "number of error values in year " << year << " = " << error_values_by_year_[year].size();
-    if (error_values_by_year_[year].size() != model_->length_bins().size())
-      LOG_FATAL_P(PARAM_ERROR_VALUES) << "We counted " << error_values_by_year_[year].size() << " error values by year but expected " << model_->length_bins().size() << " based on the obs table";
+    if (error_values_by_year_[year].size() != model_->length_bin_mid_points().size())
+      LOG_FATAL_P(PARAM_ERROR_VALUES) << "We counted " << error_values_by_year_[year].size() << " error values by year but expected " << model_->length_bin_mid_points().size() << " based on the obs table";
   }
 
 }
@@ -160,7 +160,7 @@ void ProcessRemovalsByLength::Simulate() {
   for (unsigned year : years_) {
     for (string cell : cells_) {
       bool cell_found = false;
-      vector<float> accumulated_length_frequency(model_->length_bins().size(), 0.0);
+      vector<float> accumulated_length_frequency(model_->length_bin_mid_points().size(), 0.0);
       for (auto length_comp_data : length_frequency) {
         if ((length_comp_data.year_ == year) && (layer_->get_value(length_comp_data.row_,length_comp_data.col_) == cell)) {
           // Lets accumulate the information for this cell and year
@@ -175,7 +175,7 @@ void ProcessRemovalsByLength::Simulate() {
       /*
        *  Now collapse the number_age into the expected_values for the observation
        */
-      for (unsigned k = 0; k < model_->length_bins().size(); ++k) {
+      for (unsigned k = 0; k < model_->length_bin_mid_points().size(); ++k) {
         SaveComparison(0, length_mid_points[k], cell, accumulated_length_frequency[k], 0.0, error_values_by_year_[year][k], year);
       }
     }
@@ -190,7 +190,7 @@ void ProcessRemovalsByLength::Simulate() {
         comparison.expected_ /= total_expec;
     }
   }*/
-  likelihood_->SimulateObserved(comparisons_);
+  //likelihood_->SimulateObserved(comparisons_);
   // Simualte numbers at age, but we want proportion
   for (auto& iter : comparisons_) {
     for (auto& second_iter : iter.second) {  // cell

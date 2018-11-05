@@ -66,6 +66,7 @@ void DoubleNormal::DoValidate() {
  * for each age in the model.
  */
 void DoubleNormal::RebuildCache() {
+  LOG_FINE() << "Rebuild Double Normal, length based = " << length_based_;
   if (not length_based_) {
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
       float temp = (float)age;
@@ -77,13 +78,15 @@ void DoubleNormal::RebuildCache() {
         values_[age - min_index_] = pow(2.0, -((temp - mu_) / sigma_r_ * (temp - mu_) / sigma_r_)) * alpha_;
     }
   } else {
-    vector<unsigned> length_bins = model_->length_bins();
+    vector<float> length_bins = model_->length_bin_mid_points();
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index) {
-      float temp = (float)length_bins[length_bin_index];
+      float temp = length_bins[length_bin_index];
       if (temp < mu_)
         length_values_[length_bin_index] = pow(2.0, -((temp - mu_) / sigma_l_ * (temp - mu_) / sigma_l_)) * alpha_;
       else
         length_values_[length_bin_index] = pow(2.0, -((temp - mu_) / sigma_r_ * (temp - mu_) / sigma_r_)) * alpha_;
+
+      LOG_FINE() << "value = " << length_values_[length_bin_index] << " for length mid point = " << temp;
     }
   }
 }

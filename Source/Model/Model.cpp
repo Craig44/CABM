@@ -233,6 +233,28 @@ void Model::Validate() {
   if (!parameters_.has_been_populated())
     parameters_.Populate(this);
 
+
+  /**
+   * Do some simple checks
+   * e.g Validate that the length_bins are strictly increasing order
+   */
+  for(unsigned length = 0; length < (length_bins_.size() - 1); ++length) {
+    if(length_bins_[length] < 0.0)
+      LOG_ERROR_P(PARAM_LENGTH_BINS) << "the length bin " <<  length_bins_[length] << "is less than zero this is not allowed";
+    if(length_bins_[length] > length_bins_[length + 1])
+      LOG_ERROR_P(PARAM_LENGTH_BINS) << ": Length bins must be strictly increasing " << length_bins_[length] << " is greater than " << length_bins_[length +1];
+  }
+
+  // Calculate length bin midpoints
+  for (unsigned length_ndx = 1; length_ndx < length_bins_.size(); ++length_ndx) {
+    length_bin_mid_points_.push_back((length_bins_[length_ndx - 1] + ((float)length_bins_[length_ndx] - (float)length_bins_[length_ndx - 1]) / 2));
+    LOG_FINE() << "upper = " << length_bins_[length_ndx] << " lower = " << length_bins_[length_ndx - 1] << " mid = " << length_bin_mid_points_[length_ndx - 1];
+  }
+  length_bin_number_ = length_bin_mid_points_.size();
+  LOG_FINE() << "length bins " << length_bins_.size() << " length bin midpoints = " << length_bin_mid_points_.size();
+
+
+
   // Call validation for the other objects required by the model
   world_view_->Validate();
 
@@ -253,15 +275,6 @@ void Model::Validate() {
       LOG_ERROR_P(PARAM_TIME_STEPS) << "(" << time_step << ") has not been defined. Please ensure you have defined it";
   }
 
-  /**
-   * Do some simple checks
-   * e.g Validate that the length_bins are strictly increasing order
-   */
-  for(unsigned length = 0; length < (length_bins_.size() - 1); ++length) {
-    if(length_bins_[length] < 0.0)
-    if(length_bins_[length] > length_bins_[length + 1])
-      LOG_ERROR_P(PARAM_LENGTH_BINS) << ": Length bins must be strictly increasing " << length_bins_[length] << " is greater than " << length_bins_[length +1];
-  }
 }
 
 /**
@@ -346,9 +359,6 @@ void Model::Build() {
   omp_set_dynamic(0);
   omp_set_num_threads(procs);
 
-  // Calculate length bin midpoints
-  for (unsigned length_ndx = 1; length_ndx < length_bins_.size(); ++length_ndx)
-    length_bin_mid_points_.push_back((float)(length_bins_[length_ndx] - length_bins_[length_ndx - 1] / 2));
 
   Addressables& addressables = *managers_->addressables();
   if (addressables.GetValueCount() > 0) {

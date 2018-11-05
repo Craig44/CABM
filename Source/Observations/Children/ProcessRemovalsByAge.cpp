@@ -260,7 +260,7 @@ void ProcessRemovalsByAge::Simulate() {
     first_simualtion_run_ = false;
   }
 
-  likelihood_->SimulateObserved(comparisons_);
+  //likelihood_->SimulateObserved(comparisons_);
   // Simualte numbers at age, but we want proportion
   for (auto& iter : comparisons_) {
     for (auto& second_iter : iter.second) {  // cell

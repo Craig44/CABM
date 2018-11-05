@@ -84,29 +84,10 @@ void Tagging::DoBuild() {
   for (unsigned i = 0; i < model_->get_height(); ++i) {
     cell_offset_[i].resize(model_->get_width());
     cell_offset_for_selectivity_[i].resize(model_->get_width());
-    model_length_bins_[i].resize(model_->get_width(), model_->length_bins().size());
+    model_length_bins_[i].resize(model_->get_width(), model_->length_bin_mid_points().size());
     model_age_bins_[i].resize(model_->get_width(), model_->age_spread());
     current_year_by_space_[i].resize(model_->get_width());
     handling_mort_by_space_[i].resize(model_->get_width(), handling_mortality_);
-  }
-  if (selectivity_length_based_) {
-    for (unsigned i = 0; i < model_->get_height(); ++i) {
-      for (unsigned j = 0; j < model_->get_width(); ++j) {
-        for (unsigned ogive = 0; ogive < selectivity_labels_.size(); ++ogive) {
-          for (auto len : model_->length_bins())
-            cell_offset_for_selectivity_[i][j].push_back(selectivities_[ogive]->GetResult(len));
-        }
-      }
-    }
-  } else {
-    for (unsigned i = 0; i < model_->get_height(); ++i) {
-      for (unsigned j = 0; j < model_->get_width(); ++j) {
-        for (unsigned ogive = 0; ogive < selectivity_labels_.size(); ++ogive) {
-          for (auto age = model_->min_age(); age <= model_->max_age(); ++age)
-          cell_offset_for_selectivity_[i][j].push_back(selectivities_[ogive]->GetResult(age));
-        }
-      }
-    }
   }
 }
 
@@ -131,7 +112,7 @@ void Tagging::DoExecute() {
       }
     }
     age_distribution_of_tagged_fish_by_year_[model_->current_year()].resize(model_->age_spread(),0);
-    length_distribution_of_tagged_fish_by_year_[model_->current_year()].resize(model_->length_bins().size(),0);
+    length_distribution_of_tagged_fish_by_year_[model_->current_year()].resize(model_->length_bin_mid_points().size(),0);
 
     // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
     random_numbers_.resize(n_agents_ + 1);
@@ -144,16 +125,15 @@ void Tagging::DoExecute() {
     LOG_FINE() << "about to apply tagging";
     if (not selectivity_length_based_) {
       // Thread out each loop
-      #pragma omp parallel for collapse(2)
+      //#pragma omp parallel for collapse(2)
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
           WorldCell* cell = nullptr;
           unsigned tags_to_release = 0;
-          #pragma omp critical
-          {
-            cell = world_->get_base_square(row, col); // Shared resource...
-            tags_to_release = tag_layer_[year_ndx]->get_value(row, col);
-          }
+
+          cell = world_->get_base_square(row, col); // Shared resource...
+          tags_to_release = tag_layer_[year_ndx]->get_value(row, col);
+
           if (cell->is_enabled()) {
             unsigned tag_attempts = 1;
             unsigned random_agent;
@@ -170,7 +150,7 @@ void Tagging::DoExecute() {
               if (cell->agents_[random_agent].is_alive()) {
                 auto& this_agent = cell->agents_[random_agent];
                 // See if it is vulnerable to selectivity
-                if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= cell_offset_for_selectivity_[row][col][this_agent.get_sex() * model_age_bins_[row][col] + this_agent.get_age_index()]) {
+                if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= selectivities_[this_agent.get_sex()]->GetResult(this_agent.get_age_index())) {
                   if (this_agent.get_number_tags() > 1) // This fish is alread tagged so pretend we didn't catch it
                     continue;
 
@@ -211,13 +191,11 @@ void Tagging::DoExecute() {
               ++counter;
             }
             // Store global information
-            #pragma omp critical
-            {
-              for (unsigned age = 0; age < model_->age_spread(); ++age)
-                age_distribution_of_tagged_fish_by_year_[model_->current_year()][age] += age_freq[age];
-              for (unsigned length_ndx = 0; length_ndx < model_->length_bins().size(); ++length_ndx)
-                length_distribution_of_tagged_fish_by_year_[model_->current_year()][length_ndx] += length_freq[length_ndx];
-            }
+            for (unsigned age = 0; age < model_->age_spread(); ++age)
+              age_distribution_of_tagged_fish_by_year_[model_->current_year()][age] += age_freq[age];
+            for (unsigned length_ndx = 0; length_ndx < model_->length_bin_mid_points().size(); ++length_ndx)
+              length_distribution_of_tagged_fish_by_year_[model_->current_year()][length_ndx] += length_freq[length_ndx];
+
 
           }
         }
@@ -245,8 +223,8 @@ void  Tagging::FillReportCache(ostringstream& cache) {
   cache << "\n";
   cache << "global_tag_release_length_distribution " << REPORT_R_DATAFRAME << "\n";
   cache << "year";
-  for (unsigned length_ndx = 0; length_ndx < model_->length_bins().size(); ++length_ndx) {
-    cache << " " << model_->length_bins()[length_ndx];
+  for (unsigned length_ndx = 0; length_ndx < model_->length_bin_mid_points().size(); ++length_ndx) {
+    cache << " " << model_->length_bin_mid_points()[length_ndx];
   }
   for (auto& year_value : length_distribution_of_tagged_fish_by_year_) {
     cache << "\n" << year_value.first;

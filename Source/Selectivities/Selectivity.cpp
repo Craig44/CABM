@@ -45,8 +45,11 @@ void Selectivity::Validate() {
   if (not length_based_) {
     values_.assign(model_->age_spread(), 0.0);
   } else {
-    length_values_.assign(model_->length_bins().size(), 0.0);
+    vector<float> lengths = model_->length_bin_mid_points();
+    length_values_.assign(lengths.size(), 0.0);
+    LOG_FINE() << "number of bins = " << length_values_.size();
   }
+
 }
 
 

@@ -68,7 +68,7 @@ void Increasing::DoValidate() {
           << "Expected: " << (high_ - low_ + 1) << " but got " << v_.size();
     }
   } else {
-    vector<unsigned> length_bins = model_->length_bins();
+    vector<float> length_bins = model_->length_bin_mid_points();
     if (low_ < length_bins[0] || low_ > length_bins[length_bins.size()-1])
       LOG_ERROR_P(PARAM_L) << ": 'l' (" << low_ << ") must be between the model min length (" << length_bins[0] << ") and max length (" << length_bins[length_bins.size()-1] << ")";
     unsigned bins = 0;
@@ -116,7 +116,7 @@ void Increasing::RebuildCache() {
       }
     }
   } else {
-    vector<unsigned> length_bins = model_->length_bins();
+    vector<float> length_bins = model_->length_bin_mid_points();
     unsigned mark = 0;
     unsigned start_element = 0;
     while (mark == 0) {

@@ -42,7 +42,7 @@ protected:
   virtual void                DoValidate() = 0;
   // Members
   Model*                      model_ = nullptr;
-  bool                        length_based_ = false;
+  bool                        length_based_;
 //  map<unsigned, float>       values_;
   vector<float>               values_;
   vector<float>               length_values_;

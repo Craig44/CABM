@@ -68,7 +68,7 @@ void AllValuesBounded::DoValidate() {
     }
 
   } else {
-    vector<unsigned> length_bins = model_->length_bins();
+    vector<float> length_bins = model_->length_bin_mid_points();
     unsigned bins = 0;
     for (unsigned i = 0; i < length_bins.size(); ++i) {
       if (length_bins[i] >= low_ && length_bins[i] <= high_)
@@ -118,7 +118,7 @@ void AllValuesBounded::RebuildCache() {
       values_[age - min_index_] = *v_.rbegin();
 
   } else {
-    vector<unsigned> length_bins = model_->length_bins();
+    vector<float> length_bins = model_->length_bin_mid_points();
     unsigned v_index = 0;
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index)
       if (length_bins[length_bin_index] < low_)

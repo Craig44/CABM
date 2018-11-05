@@ -182,7 +182,7 @@ void MortalityBaranov::DoBuild() {
   F_by_cell_year_.resize(model_->get_height());
   for (unsigned i = 0; i < model_->get_height(); ++i) {
     cell_offset_[i].resize(model_->get_width());
-    model_length_bins_[i].resize(model_->get_width(), model_->length_bins().size());
+    model_length_bins_[i].resize(model_->get_width(), model_->length_bin_mid_points().size());
     model_age_bins_[i].resize(model_->get_width(), model_->age_spread());
     mls_by_space_[i].resize(model_->get_width(), mls_);
     current_year_by_space_[i].resize(model_->get_width());
@@ -304,7 +304,7 @@ void MortalityBaranov::DoExecute() {
           WorldCell* cell = world_->get_base_square(row, col);
           if (cell->is_enabled()) {
             composition_data age_freq(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
-            composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->length_bins().size());
+            composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->length_bin_mid_points().size());
             census_data census_fishery(current_year_by_space_[row][col], row, col);
             tag_recapture tag_recapture_info(current_year_by_space_[row][col], row, col, current_time_step_by_space_[row][col]);
 
@@ -375,7 +375,7 @@ void MortalityBaranov::DoExecute() {
           WorldCell* cell = world_->get_base_square(row, col);
           if (cell->is_enabled()) {
             composition_data age_freq(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
-            composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->length_bins().size());
+            composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->length_bin_mid_points().size());
             census_data census_fishery(current_year_by_space_[row][col], row, col);
             tag_recapture tag_recapture_info(current_year_by_space_[row][col], row, col, current_time_step_by_space_[row][col]);
 
@@ -444,7 +444,7 @@ void MortalityBaranov::DoExecute() {
           WorldCell* cell = world_->get_base_square(row, col);
           if (cell->is_enabled()) {
             composition_data age_freq(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
-            composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->length_bins().size());
+            composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->length_bin_mid_points().size());
             census_data census_fishery(current_year_by_space_[row][col], row, col);
             tag_recapture tag_recapture_info(current_year_by_space_[row][col], row, col, current_time_step_by_space_[row][col]);
 
@@ -513,7 +513,7 @@ void MortalityBaranov::DoExecute() {
           WorldCell* cell = world_->get_base_square(row, col);
           if (cell->is_enabled()) {
             composition_data age_freq(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
-            composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->length_bins().size());
+            composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->length_bin_mid_points().size());
             census_data census_fishery(current_year_by_space_[row][col], row, col);
             tag_recapture tag_recapture_info(current_year_by_space_[row][col], row, col, current_time_step_by_space_[row][col]);
 

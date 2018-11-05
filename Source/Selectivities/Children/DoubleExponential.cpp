@@ -92,7 +92,7 @@ void DoubleExponential::RebuildCache() {
       }
     }
   } else {
-    vector<unsigned> length_bins = model_->length_bins();
+    vector<float> length_bins = model_->length_bin_mid_points();
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index) {
       if ((float)length_bins[length_bin_index] <= x0_) {
         length_values_[length_bin_index] = alpha_ * y0_ * pow((y1_ / y0_), ((float)length_bins[length_bin_index] - x0_)/(x1_ - x0_));

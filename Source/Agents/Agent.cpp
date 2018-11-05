@@ -65,7 +65,7 @@ unsigned Agent::get_length_bin_index() {
     if (length_ <= lengths[length_max])
       return length_max - 1;
   }
-  return lengths.size() - 1;
+  return lengths.size() - 2;
 }
 
 

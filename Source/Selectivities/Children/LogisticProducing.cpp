@@ -90,7 +90,7 @@ void LogisticProducing::RebuildCache() {
       }
     }
   } else {
-    vector<unsigned> length_bins = model_->length_bins();
+    vector<float> length_bins = model_->length_bin_mid_points();
 
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index) {
       float temp = (float)length_bins[length_bin_index];

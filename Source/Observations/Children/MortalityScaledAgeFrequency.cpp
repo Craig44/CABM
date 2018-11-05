@@ -234,7 +234,7 @@ void MortalityScaledAgeFrequency::Simulate() {
   vector<vector<float>> age_length_key;
   age_length_key.resize(model_->age_spread());
   for (unsigned i = 0; i < model_->age_spread(); ++i)
-    age_length_key[i].resize(model_->length_bins().size(),0.0);
+    age_length_key[i].resize(model_->length_bin_mid_points().size(),0.0);
   vector<processes::census_data>& census_data = mortality_process_->get_census_data();
   vector<processes::composition_data>& length_frequency = mortality_process_->get_removals_by_length();
 
@@ -248,10 +248,10 @@ void MortalityScaledAgeFrequency::Simulate() {
     unsigned agents_available_to_sample = 0;
     for (unsigned stratum_ndx = 0; stratum_ndx < cells_.size(); ++stratum_ndx) {
       LOG_FINE() << "About to sort our info for stratum " << cells_[stratum_ndx];
-      vector<float> stratum_length_frequency(model_->length_bins().size(),0.0);
+      vector<float> stratum_length_frequency(model_->length_bin_mid_points().size(),0.0);
       census_stratum_ndx.clear();
       for (unsigned i = 0; i < model_->age_spread(); ++i)
-        age_length_key[i].resize(model_->length_bins().size(),0.0);
+        age_length_key[i].resize(model_->length_bin_mid_points().size(),0.0);
 
       stratum_biomass_[cells_[stratum_ndx]] = 0.0;
 
@@ -347,7 +347,7 @@ void MortalityScaledAgeFrequency::Simulate() {
       }
       LOG_FINE() << "total number in length frequency " << total_agents_in_ALK;
       // Convert ALK to proportions
-      for (unsigned j = 0; j < model_->length_bins().size(); ++j) {
+      for (unsigned j = 0; j < model_->length_bin_mid_points().size(); ++j) {
         float length_sum = 0;
         for (unsigned i = 0; i < model_->age_spread(); ++i) {
           length_sum += age_length_key[i][j];

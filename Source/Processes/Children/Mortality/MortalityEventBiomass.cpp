@@ -121,7 +121,7 @@ void MortalityEventBiomass::DoBuild() {
   current_time_step_by_space_.resize(model_->get_height());
   for (unsigned i = 0; i < model_->get_height(); ++i) {
     cell_offset_[i].resize(model_->get_width());
-    model_length_bins_[i].resize(model_->get_width(), model_->length_bins().size());
+    model_length_bins_[i].resize(model_->get_width(), model_->length_bin_mid_points().size());
     model_age_bins_[i].resize(model_->get_width(), model_->age_spread());
     mls_by_space_[i].resize(model_->get_width(), mls_);
     current_year_by_space_[i].resize(model_->get_width());

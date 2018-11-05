@@ -50,9 +50,9 @@ void AllValues::DoValidate() {
           << "Expected: " << model_->age_spread() << " but got " << v_.size();
     }
   } else {
-    if (v_.size() != model_->length_bins().size()) {
+    if (v_.size() != model_->length_bin_mid_points().size()) {
       LOG_ERROR_P(PARAM_V) << ": Number of 'v' values supplied is not the same as the model length bin count.\n"
-          << "Expected: " << model_->length_bins().size() << " but got " << v_.size();
+          << "Expected: " << model_->length_bin_mid_points().size() << " but got " << v_.size();
     }
   }
 }
