@@ -52,12 +52,12 @@ protected:
   string                          layer_label_;
   AgeingError*                    ageing_error_ = nullptr;
   string                          ageing_error_label_;
-  string                          ageing_allocation_;
-  unsigned                        number_of_bootstraps_;
+  string                          ageing_allocation_ = PARAM_RANDOM;
+  unsigned                        number_of_bootstraps_ = 0;
 
   Mortality*                      mortality_process_ = nullptr;
   string                          process_label_;
-  string                          stratum_weight_method_;
+  string                          stratum_weight_method_ = PARAM_NONE;
   map<string,vector<unsigned>>    stratum_rows_;
   map<string,vector<unsigned>>    stratum_cols_;
   map<string,float>               stratum_area_;

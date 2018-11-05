@@ -40,10 +40,10 @@ MortalityScaledAgeFrequency::MortalityScaledAgeFrequency(Model* model) : Observa
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "The years of the observed values", "");
   parameters_.Bind<string>(PARAM_AGEING_ERROR, &ageing_error_label_, "Label of ageing error to use", "", PARAM_NONE);
   parameters_.Bind<string>(PARAM_PROCESS_LABEL, &process_label_, "Label of of removal process", "", "");
-  parameters_.Bind<string>(PARAM_AGEING_ALLOCATION_METHOD, &ageing_allocation_, "The method used to allocate aged individuals across the length distribution", "", PARAM_RANDOM)->set_allowed_values({PARAM_RANDOM}); // TODO add PARAM_PROPORTIONAL and PARAM_EQUAL
-  parameters_.Bind<unsigned>(PARAM_NUMBER_OF_BOOTSTRAPS, &number_of_bootstraps_, "Number of bootstraps to conduct for each stratum to calculate Pooled CV's for each stratum and total age frequency", "", 50);
-
-  parameters_.Bind<string>(PARAM_STRATUM_WEIGHT_METHOD, &stratum_weight_method_, "Method to weight stratum estimates by", "", PARAM_BIOMASS)->set_allowed_values({PARAM_BIOMASS, PARAM_AREA, PARAM_NONE});
+  // TODO add these in at some point ...
+  //parameters_.Bind<string>(PARAM_AGEING_ALLOCATION_METHOD, &ageing_allocation_, "The method used to allocate aged individuals across the length distribution", "", PARAM_RANDOM)->set_allowed_values({PARAM_RANDOM}); // TODO add PARAM_PROPORTIONAL and PARAM_EQUAL
+  //parameters_.Bind<unsigned>(PARAM_NUMBER_OF_BOOTSTRAPS, &number_of_bootstraps_, "Number of bootstraps to conduct for each stratum to calculate Pooled CV's for each stratum and total age frequency", "", 50);
+  //parameters_.Bind<string>(PARAM_STRATUM_WEIGHT_METHOD, &stratum_weight_method_, "Method to weight stratum estimates by", "", PARAM_BIOMASS)->set_allowed_values({PARAM_BIOMASS, PARAM_AREA, PARAM_NONE});
   parameters_.Bind<string>(PARAM_LAYER_OF_STRATUM_DEFINITIONS, &layer_label_, "The layer that indicates what the stratum boundaries are.", "");
   parameters_.Bind<string>(PARAM_STRATUMS_TO_INCLUDE, &cells_, "The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer", "", true);
 
@@ -245,6 +245,7 @@ void MortalityScaledAgeFrequency::Simulate() {
   }
   for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     LOG_FINE() << "About to sort our info for year " << years_[year_ndx];
+    unsigned agents_available_to_sample = 0;
     for (unsigned stratum_ndx = 0; stratum_ndx < cells_.size(); ++stratum_ndx) {
       LOG_FINE() << "About to sort our info for stratum " << cells_[stratum_ndx];
       vector<float> stratum_length_frequency(model_->length_bins().size(),0.0);
@@ -253,30 +254,35 @@ void MortalityScaledAgeFrequency::Simulate() {
         age_length_key[i].resize(model_->length_bins().size(),0.0);
 
       stratum_biomass_[cells_[stratum_ndx]] = 0.0;
-      // Calculate stratum total length frequency
-      // TODO: add a non census component here or some bias in the future
-      // The important thing is this a representative sample ...
-      for (unsigned stratum_cell_index = 0; stratum_cell_index < stratum_rows_[cells_[stratum_ndx]].size(); ++stratum_cell_index) {
-        for (processes::composition_data& length_data : length_frequency) {
-          if((stratum_rows_[cells_[stratum_ndx]][stratum_cell_index] ==  length_data.row_) &&  (stratum_cols_[cells_[stratum_ndx]][stratum_cell_index] ==  length_data.col_)) {
-            for (unsigned length_bin_ndx = 0; length_bin_ndx < length_data.frequency_.size(); ++length_bin_ndx)
-              stratum_length_frequency[length_bin_ndx] += length_data.frequency_[length_bin_ndx];
-          }
-        }
-      }
 
+      // There is a one to one relationship between census and length frequency
       unsigned census_ndx = 0;
       for (processes::census_data& census : census_data) {
         if ((census.year_ == years_[year_ndx]) && (find(stratum_rows_[cells_[stratum_ndx]].begin(),stratum_rows_[cells_[stratum_ndx]].end(), census.row_) != stratum_rows_[cells_[stratum_ndx]].end()) && (find(stratum_cols_[cells_[stratum_ndx]].begin(),stratum_cols_[cells_[stratum_ndx]].end(), census.col_) != stratum_cols_[cells_[stratum_ndx]].end())) {
-          census_stratum_ndx.push_back(census_ndx);
-          if (stratum_weight_method_ == PARAM_BIOMASS)
-            stratum_biomass_[cells_[stratum_ndx]] += census.biomass_;
+          if (census.age_ndx_.size() > 0) {
+            census_stratum_ndx.push_back(census_ndx);
+            // Calculate stratum total length frequency
+            // TODO: add a non census component here or some bias in the future
+            // The important thing is this a representative sample ...
+            processes::composition_data& length_data = length_frequency[census_ndx];
+            for (unsigned length_bin_ndx = 0; length_bin_ndx < length_data.frequency_.size(); ++length_bin_ndx)
+              stratum_length_frequency[length_bin_ndx] += length_data.frequency_[length_bin_ndx];
+
+            if (stratum_weight_method_ == PARAM_BIOMASS)
+              stratum_biomass_[cells_[stratum_ndx]] += census.biomass_;
+
+            agents_available_to_sample += census.age_ndx_.size();
+          }
         }
         ++census_ndx;
       }
+
       unsigned samples_to_take = samples_by_year_and_stratum_[years_[year_ndx]][cells_[stratum_ndx]];
 
-      LOG_FINE() << "objects from the mortality process that are available for this stratum = " << census_stratum_ndx.size();
+      if (agents_available_to_sample*0.5 <= samples_to_take) {
+        LOG_WARNING() << "in the observation " << label_ << " for year = " << years_[year_ndx] << " and stratum = " << cells_[stratum_ndx] << ", you said you wanted " << samples_to_take << " samples, there are " << agents_available_to_sample << " agents available to sample, I have arbiturarly though if samples are half number available you may have trouble getting a sample" ;
+      }
+      LOG_FINE() << "samples to take = " << samples_to_take << ", agents available in this stratum = " << agents_available_to_sample;
       // Some containers to make sure that we are doing sampling WITHOUT replacement
       // This will slow it down, but worth it I believe
       vector<unsigned> census_sampled;
@@ -293,8 +299,9 @@ void MortalityScaledAgeFrequency::Simulate() {
       LOG_FINE() << "about to build Age length key";
       unsigned max_iters = samples_to_take * 10;
       unsigned iter_to_check_max = 0;
+      float total_agents_in_ALK = 0;
+
       for (unsigned sample_attempt = 0; sample_attempt < samples_to_take; ++iter_to_check_max) {
-        //LOG_FINE() <<
         if (iter_to_check_max >= max_iters) {
           LOG_WARNING() << "in the observation " << label_ << " for year = " << years_[year_ndx] << " and stratum = " << cells_[stratum_ndx] << ", we were trying to sample for too long to build an age-length key. Most likely due to a configuration error. I have exited this observation early as not to run the output. Please check results and configuration set up";
           break;
@@ -303,16 +310,17 @@ void MortalityScaledAgeFrequency::Simulate() {
         census_ndx = rng.chance() * census_stratum_ndx.size();
         processes::census_data& this_census = census_data[census_ndx];
         // Randomly select an agent in that cell
-        agent_ndx = this_census.age_ndx_.size() * rng.chance();
-        LOG_FINE() << "census index = " << census_ndx << " agent ndx = " << agent_ndx << " attempt = " << sample_attempt;
-        if ((find(census_sampled.begin(), census_sampled.end(),census_ndx) != census_sampled.end()) && (find(agents_sampled.begin(), agents_sampled.end(),agent_ndx) != agents_sampled.end())) {
-          // If we have sampled this fish in this cell try again with out counting this as a sample
-          //LOG_FINE() << "we have sampled this agent already, try again";
+        agent_ndx = (unsigned)this_census.age_ndx_.size() * rng.chance();
+        LOG_FINEST() << "census index = " << census_ndx << " agent ndx = " << agent_ndx << " attempt = " << sample_attempt;
+
+        for (unsigned check_iter = 0; check_iter < census_sampled.size(); ++check_iter) {
+          if ((agents_sampled[check_iter] == agent_ndx) & (census_sampled[check_iter] == census_ndx))
+            LOG_FINEST() << "we have sampled this agent already, try again";
           continue;
         }
         // no agents to sample from this cell try again
         if (this_census.age_ndx_.size() <= 0) {
-          //LOG_FINE() << "No agents in this cell so try again";
+          LOG_FINE() << "No agents in this cell so try again";
           continue;
         }
         // else lets remember that we have sampled this fish
@@ -334,8 +342,26 @@ void MortalityScaledAgeFrequency::Simulate() {
           }
         }
         age_length_key[age_ndx][length_ndx]++;
+        ++total_agents_in_ALK;
         ++sample_attempt;
       }
+      LOG_FINE() << "total number in length frequency " << total_agents_in_ALK;
+      // Convert ALK to proportions
+      for (unsigned j = 0; j < model_->length_bins().size(); ++j) {
+        float length_sum = 0;
+        for (unsigned i = 0; i < model_->age_spread(); ++i) {
+          length_sum += age_length_key[i][j];
+        }
+        LOG_FINE() << "for length bin " << j << " length sum = " << length_sum;
+        if (length_sum >= 0) {
+          for (unsigned i = 0; i < model_->age_spread(); ++i)
+            age_length_key[i][j] /= length_sum;
+        }
+      }
+      float tot = 0;
+      for (unsigned len_ndx = 0; len_ndx < stratum_length_frequency.size(); ++len_ndx)
+        tot += stratum_length_frequency[len_ndx];
+      LOG_FINE() << "number in individuals in length distribution = " << tot;
       /*
        * Calculate the age-frequency by passing the length frequency through the Age-Length key.
        * if Bootstrap=true, do a sample with replacement from the age length key to calculate C.V for each age bin
@@ -346,9 +372,9 @@ void MortalityScaledAgeFrequency::Simulate() {
         for (unsigned length_bin_ndx = 0; length_bin_ndx < stratum_length_frequency.size(); ++length_bin_ndx) {
           stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx] += age_length_key[age_bin_ndx][length_bin_ndx] * stratum_length_frequency[length_bin_ndx];
         }
+        LOG_FINE() << "numbers at age = " << age_bin_ndx + model_->min_age() << " = " << stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx];
         SaveComparison(age_bin_ndx + model_->min_age(), 0, cells_[stratum_ndx], stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx], 0.0, 0, years_[year_ndx]);
       }
-
     } // Stratum loop
   } // year loop
 } // DoExecute
