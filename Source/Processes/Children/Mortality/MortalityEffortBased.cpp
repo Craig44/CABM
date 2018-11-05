@@ -258,7 +258,7 @@ void MortalityEffortBased::DoExecute() {
           if (cell->is_enabled()) {
             LOG_FINE() << "checking cell in row " << row + 1 << " col = " << col + 1;
             composition_data age_freq(PARAM_AGE, model_->current_year(), row, col,  model_->age_spread());
-            composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col,  model_->age_spread());
+            composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col,  model_->length_bins().size());
             census_data census_fishery(model_->current_year(), row, col);
 
             // iterate through and calcualte vulnerable biomass in each cell exactly, nothing random here

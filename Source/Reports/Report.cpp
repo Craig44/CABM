@@ -105,6 +105,7 @@ void Report::Prepare() {
  */
 void Report::Execute() {
   Report::lock_.lock();
+  LOG_FINE() << "label " << label_;
   DoExecute();
   Report::lock_.unlock();
 }

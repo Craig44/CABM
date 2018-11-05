@@ -35,7 +35,7 @@ Observation::Observation(Model* model) : Report(model) {
  *
  */
 void Observation::DoBuild() {
-  LOG_TRACE();
+  LOG_FINE();
   observation_ = model_->managers().observation()->GetObservation(observation_label_);
   if (!observation_) {
     auto observations = model_->managers().observation()->objects();
