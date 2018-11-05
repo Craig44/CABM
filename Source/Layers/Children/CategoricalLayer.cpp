@@ -78,7 +78,7 @@ void CategoricalLayer::DoBuild() {
  * get_value
 */
 string CategoricalLayer::get_value(unsigned RowIndex, unsigned ColIndex) {
-  LOG_FINE();
+  //LOG_FINE();
   return grid_[RowIndex][ColIndex];
 }
 
