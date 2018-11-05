@@ -198,7 +198,7 @@ void ProcessRemovalsByAge::Simulate() {
    */
   if (first_simualtion_run_) {
     vector<processes::composition_data>& age_frequency = mortality_process_->get_removals_by_age();
-    LOG_FINEST() << "number of years for this observation = " << age_frequency.size();
+    LOG_FINE() << "number of elements for this process block = " << age_frequency.size();
     unsigned age_offset = min_age_ - model_->min_age();
     // iterate over all the years that we want
     bool cell_found = false;
@@ -209,12 +209,14 @@ void ProcessRemovalsByAge::Simulate() {
         for (auto age_comp_data : age_frequency) {
           if ((age_comp_data.year_ == year) && (layer_->get_value(age_comp_data.row_,age_comp_data.col_) == cell)) {
             // Lets accumulate the information for this cell and year
+            LOG_FINE() << "row = " << age_comp_data.row_ << " col = " << age_comp_data.col_ << " cell = " << cell << " age comp = " << age_comp_data.frequency_.size();
             for(unsigned i = 0; i < age_comp_data.frequency_.size(); ++i) {
-              accumulated_age_frequency[i] = (float)age_comp_data.frequency_[i];
+              accumulated_age_frequency[i] += age_comp_data.frequency_[i];
             }
             cell_found = true;
           }
         }
+        LOG_FINE() << "before ageing error";
         if (not cell_found)
           continue; // to next cell
         if (ageing_error_) {
@@ -227,6 +229,7 @@ void ProcessRemovalsByAge::Simulate() {
           }
           accumulated_age_frequency = temp;
         }
+
         /*
          *  Now collapse the number_age into the expected_values for the observation
          */
@@ -245,7 +248,7 @@ void ProcessRemovalsByAge::Simulate() {
       }
     }
     // Convert to propotions before simulating for each year and cell sum = 1
-    for (auto& iter : comparisons_) {  // year
+/*    for (auto& iter : comparisons_) {  // year
       for (auto& second_iter : iter.second) {  // cell
         float total_expec = 0.0;
         for (auto& comparison : second_iter.second)
@@ -253,7 +256,7 @@ void ProcessRemovalsByAge::Simulate() {
         for (auto& comparison : second_iter.second)
           comparison.expected_ /= total_expec;
       }
-    }
+    }*/
     first_simualtion_run_ = false;
   }
 

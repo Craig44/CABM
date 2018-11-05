@@ -165,7 +165,7 @@ void ProcessRemovalsByLength::Simulate() {
         if ((length_comp_data.year_ == year) && (layer_->get_value(length_comp_data.row_,length_comp_data.col_) == cell)) {
           // Lets accumulate the information for this cell and year
           for(unsigned i = 0; i < length_comp_data.frequency_.size(); ++i) {
-            accumulated_length_frequency[i] = (float)length_comp_data.frequency_[i];
+            accumulated_length_frequency[i] += length_comp_data.frequency_[i];
           }
           cell_found = true;
         }
@@ -181,7 +181,7 @@ void ProcessRemovalsByLength::Simulate() {
     }
   }
   // Convert to propotions before simulating for each year and cell sum = 1
-  for (auto& iter : comparisons_) {  // year
+/*  for (auto& iter : comparisons_) {  // year
     for (auto& second_iter : iter.second) {  // cell
       float total_expec = 0.0;
       for (auto& comparison : second_iter.second)
@@ -189,7 +189,7 @@ void ProcessRemovalsByLength::Simulate() {
       for (auto& comparison : second_iter.second)
         comparison.expected_ /= total_expec;
     }
-  }
+  }*/
   likelihood_->SimulateObserved(comparisons_);
   // Simualte numbers at age, but we want proportion
   for (auto& iter : comparisons_) {
