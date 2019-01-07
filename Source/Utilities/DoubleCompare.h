@@ -23,20 +23,20 @@ using niwa::utilities::Double;
 #define ZERO 1e-15
 #define DELTA 1e-11
 
-inline bool IsZero(const Double &value) { return (value < ZERO && value > -ZERO); }
+inline bool IsZero(const float &value) { return (value < ZERO && value > -ZERO); }
 //inline bool IsInfinite(const Double &value) { return (isinf(value));}
-inline bool IsTrueZero(const Double &value) { return (value < TRUE_ZERO && value > -TRUE_ZERO); }
-inline bool IsOne(const Double &value) { return ( ((value-ONE) < ZERO) && ((value-ONE) > -ZERO) ); }
-inline bool IsEqual(Double A, Double B) { return ( ((A-B) < ZERO) && ((A-B) > -ZERO) ); }
+inline bool IsTrueZero(const float &value) { return (value < TRUE_ZERO && value > -TRUE_ZERO); }
+inline bool IsOne(const float &value) { return ( ((value-ONE) < ZERO) && ((value-ONE) > -ZERO) ); }
+inline bool IsEqual(float A, Double B) { return ( ((A-B) < ZERO) && ((A-B) > -ZERO) ); }
 
-inline niwa::utilities::Double ZeroFun(Double x) {
+inline niwa::utilities::Double ZeroFun(float x) {
   if (x >= ZERO)
     return x;
 
   return ZERO / (2.0 - (x / ZERO));
 }
 
-inline niwa::utilities::Double ZeroFun(Double x, Double delta) {
+inline niwa::utilities::Double ZeroFun(float x, float delta) {
   if (x >= delta)
     return x;
 

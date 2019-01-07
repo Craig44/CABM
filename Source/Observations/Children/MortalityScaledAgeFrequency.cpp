@@ -231,10 +231,10 @@ void MortalityScaledAgeFrequency::Simulate() {
   LOG_MEDIUM() << "Simulating data for observation = " << label_;
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
 
-  vector<vector<float>> age_length_key;
-  age_length_key.resize(model_->age_spread());
+  vector<vector<float>> age_length_key_;
+  age_length_key_.resize(model_->age_spread());
   for (unsigned i = 0; i < model_->age_spread(); ++i)
-    age_length_key[i].resize(model_->length_bin_mid_points().size(),0.0);
+    age_length_key_[i].resize(model_->length_bin_mid_points().size(),0.0);
   vector<processes::census_data>& census_data = mortality_process_->get_census_data();
   vector<processes::composition_data>& length_frequency = mortality_process_->get_removals_by_length();
 
@@ -251,7 +251,7 @@ void MortalityScaledAgeFrequency::Simulate() {
       vector<float> stratum_length_frequency(model_->length_bin_mid_points().size(),0.0);
       census_stratum_ndx.clear();
       for (unsigned i = 0; i < model_->age_spread(); ++i)
-        age_length_key[i].resize(model_->length_bin_mid_points().size(),0.0);
+        age_length_key_[i].resize(model_->length_bin_mid_points().size(),0.0);
 
       stratum_biomass_[cells_[stratum_ndx]] = 0.0;
 
@@ -300,6 +300,9 @@ void MortalityScaledAgeFrequency::Simulate() {
       unsigned max_iters = samples_to_take * 10;
       unsigned iter_to_check_max = 0;
       float total_agents_in_ALK = 0;
+      vector<vector<float>> mis_matrix;
+      if (apply_ageing_error)
+        mis_matrix = ageing_error_->mis_matrix();
 
       for (unsigned sample_attempt = 0; sample_attempt < samples_to_take; ++iter_to_check_max) {
         if (iter_to_check_max >= max_iters) {
@@ -330,18 +333,19 @@ void MortalityScaledAgeFrequency::Simulate() {
         // Are we applying ageing error which will be a multinomial process
         age_ndx = this_census.age_ndx_[agent_ndx];
         length_ndx = this_census.length_ndx_[agent_ndx];
-        //LOG_FINE() << "Agent age = " << age_ndx << " length_ndx = " << length_ndx;
         if (apply_ageing_error) {
-          vector<vector<float>> &mis_matrix = ageing_error_->mis_matrix();
           vector<float> prob_mis_classification = mis_matrix[age_ndx];
+          LOG_FINE() << "Agent age = " << age_ndx << " length_ndx = " << length_ndx << " prob correct id = " << prob_mis_classification[age_ndx];
           float temp_prob = 0.0;
           for (unsigned mis_ndx = 0; mis_ndx < prob_mis_classification.size(); ++mis_ndx) {
             temp_prob += prob_mis_classification[mis_ndx];
-            if (rng.chance() <= temp_prob)
+            if (rng.chance() <= temp_prob) {
               age_ndx = mis_ndx;
+              break;
+            }
           }
         }
-        age_length_key[age_ndx][length_ndx]++;
+        age_length_key_[age_ndx][length_ndx]++;
         ++total_agents_in_ALK;
         ++sample_attempt;
       }
@@ -350,12 +354,17 @@ void MortalityScaledAgeFrequency::Simulate() {
       for (unsigned j = 0; j < model_->length_bin_mid_points().size(); ++j) {
         float length_sum = 0;
         for (unsigned i = 0; i < model_->age_spread(); ++i) {
-          length_sum += age_length_key[i][j];
+          length_sum += age_length_key_[i][j];
         }
         LOG_FINE() << "for length bin " << j << " length sum = " << length_sum;
         if (length_sum >= 0) {
-          for (unsigned i = 0; i < model_->age_spread(); ++i)
-            age_length_key[i][j] /= length_sum;
+          for (unsigned i = 0; i < model_->age_spread(); ++i) {
+            if (!utils::doublecompare::IsZero(length_sum)) { // check for divide by zero situation
+              age_length_key_[i][j] /= length_sum;
+            } else {
+              age_length_key_[i][j] = 0.0;
+            }
+          }
         }
       }
       float tot = 0;
@@ -370,12 +379,13 @@ void MortalityScaledAgeFrequency::Simulate() {
       stratum_age_frequency_[cells_[stratum_ndx]].resize(model_->age_spread(),0.0);
       for (unsigned age_bin_ndx = 0; age_bin_ndx < model_->age_spread(); ++age_bin_ndx) {
         for (unsigned length_bin_ndx = 0; length_bin_ndx < stratum_length_frequency.size(); ++length_bin_ndx) {
-          stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx] += age_length_key[age_bin_ndx][length_bin_ndx] * stratum_length_frequency[length_bin_ndx];
+          stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx] += age_length_key_[age_bin_ndx][length_bin_ndx] * stratum_length_frequency[length_bin_ndx];
         }
         LOG_FINE() << "numbers at age = " << age_bin_ndx + model_->min_age() << " = " << stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx];
         SaveComparison(age_bin_ndx + model_->min_age(), 0, cells_[stratum_ndx], stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx], 0.0, 0, years_[year_ndx]);
       }
     } // Stratum loop
+    age_length_key_by_year_[years_[year_ndx]] = age_length_key_;
   } // year loop
 } // DoExecute
 

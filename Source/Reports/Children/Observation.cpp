@@ -65,6 +65,20 @@ void Observation::DoExecute() {
       }
     }
   }
+
+  if (observation_->type() == PARAM_MORTALITY_SCALES_AGE_FREQUENCY) {
+    // Print the age length key for curiosity
+    map<unsigned, vector<vector<float>>>& ALK = observation_->get_alk();
+    for(auto& alk_by_year : ALK) {
+      cache_ << "ALK_" << alk_by_year.first << " " <<REPORT_R_MATRIX <<"\n";
+      for (unsigned i = 0; i < alk_by_year.second.size(); ++i) {
+        for (unsigned j = 0; j < alk_by_year.second[i].size(); ++j) {
+          cache_ << alk_by_year.second[i][j] << " ";
+        }
+        cache_ << "\n";
+      }
+    }
+  }
   ready_for_writing_ = true;
 }
 

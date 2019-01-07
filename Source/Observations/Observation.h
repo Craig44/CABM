@@ -52,7 +52,7 @@ public:
   // accessors
   string&                       likelihood() { return simulation_likelihood_label_; }
   map<unsigned,map<string,vector<obs::Comparison> > > & comparisons() { return comparisons_; }
-
+  map<unsigned,vector<vector<float>>>&    get_alk() {return age_length_key_by_year_;}
 protected:
   // methods
   void                        SaveComparison(unsigned age, float length, string row_col, float expected, float simulated, float error_value, unsigned year);
@@ -65,6 +65,10 @@ protected:
   Likelihood*                 likelihood_ = nullptr;
   vector<string>              allowed_likelihood_types_;
   map<unsigned,map<string,vector<obs::Comparison> > > comparisons_;
+
+  // Only used in MortalityScaledAgeFrequency
+  map<unsigned,vector<vector<float>>>     age_length_key_by_year_;
+
 
 };
 } /* namespace niwa */

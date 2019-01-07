@@ -69,7 +69,7 @@ void WorldView::Build() {
   LOG_TRACE();
   base_layer_ = model_->managers().layer()->GetNumericLayer(model_->get_base_layer_label());
   if (!base_layer_) {
-    LOG_ERROR() << "The base layer '" << model_->get_base_layer_label() << "' found in the @model block could not be found, please check there is a @layer defined for this layer and that it is type = 'numeric'";
+    LOG_FATAL() << "The base layer '" << model_->get_base_layer_label() << "' found in the @model block could not be found, please check there is a @layer defined for this layer and that it is type = 'numeric'";
   }
 
   // Allocate memory for our cells

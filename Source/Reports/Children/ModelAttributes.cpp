@@ -49,12 +49,13 @@ void ModelAttributes::DoExecute() {
   cache_ << "*"<< type_ << "[" << label_ << "]" << "\n";
   for (auto scalar : scalars)
     cache_ << scalar.first << ": " << scalar.second << "\n";
-  ready_for_writing_ = true;
 
   cache_ << "length_mid_points: ";
   vector<float> length_mid_point = model_->length_bin_mid_points();
   for (unsigned length_ndx = 0; length_ndx < length_mid_point.size(); ++length_ndx)
     cache_ << length_mid_point[length_ndx] << " ";
+  cache_ << "\n";
+  ready_for_writing_ = true;
 
 }
 

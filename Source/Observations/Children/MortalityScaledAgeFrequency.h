@@ -65,6 +65,7 @@ protected:
   WorldView*                      world_ = nullptr;
 
   map<string,vector<unsigned>>    stratum_age_frequency_;
+  vector<vector<float>>           age_length_key_;
 
   parameters::Table*              sample_table_ = nullptr;
   map<unsigned, map<string, unsigned>>  samples_by_year_and_stratum_;

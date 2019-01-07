@@ -459,7 +459,7 @@ void ProportionsAtAge::Simulate() {
    * Simulate or generate results
    * During simulation mode we'll simulate results for this observation
    */
-	LOG_FINEST() << "Calculating score for observation = " << label_;
+	LOG_FINE() << "Calculating score for observation = " << label_;
   // Convert to propotions before simulating for each year and cell sum = 1
   for (auto& iter : comparisons_) {  // year
     for (auto& second_iter : iter.second) {  // cell
