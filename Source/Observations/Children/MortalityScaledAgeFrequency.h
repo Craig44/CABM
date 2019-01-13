@@ -28,6 +28,12 @@ namespace observations {
 
 using processes::Mortality;
 
+enum class AllocationType {
+  kRandom,
+  kEqual,
+  kProportional
+};
+
 /**
  * class definition
  */
@@ -53,11 +59,14 @@ protected:
   AgeingError*                    ageing_error_ = nullptr;
   string                          ageing_error_label_;
   string                          ageing_allocation_ = PARAM_RANDOM;
+  AllocationType                  allocation_type_ = AllocationType::kRandom;
+
   unsigned                        number_of_bootstraps_ = 0;
 
   Mortality*                      mortality_process_ = nullptr;
   string                          process_label_;
   string                          stratum_weight_method_ = PARAM_NONE;
+  // TODO change from string -> unsigned int for a little speed up
   map<string,vector<unsigned>>    stratum_rows_;
   map<string,vector<unsigned>>    stratum_cols_;
   map<string,float>               stratum_area_;
@@ -68,7 +77,10 @@ protected:
   vector<vector<float>>           age_length_key_;
 
   parameters::Table*              sample_table_ = nullptr;
+  parameters::Table*              lf_sample_table_ = nullptr;
+
   map<unsigned, map<string, unsigned>>  samples_by_year_and_stratum_;
+  map<unsigned, map<string, float>>  prop_lf_by_year_and_stratum_;
 
 
 

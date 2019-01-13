@@ -486,6 +486,7 @@
 #define PARAM_PROPORTION_MALE                     "proportion_male"
 #define PARAM_PROPORTIONS_BY_CATEGORY             "proportions_by_category"
 #define PARAM_PROPORTION_TIME_STEP                "proportion_time-step"
+#define PARAM_PROPORTION_LF_SAMPLED               "proportion_lf_sampled"
 #define PARAM_PROPOSAL_DISTRIBUTION               "proposal_distribution"
 #define PARAM_PSEUDO                              "none"
 #define PARAM_PSI                                 "psi"
