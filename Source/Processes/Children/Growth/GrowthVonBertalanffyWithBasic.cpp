@@ -29,15 +29,15 @@ namespace processes {
  * constructor
  */
 GrowthVonBertalanffyWithBasic::GrowthVonBertalanffyWithBasic(Model* model) : Growth(model) {
-  parameters_.Bind<string>(PARAM_LINF_LAYER_LABEL, &l_inf_layer_label_, "Label for the numeric layer that describes mean L inf through space", "", "");
-  parameters_.Bind<string>(PARAM_K_LAYER_LABEL, &k_layer_label_, "Label for the numeric layer that describes mean k through space", "", "");
-  parameters_.Bind<float>(PARAM_T0, &t0_, "The value for t0 default = 0", "", 0);
-  parameters_.Bind<string>(PARAM_A_LAYER_LABEL, &a_layer_label_, "Label for the numeric layer that describes mean a in the weight calcualtion through space", "", "");
-  parameters_.Bind<string>(PARAM_B_LAYER_LABEL, &b_layer_label_, "Label for the numeric layer that describes mean b in the weight calcualtion through space", "", "");
-  parameters_.Bind<float>(PARAM_LINF, &l_inf_, "Value of mean L inf multiplied by the layer value if supplied", "", 0);
-  parameters_.Bind<float>(PARAM_K, &k_, "Value of mean k multiplied by the layer value if supplied", "", 0);
-  parameters_.Bind<float>(PARAM_A, &a_, "alpha value for weight at length function", "", 0);
-  parameters_.Bind<float>(PARAM_B, &b_, "beta value for weight at length function", "", 0);
+  parameters_.Bind<string>(PARAM_LINF_LAYER_LABEL, &l_inf_layer_label_, "Label for the numeric layer that describes mean L inf through space", "", true);
+  parameters_.Bind<string>(PARAM_K_LAYER_LABEL, &k_layer_label_, "Label for the numeric layer that describes mean k through space", "", true);
+  parameters_.Bind<float>(PARAM_T0, &t0_, "The value for t0 default = 0", "", true);
+  parameters_.Bind<string>(PARAM_A_LAYER_LABEL, &a_layer_label_, "Label for the numeric layer that describes mean a in the weight calcualtion through space", "", true);
+  parameters_.Bind<string>(PARAM_B_LAYER_LABEL, &b_layer_label_, "Label for the numeric layer that describes mean b in the weight calcualtion through space", "", true);
+  parameters_.Bind<float>(PARAM_LINF, &l_inf_, "Value of mean L inf multiplied by the layer value if supplied", "", true);
+  parameters_.Bind<float>(PARAM_K, &k_, "Value of mean k multiplied by the layer value if supplied", "", true);
+  parameters_.Bind<float>(PARAM_A, &a_, "alpha value for weight at length function", "", true);
+  parameters_.Bind<float>(PARAM_B, &b_, "beta value for weight at length function", "", true);
 
   RegisterAsAddressable(PARAM_LINF, &l_inf_);
   RegisterAsAddressable(PARAM_K, &k_);
@@ -96,30 +96,72 @@ void GrowthVonBertalanffyWithBasic::DoBuild() {
     }
   }
 	// Get the layers if they have been defined
-  if (l_inf_layer_label_ != "") {
-    L_inf_layer_ = model_->managers().layer()->GetNumericLayer(l_inf_layer_label_);
-    if (!L_inf_layer_) {
-      LOG_ERROR_P(PARAM_LINF_LAYER_LABEL) << "could not find the layer '" << l_inf_layer_label_ << "', please make sure it exists and that it is type 'numeric'";
+  if (l_inf_layer_label_.size() > 0) {
+    niwa::layers::NumericLayer* temp_layer = nullptr;
+    for (unsigned i = 0; i < l_inf_layer_label_.size(); ++i) {
+      temp_layer = model_->managers().layer()->GetNumericLayer(l_inf_layer_label_[i]);
+      if (!temp_layer) {
+        LOG_FATAL_P(PARAM_LINF_LAYER_LABEL) << "could not find the layer '" << l_inf_layer_label_[i] << "', please make sure it exists and that it is type 'numeric'";
+      }
+      L_inf_layer_.push_back(temp_layer);
     }
   }
-  if (k_layer_label_ != "") {
-    k_layer_ = model_->managers().layer()->GetNumericLayer(k_layer_label_);
-    if (!k_layer_) {
-      LOG_ERROR_P(PARAM_K_LAYER_LABEL) << "could not find the layer '" << k_layer_label_ << "', please make sure it exists and that it is type 'numeric'";
+  if (k_layer_label_.size() > 0) {
+    niwa::layers::NumericLayer* temp_layer = nullptr;
+    for (unsigned i = 0; i < k_layer_label_.size(); ++i) {
+      temp_layer = model_->managers().layer()->GetNumericLayer(k_layer_label_[i]);
+      if (!temp_layer) {
+        LOG_FATAL_P(PARAM_K_LAYER_LABEL) << "could not find the layer '" << k_layer_label_[i] << "', please make sure it exists and that it is type 'numeric'";
+      }
+      k_layer_.push_back(temp_layer);
     }
   }
-  if (a_layer_label_ != "") {
-    a_layer_ = model_->managers().layer()->GetNumericLayer(a_layer_label_);
-    if (!a_layer_) {
-      LOG_ERROR_P(PARAM_A_LAYER_LABEL) << "could not find the layer '" << a_layer_label_ << "', please make sure it exists and that it is type 'numeric'";
+
+  if (a_layer_label_.size() > 0) {
+    niwa::layers::NumericLayer* temp_layer = nullptr;
+    for (unsigned i = 0; i < a_layer_label_.size(); ++i) {
+      temp_layer = model_->managers().layer()->GetNumericLayer(a_layer_label_[i]);
+      if (!temp_layer) {
+        LOG_FATAL_P(PARAM_A_LAYER_LABEL) << "could not find the layer '" << a_layer_label_[i] << "', please make sure it exists and that it is type 'numeric'";
+      }
+      a_layer_.push_back(temp_layer);
     }
   }
-  if (b_layer_label_ != "") {
-    b_layer_ = model_->managers().layer()->GetNumericLayer(b_layer_label_);
-    if (!b_layer_) {
-      LOG_ERROR_P(PARAM_B_LAYER_LABEL) << "could not find the layer '" << b_layer_label_ << "', please make sure it exists and that it is type 'numeric'";
+  if (b_layer_label_.size() > 0) {
+    niwa::layers::NumericLayer* temp_layer = nullptr;
+    for (unsigned i = 0; i < b_layer_label_.size(); ++i) {
+      temp_layer = model_->managers().layer()->GetNumericLayer(b_layer_label_[i]);
+      if (!temp_layer) {
+        LOG_FATAL_P(PARAM_B_LAYER_LABEL) << "could not find the layer '" << b_layer_label_[i] << "', please make sure it exists and that it is type 'numeric'";
+      }
+      b_layer_.push_back(temp_layer);
     }
   }
+  // Check that there is consistency in model sex and growth sex
+  if (model_->get_sexed()) {
+    if (b_layer_.size() == 1)
+      b_layer_.assign(2, b_layer_[0]);
+    if (a_layer_.size() == 1)
+      a_layer_.assign(2, a_layer_[0]);
+    if (k_layer_.size() == 1)
+      k_layer_.assign(2, k_layer_[0]);
+    if (L_inf_layer_.size() == 1)
+      L_inf_layer_.assign(2, L_inf_layer_[0]);
+    if (l_inf_.size() == 1)
+      l_inf_.assign(2, l_inf_[0]);
+    if (k_.size() == 1)
+      k_.assign(2, k_[0]);
+    if (a_.size() == 1)
+      a_.assign(2, a_[0]);
+    if (b_.size() == 1)
+      b_.assign(2, b_[0]);
+    if (t0_.size() == 1)
+      t0_.assign(2, t0_[0]);
+    if (t0_.size() == 0)
+      t0_.assign(2, 0.0);
+  }
+
+
 	// Check that the layers are all positive
 }
 
@@ -152,36 +194,38 @@ void GrowthVonBertalanffyWithBasic::DoExecute() {
  * This method is called at when ever an agent is created/seeded or moves. Agents will get a new/updated growth parameters
  * based on the spatial cells of the process. This is called in initialisation/Recruitment and movement processes if needed.
 */
-void  GrowthVonBertalanffyWithBasic::draw_growth_param(unsigned row, unsigned col, unsigned number_of_draws, vector<vector<float>>& vec) {
+void  GrowthVonBertalanffyWithBasic::draw_growth_param(unsigned row, unsigned col, unsigned number_of_draws, vector<vector<float>>& vec, unsigned sex) {
+  LOG_FINE() << "";
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   float mean_linf, mean_k, a, b;
-  if (L_inf_layer_)
-    mean_linf = L_inf_layer_->get_value(row, col);
+  if (L_inf_layer_.size() > 0)
+    mean_linf = L_inf_layer_[sex]->get_value(row, col);
   else
-    mean_linf = l_inf_;
+    mean_linf = l_inf_[sex];
 
-  if (k_layer_)
-	  mean_k = k_layer_->get_value(row, col);
+  if (k_layer_.size() > 0)
+	  mean_k = k_layer_[sex]->get_value(row, col);
   else
-    mean_k = k_;
+    mean_k = k_[sex];
 
-  if (a_layer_)
-    a = a_layer_->get_value(row, col);
+  if (a_layer_.size() > 0)
+    a = a_layer_[sex]->get_value(row, col);
   else
-    a = a_;
+    a = a_[sex];
 
-  if (b_layer_)
-    b = b_layer_->get_value(row, col);
+  if (b_layer_.size() > 0)
+    b = b_layer_[sex]->get_value(row, col);
   else
-    b = b_;
+    b = b_[sex];
 
   vec.clear();
 	vec.resize(number_of_draws);
+  LOG_FINE() << "mean_linf " << mean_linf << " mean_k " << mean_k << " a " << a << " b " << b << " t0 " << t0_[sex];
 
 	for (unsigned i = 0; i < number_of_draws; ++i) {
 	  vec[i].push_back(rng.lognormal(mean_linf, cv_));
 	  vec[i].push_back(rng.lognormal(mean_k, cv_));
-    vec[i].push_back(t0_);
+    vec[i].push_back(t0_[sex]);
 	  vec[i].push_back(a);
 	  vec[i].push_back(b);
 	}
@@ -191,7 +235,7 @@ void  GrowthVonBertalanffyWithBasic::draw_growth_param(unsigned row, unsigned co
 void GrowthVonBertalanffyWithBasic::FillReportCache(ostringstream& cache) {
   LOG_TRACE();
 
-  if ((L_inf_layer_ != nullptr) | (k_layer_ != nullptr)) {// | (a_layer_  != nullptr) | (b_layer_ != nullptr)) {
+/*  if ((L_inf_layer_.size() > 0) | (k_layer_.size() > 0)) {// | (a_layer_  != nullptr) | (b_layer_ != nullptr)) {
     LOG_FINE() << "Spatially varying growth "<< REPORT_R_DATAFRAME << "\n" << "cell ";
     for (unsigned t = 0; t <= model_->max_age(); ++t)
       cache << t << " ";
@@ -214,7 +258,7 @@ void GrowthVonBertalanffyWithBasic::FillReportCache(ostringstream& cache) {
 
         length.push_back(mean_linf * (1-exp(-mean_k * (0.001 - t0_))));
 
-/*
+
         if (a_layer_)
           a = a_layer_->get_value(row, col);
         else
@@ -223,7 +267,7 @@ void GrowthVonBertalanffyWithBasic::FillReportCache(ostringstream& cache) {
         if (b_layer_)
           b = b_layer_->get_value(row, col);
         else
-          b = b_;*/
+          b = b_;
 
         for (unsigned t = 1; t <= model_->max_age(); ++t) {
           length.push_back(length[t - 1]  + (mean_linf - length[t - 1]) * (1 - exp(-mean_k)));
@@ -246,7 +290,7 @@ void GrowthVonBertalanffyWithBasic::FillReportCache(ostringstream& cache) {
       cache << length[i] << " ";
     }
     cache << "\n";
-  }
+  }*/
 }
 // A Method for telling the world we need to redistribute Mortality parmaeters
 void GrowthVonBertalanffyWithBasic::RebuildCache() {

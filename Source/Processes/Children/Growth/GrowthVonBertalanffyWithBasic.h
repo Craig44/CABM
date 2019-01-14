@@ -38,24 +38,22 @@ public:
   void                        RebuildCache() override final;
   void                        FillReportCache(ostringstream& cache) override final;
 
-  void                        draw_growth_param(unsigned row, unsigned col, unsigned number_of_draws, vector<vector<float>>& vec) override final;
+  void                        draw_growth_param(unsigned row, unsigned col, unsigned number_of_draws, vector<vector<float>>& vec, unsigned sex) override final;
 
 protected:
-  string				              l_inf_layer_label_;
-  string				              k_layer_label_;
-  niwa::layers::NumericLayer* L_inf_layer_ = nullptr;
-  niwa::layers::NumericLayer* k_layer_ = nullptr;
-  string                      a_layer_label_;
-  string                      b_layer_label_;
-  niwa::layers::NumericLayer* a_layer_ = nullptr;
-  niwa::layers::NumericLayer* b_layer_ = nullptr;
-  float                       l_inf_;
-  float                       k_;
-  float                       a_;
-  float                       b_;
-  float                       t0_;
-
-
+  vector<string>				              l_inf_layer_label_;
+  vector<string>				              k_layer_label_;
+  vector<niwa::layers::NumericLayer*> L_inf_layer_;
+  vector<niwa::layers::NumericLayer*> k_layer_;
+  vector<string>                      a_layer_label_;
+  vector<string>                      b_layer_label_;
+  vector<niwa::layers::NumericLayer*> a_layer_;
+  vector<niwa::layers::NumericLayer*> b_layer_;
+  vector<float>                       l_inf_;
+  vector<float>                       k_;
+  vector<float>                       a_;
+  vector<float>                       b_;
+  vector<float>                       t0_;
 };
 
 } /* namespace processes */

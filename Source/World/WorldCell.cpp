@@ -88,43 +88,56 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
 
   vector<float> mort_par;
-  vector<vector<float>> growth_pars;
   mortality_->draw_rate_param(row_, col_, number_agents_to_seed, mort_par);
-  growth_->draw_growth_param(row_, col_, number_agents_to_seed, growth_pars);
 
   if (number_agents_to_seed != mort_par.size()) {
     LOG_CODE_ERROR() << "number_agents_to_seed != mort_par.size(), this must be a code error as these should always be true";
   }
-  if (number_agents_to_seed != growth_pars.size()) {
-    LOG_CODE_ERROR() << "number_agents_to_seed != growth_pars.size(), this must be a code error as these should always be true";
-  }
+
 
   unsigned age, sex;
   bool mature = false, sexed;
   float male_prop = 1.0, probability_mature_at_age;
   sexed = model_->get_sexed();
 
-  if (sexed)
+  vector<vector<float>> growth_pars;
+  vector<vector<float>> female_growth_pars;
+  growth_->draw_growth_param(row_, col_, number_agents_to_seed, growth_pars, 0);
+  if (sexed) {
+    // This creates growth vectors that are larger than we need but it shouldn't be to expensive
     male_prop = model_->get_male_proportions();
-
+    growth_->draw_growth_param(row_, col_, number_agents_to_seed, female_growth_pars, 1);
+  }
+  if (number_agents_to_seed != growth_pars.size()) {
+    LOG_CODE_ERROR() << "number_agents_to_seed != growth_pars.size(), this must be a code error as these should always be true";
+  }
   for (unsigned agent = 0; agent < number_agents_to_seed; ++agent) {
     sex = 0;
     mature = false;
-    age = std::max(std::min((unsigned)rng.exponential(seed_z), model_->max_age()),model_->min_age()); // truncate age to between min_age and max_age
+    age = std::max(std::min((unsigned)rng.exponential(seed_z), model_->max_age()), model_->min_age()); // truncate age to between min_age and max_age
     // Need to add Maturity and sex into this
     if (sexed) {
       if (rng.chance() >= male_prop)
         sex = 1;
     }
-    probability_mature_at_age =selectivity_[sex]->GetResult(age);
+    probability_mature_at_age = selectivity_[sex]->GetResult(age);
     if (rng.chance() <= probability_mature_at_age)
       mature = true;
-    Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], growth_pars[agent][2], mort_par[agent], (model_->current_year() - age),
-        growth_pars[agent][3], growth_pars[agent][4], model_, mature, sex, 1.0, row_, col_, 0);
-    if (agent == 0) {
-      LOG_MEDIUM() << "number of bytes of an agent class " << sizeof(new_agent);
+
+    if (sex == 0) {
+      Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], growth_pars[agent][2], mort_par[agent], (model_->current_year() - age),
+          growth_pars[agent][3], growth_pars[agent][4], model_, mature, sex, 1.0, row_, col_, 0);
+      agents_.push_back(new_agent);
+    } else {
+      Agent new_agent(lat_, lon_, female_growth_pars[agent][0], female_growth_pars[agent][1], female_growth_pars[agent][2], mort_par[agent], (model_->current_year() - age),
+          female_growth_pars[agent][3], female_growth_pars[agent][4], model_, mature, sex, 1.0, row_, col_, 0);
+      agents_.push_back(new_agent);
     }
-    agents_.push_back(new_agent); // This doesn't work if there is movement between stocks and areas then we this approximation becomes a bit shit. but I can't think of an alternative.
+
+/*
+   if (agent == 0) {
+      LOG_MEDIUM() << "number of bytes of an agent class " << sizeof(new_agent);
+    }*/
   }
 }
 
@@ -135,11 +148,17 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
   LOG_TRACE();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   vector<float> mort_par;
-  vector<vector<float>> growth_pars;
   mortality_->draw_rate_param(row_, col_, birth_agents, mort_par);
-  growth_->draw_growth_param(row_, col_, birth_agents, growth_pars);
   bool sexed = model_->get_sexed();
   float male_prop = model_->get_male_proportions();
+
+  vector<vector<float>> growth_pars;
+  vector<vector<float>> female_growth_pars;
+  growth_->draw_growth_param(row_, col_, birth_agents, growth_pars, 0);
+  if (sexed) {
+    // This creates growth vectors that are larger than we need but it shouldn't be to expensive
+    growth_->draw_growth_param(row_, col_, birth_agents, female_growth_pars, 1);
+  }
 
   unsigned sex;
   unsigned agent_bin = 0;
@@ -149,19 +168,36 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
       if (rng.chance() >= male_prop)
         sex = 1;
     }
-    Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1],growth_pars[agent][2], mort_par[agent], model_->current_year(),
-        growth_pars[agent][3], growth_pars[agent][4], model_, false, sex, scalar, row_, col_, 0);
-    // Check to see if
-    while (agent_bin < agents_.size()) {
-      if (not agents_[agent_bin].is_alive()) {
-        agents_[agent_bin] = new_agent;
-        break;
-      } else {
-        agent_bin++;
+    if (sex == 0) {
+      Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1],growth_pars[agent][2], mort_par[agent], model_->current_year(),
+          growth_pars[agent][3], growth_pars[agent][4], model_, false, sex, scalar, row_, col_, 0);
+      // Check to see if
+      while (agent_bin < agents_.size()) {
+        if (not agents_[agent_bin].is_alive()) {
+          agents_[agent_bin] = new_agent;
+          break;
+        } else {
+          agent_bin++;
+        }
       }
-    }
-    if (agent_bin == agents_.size()) {
-      agents_.push_back(new_agent);
+      if (agent_bin == agents_.size()) {
+        agents_.push_back(new_agent);
+      }
+    } else {
+      Agent new_agent(lat_, lon_, female_growth_pars[agent][0], female_growth_pars[agent][1],female_growth_pars[agent][2], mort_par[agent], model_->current_year(),
+          female_growth_pars[agent][3], female_growth_pars[agent][4], model_, false, sex, scalar, row_, col_, 0);
+      // Check to see if
+      while (agent_bin < agents_.size()) {
+        if (not agents_[agent_bin].is_alive()) {
+          agents_[agent_bin] = new_agent;
+          break;
+        } else {
+          agent_bin++;
+        }
+      }
+      if (agent_bin == agents_.size()) {
+        agents_.push_back(new_agent);
+      }
     }
   }
 }
@@ -175,15 +211,27 @@ void  WorldCell::update_agent_parameters() {
   unsigned counter = 0;
   if (growth_->update_growth() && mortality_->update_mortality()) {
     vector<float> mort_par;
-    vector<vector<float>> growth_pars;
     mortality_->draw_rate_param(row_, col_, agents_.size(), mort_par);
-    growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars);
+    vector<vector<float>> growth_pars;
+    vector<vector<float>> female_growth_pars;
+    growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars, 0);
+    if (model_->get_sexed()) {
+      growth_->draw_growth_param(row_, col_, agents_.size(), female_growth_pars, 1);
+    }
+
     for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
       if ( (*iter).is_alive()) {
-        (*iter).set_first_age_length_par(growth_pars[counter][0]);
-        (*iter).set_second_age_length_par(growth_pars[counter][1]);
-        (*iter).set_first_length_weight_par(growth_pars[counter][2]);
-        (*iter).set_second_length_weight_par(growth_pars[counter][3]);
+        if ((*iter).get_sex() == 0) {
+          (*iter).set_first_age_length_par(growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(growth_pars[counter][1]);
+          (*iter).set_first_length_weight_par(growth_pars[counter][2]);
+          (*iter).set_second_length_weight_par(growth_pars[counter][3]);
+        } else {
+          (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+          (*iter).set_first_length_weight_par(female_growth_pars[counter][2]);
+          (*iter).set_second_length_weight_par(female_growth_pars[counter][3]);
+        }
         (*iter).set_m(mort_par[counter]);
       }
     }
@@ -197,13 +245,24 @@ void  WorldCell::update_agent_parameters() {
     }
   } else if (growth_->update_growth() && !mortality_->update_mortality()) {
     vector<vector<float>> growth_pars;
-    growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars);
+    vector<vector<float>> female_growth_pars;
+    growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars, 0);
+    if (model_->get_sexed()) {
+      growth_->draw_growth_param(row_, col_, agents_.size(), female_growth_pars, 1);
+    }
     for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
       if ( (*iter).is_alive()) {
-        (*iter).set_first_age_length_par(growth_pars[counter][0]);
-        (*iter).set_second_age_length_par(growth_pars[counter][1]);
-        (*iter).set_first_length_weight_par(growth_pars[counter][2]);
-        (*iter).set_second_length_weight_par(growth_pars[counter][3]);
+        if ((*iter).get_sex() == 0) {
+          (*iter).set_first_age_length_par(growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(growth_pars[counter][1]);
+          (*iter).set_first_length_weight_par(growth_pars[counter][2]);
+          (*iter).set_second_length_weight_par(growth_pars[counter][3]);
+        } else {
+          (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+          (*iter).set_first_length_weight_par(female_growth_pars[counter][2]);
+          (*iter).set_second_length_weight_par(female_growth_pars[counter][3]);
+        }
       }
     }
   }
@@ -230,14 +289,25 @@ void  WorldCell::update_mortality_params() {
 void  WorldCell::update_growth_params() {
   LOG_FINE() << "Updating growth params based on time varying parameters";
   vector<vector<float>> growth_pars;
-  growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars);
+  vector<vector<float>> female_growth_pars;
+  growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars, 0);
+  if (model_->get_sexed()) {
+    growth_->draw_growth_param(row_, col_, agents_.size(), female_growth_pars, 1);
+  }
   unsigned counter = 0;
   for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
     if ( (*iter).is_alive()) {
-      (*iter).set_first_age_length_par(growth_pars[counter][0]);
-      (*iter).set_second_age_length_par(growth_pars[counter][1]);
-      (*iter).set_first_length_weight_par(growth_pars[counter][2]);
-      (*iter).set_second_length_weight_par(growth_pars[counter][3]);
+      if ((*iter).get_sex() == 0) {
+        (*iter).set_first_age_length_par(growth_pars[counter][0]);
+        (*iter).set_second_age_length_par(growth_pars[counter][1]);
+        (*iter).set_first_length_weight_par(growth_pars[counter][2]);
+        (*iter).set_second_length_weight_par(growth_pars[counter][3]);
+      } else {
+        (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+        (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+        (*iter).set_first_length_weight_par(female_growth_pars[counter][2]);
+        (*iter).set_second_length_weight_par(female_growth_pars[counter][3]);
+      }
     }
   }
 }

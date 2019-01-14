@@ -78,6 +78,12 @@ void MortalityBaranov::DoValidate() {
 void MortalityBaranov::DoBuild() {
   LOG_FINE();
 
+  if (model_->get_sexed()) {
+     if (fishery_selectivity_label_.size() == 1)
+       fishery_selectivity_label_.assign(2, fishery_selectivity_label_[0]);
+     if (natural_mortality_selectivity_label_.size() == 1)
+       natural_mortality_selectivity_label_.assign(2, natural_mortality_selectivity_label_[0]);
+  }
   // Users don't have to apply tagging
   if (parameters_.Get(PARAM_SCANNING_YEARS)->has_been_defined()) {
     for (auto year : scanning_years_) {

@@ -57,6 +57,11 @@ void Tagging::DoBuild() {
     tag_layer_.push_back(temp_layer);
   }
 
+  if (model_->get_sexed()) {
+     if (selectivity_labels_.size() == 1)
+       selectivity_labels_.assign(2, selectivity_labels_[0]);
+  }
+
   // Build selectivities
   bool first = true;
   for (auto label : selectivity_labels_) {
@@ -113,10 +118,11 @@ void Tagging::DoExecute() {
     }
     age_distribution_of_tagged_fish_by_year_[model_->current_year()].resize(model_->age_spread(),0);
     length_distribution_of_tagged_fish_by_year_[model_->current_year()].resize(model_->length_bin_mid_points().size(),0);
-
+    LOG_FINE() << "allocate";
     // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
     random_numbers_.resize(n_agents_ + 1);
     selectivity_random_numbers_.resize(n_agents_ + 1);
+    handling_mortality_random_numbers_.resize(n_agents_ + 1);
     for (unsigned i = 0; i <= n_agents_; ++i) {
       random_numbers_[i] = rng.chance();
       selectivity_random_numbers_[i] = rng.chance();
@@ -166,6 +172,7 @@ void Tagging::DoExecute() {
                   // Lets see if it survives handling
                   if (handling_mortality_random_numbers_[cell_offset_[row][col] + counter] <= handling_mort_by_space_[row][col]) {
                     // It died we will never see this or know about this tagged fish so I am just going to skip the rest of the algorithm
+                    this_agent.dies();
                     continue;
                   }
                   // Agent is tagged and survived the process find a slot to add this tagged agent back in
@@ -201,7 +208,7 @@ void Tagging::DoExecute() {
         }
       }
     } else {
-      LOG_FINE() << "length based tagging";
+      LOG_WARNING() << "length based tagging not yet implemented";
     }
 
   }

@@ -116,7 +116,7 @@ void Biomass::DoBuild() {
   LOG_FINEST() << "finished building selectivities";
   world_ = model_->world_view();
   if (!world_)
-    LOG_CODE_ERROR() << "!world_ could not create pointer to world viw model, something is wrong";
+    LOG_CODE_ERROR() << "!world_ could not create pointer to world view model, something is wrong";
 
   LOG_FINEST() << "finished building pointer to world";
 

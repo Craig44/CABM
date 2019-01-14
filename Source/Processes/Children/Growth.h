@@ -34,7 +34,7 @@ public:
   virtual void                        DoReset() { };
   virtual void                        DoExecute() { };
 
-  virtual void                        draw_growth_param(unsigned row, unsigned col, unsigned number_of_draws, vector<vector<float>>& vec) = 0;
+  virtual void                        draw_growth_param(unsigned row, unsigned col, unsigned number_of_draws, vector<vector<float>>& vec, unsigned sex) = 0;
   bool                                update_growth() {return update_growth_parameters_;};
 
 protected:

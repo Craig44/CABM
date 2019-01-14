@@ -65,8 +65,8 @@ Model::Model() {
   parameters_.Bind<float>(PARAM_LONGITUDE_BOUNDS, &lon_bounds_, "Longitude bounds for the spatial domain, should include lower and upper bound, so there should be columns + 1 values", "", true);
   parameters_.Bind<unsigned>(PARAM_NROWS, &world_height_, "number of rows in spatial domain", "")->set_lower_bound(1,true);
   parameters_.Bind<unsigned>(PARAM_NCOLS, &world_width_, "number of columns in spatial domain", "")->set_lower_bound(1,true);
-  parameters_.Bind<bool>(PARAM_SEXED, &sex_, "Is sex an attribute of you agent?", "", false);
-  parameters_.Bind<float>(PARAM_PROPORTION_MALE, &proportion_male_, "what proportion of the generated agents should be male?", "", 1.0)->set_range(0.0, 1.0, true, true);
+  parameters_.Bind<bool>(PARAM_SEXED, &sex_, "Is sex an attribute of then agents?", "", false);
+  parameters_.Bind<float>(PARAM_PROPORTION_MALE, &proportion_male_, "what proportion of the generated agents should be male?", "", 1.0)->set_range(0.0, 1.0, true, true); //TODO move to recruitment so it can be time-varying.
   parameters_.Bind<string>(PARAM_MATRUITY_OGIVE_LABEL, &maturity_ogives_, "Maturity ogive label for each sex (male female) order is important", "", false);
   parameters_.Bind<string>(PARAM_GROWTH_PROCESS_LABEL, &growth_process_label_, "Label for the growth process in the annual cycle", "");
   parameters_.Bind<string>(PARAM_NATURAL_MORTALITY_PROCESS_LABEL, &natural_mortality_label_, "Label for the natural mortality process in the annual cycle", "");
@@ -233,7 +233,8 @@ void Model::Validate() {
   if (!parameters_.has_been_populated())
     parameters_.Populate(this);
 
-
+  if (sex_ & (maturity_ogives_.size() != 2))
+    LOG_FATAL_P(PARAM_MATRUITY_OGIVE_LABEL) << "if you have specified a model with sex, you need to supply two maturity ogives one for each sex (they can be the same)";
   /**
    * Do some simple checks
    * e.g Validate that the length_bins are strictly increasing order

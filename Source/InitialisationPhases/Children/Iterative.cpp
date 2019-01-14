@@ -170,7 +170,7 @@ void Iterative::Execute() {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
         cell->seed_agents(agents_per_cell[row][col], seed_z);
-        LOG_FINEST() << "row " << row + 1 << " col = " << col + 1 << " seeded " << cell->agents_.size();
+        LOG_FINE() << "row " << row + 1 << " col = " << col + 1 << " seeded " << cell->agents_.size();
       }
     }
   }

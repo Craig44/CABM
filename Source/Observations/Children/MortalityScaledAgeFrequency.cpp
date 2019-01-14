@@ -361,7 +361,7 @@ void MortalityScaledAgeFrequency::Simulate() {
        * ages across a length distribution
       */
       LOG_FINE() << "about to build Age length key";
-      unsigned max_iters = samples_to_take * 10;
+      unsigned max_iters = samples_to_take * 20;
       unsigned iter_to_check_max = 0;
       float total_agents_in_ALK = 0;
       vector<vector<float>> mis_matrix;
@@ -395,7 +395,8 @@ void MortalityScaledAgeFrequency::Simulate() {
 
       for (unsigned sample_attempt = 0; sample_attempt < samples_to_take; ++iter_to_check_max) {
         if (iter_to_check_max >= max_iters) {
-          LOG_WARNING() << "in the observation " << label_ << " for year = " << years_[year_ndx] << " and stratum = " << cells_[stratum_ndx] << ", we were trying to sample for too long to build an age-length key. Most likely due to a configuration error. I have exited this observation early as not to run the output. Please check results and configuration set up";
+          LOG_WARNING() << "in the observation " << label_ << " for year = " << years_[year_ndx] << " and stratum = " << cells_[stratum_ndx] << ", we were trying to sample for too long to build an age-length key. This is set at 20 * "
+              "samples needed to take. This is mainly caused from trying to get an age for low proportion length bins, I suggest you look at the age length key to see if it is a genuine problem";
           break;
         }
         // Randomly select a cell that a stratum belons to

@@ -30,13 +30,12 @@ MortalityEventBiomass::MortalityEventBiomass(Model* model) : Mortality(model) {
   parameters_.Bind<string>(PARAM_SELECTIVITY, &selectivity_label_, "Selectivity label", "");
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "years to apply the process", "");
   parameters_.Bind<string>(PARAM_CATCH_LAYERS, &catch_layer_label_, "Spatial layer describing catch by cell for each year, there is a one to one link with the year specified, so make sure the order is right", "");
-  parameters_.Bind<float>(PARAM_MINIMUM_LEGAL_LENGTH, &mls_, "The minimum legal length for this fishery, any individual less than this will be returned using some discard mortality", "", 0);
+  parameters_.Bind<float>(PARAM_MINIMUM_LEGAL_LENGTH, &mls_, "The minimum legal length for this fishery, any individual less than this will be returned whilst applying handling mortality", "", 0);
   parameters_.Bind<float>(PARAM_HANDLING_MORTALITY, &discard_mortality_, "if discarded due to being under the minimum legal length, what is the probability the individual will die when released", "", 1.0);
   parameters_.Bind<bool>(PARAM_PRINT_EXTRA_INFO, &print_extra_info_, "if you have process report for this process you can control the amount of information printed to the file.", "", true);
   // Tag-recapture inputs
   parameters_.Bind<unsigned>(PARAM_SCANNING_YEARS, &scanning_years_, "Years to scan for tags in the fishery", "", true);
   parameters_.Bind<float>(PARAM_SCANNING_PROPROTION, &scanning_proportion_, "The proportion of catch scanned in each year", "", true);
-
 
 }
 
