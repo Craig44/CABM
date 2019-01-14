@@ -116,13 +116,19 @@ cells r1-c1 r2-c1 r3-c1
 
 
 \subsubsection{Age frequency from scaled length frequency}\label{subsubsec:Mortalitysubsamle}\index{Observations!Age frequency from scaled length frequency}
-This observation class, generates an age frequency by getting all agents removed by an F method in user defined stratum, and returns a sub-sample of age and lengths that is used to generate an age length key. The user can ask for ageing-error to be applied to when generating an age length key, using the  \command{ageing\_error} block (see Section~\ref{subsec:ageing_error}). Calculations currently follow the below equations.  
+This observation class, generates an age frequency by getting all agents removed by an F method in user defined stratum, and returns a sub-sample of age and lengths that is used to generate an age length key. The user can ask for ageing-error to be applied to when generating an age length key, using the  \command{ageing\_error} block (see Section~\ref{subsec:ageing_error}). Calculations currently follow the following algorithm for each spatial stratum,
+
+\begin{enumerate}
+	\item randomly sub sample fishery to calculate length frequency
+	\item within the sampled fish for length frequency, sub sample ages based on the \subcommand{age\_allocation\_method} command
+	\item apply ageing error to the ages.
+\end{enumerate}
 
 \begin{equation}
-N_{n,a} = \sum_l K_{l,a,n} N_{n,l,n}
+N_{n,a} = \sum_l K_{a,l,n} N_{l,n}
 \end{equation}
 
-where we calculate an age length key for each stratum $K_{l,a,n}$ and pass a census of numbers at length ($N_{n,l,n}$) from the mortality process to get numbers at age for each stratum $n$. The age length key is currently calculated by random sampling agents so some length bin and age groups may be sparsely sampled.
+where $K_{a,l,n}$ is the age length key for stratum $n$, $N_{l,n}$ is the numbers at length which can be a sub sample of the fishery, this is controlled by the input table \subcommand{proportion\_lf\_sampled}. There are three methods for allocating ages for a single age length key, these are \subcommand{random}, \subcommand{equal}, \subcommand{proportional}. Random will uniformly sample without replacement, Equal will put equal amount of ages in each length bin that is non-zero, and proportional will distribute the number of ages, proportional to the length frequency.
 
 \begin{equation}
 N_{a} = \sum_n \sum_s N_{n,a,s}
@@ -139,11 +145,27 @@ ageing_error none
 stratum_weighting_method biomass
 layer_of_stratum_definitions summery_fishery_catch_at_age_stratum
 stratums_to_include Inshore Offshore
+age_allocation_method proportional
+
 table samples ## number of individuals randomly selected to calculate age-length key
 year   Inshore    Offshore
 1991   400        200
 end_table
+
+table proportion_lf_sampled ## proportion of catch that is sampled for Length frequency
+year   Inshore    Offshore
+1991   0.8        0.7
+end_table
 simulation_likelihood multinomial
+
+@layer summery_fishery_catch_at_age_stratum
+type categorical
+table layer 
+Inshore Inshore Offshore Offshore Offshore
+Inshore Inshore Offshore Offshore Offshore
+Inshore Inshore Offshore Offshore Offshore
+Inshore Inshore Offshore Offshore Offshore
+end_table
 \end{verbatim}}}
 
 
@@ -152,10 +174,8 @@ This will be a great class for investigating catch at age inputs, I will have to
 
 \begin{itemize}
 	\item Add sex in these equations.
-	\item currently we only get stratum based information, but somehow structuring fishery data to represent tows and fleets mights be quite handy in this type of investigation.
-	\item Add a sample of length frequencies (instead of a census) and calculate scaled length frequency, with boot strapped values.
+	\item currently we only get spatial stratum based information, but somehow structuring fishery data to represent tows and fleets mights be quite handy in this type of investigation.
 	\item different methods for weighting, to generate scaled length frequency you would want to add the options to weight stratum by biomass, area, numbers or proportion
-	\item allocate ages across the age length key length distribution, equal ages in each length bin, proportional ages to the length frequency, random (current implementation)
 	\item Bootstrap estimates, we could boot strap ALK and Scaled length frequencies to get CV for each age bin in the frequency, and calculate an effective sample size.
 \end{itemize}
 

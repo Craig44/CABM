@@ -37,7 +37,7 @@
 \defSub{sexed} {Will the observation be split by sex?}
 \defSub{robust} {Robustification term for zero observations}
 \defSub{seperate\_by\_sex} {If data is sexed, should the covariance matrix be seperated by sex?}
-\defSub{sex\_lag} {R(if T and data are sexed, then the AR(n) correlation structure ignores sex and sets lag = |i-j|+1, where i \& j index the age or length classes in the data.  Ignored if data are not sexed.)}
+\defSub{sex\_lag} {if T and data are sexed, then the AR(n) correlation structure ignores sex and sets lag = |i-j|+1, where i and j index the age or length classes in the data.  Ignored if data are not sexed.}
 \par\textbf{\commandlabsubarg{likelihood}{type}{multinomial}}\par
 \par\textbf{\commandlabsubarg{likelihood}{type}{normal}}\par
 \par\textbf{\commandlabsubarg{likelihood}{type}{pseudo}}\par
@@ -61,7 +61,6 @@
 \defSub{maturity\_ogive\_label} {Maturity ogive label for each sex (male female) order is important}
 \defSub{growth\_process\_label} {Label for the growth process in the annual cycle}
 \defSub{natural\_mortality\_process\_label} {Label for the natural mortality process in the annual cycle}
-\defSub{max\_threads\_to\_use} {The maxiumum threads you want to give access to this program}
 \defComLab{observation}{Define an object of type \emph{observation}}\par\par
 \defSub{label} {Label}
 \defSub{type} {Type of observation}
@@ -81,6 +80,12 @@
 \defSub{proportion\_through\_mortality\_block} {Proportion through the mortality block of the time step to infer observation with}
 \defSub{cell\_layer} {The layer that indicates what area to summarise observations over.}
 \defSub{cells} {The cells we want to generate observations for from the layer of cells supplied}
+\par\textbf{\commandlabsubarg{observation}{type}{mortality\_scaled\_age\_frequency}}\par
+\defSub{years} {The years of the observed values}
+\defSub{ageing\_error} {Label of ageing error to use}
+\defSub{process\_label} {Label of of removal process}
+\defSub{layer\_of\_stratum\_definitions} {The layer that indicates what the stratum boundaries are.}
+\defSub{stratums\_to\_include} {The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer}
 \par\textbf{\commandlabsubarg{observation}{type}{process\_removals\_by\_age}}\par
 \defSub{min\_age} {Minimum age}
 \defSub{max\_age} {Maximum age}
@@ -142,11 +147,14 @@
 \defSub{m} {Natural mortality for the model}
 \defSub{update\_mortality\_parameters} {If an agent/individual moves do you want it to take on the natural mortality parameters of the new spatial cell}
 \defSub{time\_step\_ratio} {Time step ratios for the mortality rates to apply in each time step. See manual for how this is applied}
-\par\textbf{\commandlabsubarg{process}{type}{mortality\_effort\_based\_baranov}}\par
+\par\textbf{\commandlabsubarg{process}{type}{mortality\_effort\_based}}\par
 \defSub{selectivity} {Selectivity label}
+\defSub{minimiser} {Label of the minimser to solve the problem}
 \defSub{years} {years to apply the process}
 \defSub{catches} {Total catch by year}
-\defSub{catchability} {An arbiturary scalar to get the effort value}
+\defSub{effort\_values} {A vector of effort values, one for each enabled cell of the model}
+\defSub{effort\_layer\_label} {A layer label that is a numeric layer label that contains effort values for each year.}
+\defSub{starting\_value\_for\_lambda} {Total catch by year}
 \par\textbf{\commandlabsubarg{process}{type}{mortality\_event\_biomass}}\par
 \defSub{selectivity} {Selectivity label}
 \defSub{years} {years to apply the process}
@@ -159,6 +167,7 @@
 \defSub{origin\_cell} {The origin cell associated with each spatial layer (should have a one to one relationship with specified layers), format follows row-col (1-2}
 \defSub{probability\_layers} {Spatial layers (one layer for each origin cell) describing the probability of moving from an origin cell to all other cells in the spatial domain.}
 \defSub{movement\_type} {What type of movement are you applying?}
+\defSub{selectivity\_label} {Label for the selectivity block}
 \par\textbf{\commandlabsubarg{process}{type}{movement\_preference}}\par
 \defSub{d\_max} {The maxiumu diffusion value}
 \defSub{time\_intervals} {The time interval that this movement process occurs over (k) in the documentation formula's}
@@ -166,6 +175,7 @@
 \defSub{brownian\_motion} {Just apply random movement, undirected movement}
 \defSub{preference\_functions} {The preference functions to apply}
 \defSub{preference\_layers} {The preference functions to apply}
+\defSub{selectivity\_label} {Label for the selectivity block}
 \par\textbf{\commandlabsubarg{process}{type}{nop}}\par
 \par\textbf{\commandlabsubarg{process}{type}{recruitment\_beverton\_holt}}\par
 \defSub{b0} {B0}
@@ -190,6 +200,8 @@
 \par\textbf{\commandlabsubarg{report}{type}{age\_frequency\_by\_cell}}\par
 \defSub{years} {Years}
 \defSub{time\_step} {Time Step label}
+\par\textbf{\commandlabsubarg{report}{type}{ageing\_error\_matrix}}\par
+\defSub{ageing\_error} {Ageing Error label}
 \par\textbf{\commandlabsubarg{report}{type}{derived\_quantity}}\par
 \par\textbf{\commandlabsubarg{report}{type}{initialisation\_partition}}\par
 \par\textbf{\commandlabsubarg{report}{type}{model\_attributes}}\par
