@@ -84,7 +84,7 @@ void WorldCell::Reset() {
  * each agent that is created will be call seed() this will seed an agent with an equilibrium age structure
  */
 void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z) {
-  LOG_TRACE();
+  LOG_FINE();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
 
   vector<float> mort_par;
@@ -111,6 +111,7 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
   if (number_agents_to_seed != growth_pars.size()) {
     LOG_CODE_ERROR() << "number_agents_to_seed != growth_pars.size(), this must be a code error as these should always be true";
   }
+  LOG_FINE() << "start seeding";
   for (unsigned agent = 0; agent < number_agents_to_seed; ++agent) {
     sex = 0;
     mature = false;

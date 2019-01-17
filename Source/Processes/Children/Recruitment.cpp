@@ -27,7 +27,7 @@ namespace processes {
 Recruitment::Recruitment(Model* model) : Process(model) {
   process_type_ = ProcessType::kRecruitment;
   parameters_.Bind<float>(PARAM_B0, &b0_, "B0", "",false);
-  parameters_.Bind<string>(PARAM_RECRUITMENT_LAYER_LABEL, &recruitment_layer_label_, "A label for the recruitment layer", "");
+  parameters_.Bind<string>(PARAM_RECRUITMENT_LAYER_LABEL, &recruitment_layer_label_, "A label for the recruitment layer, that describes spatial distribution of recruits.", "");
   parameters_.Bind<string>(PARAM_SSB, &ssb_label_, "A label for the SSB derived quantity", "");
 }
 

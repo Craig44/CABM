@@ -18,11 +18,12 @@
 
 // Namespaces
 namespace niwa {
-
 /**
  * Class Definition
+ * This is the core agent class and holds all the attributes for an individual\agent over its life.
+ *
  */
-class Agent { // Don't make this inherit from BaseClasses/Object.h
+class Agent {
 public:
   // Methods
   virtual                       ~Agent() = default;
@@ -102,6 +103,8 @@ protected:
   bool                        alive_ = true;
   unsigned                    tag_row_;
   unsigned                    tag_col_;
+  unsigned                    life_stage_;  // 1 = larvae, 2 = immature, 3 = mature. // TODO perhaps this could be dealt with in the WorldCell level partition the agents for each cell, then processes can call
+                                            // The life history of interest.
 
 private:
 

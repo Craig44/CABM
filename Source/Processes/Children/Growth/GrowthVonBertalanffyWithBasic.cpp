@@ -62,7 +62,8 @@ void GrowthVonBertalanffyWithBasic::DoValidate() {
     LOG_ERROR_P(PARAM_LABEL) << "You have not specified a value or a layer label for the 'a' parameter, you must pick one of these options";
   if (!parameters_.Get(PARAM_B_LAYER_LABEL)->has_been_defined() & !parameters_.Get(PARAM_B)->has_been_defined())
     LOG_ERROR_P(PARAM_LABEL) << "You have not specified a value or a layer label for the 'b' parameter, you must pick one of these options";
-
+  if(!parameters_.Get(PARAM_T0)->has_been_defined())
+    t0_.push_back(0.0);
 }
 
 
@@ -195,32 +196,37 @@ void GrowthVonBertalanffyWithBasic::DoExecute() {
  * based on the spatial cells of the process. This is called in initialisation/Recruitment and movement processes if needed.
 */
 void  GrowthVonBertalanffyWithBasic::draw_growth_param(unsigned row, unsigned col, unsigned number_of_draws, vector<vector<float>>& vec, unsigned sex) {
-  LOG_FINE() << "";
+  LOG_FINE() << "sex " << sex;
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   float mean_linf, mean_k, a, b;
   if (L_inf_layer_.size() > 0)
     mean_linf = L_inf_layer_[sex]->get_value(row, col);
   else
     mean_linf = l_inf_[sex];
+  LOG_FINE() << "L_inf";
 
   if (k_layer_.size() > 0)
 	  mean_k = k_layer_[sex]->get_value(row, col);
   else
     mean_k = k_[sex];
+  LOG_FINE() << "k";
 
   if (a_layer_.size() > 0)
     a = a_layer_[sex]->get_value(row, col);
   else
     a = a_[sex];
+  LOG_FINE() << "a";
 
   if (b_layer_.size() > 0)
     b = b_layer_[sex]->get_value(row, col);
   else
     b = b_[sex];
 
+  LOG_FINE() << "b";
+
   vec.clear();
 	vec.resize(number_of_draws);
-  LOG_FINE() << "mean_linf " << mean_linf << " mean_k " << mean_k << " a " << a << " b " << b << " t0 " << t0_[sex];
+  LOG_FINE() << "mean_linf " << mean_linf << " mean_k " << mean_k << " a " << a << " b " << b;// << " t0 " << t0_[sex];
 
 	for (unsigned i = 0; i < number_of_draws; ++i) {
 	  vec[i].push_back(rng.lognormal(mean_linf, cv_));
@@ -229,6 +235,8 @@ void  GrowthVonBertalanffyWithBasic::draw_growth_param(unsigned row, unsigned co
 	  vec[i].push_back(a);
 	  vec[i].push_back(b);
 	}
+  LOG_FINE() << "";
+
 }
 // FillReportCache, called in the report class, it will print out additional information that is stored in
 // containers in this class.
