@@ -21,7 +21,7 @@ setwd("R")
 
 
 output_50 = extract.run(file = "output_50_burnin.log", path= ibmDir)
-output = extract.run(file = "output_40.log", path= ibmDir)
+output = extract.run(file = "run.log", path= ibmDir)
 #output = extract.run(file = "output.log", path= ibmDir)
 
 names(output)
@@ -101,6 +101,70 @@ image.plot(image_mat(output$offshore_preference_movement$`1`$zonal_1990),main = 
 
 image.plot(image_mat(output$offshore_preference_movement$`1`$average_meridional_jump_1990),main = "average merid jump")
 image.plot(image_mat(output$offshore_preference_movement$`1`$average_zonal_jump_1990),main = "average zonal jump")
+
+
+################
+## look at scaled age freq
+################
+output = extract.run(file = "run.log", path= ibmDir)
+output1 = extract.run(file = "run_ageing_error.log", path= ibmDir)
+output_e = extract.run(file = "run_equal.log", path= ibmDir)
+output_p = extract.run(file = "run_prop.log", path= ibmDir)
+
+length(output$model_attributes$`1`$length_mid_points)
+
+sum(apply(output$summer_fishery_scaled_age_freq$`1`$ALK_1991, MARGIN = 1, FUN = sum, na.rm = T))
+sum(apply(output1$summer_fishery_scaled_age_freq$`1`$ALK_1991, MARGIN = 1, FUN = sum, na.rm = T))
+
+sum(output$summer_fishery_scaled_age_freq$`1`$length_freq_by_year_stratum[,-1])
+sum(output1$summer_fishery_scaled_age_freq$`1`$length_freq_by_year_stratum[,-1])
+
+output1$summer_fishery_scaled_age_freq$`1`$length_freq_by_year_stratum[,-1]/sum(output1$summer_fishery_scaled_age_freq$`1`$length_freq_by_year_stratum[,-1]) - 
+t(apply(output1$summer_fishery_scaled_age_freq$`1`$ALK_1991, MARGIN = 2, FUN = sum, na.rm = T)) / sum(apply(output1$summer_fishery_scaled_age_freq$`1`$ALK_1991, MARGIN = 2, FUN = sum, na.rm = T))
+
+
+dim(output$summer_fishery_scaled_age_freq$`1`$ALK_1991)
+apply(output$summer_fishery_scaled_age_freq$`1`$ALK_1991, MARGIN = 1, FUN = sum, na.rm = T)
+apply(output1$summer_fishery_scaled_age_freq$`1`$ALK_1991, MARGIN =1, FUN = sum, na.rm = T)
+
+sum(output$summer_fishery_scaled_age_freq$`1`$ALK_1991)
+sum(output_e$summer_fishery_scaled_age_freq$`1`$ALK_1991)
+sum(output_p$summer_fishery_scaled_age_freq$`1`$ALK_1991)
+
+len = colnames(output$summer_fishery_scaled_age_freq$`1`$length_freq_by_year_stratum[,-1])
+plot(len, apply(output$summer_fishery_scaled_age_freq$`1`$ALK_1991, MARGIN = 2, FUN = sum, na.rm = T)/sum(output$summer_fishery_scaled_age_freq$`1`$ALK_1991) , xlab = "length bin", ylim = c(0,0.11), ylab = "LF", type = "l", lwd = 2)
+lines(len, apply(output_e$summer_fishery_scaled_age_freq$`1`$ALK_1991, MARGIN = 2, FUN = sum, na.rm = T)/sum(output_e$summer_fishery_scaled_age_freq$`1`$ALK_1991), lwd = 2, col = "red")
+lines(len, apply(output_p$summer_fishery_scaled_age_freq$`1`$ALK_1991, MARGIN = 2, FUN = sum, na.rm = T)/sum(output_p$summer_fishery_scaled_age_freq$`1`$ALK_1991), lwd = 2, col = "blue", lty = 3)
+lines(len, output$summer_fishery_scaled_age_freq$`1`$length_freq_by_year_stratum[,-1]/sum(output$summer_fishery_scaled_age_freq$`1`$length_freq_by_year_stratum[,-1]), lwd = 2, col = "green", lty = 2)
+
+## plot comparison
+ages = output$summer_fishery_scaled_age_freq$`1`$Values$age
+plot(ages, output$summer_fishery_scaled_age_freq$`1`$Values$expected / sum(output$summer_fishery_scaled_age_freq$`1`$Values$expected), type = "l", col = "red", lwd = 3, xlab  ="Age", ylab = "Expected Frequency", ylim= c(0,0.15))
+lines(ages, output$overall_fishery_age$`1`$Values$expected / sum(output$overall_fishery_age$`1`$Values$expected), col = "blue", lwd = 2);
+lines(ages, output_e$summer_fishery_scaled_age_freq$`1`$Values$expected / sum(output_e$summer_fishery_scaled_age_freq$`1`$Values$expected), col = "orange", lwd = 2);
+lines(ages, output_p$summer_fishery_scaled_age_freq$`1`$Values$expected / sum(output_p$summer_fishery_scaled_age_freq$`1`$Values$expected), col = "green", lwd = 2);
+lines(ages, output1$summer_fishery_scaled_age_freq$`1`$Values$expected / sum(output1$summer_fishery_scaled_age_freq$`1`$Values$expected), col = "gray60", lwd = 2);
+
+alk_age = output$summer_fishery_scaled_age_freq$`1`$Values$expected
+dir_age = output$overall_fishery_age$`1`$Values$expected 
+
+cbind(alk_age, dir_age)
+
+plot(output$Summer_agents$`1`$values$age, output$Summer_agents$`1`$values$length)
+
+## look at the ALK
+output$summer_fishery_scaled_age_freq$`1`$ALK_1991
+output$model_attributes$`1`$Recruitment
+
+
+
+
+
+
+
+
+
+
 
 
 

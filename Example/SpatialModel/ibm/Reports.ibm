@@ -94,6 +94,11 @@ ageing_error Age_misclassification
 ################
 ## Processes
 ################
+@report summer_fishery
+type process
+process summer_fishery
+
+/*
 @report offshore_preference_movement
 type process
 process offshore_preference_movement
@@ -110,9 +115,6 @@ process Move_inshore
 type process
 process Move_offshore
 
-@report summer_fishery
-type process
-process summer_fishery
 
 @report Rec
 type process
@@ -122,7 +124,7 @@ process Recruitment
 type process
 process M
 
-/*
+
 @report preferenceMovement
 type process
 process preferenceMovement
@@ -132,6 +134,7 @@ process preferenceMovement
 ## Layers
 ################
 ## Biomass
+/*
 @report Summer_total_biomass_by_cell
 type numeric_layer
 layer_label biomass_by_cell
@@ -179,3 +182,4 @@ type numeric_layer
 layer_label abundance_by_cell
 years 1990:2018
 time_step Spring
+*/

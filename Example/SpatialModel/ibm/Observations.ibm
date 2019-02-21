@@ -4,14 +4,21 @@
 type mortality_scaled_age_frequency
 years 1991
 process_label summer_fishery
-ageing_error none
+ageing_error Age_misclassification
 layer_of_stratum_definitions single_cell # summer_fishery_stratum_meta
 stratums_to_include single_cell #Inshore Offshore
+## Do you want to treat fisheries as a stratum, a stratum for each fishery and area.
 table samples ## number of individuals randomly selected to calculate age-length key for scaling age frequency
 year   single_cell 	#Inshore    Offshore
-1991   6000		#400        200
+1991   600		#400        200
+end_table
+
+table proportion_lf_sampled ## Proportion of agents from catch sampled for LF, used to put through the ALK
+year   single_cell
+1991   0.7
 end_table
 simulation_likelihood multinomial
+age_allocation_method proportional
 
 ## fishery age compositional data
 @observation overall_fishery_age
@@ -43,7 +50,8 @@ cells single_cell
 
 
 @ageing_error Age_misclassification
-type none
+type normal
+cv 0.05
 
 /*
 @observation biomass_survey_post_fishing_by_cell
