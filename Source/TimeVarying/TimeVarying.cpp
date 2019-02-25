@@ -88,12 +88,20 @@ void TimeVarying::Update(unsigned current_year) {
   if (update_function_ == 0)
     LOG_CODE_ERROR() << "DoUpdateFunc_ == 0";
 
-  if (years_.size() > 0 && std::find(years_.begin(), years_.end(), current_year) == years_.end())
+  if (years_.size() > 0 && (std::find(years_.begin(), years_.end(), current_year) == years_.end()) &&  (std::find(years_.begin(), years_.end(), current_year - 1) != years_.end())) {
+    // only restore if we are moving from an update year to a non-update year
+    LOG_FINE() << "Restoring";
     RestoreOriginalValue();
-  else
+    target_object_->RebuildCache();
+  } else if (years_.size() > 0 && std::find(years_.begin(), years_.end(), current_year) != years_.end()) {
+    LOG_FINE() << "Updating";
     DoUpdate();
+    target_object_->RebuildCache();
+  } else {
+    LOG_FINE() << "Doing nothing";
+  }
+  // else do nothing
 
-  target_object_->RebuildCache();
 }
 
 /**

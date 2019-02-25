@@ -73,6 +73,8 @@ Model::Model() {
   //parameters_.Bind<unsigned>(PARAM_MAX_THREADS_TO_USE, &max_threads_, "The maxiumum threads you want to give access to this program", "",1);
 
 
+  RegisterAsAddressable(PARAM_PROPORTION_MALE, &proportion_male_); // can make this time-varying
+
   global_configuration_ = new GlobalConfiguration();
   managers_ = new Managers(this);
   objects_ = new Objects(this);

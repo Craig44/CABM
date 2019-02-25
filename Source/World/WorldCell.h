@@ -58,6 +58,9 @@ public:
   void                        update_agent_parameters();
   void                        update_mortality_params();
   void                        update_growth_params();
+  void                        apply_growth_time_varying();
+  void                        apply_mortality_time_varying();
+
 
   vector<Agent>               agents_;
   string                      get_cell_label() {return cell_label_;};
