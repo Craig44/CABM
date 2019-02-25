@@ -1,7 +1,7 @@
-#' @title extract MPD function for readin in IBM output that has been generated from a -rrun mode.  
+#' @title extract function for readin in IBM output that has been generated from a '-r' & '-s' run mode.  
 #'
 #' @description
-#' An extract function that reads IBM output that are produced from a '-r' model run. This funciton
+#' An extract function that reads IBM output that are produced from a '-r' & '-s' model run. This funciton
 #' also create a 'ibm_output' class which can be used in plotting and summary functions. See the casal2 manual for more information.
 #'
 #' @author Dan Fu & C.Marsh
