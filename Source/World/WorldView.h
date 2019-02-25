@@ -71,7 +71,7 @@ public:
   void                        MergeCachedGrid(bool update_lat_long);
   void                        get_world_age_frequency(vector<unsigned>& world_age_freq);
   void                        get_cell_element(unsigned& row, unsigned& col, const float lat, const float lon);
-  // Used by methods to tell the world that time varying parameters need to be changed
+  // Used by methods to tell the world that time varying parameters need to be changed, usually in the RebuildCache() function of a process
   void                        rebuild_growth_params() {update_growth_params_ = true;}
   void                        rebuild_mort_params() {update_mortality_params_ = true;}
   //Called by the Model in RunBasic after time varying to update agent params if need be
