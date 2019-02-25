@@ -27,43 +27,207 @@ namespace processes {
  * constructor
  */
 MortalityEventBiomass::MortalityEventBiomass(Model* model) : Mortality(model) {
-  parameters_.Bind<string>(PARAM_SELECTIVITY, &selectivity_label_, "Selectivity label", "");
-  parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "years to apply the process", "");
-  parameters_.Bind<string>(PARAM_CATCH_LAYERS, &catch_layer_label_, "Spatial layer describing catch by cell for each year, there is a one to one link with the year specified, so make sure the order is right", "");
-  parameters_.Bind<float>(PARAM_MINIMUM_LEGAL_LENGTH, &mls_, "The minimum legal length for this fishery, any individual less than this will be returned whilst applying handling mortality", "", 0);
-  parameters_.Bind<float>(PARAM_HANDLING_MORTALITY, &discard_mortality_, "if discarded due to being under the minimum legal length, what is the probability the individual will die when released", "", 1.0);
+  catch_table_ = new parameters::Table(PARAM_CATCH);
+  parameters_.BindTable(PARAM_CATCH, catch_table_, "Table of catch_layer by year for each fishery", "", false);
+  scanning_table_ = new parameters::Table(PARAM_SCANNING);
+  parameters_.BindTable(PARAM_SCANNING, scanning_table_, "Table of scanning proportions by year for each fishery", "", true);
+  method_table_ = new parameters::Table(PARAM_METHOD_INFO);
+  parameters_.BindTable(PARAM_METHOD_INFO, method_table_, "Table of information for each fishery.", "", false);
   parameters_.Bind<bool>(PARAM_PRINT_EXTRA_INFO, &print_extra_info_, "if you have process report for this process you can control the amount of information printed to the file.", "", true);
-  // Tag-recapture inputs
-  parameters_.Bind<unsigned>(PARAM_SCANNING_YEARS, &scanning_years_, "Years to scan for tags in the fishery", "", true);
-  parameters_.Bind<float>(PARAM_SCANNING_PROPROTION, &scanning_proportion_, "The proportion of catch scanned in each year", "", true);
+}
 
+MortalityEventBiomass::~MortalityEventBiomass() {
+  delete catch_table_;
+  delete method_table_;
+  delete scanning_table_;
 }
 
 /**
  * Do some initial checks of user supplied parameters.
  */
 void MortalityEventBiomass::DoValidate() {
-  LOG_TRACE();
-  if (years_.size() != catch_layer_label_.size())
-    LOG_ERROR_P(PARAM_YEARS) << "you must specify a layer label for each year. You have supplied '" << years_.size() << "' years but '" << catch_layer_label_.size() << "' catch layer labels, please sort this out.";
-
-  if (scanning_proportion_.size() == 1)
-    scanning_proportion_.resize(scanning_years_.size(), scanning_proportion_[0]);
-  if (scanning_years_.size() != scanning_proportion_.size()) {
-    LOG_ERROR_P(PARAM_SCANNING_YEARS) << "there needs to be a proportion for all years to apply tagging in. You supplied " << scanning_years_.size() << " years but " << scanning_proportion_.size() << " proportions, sort this descrepency out please";
+  // check headers
+  LOG_FINE() << "check catch table headers";
+  auto catch_columns = catch_table_->columns();
+  if (catch_columns[0] != PARAM_YEAR)
+    LOG_ERROR_P(PARAM_CATCH) << "the first column header needs to be " << PARAM_YEAR << ". Please add it =)";
+  for (unsigned j = 1; j < catch_columns.size(); ++j) {
+    fishery_index_.push_back(j);
+    fishery_label_.push_back(catch_columns[j]);
+    LOG_FINE() << "fishery ndx = " << j << " fishery label " << catch_columns[j];
   }
 
-  for (auto& prop : scanning_proportion_) {
-    if (prop < 0.0)
-      LOG_ERROR_P(PARAM_SCANNING_PROPROTION) << "you cannot supply a proportion less than 0";
+  LOG_FINE() << "check method info";
+  auto meth_columns = method_table_->columns();
+  if (std::find(meth_columns.begin(), meth_columns.end(), PARAM_HANDLING_MORTALITY) == meth_columns.end()) {
+    LOG_FATAL_P(PARAM_METHOD_INFO) << "The column header " << PARAM_HANDLING_MORTALITY << ", is missing can you please add it";
+  }
+  if (std::find(meth_columns.begin(), meth_columns.end(), PARAM_MINIMUM_LEGAL_LENGTH) == meth_columns.end()) {
+    LOG_FATAL_P(PARAM_METHOD_INFO) << "The column header " << PARAM_MINIMUM_LEGAL_LENGTH << ", is missing can you please add it";
   }
 
+  if (meth_columns[0] != PARAM_METHOD) {
+    LOG_FATAL_P(PARAM_METHOD_INFO) << "The first column header must be labelled " << PARAM_METHOD << ", can you please sort this out";
+  }
+
+  if (!model_->get_sexed()) {
+    // find the column header selectivity
+    if (std::find(meth_columns.begin(), meth_columns.end(), PARAM_SELECTIVITY) == meth_columns.end()) {
+      LOG_FATAL_P(PARAM_METHOD_INFO) << "because the model is unsexed we expect the column header " << PARAM_SELECTIVITY << ", this is missing can you please add it";
+    }
+  } else {
+    if (std::find(meth_columns.begin(), meth_columns.end(), PARAM_MALE_SELECTIVITY) == meth_columns.end()) {
+      LOG_FATAL_P(PARAM_METHOD_INFO) << "because the model is sexed we expect the column header " << PARAM_MALE_SELECTIVITY << ", this is missing can you please add it";
+    }
+    if (std::find(meth_columns.begin(), meth_columns.end(), PARAM_FEMALE_SELECTIVITY) == meth_columns.end()) {
+      LOG_FATAL_P(PARAM_METHOD_INFO) << "because the model is sexed we expect the column header " << PARAM_FEMALE_SELECTIVITY << ", this is missing can you please add it";
+    }
+  }
+  auto meth_data = method_table_->data();
+  for (unsigned i = 0; i < meth_data.size(); ++i) {
+    LOG_FINE() << "trying to check this " << meth_data[0][i] << " fishery is in the catch table";
+    if (std::find(fishery_label_.begin(), fishery_label_.end(), meth_data[0][i]) == fishery_label_.end()) {
+      LOG_ERROR_P(PARAM_METHOD_INFO) << "Could not find the row lable " <<  meth_data[0][i] << " these need to be consistent with the column headers with the catch table, can you please double check this";
+    }
+  }
+
+  // Scanning if user has defined it
+  if (parameters_.Get(PARAM_SCANNING)->has_been_defined()) {
+    LOG_FINE() << "check scanning headers";
+    auto scan_columns = scanning_table_->columns();
+    if (scan_columns[0] != PARAM_YEAR)
+      LOG_ERROR_P(PARAM_SCANNING) << "the first column header needs to be " << PARAM_YEAR << ". Please add it =)";
+    for (unsigned j = 1; j < scan_columns.size(); ++j) {
+      if (std::find(fishery_label_.begin(), fishery_label_.end(), scan_columns[j]) == fishery_label_.end()) {
+        LOG_ERROR_P(PARAM_SCANNING) << "could not find the column header " << scan_columns[j] << " in the catch table column headers. The headers of this table must match the column headers of the catch table";
+      }
+    }
+  }
 }
 
 /**
  * DoBuild
  */
 void MortalityEventBiomass::DoBuild() {
+
+  LOG_FINE() << "Build tables";
+  LOG_FINE() << "Building catch table";
+
+  auto model_years = model_->years();
+  // load objects
+  vector<vector<string>>& catch_values_data = catch_table_->data();
+
+  for (auto row : catch_values_data) {
+    unsigned year = 0;
+    if (!utilities::To<string, unsigned>(row[0], year))
+       LOG_ERROR_P(PARAM_CATCH) << "year value " << row[0] << " is not numeric.";
+     if (std::find(model_years.begin(), model_years.end(), year) == model_years.end())
+       LOG_ERROR_P(PARAM_CATCH) << "year " << year << " is not a valid year in this model";
+     catch_year_.push_back(year);
+     for (unsigned i = 1; i < row.size(); ++i) {
+       fishery_catch_layer_labels_[i].push_back(row[i]);
+       layers::NumericLayer* temp_layer = nullptr;
+       temp_layer = model_->managers().layer()->GetNumericLayer(row[i]);
+       if (!temp_layer) {
+         LOG_FATAL_P(PARAM_CATCH) << "could not find the catch layer '" << row[i] << "', in year " << year << " for fishery " << fishery_label_[i - 1] << " please check it is numeric if it exists";
+       }
+       fishery_catch_layer_[i].push_back(temp_layer);
+     }
+  }
+
+
+  // Method info
+  auto meth_data = method_table_->data();
+  auto meth_cols = method_table_->columns();
+
+  // special case with selectivity in this so do it first
+  if (!model_->get_sexed()) {
+    // find the column header selectivity
+    unsigned selec_index = std::find(meth_cols.begin(), meth_cols.end(), PARAM_SELECTIVITY) - meth_cols.begin();
+    for (auto meth_row : meth_data) {
+
+      unsigned meth_index = std::find(fishery_label_.begin(), fishery_label_.end(), meth_row[0]) - fishery_label_.begin();
+
+      fishery_selectivity_label_[fishery_index_[meth_index]].push_back(meth_row[selec_index]);
+      fishery_selectivity_label_[fishery_index_[meth_index]].push_back(meth_row[selec_index]);
+      Selectivity* temp_selectivity = model_->managers().selectivity()->GetSelectivity(meth_row[selec_index]);
+
+      if (!temp_selectivity)
+        LOG_FATAL_P(PARAM_METHOD_INFO) << ": selectivity " << meth_row[selec_index] << " does not exist. Have you defined it? located in column " << selec_index;
+      fishery_selectivity_[fishery_index_[meth_index]].push_back(temp_selectivity);
+      fishery_selectivity_[fishery_index_[meth_index]].push_back(temp_selectivity);
+
+    }
+  }  else {
+    unsigned male_selec_index = std::find(meth_cols.begin(), meth_cols.end(), PARAM_MALE_SELECTIVITY) - meth_cols.begin();
+    unsigned female_selec_index = std::find(meth_cols.begin(), meth_cols.end(), PARAM_FEMALE_SELECTIVITY) - meth_cols.begin();
+    for (auto meth_row : meth_data) {
+      unsigned meth_index = std::find(fishery_label_.begin(), fishery_label_.end(), meth_row[0]) - fishery_label_.begin();
+      fishery_selectivity_label_[fishery_index_[meth_index]].push_back(meth_row[male_selec_index]);
+      fishery_selectivity_label_[fishery_index_[meth_index]].push_back(meth_row[female_selec_index]);
+      Selectivity* male_temp_selectivity = model_->managers().selectivity()->GetSelectivity(meth_row[male_selec_index]);
+      if (!male_temp_selectivity)
+        LOG_FATAL_P(PARAM_METHOD_INFO) << ": male_selectivity " << meth_row[male_selec_index] << " does not exist. Have you defined it?";
+
+      Selectivity* female_temp_selectivity = model_->managers().selectivity()->GetSelectivity(meth_row[female_selec_index]);
+      if (!female_temp_selectivity)
+        LOG_FATAL_P(PARAM_METHOD_INFO) << ": female_selectivity " << meth_row[female_selec_index] << " does not exist. Have you defined it?";
+
+      fishery_selectivity_[fishery_index_[meth_index]].push_back(male_temp_selectivity);
+      fishery_selectivity_[fishery_index_[meth_index]].push_back(female_temp_selectivity);
+    }
+  }
+
+  unsigned mls_index = std::find(meth_cols.begin(), meth_cols.end(), PARAM_MINIMUM_LEGAL_LENGTH) - meth_cols.begin();
+  unsigned hand_mort_index = std::find(meth_cols.begin(), meth_cols.end(), PARAM_HANDLING_MORTALITY) - meth_cols.begin();
+  for (auto meth_row : meth_data) {
+    unsigned meth_index = std::find(fishery_label_.begin(), fishery_label_.end(), meth_row[0]) - fishery_label_.begin();
+    float mls = 0;
+    float hand_mort = 0;
+    if (!utilities::To<string, float>(meth_row[mls_index], mls))
+       LOG_ERROR_P(PARAM_METHOD_INFO) << PARAM_MINIMUM_LEGAL_LENGTH << " value " << meth_row[mls_index] << " is not numeric, please sort this out.";
+    if (!utilities::To<string, float>(meth_row[hand_mort_index], hand_mort))
+       LOG_ERROR_P(PARAM_METHOD_INFO) << PARAM_HANDLING_MORTALITY << " value " << meth_row[hand_mort_index] << " is not numeric, please sort this out.";
+    fishery_mls_[fishery_index_[meth_index]] = mls;
+    fishery_hand_mort_[fishery_index_[meth_index]] = hand_mort;
+  }
+
+  if (parameters_.Get(PARAM_SCANNING)->has_been_defined()) {
+    auto scan_data = scanning_table_->data();
+    auto scan_columns = scanning_table_->columns();
+
+    if (scan_data.size() != catch_values_data.size())
+      LOG_FATAL_P(PARAM_SCANNING) << "found " << scan_data.size() << " rows in the scanning table but " << catch_values_data.size() << " rows in the catch table, these have to be the same";
+    if (scan_data[0].size() != catch_values_data[0].size())
+      LOG_FATAL_P(PARAM_SCANNING) << "found " << scan_data[0].size() << " columns in the scanning table but " << catch_values_data[0].size() << " columns in the catch table, these have to be the same";
+    vector<unsigned> fish_index_map;
+    for(unsigned i = 1; i < scan_columns.size(); ++i) {
+      fish_index_map.push_back(std::find(fishery_label_.begin(), fishery_label_.end(), scan_columns[i]) - fishery_label_.begin());
+    }
+
+    for (auto scan_row : scan_data) {
+      unsigned year = 0;
+      if (!utilities::To<string, unsigned>(scan_row[0], year))
+        LOG_FATAL_P(PARAM_SCANNING) << "year value " << scan_row[0] << " is not numeric.";
+      if (std::find(model_years.begin(), model_years.end(), year) == model_years.end())
+        LOG_FATAL_P(PARAM_SCANNING) << "year " << year << " is not a valid year in this model";
+      scanning_years_.push_back(year);
+
+      float prop = 0;
+      for (unsigned i = 1; i < scan_row.size(); ++i) {
+        if (!utilities::To<string, float>(scan_row[i], prop))
+          LOG_FATAL_P(PARAM_SCANNING) << "proportion value " << scan_row[i] << " is not numeric.";
+        if (prop < 0 || prop > 1) {
+          LOG_FATAL_P(PARAM_SCANNING) << "found a proportion less then zero or greater the one, please sort this out";
+        }
+        scanning_proportion_by_fishery_[fish_index_map[i - 1]].push_back(prop);
+      }
+    }
+  }
+
+
+
+  /*
   LOG_FINE();
   // Get the layers
   for (auto& label : catch_layer_label_) {
@@ -128,12 +292,14 @@ void MortalityEventBiomass::DoBuild() {
     scanning_prop_year_by_space_[i].resize(model_->get_width(), 0.0);
     current_time_step_by_space_[i].resize(model_->get_width(), 1);
   }
+  */
 }
 
 /**
  * DoExecute
  */
 void MortalityEventBiomass::DoExecute() {
+  /*
   LOG_MEDIUM();
   vector<unsigned> global_age_freq(model_->age_spread(), 0);
   auto iter = years_.begin();
@@ -388,12 +554,14 @@ void MortalityEventBiomass::DoExecute() {
       LOG_MEDIUM();
     } // find(years_.begin(), years_.end(), model_->current_year()) != years_.end()
   }  //model_->state() != State::kInitialise
+  */
 }
 
 
 // FillReportCache, called in the report class, it will print out additional information that is stored in
 // containers in this class.
 void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
+  /*
   cache << "biomass_removed: ";
   for (auto& year : actual_removals_by_year_)
     cache << year.second << " ";
@@ -459,16 +627,20 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
       cache << "\n";
     }
   }
+  */
 }
 
 // true means all years are found, false means there is a mismatch in years
 bool MortalityEventBiomass::check_years(vector<unsigned> years_to_check_) {
+  /*
   LOG_FINE();
   for (unsigned year_ndx = 0; year_ndx < years_to_check_.size(); ++year_ndx) {
     if (find(years_.begin(), years_.end(), years_to_check_[year_ndx]) == years_.end())
       return false;
   }
+  */
   return true;
+
 }
 
 } /* namespace processes */

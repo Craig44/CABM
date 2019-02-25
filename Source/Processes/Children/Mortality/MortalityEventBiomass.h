@@ -32,7 +32,7 @@ class MortalityEventBiomass : public Mortality {
 public:
   // methods
   explicit MortalityEventBiomass(Model* model);
-  virtual                     ~MortalityEventBiomass() = default;
+  virtual                        ~MortalityEventBiomass();
   virtual void                        DoValidate() override final;
   virtual void                        DoBuild() override final;
   virtual void                        DoReset() override final { };
@@ -42,33 +42,23 @@ public:
   virtual bool                        check_years(vector<unsigned> years_to_check_) override final;
 
 protected:
-  vector<string>                      catch_layer_label_;
-  vector<layers::NumericLayer*>       catch_layer_;
-  vector<string>                      selectivity_label_;
-  vector<Selectivity*>                selectivity_;
-  vector<unsigned>                    years_;
-  bool                                selectivity_length_based_ = false;
-  float                               discard_mortality_;
-  float                               mls_;
-  // objects for thread safety of rng
-  vector<float>                       random_numbers_;
-  vector<float>                       discard_random_numbers_;
-  vector<float>                       selectivity_random_numbers_;
-  vector<float>                       scanning_random_numbers_;
+  parameters::Table*                  catch_table_ = nullptr;
+  parameters::Table*                  method_table_ = nullptr;
+  vector<unsigned>                    fishery_index_; // starts at 1 not the conventional C++ index more like R, just to keep people on their tows
+  vector<string>                      fishery_label_;
+  vector<unsigned>                    catch_year_;
+  map<unsigned,vector<string>>        fishery_catch_layer_labels_;
+  map<unsigned,vector<layers::NumericLayer*>>  fishery_catch_layer_;
+  map<unsigned,vector<string>>        fishery_selectivity_label_;
+  map<unsigned,vector<Selectivity*>>  fishery_selectivity_;
+  map<unsigned,float>                 fishery_mls_;
+  map<unsigned,float>                 fishery_hand_mort_;
 
-  unsigned                            n_agents_;
-  vector<vector<unsigned>>            cell_offset_;
-  vector<vector<unsigned>>            model_length_bins_;
-  vector<vector<unsigned>>            model_age_bins_;
-  vector<vector<float>>               mls_by_space_;
-  vector<vector<float>>               discard_by_space_;
-  vector<vector<unsigned>>            current_year_by_space_;
-  vector<vector<unsigned>>            current_time_step_by_space_;
-  vector<vector<float>>               scanning_prop_year_by_space_;
 
-  // For Tag-recaptures
+  // For scanning and Tag-recaptures optional
+  parameters::Table*                  scanning_table_ = nullptr;
   vector<unsigned>                    scanning_years_;
-  vector<float>                       scanning_proportion_;
+  map<unsigned,vector<float>>         scanning_proportion_by_fishery_;
 
   // For reporting
   map<unsigned, float>                actual_removals_by_year_;
