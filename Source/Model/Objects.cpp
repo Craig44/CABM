@@ -251,7 +251,7 @@ void Objects::ExplodeString(const string& parameter_absolute_name, string &type,
   index      = "";
    /**
      * This snippet of code will split the parameter from
-     * objectType[ObjectName].ObjectParam(Index)
+     * objectType[ObjectName].ObjectParam{Index}
      */
    vector<string> token_list;
 
