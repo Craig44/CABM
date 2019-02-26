@@ -29,10 +29,12 @@ struct composition_data {
   unsigned row_;
   unsigned col_;
   vector<float> frequency_;
+  vector<float> female_frequency_;
   composition_data(string type, unsigned year, unsigned row, unsigned col, unsigned size) : type_(type), year_(year),
       row_(row), col_(col)
   {
-    frequency_.resize(size);
+    frequency_.resize(size, 0.0);
+    female_frequency_.resize(size, 0.0);
   }
 };
 
@@ -42,6 +44,8 @@ struct census_data {
   unsigned row_;
   unsigned col_;
   float    biomass_; // Total biomass
+  vector<unsigned> fishery_ndx_;
+  vector<unsigned> sex_;
   vector<unsigned> age_ndx_;
   vector<unsigned> length_ndx_;
   vector<float> scalar_;
@@ -57,6 +61,8 @@ struct tag_recapture {
   unsigned time_step_;
   unsigned scanned_fish_ = 0;
   vector<unsigned> age_;
+  vector<unsigned> sex_;
+  vector<unsigned> fishery_ndx_;
   vector<float> length_;
   vector<unsigned> time_at_liberty_;
   vector<unsigned> tag_row_;
