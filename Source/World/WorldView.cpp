@@ -265,6 +265,7 @@ WorldCell* WorldView::get_cached_square(int RowIndex, int ColIndex) {
   return &cached_grid_[RowIndex][ColIndex];
 }
 
+// Called in model.cpp RunBasic(); to update agent parameters.
 void WorldView::rebuild_agent_time_varying_params() {
   LOG_FINE();
   if (update_growth_params_ || update_mortality_params_) {
@@ -272,10 +273,10 @@ void WorldView::rebuild_agent_time_varying_params() {
       for (unsigned j = 0; j < width_; ++j) {
         if (base_grid_[i][j].is_enabled()) {
           if (update_growth_params_) {
-            base_grid_[i][j].update_growth_params();
+            base_grid_[i][j].apply_growth_time_varying();
           }
           if (update_mortality_params_)
-            base_grid_[i][j].update_mortality_params();
+            base_grid_[i][j].apply_mortality_time_varying();
 
         }
       }

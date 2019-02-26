@@ -204,6 +204,54 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
 }
 
 /*
+ * apply_mortality_time_varying applied when we update M parameters using @time_varying block
+ */
+void  WorldCell::apply_mortality_time_varying() {
+  LOG_FINE() << " ";
+  unsigned counter = 0;
+  vector<float> mort_par;
+  mortality_->draw_rate_param(row_, col_, agents_.size(), mort_par);
+  LOG_FINE() << " ";
+  for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+    if ( (*iter).is_alive())
+      (*iter).set_m(mort_par[counter]);
+  }
+
+}
+
+/*
+ * apply_growth_time_varying applied when we update M parameters using @time_varying block
+ * These update functions just randomly allocate a new agent a new growth parameter based on a distribution.
+ */
+void  WorldCell::apply_growth_time_varying() {
+  LOG_FINE() << " ";
+  unsigned counter = 0;
+  vector<vector<float>> growth_pars;
+  vector<vector<float>> female_growth_pars;
+  growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars, 0);
+  if (model_->get_sexed()) {
+    growth_->draw_growth_param(row_, col_, agents_.size(), female_growth_pars, 1);
+  }
+
+  for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+    if ( (*iter).is_alive()) {
+      if ((*iter).get_sex() == 0) {
+        (*iter).set_first_age_length_par(growth_pars[counter][0]);
+        (*iter).set_second_age_length_par(growth_pars[counter][1]);
+        (*iter).set_third_age_length_par(growth_pars[counter][2]);
+        (*iter).set_first_length_weight_par(growth_pars[counter][3]);
+        (*iter).set_second_length_weight_par(growth_pars[counter][4]);
+      } else {
+        (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+        (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+        (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+        (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
+        (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+      }
+    }
+  }
+}
+/*
  * Called in WorldView usually after a movement process, where agents get assigned new parameters if we have spatial Mortality, or growth
  * This is for spatial updating
 */
@@ -225,13 +273,15 @@ void  WorldCell::update_agent_parameters() {
         if ((*iter).get_sex() == 0) {
           (*iter).set_first_age_length_par(growth_pars[counter][0]);
           (*iter).set_second_age_length_par(growth_pars[counter][1]);
-          (*iter).set_first_length_weight_par(growth_pars[counter][2]);
-          (*iter).set_second_length_weight_par(growth_pars[counter][3]);
+          (*iter).set_third_age_length_par(growth_pars[counter][2]);
+          (*iter).set_first_length_weight_par(growth_pars[counter][3]);
+          (*iter).set_second_length_weight_par(growth_pars[counter][4]);
         } else {
           (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
           (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
-          (*iter).set_first_length_weight_par(female_growth_pars[counter][2]);
-          (*iter).set_second_length_weight_par(female_growth_pars[counter][3]);
+          (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+          (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
+          (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
         }
         (*iter).set_m(mort_par[counter]);
       }
@@ -256,13 +306,15 @@ void  WorldCell::update_agent_parameters() {
         if ((*iter).get_sex() == 0) {
           (*iter).set_first_age_length_par(growth_pars[counter][0]);
           (*iter).set_second_age_length_par(growth_pars[counter][1]);
-          (*iter).set_first_length_weight_par(growth_pars[counter][2]);
-          (*iter).set_second_length_weight_par(growth_pars[counter][3]);
+          (*iter).set_third_age_length_par(growth_pars[counter][2]);
+          (*iter).set_first_length_weight_par(growth_pars[counter][3]);
+          (*iter).set_second_length_weight_par(growth_pars[counter][4]);
         } else {
           (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
           (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
-          (*iter).set_first_length_weight_par(female_growth_pars[counter][2]);
-          (*iter).set_second_length_weight_par(female_growth_pars[counter][3]);
+          (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+          (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
+          (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
         }
       }
     }
@@ -301,13 +353,15 @@ void  WorldCell::update_growth_params() {
       if ((*iter).get_sex() == 0) {
         (*iter).set_first_age_length_par(growth_pars[counter][0]);
         (*iter).set_second_age_length_par(growth_pars[counter][1]);
-        (*iter).set_first_length_weight_par(growth_pars[counter][2]);
-        (*iter).set_second_length_weight_par(growth_pars[counter][3]);
+        (*iter).set_third_age_length_par(growth_pars[counter][2]);
+        (*iter).set_first_length_weight_par(growth_pars[counter][3]);
+        (*iter).set_second_length_weight_par(growth_pars[counter][4]);
       } else {
         (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
         (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
-        (*iter).set_first_length_weight_par(female_growth_pars[counter][2]);
-        (*iter).set_second_length_weight_par(female_growth_pars[counter][3]);
+        (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+        (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
+        (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
       }
     }
   }

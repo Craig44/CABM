@@ -175,9 +175,6 @@ void MortalityEventBiomass::DoExecute() {
         }
       }
 
-
-
-
       // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
       random_numbers_.resize(n_agents_ + 1);
       discard_random_numbers_.resize(n_agents_ + 1);
@@ -207,6 +204,7 @@ void MortalityEventBiomass::DoExecute() {
             cell = world_->get_base_square(row, col); // Shared resource...
             catch_taken = catch_layer_[catch_ndx]->get_value(row, col);
             world_catch_to_take += catch_taken;
+            LOG_FINE() << "need to remove " << catch_taken << " weight of fish";
             if (cell->is_enabled()) {
               unsigned counter = 0;
               if (catch_taken > 0) {
@@ -233,9 +231,10 @@ void MortalityEventBiomass::DoExecute() {
                         }
                       } else {
                         // record information
+                        LOG_FINE() << catch_taken << " " <<  this_agent.get_sex() << " " << this_agent.get_weight() << " " << this_agent.get_scalar();
                         catch_taken -= this_agent.get_weight() * this_agent.get_scalar();
                         actual_catch_this_cell += this_agent.get_weight() * this_agent.get_scalar();
-                        age_freq.frequency_[this_agent.get_age_index()] += this_agent.get_scalar(); // This catch actually represents many individuals.
+                        age_freq.frequency_[this_agent.get_age_index()] += this_agent.get_scalar(); // This actually represents many individuals.
                         length_freq.frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
                         census_fishery.age_ndx_.push_back(this_agent.get_age_index());
                         census_fishery.length_ndx_.push_back(this_agent.get_length_bin_index());
@@ -259,15 +258,14 @@ void MortalityEventBiomass::DoExecute() {
                             }
                           }
                         }
-
-                        this_agent.dies();
                       }
+                      this_agent.dies();
                     }
-                    // Make sure we don't end up fishing for infinity
-                    if (catch_attempts >= catch_max) {
-                      LOG_FATAL_P(PARAM_TYPE) << "Too many attempts to catch an agent in the process " << label_ << " in year " << current_year_by_space_[row][col] << " in row " << row + 1 << " and column " << col + 1 << ", remaining catch to take = " << catch_taken << " this most likely means you have" <<
-                         " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation";
-                    }
+                  }
+                  // Make sure we don't end up fishing for infinity
+                  if (catch_attempts >= catch_max) {
+                    LOG_FATAL_P(PARAM_TYPE) << "Too many attempts to catch an agent in the process " << label_ << " in year " << current_year_by_space_[row][col] << " with label '" << catch_layer_label_[catch_ndx] << "' in row " << row + 1 << " and column " << col + 1 << ", remaining catch to take = " << catch_taken << " this most likely means you have" <<
+                       " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation";
                   }
                   ++counter;
                 }
@@ -358,11 +356,11 @@ void MortalityEventBiomass::DoExecute() {
                         this_agent.dies();
                       }
                     }
-                    // Make sure we don't end up fishing for infinity if there are not enough fish here
-                    if (catch_attempts >= catch_max) {
-                      LOG_FATAL_P(PARAM_TYPE) << "Too many attempts to catch an agent in the process " << label_ << " in year " << current_year_by_space_[row][col] << " in row " << row + 1 << " and column " << col + 1 << ", remaining catch to take = " << catch_taken << " this most likely means you have" <<
-                         " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation";
-                    }
+                  }
+                  // Make sure we don't end up fishing for infinity if there are not enough fish here
+                  if (catch_attempts >= catch_max) {
+                    LOG_FATAL_P(PARAM_TYPE) << "Too many attempts to catch an agent in the process " << label_ << " in year " << current_year_by_space_[row][col] << " in row " << row + 1 << " and column " << col + 1 << ", remaining catch to take = " << catch_taken << " this most likely means you have" <<
+                       " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation";
                   }
                   ++counter;
                 }
