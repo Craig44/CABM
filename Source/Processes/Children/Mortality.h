@@ -33,8 +33,8 @@ struct composition_data {
   composition_data(string type, unsigned year, unsigned row, unsigned col, unsigned size) : type_(type), year_(year),
       row_(row), col_(col)
   {
-    frequency_.resize(size, 0.0);
-    female_frequency_.resize(size, 0.0);
+    frequency_.resize(size);
+    female_frequency_.resize(size);
   }
 };
 

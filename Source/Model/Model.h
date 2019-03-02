@@ -108,7 +108,7 @@ public:
   const vector<string>&       initialisation_phases() const { return initialisation_phases_; }
   virtual const vector<unsigned>&  length_bins() const { return length_bins_; }
   virtual const vector<float>&     length_bin_mid_points() const { return length_bin_mid_points_; }
-  bool                        number_of_length_bins() {return length_bin_number_;}
+  unsigned                    number_of_length_bins() {return length_bin_number_;}
 
   virtual bool                length_plus() const { return length_plus_; }
   string&                     get_base_layer_label() {return base_layer_;}
@@ -163,7 +163,7 @@ protected:
   vector<unsigned>            length_bins_;
   bool                        length_plus_ = true;
   vector<float>               length_bin_mid_points_;
-  bool                        length_bin_number_;
+  unsigned                    length_bin_number_;
   bool                        addressable_values_file_ = false;
   unsigned                    adressable_values_count_ = 1;
   bool                        sexed_ = false;

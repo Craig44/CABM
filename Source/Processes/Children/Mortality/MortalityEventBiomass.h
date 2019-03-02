@@ -47,12 +47,12 @@ protected:
   vector<unsigned>                    fishery_index_; // used for look up on all the vectors specific fishery objects, better than maps for random access
   vector<string>                      fishery_label_;
   vector<unsigned>                    catch_year_;
-  vector<vector<string>>              fishery_catch_layer_labels_;
-  vector<vector<float>>               fishery_actual_catch_taken_;
-  vector<vector<float>>               fishery_catch_to_take_;
-  vector<vector<layers::NumericLayer*>>  fishery_catch_layer_;
-  vector<vector<string>>              fishery_selectivity_label_;
-  vector<vector<Selectivity*>>        fishery_selectivity_;
+  vector<vector<string>>              fishery_catch_layer_labels_; // n_fishery * n_years
+  vector<vector<float>>               fishery_actual_catch_taken_; // n_fishery * n_years
+  vector<vector<float>>               fishery_catch_to_take_; // n_fishery * n_years
+  vector<vector<layers::NumericLayer*>>  fishery_catch_layer_; // n_fishery * n_years
+  vector<vector<string>>              fishery_selectivity_label_; // n_fishery * n_sex
+  vector<vector<Selectivity*>>        fishery_selectivity_; // n_fishery * n_sex
   vector<float>                       fishery_mls_;
   vector<float>                       fishery_hand_mort_;
   bool                                selectivity_length_based_ = false;
@@ -66,8 +66,8 @@ protected:
   map<unsigned, float>                actual_removals_by_year_;
   map<unsigned, float>                removals_by_year_;
   bool                                print_extra_info_ = false;
-  vector<composition_data>            age_comp_by_fishery_;
-  vector<composition_data>            length_comp_by_fishery_;
+  vector<vector<composition_data>>    age_comp_by_fishery_; // n_fishery * n_years
+  vector<vector<composition_data>>    length_comp_by_fishery_; // n_fishery * n_years
 
 
 };
