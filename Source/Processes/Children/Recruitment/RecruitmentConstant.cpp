@@ -131,7 +131,7 @@ void RecruitmentConstant::DoExecute() {
       }
     }
   } else {
-    float SSB = derived_quantity_->GetValue(model_->current_year());
+    float SSB = derived_quantity_->GetValue(model_->current_year() - model_->min_age());
     ssb_by_year_[model_->current_year()] = SSB;
     float amount_per = initial_recruits_;
     recruits_by_year_[model_->current_year()] = amount_per;

@@ -145,7 +145,7 @@ void RecruitmentBevertonHolt::DoExecute() {
       }
     }
   } else {
-    float SSB = derived_quantity_->GetValue(model_->current_year());
+    float SSB = derived_quantity_->GetValue(model_->current_year() - model_->min_age());
     ssb_by_year_[model_->current_year()] = SSB;
     float ssb_ratio = SSB / b0_;
     float SR = ssb_ratio / (1.0 - ((5.0 * steepness_ - 1.0) / (4.0 * steepness_)) * (1.0 - ssb_ratio));
