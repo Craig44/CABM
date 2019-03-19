@@ -356,7 +356,6 @@ void MortalityEventBiomass::DoExecute() {
                         break;
                       }
                     }
-                    LOG_FINE() << "fishery_ndx = " << fishery_ndx;
                     // Do we need to take catch from this fishery
                     if (catch_to_take_by_fishery[fishery_ndx] > 0) {
                       if (rng.chance() <= fishery_selectivity_[fishery_ndx][this_agent.get_sex()]->GetResult(this_agent.get_age_index())) {
@@ -413,8 +412,10 @@ void MortalityEventBiomass::DoExecute() {
                     }
                     // Make sure we don't end up fishing for infinity
                     if (catch_attempts >= catch_max) {
-                      LOG_FATAL_P(PARAM_TYPE) << "Too many attempts to catch an agent in the process " << label_ << " in year " << model_->current_year() << " in row " << row + 1 << " and column " << col + 1 << ", remaining catch to take = " << catch_taken << " this most likely means you have" <<
-                         " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation";
+                     LOG_WARNING() << "Too many attempts to catch an agent in the process " << label_ << " in year " << model_->current_year() << " in row " << row + 1 << " and column " << col + 1 << ", remaining catch to take = " << catch_taken << " this most likely means you have" <<
+                         " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation. attempts = " << catch_attempts << " max attempts allowed = " << catch_max;
+                     // Kick out of this cell
+                     break;
                     }
                     ++counter;
                   }
