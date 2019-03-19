@@ -50,7 +50,7 @@ void InitialisationPartition::DoExecute() {
   LOG_FINE() <<" printing report " << label_;
   if (call_number_) {
     cache_ << "*"<< type_ << "[" << label_ << "_1]" << "\n";
-    cache_ << "ewuilibrium_shortcut: " << model_->current_year() << "\n";
+    cache_ << "equilibrium_shortcut: " << model_->current_year() << "\n";
   } else {
     cache_ << "*"<< type_ << "[" << label_ << "_2]" << "\n";
     cache_ << "year: " << model_->current_year() << "\n";
@@ -76,6 +76,7 @@ void InitialisationPartition::DoExecute() {
   }
   ready_for_writing_ = true;
   call_number_ = false;
+  LOG_FINE() << "finished printing report = " << label_;
 }
 
 } /* namespace reports */
