@@ -170,7 +170,7 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
         sex = 1;
     }
     if (sex == 0) {
-      Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1],growth_pars[agent][2], mort_par[agent], model_->current_year(),
+      Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1],growth_pars[agent][2], mort_par[agent], model_->current_year() - model_->min_age(),
           growth_pars[agent][3], growth_pars[agent][4], model_, false, sex, scalar, row_, col_, 0);
       // Check to see if
       while (agent_bin < agents_.size()) {
@@ -185,7 +185,7 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
         agents_.push_back(new_agent);
       }
     } else {
-      Agent new_agent(lat_, lon_, female_growth_pars[agent][0], female_growth_pars[agent][1],female_growth_pars[agent][2], mort_par[agent], model_->current_year(),
+      Agent new_agent(lat_, lon_, female_growth_pars[agent][0], female_growth_pars[agent][1],female_growth_pars[agent][2], mort_par[agent], model_->current_year() - model_->min_age(),
           female_growth_pars[agent][3], female_growth_pars[agent][4], model_, false, sex, scalar, row_, col_, 0);
       // Check to see if
       while (agent_bin < agents_.size()) {
