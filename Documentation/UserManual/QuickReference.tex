@@ -56,11 +56,11 @@
 \defSub{longitude\_bounds} {Longitude bounds for the spatial domain, should include lower and upper bound, so there should be columns + 1 values}
 \defSub{nrows} {number of rows in spatial domain}
 \defSub{ncols} {number of columns in spatial domain}
-\defSub{sexed} {Is sex an attribute of you agent?}
+\defSub{sexed} {Is sex an attribute of then agents?}
 \defSub{proportion\_male} {what proportion of the generated agents should be male?}
-\defSub{maturity\_ogive\_label} {Maturity ogive label for each sex (male female) order is important}
 \defSub{growth\_process\_label} {Label for the growth process in the annual cycle}
 \defSub{natural\_mortality\_process\_label} {Label for the natural mortality process in the annual cycle}
+\defSub{proportion\_male} {}
 \defComLab{observation}{Define an object of type \emph{observation}}\par\par
 \defSub{label} {Label}
 \defSub{type} {Type of observation}
@@ -156,13 +156,7 @@
 \defSub{effort\_layer\_label} {A layer label that is a numeric layer label that contains effort values for each year.}
 \defSub{starting\_value\_for\_lambda} {Total catch by year}
 \par\textbf{\commandlabsubarg{process}{type}{mortality\_event\_biomass}}\par
-\defSub{selectivity} {Selectivity label}
-\defSub{years} {years to apply the process}
-\defSub{catch\_layers} {Spatial layer describing catch by cell for each year, there is a one to one link with the year specified, so make sure the order is right}
-\defSub{minimum\_legel\_length} {The minimum legal length for this fishery, any individual less than this will be returned using some discard mortality}
-\defSub{handling\_mortality} {if discarded due to being under the minimum legal length, what is the probability the individual will die when released}
 \defSub{print\_extra\_info} {if you have process report for this process you can control the amount of information printed to the file.}
-\defSub{scanning\_proportion\_of\_catch} {The proportion of catch scanned in each year}
 \par\textbf{\commandlabsubarg{process}{type}{movement\_box\_transfer}}\par
 \defSub{origin\_cell} {The origin cell associated with each spatial layer (should have a one to one relationship with specified layers), format follows row-col (1-2}
 \defSub{probability\_layers} {Spatial layers (one layer for each origin cell) describing the probability of moving from an origin cell to all other cells in the spatial domain.}
@@ -179,13 +173,13 @@
 \par\textbf{\commandlabsubarg{process}{type}{nop}}\par
 \par\textbf{\commandlabsubarg{process}{type}{recruitment\_beverton\_holt}}\par
 \defSub{b0} {B0}
-\defSub{recruitment\_layer\_label} {A label for the recruitment layer}
+\defSub{recruitment\_layer\_label} {A label for the recruitment layer, that describes spatial distribution of recruits.}
 \defSub{ssb} {A label for the SSB derived quantity}
 \defSub{steepness} {Steepness}
 \defSub{ycs\_values} {YCS (Year-Class-Strength) Values}
 \par\textbf{\commandlabsubarg{process}{type}{recruitment\_constant}}\par
 \defSub{b0} {B0}
-\defSub{recruitment\_layer\_label} {A label for the recruitment layer}
+\defSub{recruitment\_layer\_label} {A label for the recruitment layer, that describes spatial distribution of recruits.}
 \defSub{ssb} {A label for the SSB derived quantity}
 \par\textbf{\commandlabsubarg{process}{type}{tagging}}\par
 \defSub{tag\_release\_layer} {Spatial layer describing catch by cell for each year, there is a one to one link with the year specified, so make sure the order is right}

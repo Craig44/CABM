@@ -511,11 +511,12 @@ years 1990 1991 1992 1993
 
 
 \paragraph{Event-Biomass}\label{para:event_mort}\index{Processes!Mortality!Event-Biomass}
-This is a removal event such as fishing, where we iterate over a range of cells and remove agents based on some selectivity or spatial vulnerability. This is the simplest way to remove individuals from an anthropogenic process, however it is quite annoying to set up for a spatial model with a fine spatial resolution as you need to specify a catch for each cell. An example of how this process is set up is specified below, if you want an alternative fishing process that is based in theoretiical spatial fishing distributions see the next section (Section~\ref{para:effort_based_F}). Advantages over using this mortality process say over the Baranov method (next paragraph~\ref{para:baranov}) is that it allows for agents to have multiple encounters with a fishery, but the negatives is that you cannot simply incorporate simultaneously natural mortality processes, and may be more suited for pulse fisheries.\\
+This is a removal event such as fishing, where we iterate over a range of cells and remove agents based on some selectivity or spatial vulnerability. This is the simplest way to remove individuals from an anthropogenic process, however it is quite annoying to set up for a spatial model with a fine spatial resolution as you need to specify a catch for each cell. An example of how this process is set up is specified below, if you want an alternative fishing process that is based in theoretiical spatial fishing distributions see the next section (Section~\ref{para:effort_based_F}). Advantages using this mortality process say over the Baranov method (next paragraph~\ref{para:baranov}) is that it allows for agents to have multiple encounters with a fishery and it can deal with multiple fisheries with different selectivities and spatial patterns, but the negatives is that you cannot simply incorporate simultaneously natural mortality processes, and may be more suited for a pulse like fishery.\\
 
 \textbf{The algorithm}
 \begin{itemize}
 	\item randomly select an agent, \textbf{with replacement}
+	\item randomly select a fishery (if more than one), \textbf{with replacement}
 	\item check to see if this agent is vulnerable to the fishery either age or length based process, by comparing a uniform random draw with a ogive
 	\item if we are scanning fish for tag-recaptures check for tags
 	\item if we have minimum legal size (MLS) check to see if the fish will be returned this is a true or false statement, if agent length $<$ MLS return with some handling mortality probability that will be again checked with a uniform random variable
@@ -523,6 +524,39 @@ This is a removal event such as fishing, where we iterate over a range of cells 
 	\item repeat the above steps until we have removed a desired biomass or if there are not enough fish to remove we exit with an error.
 \end{itemize}
 The key here is that an agent can interact with fishery many times during a fishing event, but there is no natural mortality.
+
+\pagebreak
+{\small{\begin{verbatim}
+@process Fishing_Mortality
+type mortality_event_biomass
+print_extra_info true ## this may print too much information and slow down model
+table catch ## these are labels for @layer that describe catch over space.
+year FishingTrwl FishingLine
+1972 1972_Trwl 1972_Line
+1973 1973_Trwl 1973_Line
+1974 1974_Trwl 1974_Line
+end_table
+
+table scanning ## proportion of catch scanned for tags
+year FishingTrwl FishingLine
+1972 0.3 0.5
+1973 0.6 0.7
+1974 0.2 0.4
+end_table
+
+## describe fishery specific parameters		
+table method_info
+method          male_selectivity    female_selectivity 	minimum_legel_length  handling_mortality
+FishingTrwl     trwlFSel_m          trwlFSel_f			0			0
+FishingLine	    Sel_Line            Sel_Line			0			0
+end_table
+## if single sex model only have one column called selectivity
+table method_info
+method        selectivity  minimum_legel_length handling_mortality
+FishingTrwl   trwlFSel     0                    0
+FishingLine   Sel_Line     0                    0
+end_table
+\end{verbatim}}}
 
 
 \paragraph{Baranov}\label{para:baranov}\index{Processes!Mortality!Baranov}
