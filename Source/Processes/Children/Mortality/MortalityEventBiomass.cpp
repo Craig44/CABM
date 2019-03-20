@@ -121,6 +121,9 @@ void MortalityEventBiomass::DoValidate() {
   scanning_proportion_by_fishery_.resize(fishery_label_.size());
   age_comp_by_fishery_.resize(fishery_label_.size());
   length_comp_by_fishery_.resize(fishery_label_.size());
+  cell_ndx_.resize(fishery_label_.size());
+
+
 
   LOG_FINE() << "finish Validation";
 }
@@ -266,6 +269,11 @@ void MortalityEventBiomass::DoBuild() {
     }
   }
 
+  for (unsigned i = 0; i < age_comp_by_fishery_.size(); ++i) {
+    age_comp_by_fishery_[i].resize( catch_year_.size());
+    length_comp_by_fishery_[i].resize( catch_year_.size());
+  }
+
   LOG_FINE() << "finished building Tables";
 }
 
@@ -306,15 +314,15 @@ void MortalityEventBiomass::DoExecute() {
                 catch_taken += catch_for_fishery;
                 LOG_FINE() << "need to remove " << catch_for_fishery;
                 composition_data age_freq_for_fishery(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
-                age_comp_by_fishery_[i].push_back(age_freq_for_fishery);
+                age_comp_by_fishery_[i][catch_ndx].push_back(age_freq_for_fishery);
                 composition_data length_freq_for_fishery(PARAM_LENGTH, model_->current_year(), row, col, model_->number_of_length_bins());
-                length_comp_by_fishery_[i].push_back(length_freq_for_fishery);
+                length_comp_by_fishery_[i][catch_ndx].push_back(length_freq_for_fishery);
 
-                LOG_FINE() << "catch_ndx = " << catch_ndx + 1 << " size of vectors " <<  length_comp_by_fishery_[i].size();
                 if (catch_for_fishery > 0.0) {
                   catch_to_take_by_fishery.push_back(catch_for_fishery);
                   fisheries_to_sample_from.push_back(i);
                 }
+                cell_ndx_[i] = age_comp_by_fishery_[i][catch_ndx].size() - 1;
               }
               vector<float> prop_catch_by_fishery = catch_to_take_by_fishery;
               for (unsigned i = 0; i < prop_catch_by_fishery.size(); ++i)
@@ -374,11 +382,11 @@ void MortalityEventBiomass::DoExecute() {
                           length_freq.frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
 
                           if (this_agent.get_sex() == 0) {
-                            age_comp_by_fishery_[fishery_ndx][catch_ndx].frequency_[this_agent.get_age_index()] += this_agent.get_scalar();
-                            length_comp_by_fishery_[fishery_ndx][catch_ndx].frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
+                            age_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].frequency_[this_agent.get_age_index()] += this_agent.get_scalar();
+                            length_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
                           } else {
-                            age_comp_by_fishery_[fishery_ndx][catch_ndx].female_frequency_[this_agent.get_age_index()] += this_agent.get_scalar();
-                            length_comp_by_fishery_[fishery_ndx][catch_ndx].female_frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
+                            age_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].female_frequency_[this_agent.get_age_index()] += this_agent.get_scalar();
+                            length_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].female_frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
                           }
                           global_age_freq[this_agent.get_age_index()] += this_agent.get_scalar();
                           census_fishery.age_ndx_.push_back(this_agent.get_age_index());
@@ -585,13 +593,14 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
         for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
           cache << age << " ";
         cache << "\n";
-        vector<unsigned> temp_age_freq(model_->age_spread(), 0.0);
-        for (unsigned i = 0; i < age_comp_by_fishery_[fishery].size(); ++i) {
-          cache << catch_year_[i] << " ";
-          for (unsigned j = 0; j < age_comp_by_fishery_[fishery][i].frequency_.size(); ++j) {
-            if (age_comp_by_fishery_[fishery][i].year_ == catch_year_[i]) {
-              for (unsigned age_ndx = 0; age_ndx < age_comp_by_fishery_[fishery][i].frequency_.size(); ++age_ndx)
-                temp_age_freq[age_ndx] += age_comp_by_fishery_[fishery][i].frequency_[age_ndx];
+        for (unsigned year_ndx = 0; year_ndx < age_comp_by_fishery_[fishery].size(); ++year_ndx) {
+          vector<unsigned> temp_age_freq(model_->age_spread(), 0.0);
+          cache << catch_year_[year_ndx] << " ";
+          // Accumulate over all cells
+          for (unsigned cell_ndx = 0; cell_ndx < age_comp_by_fishery_[fishery][year_ndx].size(); ++cell_ndx) {
+            if (age_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
+              for (unsigned age_ndx = 0; age_ndx < age_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_.size(); ++age_ndx)
+                temp_age_freq[age_ndx] += age_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_[age_ndx];
             }
           }
           for (auto& age_freq : temp_age_freq)
@@ -606,13 +615,14 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
         for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
           cache << age << " ";
         cache << "\n";
-        vector<unsigned> temp_age_freq(model_->age_spread(), 0.0);
-        for (unsigned i = 0; i < age_comp_by_fishery_[fishery].size(); ++i) {
-          cache << catch_year_[i] << " ";
-          for (unsigned j = 0; j < age_comp_by_fishery_[fishery][i].female_frequency_.size(); ++j) {
-            if (age_comp_by_fishery_[fishery][i].year_ == catch_year_[i]) {
-              for (unsigned age_ndx = 0; age_ndx < age_comp_by_fishery_[fishery][i].female_frequency_.size(); ++age_ndx)
-                temp_age_freq[age_ndx] += age_comp_by_fishery_[fishery][i].female_frequency_[age_ndx];
+        for (unsigned year_ndx = 0; year_ndx < age_comp_by_fishery_[fishery].size(); ++year_ndx) {
+          vector<unsigned> temp_age_freq(model_->age_spread(), 0.0);
+          cache << catch_year_[year_ndx] << " ";
+          // Accumulate over all cells
+          for (unsigned cell_ndx = 0; cell_ndx < age_comp_by_fishery_[fishery][year_ndx].size(); ++cell_ndx) {
+            if (age_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
+              for (unsigned age_ndx = 0; age_ndx < age_comp_by_fishery_[fishery][year_ndx][cell_ndx].female_frequency_.size(); ++age_ndx)
+                temp_age_freq[age_ndx] += age_comp_by_fishery_[fishery][year_ndx][cell_ndx].female_frequency_[age_ndx];
             }
           }
           for (auto& age_freq : temp_age_freq)
@@ -628,13 +638,14 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
         for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
           cache << age << " ";
         cache << "\n";
-        vector<unsigned> temp_age_freq(model_->age_spread(), 0.0);
-        for (unsigned i = 0; i < age_comp_by_fishery_[fishery].size(); ++i) {
-          cache << catch_year_[i] << " ";
-          for (unsigned j = 0; j < age_comp_by_fishery_[fishery][i].frequency_.size(); ++j) {
-            if (age_comp_by_fishery_[fishery][i].year_ == catch_year_[i]) {
-              for (unsigned age_ndx = 0; age_ndx < age_comp_by_fishery_[fishery][i].frequency_.size(); ++age_ndx)
-                temp_age_freq[age_ndx] += age_comp_by_fishery_[fishery][i].frequency_[age_ndx];
+        for (unsigned year_ndx = 0; year_ndx < age_comp_by_fishery_[fishery].size(); ++year_ndx) {
+          vector<unsigned> temp_age_freq(model_->age_spread(), 0.0);
+          cache << catch_year_[year_ndx] << " ";
+          // Accumulate over all cells
+          for (unsigned cell_ndx = 0; cell_ndx < age_comp_by_fishery_[fishery][year_ndx].size(); ++cell_ndx) {
+            if (age_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
+              for (unsigned age_ndx = 0; age_ndx < age_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_.size(); ++age_ndx)
+                temp_age_freq[age_ndx] += age_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_[age_ndx];
             }
           }
           for (auto& age_freq : temp_age_freq)

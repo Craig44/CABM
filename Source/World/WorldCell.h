@@ -52,6 +52,9 @@ public:
   void                        birth_agents(unsigned number_agents_to_birth, float scalar);
   void                        set_scalar();
   void                        get_age_frequency(vector<unsigned>& age_freq);
+  void                        get_female_frequency(vector<unsigned>& age_freq);
+  void                        get_male_frequency(vector<unsigned>& age_freq);
+
   float                       get_abundance();
   float                       get_biomass();
   float                       get_mature_biomass();

@@ -56,22 +56,63 @@ void AgeFrequencyByCell::DoExecute() {
   cache_ << "*"<< type_ << "[" << label_ << "]\n";
   cache_ << "year: " << model_->current_year() << "\n";
   cache_ << "time_step: " << time_step_ << "\n";
-  cache_ << "values "<< REPORT_R_DATAFRAME<<"\n";
-  cache_ << "row-col";
-  for (unsigned i = model_->min_age(); i <=  model_->max_age(); ++i)
-    cache_ << " " << i;
-  cache_ << "\n";
+  if (model_->get_sexed()) {
+    cache_ << "male-values "<< REPORT_R_DATAFRAME<<"\n";
+    cache_ << "row-col";
+    for (unsigned i = model_->min_age(); i <=  model_->max_age(); ++i)
+      cache_ << " " << i;
+    cache_ << "\n";
 
-  vector<unsigned> age_freq;
-  for (unsigned row = 0; row < model_->get_height(); ++row) {
-    for (unsigned col = 0; col < model_->get_width(); ++col) {
-      WorldCell* cell = world_->get_base_square(row, col);
-      if (cell->is_enabled()) {
-        cache_ << row + 1 << "-" << col + 1;
-        cell->get_age_frequency(age_freq);
-        for(auto& age : age_freq)
-          cache_ << " " << age;
-        cache_ << "\n";
+    vector<unsigned> age_freq_male;
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        WorldCell* cell = world_->get_base_square(row, col);
+        if (cell->is_enabled()) {
+          cache_ << row + 1 << "-" << col + 1;
+          cell->get_male_frequency(age_freq_male);
+          for(auto& age : age_freq_male)
+            cache_ << " " << age;
+          cache_ << "\n";
+        }
+      }
+    }
+    cache_ << "female-values "<< REPORT_R_DATAFRAME<<"\n";
+    cache_ << "row-col";
+    for (unsigned i = model_->min_age(); i <=  model_->max_age(); ++i)
+      cache_ << " " << i;
+    cache_ << "\n";
+
+    vector<unsigned> age_freq_female;
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        WorldCell* cell = world_->get_base_square(row, col);
+        if (cell->is_enabled()) {
+          cache_ << row + 1 << "-" << col + 1;
+          cell->get_female_frequency(age_freq_female);
+          for(auto& age : age_freq_female)
+            cache_ << " " << age;
+          cache_ << "\n";
+        }
+      }
+    }
+  } else {
+    cache_ << "values "<< REPORT_R_DATAFRAME<<"\n";
+    cache_ << "row-col";
+    for (unsigned i = model_->min_age(); i <=  model_->max_age(); ++i)
+      cache_ << " " << i;
+    cache_ << "\n";
+
+    vector<unsigned> age_freq;
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        WorldCell* cell = world_->get_base_square(row, col);
+        if (cell->is_enabled()) {
+          cache_ << row + 1 << "-" << col + 1;
+          cell->get_age_frequency(age_freq);
+          for(auto& age : age_freq)
+            cache_ << " " << age;
+          cache_ << "\n";
+        }
       }
     }
   }

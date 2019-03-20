@@ -53,8 +53,8 @@ protected:
   vector<vector<layers::NumericLayer*>>  fishery_catch_layer_; // n_fishery * n_years
   vector<vector<string>>              fishery_selectivity_label_; // n_fishery * n_sex
   vector<vector<Selectivity*>>        fishery_selectivity_; // n_fishery * n_sex
-  vector<float>                       fishery_mls_;
-  vector<float>                       fishery_hand_mort_;
+  vector<float>                       fishery_mls_; // fishery specific
+  vector<float>                       fishery_hand_mort_; // fishery specific
   bool                                selectivity_length_based_ = false;
 
   // For scanning and Tag-recaptures optional
@@ -66,8 +66,9 @@ protected:
   map<unsigned, float>                actual_removals_by_year_;
   map<unsigned, float>                removals_by_year_;
   bool                                print_extra_info_ = false;
-  vector<vector<composition_data>>    age_comp_by_fishery_; // n_fishery * n_years
-  vector<vector<composition_data>>    length_comp_by_fishery_; // n_fishery * n_years
+  vector<vector<vector<composition_data>>>    age_comp_by_fishery_; // n_fishery * n_years * n_cells
+  vector<vector<vector<composition_data>>>   length_comp_by_fishery_; // n_fishery * n_years * n_cells
+  vector<unsigned>                    cell_ndx_;
 
 
 };

@@ -419,4 +419,32 @@ void  WorldCell::get_age_frequency(vector<unsigned>& age_freq) {
   }
 }
 
+
+
+/*
+ * Return male age frequency
+*/
+void  WorldCell::get_male_frequency(vector<unsigned>& age_freq) {
+  age_freq.clear();
+  age_freq.resize(model_->age_spread(),0);
+  for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
+    if ((*iter).is_alive() and (*iter).get_sex() == 0) {
+      age_freq[(*iter).get_age_index()]++;
+    }
+  }
+}
+
+
+/*
+ * Returns total female age frequency
+*/
+void  WorldCell::get_female_frequency(vector<unsigned>& age_freq) {
+  age_freq.clear();
+  age_freq.resize(model_->age_spread(),0);
+  for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
+    if ((*iter).is_alive() and (*iter).get_sex() == 1) {
+      age_freq[(*iter).get_age_index()]++;
+    }
+  }
+}
 } /* namespace niwa */
