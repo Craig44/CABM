@@ -1,7 +1,7 @@
 @model
 start_year 1940
 final_year 1992
-min_age 0
+min_age 1
 max_age 30
 age_plus true # other acceptable inputs for bool are '1' and 'yes'
 initialisation_phase_labels Iterative #label to an @initialisation block
@@ -25,7 +25,7 @@ type iterative
 years 40
 #convergence_years 20 40
 #lambda 1
-number_of_individuals 100000 ## initial number of agents
+number_of_individuals 1000000 ## initial number of agents
 layer_label Base
 recruitment_layer_label recruitment_labels
 # --------------
@@ -48,11 +48,11 @@ type growth_von_bertalanffy_with_basic_weight
 linf 101.8
 #k_layer_label k_layer
 k 0.161
-a 2.0e-6 
+a 2.0e-9 
 b 3.288
 update_growth_parameters false
 distribution lognormal
-cv 0.0001
+cv 0.00000001
 time_step_proportions 1
 
 # Maturity
@@ -66,16 +66,34 @@ update_mortality_parameters false
 m_multiplier_layer_label M_layer
 m 0.2
 distribution lognormal
-cv 0.0001
+cv 0.00000001
 selectivity_label One
 time_step_ratio 1
 
 # Fishing Mortality
 @process fishing
 type mortality_event_biomass
-years 1970 1981:1990
-catch_layers catch_1970 catch_1981 catch_1982 catch_1983 catch_1984 catch_1985 catch_1986 catch_1987 catch_1988 catch_1989 catch_1990 
-selectivity trawl_selectivity
+print_extra_info true
+table catch
+year FishingTrwl
+1970 catch_1970
+1981 catch_1981
+1982 catch_1982
+1983 catch_1983
+1984 catch_1984
+1985 catch_1985
+1986 catch_1986
+1987 catch_1987
+1988 catch_1988
+1989 catch_1989
+1990 catch_1990
+end_table
+
+table method_info
+method 	 	selectivity	 	minimum_legel_length  handling_mortality
+FishingTrwl     trawl_selectivity	0			0
+end_table
+
 
 
 /*
@@ -93,7 +111,7 @@ ssb SSB
 @process Recruitment_const
 type recruitment_constant
 recruitment_layer_label recruit_layer
-b0 29924.6 
+b0 29892.9
 ssb SSB
 # --------------
 # Define selectivities
@@ -159,6 +177,11 @@ process Maturation
 @report fishing
 type process
 process fishing
+
+
+@report Rec
+type process
+process Recruitment_const
 
 /*
 @report Recruitment_report
