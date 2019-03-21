@@ -320,6 +320,15 @@ void Object::RegisterAsAddressable(map<string, vector<float>>* variables) {
   unnamed_addressable_s_map_vector_.push_back(variables);
 }
 
+
+/**
+ * The default Rebuild cache will call
+ * the subscribers rebuild cache so a cascading cache rebuild will
+ * take effect when something like a time varying parameter is hit.
+ */
+void Object::RebuildCache() {
+}
+
 /**
  * This method will print the same value as the locations() method on the ParameterList for a given
  * parameter except it'll doing it for the whole base object
@@ -351,6 +360,26 @@ void Object::PrintParameterQueryInfo() {
   }
 
 }
+
+/**
+ * This method allows one object to subscribe to the RebuildCache of another. We use this with things like
+ * time varying parameters where a process can subscribe to a selectivity. The selectivity will notify the
+ * process it has changed and the process can handle any updates it wants.
+ *
+ * @param subscriber The object that wants to subscribe to this object
+ */
+void Object::SubscribeToRebuildCache(Object* subscriber) {
+  rebuild_cache_subscribers_.push_back(subscriber);
+}
+
+/**
+ * This method will notify subscribers of a cache rebuild event
+ */
+void Object::NotifySubscribers() {
+  for (auto subscriber : rebuild_cache_subscribers_)
+    subscriber->RebuildCache();
+}
+
 
 } /* namespace base */
 } /* namespace niwa */

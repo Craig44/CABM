@@ -85,7 +85,9 @@ public:
   vector<float>*                  GetAddressableVector(const string& label);
   addressable::Type               GetAddressableType(const string& label) const;
   void                            PrintParameterQueryInfo();
-  virtual void                    RebuildCache() { };
+  void                            SubscribeToRebuildCache(Object* subscriber);
+  void                            NotifySubscribers();
+  virtual void                    RebuildCache();
 
   // pure virtual methods
   virtual void                    Reset() = 0;
@@ -121,6 +123,7 @@ protected:
   map<string, vector<float*> >    addressable_custom_vectors_;
   map<string, addressable::Type>  addressable_types_;
   map<string, addressable::Usage> addressable_usage_;
+  vector<Object*>                 rebuild_cache_subscribers_;
 
   map<string, map<unsigned, float>* >      addressable_u_maps_;
   map<string, OrderedMap<string, float>* > addressable_s_maps_;
