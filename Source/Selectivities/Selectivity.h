@@ -33,7 +33,7 @@ public:
   void                        Validate();
   virtual void                Build() { RebuildCache(); };
   void                        Reset();
-  virtual float               GetResult(unsigned age_or_length); // Age and or Length INDEX not the actual value
+  virtual float               GetResult(unsigned age_or_length); // Age and or Length INDEX !! not the actual value
   bool                        is_length_based() {return length_based_;}
   bool                        include_zero_age_values_;
 

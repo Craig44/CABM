@@ -66,7 +66,7 @@ void Observation::DoExecute() {
     }
   }
 
-  if (observation_->type() == PARAM_MORTALITY_SCALES_AGE_FREQUENCY) {
+  if (observation_->type() == PARAM_MORTALITY_SCALES_AGE_FREQUENCY || observation_->type() == PARAM_MORTALITY_EVENT_BIOMASS_SCALED_AGE_FREQUENCY) {
     // Print the age length key for curiosity
     map<unsigned,map<string,vector<float>>>& LF = observation_->get_lf();
     map<unsigned,map<string,vector<vector<float>>>>& ALK = observation_->get_alk();

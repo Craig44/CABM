@@ -40,6 +40,10 @@ public:
   void                                draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) override final { };
   void                                FillReportCache(ostringstream& cache) override final;
   virtual bool                        check_years(vector<unsigned> years_to_check_) override final;
+  bool                                check_fishery_exists(string fishery_label);
+  vector<unsigned>&                   get_fishery_years() {return catch_year_;};
+  vector<vector<census_data>>         get_fishery_census_data(string fishery_label);
+
 
 protected:
   parameters::Table*                  catch_table_ = nullptr;
@@ -68,6 +72,8 @@ protected:
   bool                                print_extra_info_ = false;
   vector<vector<vector<composition_data>>>    age_comp_by_fishery_; // n_fishery * n_years * n_cells
   vector<vector<vector<composition_data>>>   length_comp_by_fishery_; // n_fishery * n_years * n_cells
+  vector<vector<vector<census_data>>>   fishery_census_data_; // n_fishery * n_years * n_cells
+
   vector<unsigned>                    cell_ndx_;
 
 

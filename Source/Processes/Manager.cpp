@@ -115,6 +115,28 @@ Growth* Manager::GetGrowthProcess(const string& label) {
  * @param label The name of the process to find
  * @return A pointer to the process or empty pointer
  */
+MortalityEventBiomass* Manager::GetMortalityEventBiomassProcess(const string& label) {
+  LOG_TRACE();
+  MortalityEventBiomass* mortality_ptr = nullptr;
+  for (auto process : objects_) {
+    if ((process->label() == label) && (process->type() == PARAM_MORTALITY_EVENT_BIOMASS)) {
+      mortality_ptr = dynamic_cast<MortalityEventBiomass*>(process);
+      return mortality_ptr;
+    }
+  }
+
+  return mortality_ptr;
+}
+
+
+/**
+ * Return the growth process with the name passed in as a parameter.
+ * If no process is found then an empty pointer will
+ * be returned.
+ *
+ * @param label The name of the process to find
+ * @return A pointer to the process or empty pointer
+ */
 Mortality* Manager::GetMortalityProcess(const string& label) {
   LOG_TRACE();
   Mortality* mortality_ptr = nullptr;

@@ -121,6 +121,7 @@ void MortalityEventBiomass::DoValidate() {
   scanning_proportion_by_fishery_.resize(fishery_label_.size());
   age_comp_by_fishery_.resize(fishery_label_.size());
   length_comp_by_fishery_.resize(fishery_label_.size());
+  fishery_census_data_.resize(fishery_label_.size());
   cell_ndx_.resize(fishery_label_.size());
 
 
@@ -272,6 +273,7 @@ void MortalityEventBiomass::DoBuild() {
   for (unsigned i = 0; i < age_comp_by_fishery_.size(); ++i) {
     age_comp_by_fishery_[i].resize( catch_year_.size());
     length_comp_by_fishery_[i].resize( catch_year_.size());
+    fishery_census_data_[i].resize( catch_year_.size());
   }
 
   LOG_FINE() << "finished building Tables";
@@ -318,6 +320,8 @@ void MortalityEventBiomass::DoExecute() {
                 age_comp_by_fishery_[i][catch_ndx].push_back(age_freq_for_fishery);
                 composition_data length_freq_for_fishery(PARAM_LENGTH, model_->current_year(), row, col, model_->number_of_length_bins());
                 length_comp_by_fishery_[i][catch_ndx].push_back(length_freq_for_fishery);
+                census_data census_fishery_specific(model_->current_year(), row, col);
+                fishery_census_data_[i][catch_ndx].push_back(census_fishery_specific);
 
                 if (catch_for_fishery > 0.0) {
                   catch_to_take_by_fishery.push_back(catch_for_fishery);
@@ -390,12 +394,13 @@ void MortalityEventBiomass::DoExecute() {
                             length_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].female_frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
                           }
                           global_age_freq[this_agent.get_age_index()] += this_agent.get_scalar();
-                          census_fishery.age_ndx_.push_back(this_agent.get_age_index());
-                          census_fishery.sex_.push_back(this_agent.get_sex());
-                          census_fishery.length_ndx_.push_back(this_agent.get_length_bin_index());
-                          census_fishery.fishery_ndx_.push_back(fishery_ndx);
-                          census_fishery.scalar_.push_back(this_agent.get_scalar());
-                          census_fishery.biomass_+= this_agent.get_weight() * this_agent.get_scalar();
+
+                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].age_ndx_.push_back(this_agent.get_age_index());
+                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].sex_.push_back(this_agent.get_sex());
+                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].fishery_ndx_.push_back(fishery_ndx);
+                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].length_ndx_.push_back(this_agent.get_length_bin_index());
+                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].scalar_.push_back(this_agent.get_scalar());
+                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].biomass_+= this_agent.get_weight() * this_agent.get_scalar();
 
                           if (scanning_) {
                             // Probability of scanning agent
@@ -467,7 +472,8 @@ void MortalityEventBiomass::DoExecute() {
                 age_comp_by_fishery_[i][catch_ndx].push_back(age_freq_for_fishery);
                 composition_data length_freq_for_fishery(PARAM_LENGTH, model_->current_year(), row, col, model_->number_of_length_bins());
                 length_comp_by_fishery_[i][catch_ndx].push_back(length_freq_for_fishery);
-
+                census_data census_fishery_specific(model_->current_year(), row, col);
+                fishery_census_data_[i][catch_ndx].push_back(census_fishery_specific);
                 if (catch_for_fishery > 0.0) {
                   catch_to_take_by_fishery.push_back(catch_for_fishery);
                   fisheries_to_sample_from.push_back(i);
@@ -516,7 +522,7 @@ void MortalityEventBiomass::DoExecute() {
                     }
                     // Do we need to take catch from this fishery
                     if (catch_to_take_by_fishery[fishery_ndx] > 0) {
-                      if (rng.chance() <= fishery_selectivity_[fishery_ndx][this_agent.get_sex()]->GetResult(this_agent.get_age_index())) {
+                      if (rng.chance() <= fishery_selectivity_[fishery_ndx][this_agent.get_sex()]->GetResult(this_agent.get_length_bin_index())) {
                         // check under MLS and apply some handling mortality
                         if (this_agent.get_length() < fishery_mls_[fishery_ndx]) {
                           if (rng.chance() <= fishery_hand_mort_[fishery_ndx]) {
@@ -539,12 +545,13 @@ void MortalityEventBiomass::DoExecute() {
                             length_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].female_frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
                           }
                           global_age_freq[this_agent.get_age_index()] += this_agent.get_scalar();
-                          census_fishery.age_ndx_.push_back(this_agent.get_age_index());
-                          census_fishery.sex_.push_back(this_agent.get_sex());
-                          census_fishery.length_ndx_.push_back(this_agent.get_length_bin_index());
-                          census_fishery.fishery_ndx_.push_back(fishery_ndx);
-                          census_fishery.scalar_.push_back(this_agent.get_scalar());
-                          census_fishery.biomass_+= this_agent.get_weight() * this_agent.get_scalar();
+
+                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].age_ndx_.push_back(this_agent.get_age_index());
+                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].sex_.push_back(this_agent.get_sex());
+                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].length_ndx_.push_back(this_agent.get_length_bin_index());
+                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].scalar_.push_back(this_agent.get_scalar());
+                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].biomass_+= this_agent.get_weight() * this_agent.get_scalar();
+                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].fishery_ndx_.push_back(fishery_ndx);
 
                           if (scanning_) {
                             // Probability of scanning agent
@@ -583,7 +590,7 @@ void MortalityEventBiomass::DoExecute() {
                   LOG_FINE() << catch_;
                 removals_by_length_and_area_.push_back(length_freq);
                 removals_by_age_and_area_.push_back(age_freq);
-                removals_census_.push_back(census_fishery);
+                removals_census_.push_back(fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]]);
                 if (scanning_) {
                   removals_tag_recapture_.push_back(tag_recapture_info);
                 }
@@ -631,6 +638,55 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
     }
   }
 
+  // Get rid of this later, but check census data is the same as age-freq which has been validated
+  if (fishery_census_data_.size() > 0) {
+    if (model_->get_sexed()) {
+      for (auto& fishery : fishery_index_) {
+        cache << "age_freq-census-male-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
+        cache << "year ";
+        for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
+          cache << age << " ";
+        cache << "\n";
+        for (unsigned year_ndx = 0; year_ndx < fishery_census_data_[fishery].size(); ++year_ndx) {
+          vector<unsigned> temp_age_freq(model_->age_spread(), 0.0);
+          cache << catch_year_[year_ndx] << " ";
+          for (unsigned cell_ndx = 0; cell_ndx < fishery_census_data_[fishery][year_ndx].size(); ++cell_ndx) {
+            if (fishery_census_data_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
+              for (unsigned age_ndx = 0; age_ndx < fishery_census_data_[fishery][year_ndx][cell_ndx].age_ndx_.size(); ++age_ndx) {
+                if (fishery_census_data_[fishery][year_ndx][cell_ndx].sex_[age_ndx] == 0)
+                  temp_age_freq[fishery_census_data_[fishery][year_ndx][cell_ndx].age_ndx_[age_ndx]]++;
+              }
+            }
+          }
+          for (auto& age_freq : temp_age_freq)
+            cache << age_freq << " ";
+          cache << "\n";
+        }
+      }
+      for (auto& fishery : fishery_index_) {
+        cache << "age_freq-census-female-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
+        cache << "year ";
+        for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
+          cache << age << " ";
+        cache << "\n";
+        for (unsigned year_ndx = 0; year_ndx < fishery_census_data_[fishery].size(); ++year_ndx) {
+          vector<unsigned> temp_age_freq(model_->age_spread(), 0.0);
+          cache << catch_year_[year_ndx] << " ";
+          for (unsigned cell_ndx = 0; cell_ndx < fishery_census_data_[fishery][year_ndx].size(); ++cell_ndx) {
+            if (fishery_census_data_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
+              for (unsigned age_ndx = 0; age_ndx < fishery_census_data_[fishery][year_ndx][cell_ndx].age_ndx_.size(); ++age_ndx) {
+                if (fishery_census_data_[fishery][year_ndx][cell_ndx].sex_[age_ndx] == 1)
+                  temp_age_freq[fishery_census_data_[fishery][year_ndx][cell_ndx].age_ndx_[age_ndx]]++;
+              }
+            }
+          }
+          for (auto& age_freq : temp_age_freq)
+            cache << age_freq << " ";
+          cache << "\n";
+        }
+      }
+    }
+  }
 
   // age frequency by sex fishery and year
   if (age_comp_by_fishery_.size() > 0) {
@@ -775,6 +831,28 @@ bool MortalityEventBiomass::check_years(vector<unsigned> years_to_check_) {
 
   return true;
 
+}
+// Does this fishery exist?
+// yes = true
+// no = false
+bool MortalityEventBiomass::check_fishery_exists(string fishery_label) {
+  LOG_FINE();
+  if (find(fishery_label_.begin(), fishery_label_.end(), fishery_label) != fishery_label_.end())
+    return true;
+
+  return false;
+
+}
+
+// find and return age comp data for this fishery.
+vector<vector<census_data>>  MortalityEventBiomass::get_fishery_census_data(string fishery_label) {
+  LOG_FINE();
+  vector<vector<census_data>> fish_comp;
+  for (unsigned i = 0; i < fishery_label_.size(); ++i) {
+    if (fishery_label_[i] == fishery_label)
+      fish_comp = fishery_census_data_[fishery_index_[i]];
+  }
+  return fish_comp;
 }
 
 } /* namespace processes */

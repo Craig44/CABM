@@ -73,6 +73,7 @@ void MortalityConstantRate::DoBuild() {
     Selectivity* temp_selectivity = model_->managers().selectivity()->GetSelectivity(label);
     if (!temp_selectivity)
       LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << ": selectivity " << label << " does not exist. Have you defined it?";
+    temp_selectivity->SubscribeToRebuildCache(this);
 
     selectivity_.push_back(temp_selectivity);
     if (first) {
