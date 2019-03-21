@@ -1,5 +1,5 @@
 /**
- * @file MortalityScaledAgeFrequency.h
+ * @file MortalityEventBiomassScaledAgeFrequency.h
  * @author  C.Marsh github.com/Craig44
  * @date 4/11/2018
  * @section LICENSE
@@ -11,33 +11,32 @@
  * with ageing error and scales the length frequency through the age length key to generate a final age
  * frequency
  */
-#ifndef OBSERVATIONS_MORTALITY_SCALED_AGE_FREQUENCY_H_
-#define OBSERVATIONS_MORTALITY_SCALED_AGE_FREQUENCY_H_
+#ifndef OBSERVATIONS_MORTALITY_EVENT_BIOMASS_SCALED_AGE_FREQUENCY_H_
+#define OBSERVATIONS_MORTALITY_EVENT_BIOMASS_SCALED_AGE_FREQUENCY_H_
 
 // headers
 #include "Observations/Observation.h"
 #include "Layers/Children/CategoricalLayer.h"
 
 #include "AgeingErrors/AgeingError.h"
-#include "Processes/Children/Mortality.h"
+//#include "Processes/Children/Mortality.h"
+#include "Processes/Children/Mortality/MortalityEventBiomass.h"
 
 
 // namespaces
 namespace niwa {
 namespace observations {
 
-using processes::Mortality;
-
-
+using processes::MortalityEventBiomass;
 
 /**
  * class definition
  */
-class MortalityScaledAgeFrequency : public niwa::Observation {
+class MortalityEventBiomassScaledAgeFrequency : public niwa::Observation {
 public:
   // methods
-	MortalityScaledAgeFrequency(Model* model);
-  virtual                     ~MortalityScaledAgeFrequency();
+  MortalityEventBiomassScaledAgeFrequency(Model* model);
+  virtual                     ~MortalityEventBiomassScaledAgeFrequency();
   void                        DoValidate() override final;
   virtual void                DoBuild() override;
   void                        DoReset() override final { };
@@ -59,7 +58,8 @@ protected:
 
   unsigned                        number_of_bootstraps_ = 0;
 
-  Mortality*                      mortality_process_ = nullptr;
+  string                          fishery_label_;
+  MortalityEventBiomass*          mortality_process_ = nullptr;
   string                          process_label_;
   string                          stratum_weight_method_ = PARAM_NONE;
   // TODO change from string -> unsigned int for a little speed up
@@ -68,8 +68,8 @@ protected:
   map<string,float>               stratum_area_;
   map<string,float>               stratum_biomass_;
   WorldView*                      world_ = nullptr;
-
-  map<string,vector<float>>    stratum_age_frequency_;
+  vector<unsigned>                fishery_years_;
+  map<string,vector<float>>       stratum_age_frequency_;
   vector<vector<float>>           age_length_key_;
 
   parameters::Table*              sample_table_ = nullptr;
@@ -85,4 +85,4 @@ protected:
 } /* namespace observations */
 } /* namespace niwa */
 
-#endif /* OBSERVATIONS_MORTALITY_SCALED_AGE_FREQUENCY_H_ */
+#endif /* OBSERVATIONS_MORTALITY_EVENT_BIOMASS_SCALED_AGE_FREQUENCY_H_ */

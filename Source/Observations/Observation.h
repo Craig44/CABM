@@ -28,7 +28,11 @@ namespace obs = niwa::observations;
 
 class Model;
 
-
+enum class AllocationType {
+  kRandom,
+  kEqual,
+  kProportional
+};
 /**
  * Class Definition
  */

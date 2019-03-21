@@ -1,5 +1,5 @@
 /**
- * @file MortalityScaledAgeFrequency.cpp
+ * @file MortalityEventBiomassScaledAgeFrequency.cpp
  * @author  C.Marsh github.com/Craig44
  * @date 4/11/2018
  * @section LICENSE
@@ -8,7 +8,7 @@
  */
 
 // headers
-#include "MortalityScaledAgeFrequency.h"
+#include "MortalityEventBiomassScaledAgeFrequency.h"
 
 
 #include "Processes/Manager.h"
@@ -34,7 +34,7 @@ namespace utils = niwa::utilities;
 /**
  * Default constructor
  */
-MortalityScaledAgeFrequency::MortalityScaledAgeFrequency(Model* model) : Observation(model) {
+MortalityEventBiomassScaledAgeFrequency::MortalityEventBiomassScaledAgeFrequency(Model* model) : Observation(model) {
   sample_table_ = new parameters::Table(PARAM_SAMPLES);
   lf_sample_table_ = new parameters::Table(PARAM_PROPORTION_LF_SAMPLED);
 
@@ -44,6 +44,8 @@ MortalityScaledAgeFrequency::MortalityScaledAgeFrequency(Model* model) : Observa
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "The years of the observed values", "");
   parameters_.Bind<string>(PARAM_AGEING_ERROR, &ageing_error_label_, "Label of ageing error to use", "", PARAM_NONE);
   parameters_.Bind<string>(PARAM_PROCESS_LABEL, &process_label_, "Label of of removal process", "", "");
+  parameters_.Bind<string>(PARAM_FISHERY_LABEL, &fishery_label_, "Label of of removal process", "");
+
   parameters_.Bind<string>(PARAM_AGEING_ALLOCATION_METHOD, &ageing_allocation_, "The method used to allocate aged individuals across the length distribution", "", PARAM_RANDOM)->set_allowed_values({PARAM_RANDOM,PARAM_EQUAL,PARAM_PROPORTIONAL});
   // TODO add these in at some point ...
   //parameters_.Bind<unsigned>(PARAM_NUMBER_OF_BOOTSTRAPS, &number_of_bootstraps_, "Number of bootstraps to conduct for each stratum to calculate Pooled CV's for each stratum and total age frequency", "", 50);
@@ -60,14 +62,14 @@ MortalityScaledAgeFrequency::MortalityScaledAgeFrequency(Model* model) : Observa
 /**
  * Destructor
  */
-MortalityScaledAgeFrequency::~MortalityScaledAgeFrequency() {
+MortalityEventBiomassScaledAgeFrequency::~MortalityEventBiomassScaledAgeFrequency() {
   delete sample_table_;
   delete lf_sample_table_;
 }
 /**
  *
  */
-void MortalityScaledAgeFrequency::DoValidate() {
+void MortalityEventBiomassScaledAgeFrequency::DoValidate() {
   LOG_TRACE();
   for (auto year : years_) {
     LOG_FINE() << "year : " << year;
@@ -81,7 +83,7 @@ void MortalityScaledAgeFrequency::DoValidate() {
 /**
  *
  */
-void MortalityScaledAgeFrequency::DoBuild() {
+void MortalityEventBiomassScaledAgeFrequency::DoBuild() {
   LOG_TRACE();
   // Create a pointer to misclassification matrix
   if (ageing_error_label_ != PARAM_NONE) {
@@ -97,13 +99,9 @@ void MortalityScaledAgeFrequency::DoBuild() {
   if (!world_)
     LOG_CODE_ERROR() << "!world_ could not create pointer to world viw model, something is wrong";
 
-  mortality_process_ = model_->managers().process()->GetMortalityProcess(process_label_);
+  mortality_process_ = model_->managers().process()->GetMortalityEventBiomassProcess(process_label_);
   if (!mortality_process_)
-    LOG_FATAL_P(PARAM_PROCESS_LABEL)<< "could not find the process " << process_label_ << ", please make sure it exists";
-
-  if (mortality_process_->type() == PARAM_MORTALITY_EVENT_BIOMASS) {
-    LOG_ERROR_P(PARAM_PROCESS_LABEL) << "We suggest that age observations for the mortality process of type " << PARAM_MORTALITY_EVENT_BIOMASS << " you use the observation type " << PARAM_MORTALITY_EVENT_BIOMASS_SCALED_AGE_FREQUENCY;
-  }
+    LOG_FATAL_P(PARAM_PROCESS_LABEL)<< "could not find the process " << process_label_ << ", please make sure it exists and is of type " << PARAM_MORTALITY_EVENT_BIOMASS;
 
 
     // Build and validate layers
@@ -160,6 +158,13 @@ void MortalityScaledAgeFrequency::DoBuild() {
     LOG_ERROR_P(PARAM_YEARS)
         << "there was a year that the mortality process doesn't not execute in, can you please check that the years you have supplied for this observation are years that the mortality process occurs in cheers.";
   }
+
+  if (not mortality_process_->check_fishery_exists(fishery_label_)) {
+    LOG_FATAL_P(PARAM_FISHERY_LABEL)
+        << "could not find the fishery label " << fishery_label_ << " in the mortality process " << process_label_ << " please check it exists and or is spelt correctly";
+  }
+
+  fishery_years_ = mortality_process_->get_fishery_years();
 
   for (auto& row_map : stratum_rows_) {
     LOG_FINE() << "rows in cell " << row_map.first;
@@ -270,45 +275,57 @@ void MortalityScaledAgeFrequency::DoBuild() {
 /**
  *
  */
-void MortalityScaledAgeFrequency::PreExecute() {
+void MortalityEventBiomassScaledAgeFrequency::PreExecute() {
 
 }
 
 /**
  *
  */
-void MortalityScaledAgeFrequency::Execute() {
+void MortalityEventBiomassScaledAgeFrequency::Execute() {
 
 }
 
 /**
  *
  */
-void MortalityScaledAgeFrequency::Simulate() {
+void MortalityEventBiomassScaledAgeFrequency::Simulate() {
   LOG_MEDIUM() << "Simulating data for observation = " << label_;
+
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
 
   vector<vector<float>> age_length_key_;
   age_length_key_.resize(model_->age_spread());
   for (unsigned i = 0; i < model_->age_spread(); ++i)
     age_length_key_[i].resize(model_->length_bin_mid_points().size(),0.0);
-  vector<processes::census_data>& census_data = mortality_process_->get_census_data();
+  vector<vector<processes::census_data>> fishery_age_data = mortality_process_->get_fishery_census_data(fishery_label_);
+
+  if (fishery_age_data.size() == 0) {
+    LOG_CODE_ERROR() << "could not return information for fishery " << fishery_label_ << " this error should be dealt with earlier in the code";
+  }
+
   //vector<processes::composition_data>& length_frequency = mortality_process_->get_removals_by_length();
-  LOG_FINE() << "length of census data = " << census_data.size();
+  LOG_FINE() << "length of census data (years) = " << fishery_age_data.size();
+
   vector<unsigned> census_stratum_ndx;
   bool apply_ageing_error = true;
   if (!ageing_error_) {
     apply_ageing_error = false;
   }
   for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
-    LOG_FINE() << "About to sort our info for year " << years_[year_ndx];
+    // find equivalent fishery index
+    auto iter = find(fishery_years_.begin(), fishery_years_.end(), years_[year_ndx]);
+    unsigned fishery_year_ndx = distance(fishery_years_.begin(), iter);
+    LOG_FINE() << "About to sort our info for year " << years_[year_ndx] << " fishery index " << fishery_year_ndx;
+
+    vector<processes::census_data>& fishery_year_census = fishery_age_data[fishery_year_ndx];
     unsigned agents_available_to_sample = 0;
     for (unsigned stratum_ndx = 0; stratum_ndx < cells_.size(); ++stratum_ndx) {
       LOG_FINE() << "About to sort our info for stratum " << cells_[stratum_ndx];
       vector<float> stratum_length_frequency(model_->length_bin_mid_points().size(),0.0);
       float proportion_lf_sampled = prop_lf_by_year_and_stratum_[years_[year_ndx]][cells_[stratum_ndx]];
       if (proportion_lf_sampled <= 0)
-        LOG_CODE_ERROR() << "asked for an observation but dont want any samples this is a simple code error that needs to be addressed";
+        LOG_CODE_ERROR() << "asked for an observation but dont want any samples this is a simple code error that needs to be addressed, catch this error earlier";
       census_stratum_ndx.clear();
       // clear ALK
       for (unsigned i = 0; i < model_->age_spread(); ++i)
@@ -322,17 +339,19 @@ void MortalityScaledAgeFrequency::Simulate() {
       //
       // Calculate Length frequency for the strata
       unsigned census_ndx = 0; // links back to the census
-      vector<vector<unsigned>> agents_ndx_measured_for_length(census_data.size());
-      for (processes::census_data& census : census_data) {
-        // Find census elements that are in this year and stratum
-        if ((census.year_ == years_[year_ndx]) && (find(stratum_rows_[cells_[stratum_ndx]].begin(),stratum_rows_[cells_[stratum_ndx]].end(), census.row_) != stratum_rows_[cells_[stratum_ndx]].end()) && (find(stratum_cols_[cells_[stratum_ndx]].begin(),stratum_cols_[cells_[stratum_ndx]].end(), census.col_) != stratum_cols_[cells_[stratum_ndx]].end())) {
+      LOG_FINE() << "number of cells in this year and fishery = " << fishery_year_census.size();
+      vector<vector<unsigned>> agents_ndx_measured_for_length(fishery_year_census.size());
+      for (processes::census_data& census : fishery_year_census) {
+        // Find census elements that are in this stratum
+        if ((find(stratum_rows_[cells_[stratum_ndx]].begin(),stratum_rows_[cells_[stratum_ndx]].end(), census.row_) != stratum_rows_[cells_[stratum_ndx]].end()) && (find(stratum_cols_[cells_[stratum_ndx]].begin(),stratum_cols_[cells_[stratum_ndx]].end(), census.col_) != stratum_cols_[cells_[stratum_ndx]].end())) {
           if (census.age_ndx_.size() > 0) {
             //LOG_FINE() << "found a census that year and cell work, agents in it = " << census.age_ndx_.size() << " proportion to take = " << proportion_lf_sampled;
             census_stratum_ndx.push_back(census_ndx);
             // Calculate the agents available in the first sampling unit
+            LOG_FINE() << "agents in this cell = " << census.age_ndx_.size();
             for (unsigned agent_ndx = 0; agent_ndx < census.age_ndx_.size(); ++ agent_ndx) {
               if(rng.chance() <= proportion_lf_sampled) {
-                stratum_length_frequency[census.length_ndx_[agent_ndx]]+= census.scalar_[agent_ndx];
+                stratum_length_frequency[census.length_ndx_[agent_ndx]] += census.scalar_[agent_ndx];
                 agents_available_to_sample++;
                 agents_ndx_measured_for_length[census_ndx].push_back(agent_ndx);
               }
@@ -364,9 +383,9 @@ void MortalityScaledAgeFrequency::Simulate() {
       unsigned agent_ndx;
       unsigned age_ndx = 0;
       unsigned length_ndx = 0;
-      /*
-       * Generate an age-length-key for this stratum
-      */
+
+      // Generate an age-length-key for this stratum
+
       LOG_FINE() << "about to build Age length key";
       unsigned max_iters = agents_available_to_sample * 10;
       unsigned iter_to_check_max = 0;
@@ -401,6 +420,7 @@ void MortalityScaledAgeFrequency::Simulate() {
       }
 
       LOG_FINE() << "samples to take " << samples_to_take;
+      vector<unsigned> this_strata_age_freq(model_->age_spread(), 0.0);
       for (unsigned sample_attempt = 0; sample_attempt < samples_to_take; ++iter_to_check_max) {
         if (iter_to_check_max >= max_iters) {
           LOG_WARNING() << "in the observation " << label_ << " for year = " << years_[year_ndx] << " and stratum = " << cells_[stratum_ndx] << ", we were trying to sample for too long to build an age-length key. This is set at 10 x "
@@ -409,7 +429,7 @@ void MortalityScaledAgeFrequency::Simulate() {
         }
         // Randomly select a cell that a stratum belongs to
         census_ndx = census_stratum_ndx[rng.chance() * census_stratum_ndx.size()];
-        processes::census_data& this_census = census_data[census_ndx];
+        processes::census_data& this_census = fishery_year_census[census_ndx];
 
 
         // Randomly select an agent in that cell that was measured for length
@@ -461,12 +481,15 @@ void MortalityScaledAgeFrequency::Simulate() {
         age_length_key_[age_ndx][length_ndx]++;
         ++total_agents_in_ALK;
         ++sample_attempt;
+        this_strata_age_freq[age_ndx]++;
         sampled_numbers_of_lf[length_ndx]++;
       }
+
+
       LOG_FINE() << "total number in length frequency " << total_agents_in_ALK;
       age_length_key_by_year_stratum_[years_[year_ndx]][cells_[stratum_ndx]] = age_length_key_;
       lf_by_year_stratum_[years_[year_ndx]][cells_[stratum_ndx]] = stratum_length_frequency;
-      // Convert ALK to proportions
+      // Convert ALK to proportions and apply LF
       for (unsigned j = 0; j < model_->length_bin_mid_points().size(); ++j) {
         float length_sum = 0;
         for (unsigned i = 0; i < model_->age_spread(); ++i) {
@@ -484,21 +507,24 @@ void MortalityScaledAgeFrequency::Simulate() {
         }
       }
 
-      /*
-       * Calculate the age-frequency by passing the length frequency through the Age-Length key.
-       * if Bootstrap=true, do a sample with replacement from the age length key to calculate C.V for each age bin
-      */
+
       LOG_FINE() << "about to calculate a frequency via age length key";
       stratum_age_frequency_[cells_[stratum_ndx]].resize(model_->age_spread(),0.0);
+      stratum_age_frequency_[cells_[stratum_ndx]].clear();
       for (unsigned age_bin_ndx = 0; age_bin_ndx < model_->age_spread(); ++age_bin_ndx) {
+        LOG_FINE() << "numbers at age before = " << stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx];
+        stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx] = 0.0;
         for (unsigned length_bin_ndx = 0; length_bin_ndx < stratum_length_frequency.size(); ++length_bin_ndx) {
           stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx] += age_length_key_[age_bin_ndx][length_bin_ndx] * stratum_length_frequency[length_bin_ndx];
+          LOG_FINE() << "length bin = " << length_bin_ndx << " ALK = " << age_length_key_[age_bin_ndx][length_bin_ndx] << " total length = " << stratum_length_frequency[length_bin_ndx];
         }
         LOG_FINE() << "numbers at age = " << age_bin_ndx + model_->min_age() << " = " << stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx];
         SaveComparison(age_bin_ndx + model_->min_age(), 0, cells_[stratum_ndx], stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx], 0.0, 0, years_[year_ndx]);
       }
+
     } // Stratum loop
   } // year loop
+
 } // DoExecute
 
 } /* namespace observations */
