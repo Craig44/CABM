@@ -50,6 +50,7 @@ MortalityEventBiomassScaledAgeFrequency::MortalityEventBiomassScaledAgeFrequency
   // TODO add these in at some point ...
   //parameters_.Bind<unsigned>(PARAM_NUMBER_OF_BOOTSTRAPS, &number_of_bootstraps_, "Number of bootstraps to conduct for each stratum to calculate Pooled CV's for each stratum and total age frequency", "", 50);
   //parameters_.Bind<string>(PARAM_STRATUM_WEIGHT_METHOD, &stratum_weight_method_, "Method to weight stratum estimates by", "", PARAM_BIOMASS)->set_allowed_values({PARAM_BIOMASS, PARAM_AREA, PARAM_NONE});
+  parameters_.Bind<string>(PARAM_SEX, &sexed_, "You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female", "", PARAM_IGNORE)->set_allowed_values({PARAM_MALE,PARAM_FEMALE,PARAM_IGNORE});
 
   parameters_.Bind<string>(PARAM_LAYER_OF_STRATUM_DEFINITIONS, &layer_label_, "The layer that indicates what the stratum boundaries are.", "");
   parameters_.Bind<string>(PARAM_STRATUMS_TO_INCLUDE, &cells_, "The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer", "", true);
@@ -76,6 +77,21 @@ void MortalityEventBiomassScaledAgeFrequency::DoValidate() {
     if ((year < model_->start_year()) || (year > model_->final_year()))
       LOG_ERROR_P(PARAM_YEARS) << "Years can't be less than start_year (" << model_->start_year() << "), or greater than final_year (" << model_->final_year()
           << "). Please fix this.";
+  }
+
+  if (sexed_ == PARAM_IGNORE) {
+    sexed_flag_ = false;
+    sex_match_ = 0;
+  } else if (sexed_ == PARAM_MALE) {
+    sexed_flag_ = true;
+    sex_match_ = 0;
+  } else if (sexed_ == PARAM_FEMALE) {
+    sexed_flag_ = true;
+    sex_match_ = 1;
+  }
+  if(!model_->get_sexed()) {
+    if (sexed_flag_)
+      LOG_WARNING() << "you asked for a sexed observation but the model isn't sexed so I am ignoring this and giving you unsexed results.";
   }
 
 }
@@ -344,12 +360,18 @@ void MortalityEventBiomassScaledAgeFrequency::Simulate() {
       for (processes::census_data& census : fishery_year_census) {
         // Find census elements that are in this stratum
         if ((find(stratum_rows_[cells_[stratum_ndx]].begin(),stratum_rows_[cells_[stratum_ndx]].end(), census.row_) != stratum_rows_[cells_[stratum_ndx]].end()) && (find(stratum_cols_[cells_[stratum_ndx]].begin(),stratum_cols_[cells_[stratum_ndx]].end(), census.col_) != stratum_cols_[cells_[stratum_ndx]].end())) {
+
           if (census.age_ndx_.size() > 0) {
             //LOG_FINE() << "found a census that year and cell work, agents in it = " << census.age_ndx_.size() << " proportion to take = " << proportion_lf_sampled;
             census_stratum_ndx.push_back(census_ndx);
             // Calculate the agents available in the first sampling unit
             LOG_FINE() << "agents in this cell = " << census.age_ndx_.size();
             for (unsigned agent_ndx = 0; agent_ndx < census.age_ndx_.size(); ++ agent_ndx) {
+              // check if sex specific observation
+              if (sexed_flag_) {
+                if (census.sex_[agent_ndx] != sex_match_)
+                  continue;
+              }
               if(rng.chance() <= proportion_lf_sampled) {
                 stratum_length_frequency[census.length_ndx_[agent_ndx]] += census.scalar_[agent_ndx];
                 agents_available_to_sample++;

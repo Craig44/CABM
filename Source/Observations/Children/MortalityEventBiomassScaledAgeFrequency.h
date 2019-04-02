@@ -55,6 +55,10 @@ protected:
   string                          ageing_error_label_;
   string                          ageing_allocation_ = PARAM_RANDOM;
   AllocationType                  allocation_type_ = AllocationType::kRandom;
+  string                          sexed_;
+  unsigned                        sex_match_;
+  bool                            sexed_flag_;
+
 
   unsigned                        number_of_bootstraps_ = 0;
 
@@ -71,6 +75,7 @@ protected:
   vector<unsigned>                fishery_years_;
   map<string,vector<float>>       stratum_age_frequency_;
   vector<vector<float>>           age_length_key_;
+
 
   parameters::Table*              sample_table_ = nullptr;
   parameters::Table*              lf_sample_table_ = nullptr;
