@@ -32,7 +32,7 @@ public:
   // methods
   explicit RecruitmentBevertonHolt(Model* model);
   virtual                     ~RecruitmentBevertonHolt() = default;
-  void                        DoValidate() override final { };
+  void                        DoValidate() override final;
   void                        DoBuild() override final;
   void                        DoReset() override final { };
   void                        DoExecute() override final;

@@ -33,6 +33,29 @@ RecruitmentConstant::RecruitmentConstant(Model* model) : Recruitment(model) {
   process_type_ = ProcessType::kRecruitment;
 }
 
+// DoValidate
+void RecruitmentConstant::DoValidate() {
+  vector<unsigned> years = model_->years();
+  if (model_->get_sexed()) {
+    if (!parameters_.Get(PARAM_PROPORTION_MALE)->has_been_defined())
+      LOG_FATAL_P(PARAM_LABEL) << "If you have a sexed model you will want to explicitly specify proportion male";
+    if (prop_male_.size() == 1)
+      prop_male_.assign(years.size(), prop_male_[0]);
+    if (prop_male_.size() != years.size())
+      LOG_FATAL_P(PARAM_PROPORTION_MALE) << "Either supply a single value to be applied in all years, or a value for each year of the model";
+  } else {
+    prop_male_.assign(years.size(), 1.0);
+  }
+
+  unsigned prop_ndx = 0;
+  for (auto& year : years) {
+    prop_male_by_year_[year] = prop_male_[prop_ndx];
+    ++prop_ndx;
+  }
+
+  model_->set_male_proportions(prop_male_by_year_);
+}
+
 // DoBuild
 void RecruitmentConstant::DoBuild() {
   LOG_FINE();

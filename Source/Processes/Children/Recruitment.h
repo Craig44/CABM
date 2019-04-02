@@ -50,6 +50,10 @@ protected:
   bool                        first_enter_execute_ = true;
   map<unsigned, float>        ssb_by_year_;
   float                       scalar_;
+  vector<float>               prop_male_;
+  map<unsigned, float>        prop_male_by_year_;
+
+
 };
 
 } /* namespace processes */

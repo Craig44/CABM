@@ -122,7 +122,9 @@ public:
   string                      get_growth_process() {return growth_process_label_;}
   vector<string>              get_maturity_ogive() {return maturity_ogives_;};
   bool                        get_sexed() const {return sex_;};
-  float                       get_male_proportions() const {return proportion_male_;};
+  float                       get_male_proportions(unsigned year)  {return proportion_male_[year];};
+  void                        set_male_proportions(map<unsigned, float> male_props)  {proportion_male_ = male_props;};
+
   unsigned                    get_max_threads() const {return max_threads_;}
   bool                        lat_and_long_supplied();
   virtual const float&        min_lat() const {return min_lat_;}
@@ -188,7 +190,7 @@ protected:
   map<string, float>          ssb_;
   map<string, float>          scalar_;
   bool                        sex_;
-  float                       proportion_male_;
+  map<unsigned, float>        proportion_male_;
   vector<string>              maturity_ogives_;
   unsigned                    max_threads_ = 1;
   unsigned                    time_step_counter_ = 1; // This will keep track of the time steps for things such as tagging it would be helpful if we have multiple time steps in years.

@@ -66,14 +66,14 @@ Model::Model() {
   parameters_.Bind<unsigned>(PARAM_NROWS, &world_height_, "number of rows in spatial domain", "")->set_lower_bound(1,true);
   parameters_.Bind<unsigned>(PARAM_NCOLS, &world_width_, "number of columns in spatial domain", "")->set_lower_bound(1,true);
   parameters_.Bind<bool>(PARAM_SEXED, &sex_, "Is sex an attribute of then agents?", "", false);
-  parameters_.Bind<float>(PARAM_PROPORTION_MALE, &proportion_male_, "what proportion of the generated agents should be male?", "", 1.0)->set_range(0.0, 1.0, true, true); //TODO move to recruitment so it can be time-varying.
+  //parameters_.Bind<float>(PARAM_PROPORTION_MALE, &proportion_male_, "what proportion of the generated agents should be male?", "", 1.0)->set_range(0.0, 1.0, true, true); //TODO move to recruitment so it can be time-varying.
   parameters_.Bind<string>(PARAM_MATRUITY_OGIVE_LABEL, &maturity_ogives_, "Maturity ogive label for each sex (male female) order is important", "", false);
   parameters_.Bind<string>(PARAM_GROWTH_PROCESS_LABEL, &growth_process_label_, "Label for the growth process in the annual cycle", "");
   parameters_.Bind<string>(PARAM_NATURAL_MORTALITY_PROCESS_LABEL, &natural_mortality_label_, "Label for the natural mortality process in the annual cycle", "");
   //parameters_.Bind<unsigned>(PARAM_MAX_THREADS_TO_USE, &max_threads_, "The maxiumum threads you want to give access to this program", "",1);
 
 
-  RegisterAsAddressable(PARAM_PROPORTION_MALE, &proportion_male_); // can make this time-varying
+  //RegisterAsAddressable(PARAM_PROPORTION_MALE, &proportion_male_); // can make this time-varying
 
   global_configuration_ = new GlobalConfiguration();
   managers_ = new Managers(this);
