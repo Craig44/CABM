@@ -42,7 +42,7 @@ void RecruitmentConstant::DoValidate() {
     if (prop_male_.size() == 1)
       prop_male_.assign(years.size(), prop_male_[0]);
     if (prop_male_.size() != years.size())
-      LOG_FATAL_P(PARAM_PROPORTION_MALE) << "Either supply a single value to be applied in all years, or a value for each year of the model";
+      LOG_FATAL_P(PARAM_PROPORTION_MALE) << "Either supply a single value to be applied in all years '" << years.size()<< "', or a value for each year of the model, you have supplied '"<< prop_male_.size() << "', please sort this out";
   } else {
     prop_male_.assign(years.size(), 1.0);
   }
@@ -52,6 +52,8 @@ void RecruitmentConstant::DoValidate() {
     prop_male_by_year_[year] = prop_male_[prop_ndx];
     ++prop_ndx;
   }
+  // plus set the first value for usage in initialisation, the key = 0;
+  prop_male_by_year_[0] = prop_male_[0];
 
   model_->set_male_proportions(prop_male_by_year_);
 }
