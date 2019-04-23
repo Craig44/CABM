@@ -265,6 +265,11 @@ void MortalityScaledAgeFrequency::DoBuild() {
     allocation_type_ = AllocationType::kEqual;
   else if (ageing_allocation_ == PARAM_PROPORTIONAL)
     allocation_type_ = AllocationType::kProportional;
+
+  age_length_key_.resize(model_->age_spread());
+  for (unsigned i = 0; i < model_->age_spread(); ++i)
+    age_length_key_[i].resize(model_->number_of_length_bins(),0.0);
+
 }
 
 /**
@@ -288,10 +293,6 @@ void MortalityScaledAgeFrequency::Simulate() {
   LOG_MEDIUM() << "Simulating data for observation = " << label_;
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
 
-  vector<vector<float>> age_length_key_;
-  age_length_key_.resize(model_->age_spread());
-  for (unsigned i = 0; i < model_->age_spread(); ++i)
-    age_length_key_[i].resize(model_->length_bin_mid_points().size(),0.0);
   vector<processes::census_data>& census_data = mortality_process_->get_census_data();
   //vector<processes::composition_data>& length_frequency = mortality_process_->get_removals_by_length();
   LOG_FINE() << "length of census data = " << census_data.size();
@@ -312,7 +313,7 @@ void MortalityScaledAgeFrequency::Simulate() {
       census_stratum_ndx.clear();
       // clear ALK
       for (unsigned i = 0; i < model_->age_spread(); ++i)
-        age_length_key_[i].resize(model_->length_bin_mid_points().size(),0.0);
+        fill(age_length_key_[i].begin(), age_length_key_[i].end(),0.0);
 
       stratum_biomass_[cells_[stratum_ndx]] = 0.0;
 
@@ -463,7 +464,7 @@ void MortalityScaledAgeFrequency::Simulate() {
         ++sample_attempt;
         sampled_numbers_of_lf[length_ndx]++;
       }
-      LOG_FINE() << "total number in length frequency " << total_agents_in_ALK;
+      LOG_FINE() << "total number in ALK frequency " << total_agents_in_ALK;
       age_length_key_by_year_stratum_[years_[year_ndx]][cells_[stratum_ndx]] = age_length_key_;
       lf_by_year_stratum_[years_[year_ndx]][cells_[stratum_ndx]] = stratum_length_frequency;
       // Convert ALK to proportions

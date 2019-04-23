@@ -64,8 +64,10 @@ protected:
   // For scanning and Tag-recaptures optional
   parameters::Table*                  scanning_table_ = nullptr;
   vector<unsigned>                    scanning_years_;
-  vector<vector<float>>               scanning_proportion_by_fishery_;
+  vector<vector<float>>               scanning_proportion_by_fishery_; // n_fishery * n_years;
   bool                                scanning_ = false;
+  vector<bool>                        scanning_this_year_; // n_fishery
+
   // For reporting
   map<unsigned, float>                actual_removals_by_year_;
   map<unsigned, float>                removals_by_year_;

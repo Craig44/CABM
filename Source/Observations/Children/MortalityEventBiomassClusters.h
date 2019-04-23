@@ -97,10 +97,8 @@ protected:
   map<string,vector<float>>       stratum_age_frequency_;
   vector<vector<float>>           age_length_key_;
 
-  parameters::Table*              sample_table_ = nullptr;
   parameters::Table*              cluster_sample_table_ = nullptr;
 
-  map<unsigned, map<string, unsigned>>  samples_by_year_and_stratum_;
   map<unsigned, map<string, float>>  cluster_by_year_and_stratum_;
 
   map<unsigned,map<string,vector<vector<float>>>>     age_length_key_by_year_stratum_;

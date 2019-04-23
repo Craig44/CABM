@@ -29,8 +29,10 @@ namespace processes {
  * constructor
  */
 GrowthVonBertalanffyWithBasic::GrowthVonBertalanffyWithBasic(Model* model) : Growth(model) {
-  parameters_.Bind<string>(PARAM_LINF_LAYER_LABEL, &l_inf_layer_label_, "Label for the numeric layer that describes mean L inf through space", "", true);
-  parameters_.Bind<string>(PARAM_K_LAYER_LABEL, &k_layer_label_, "Label for the numeric layer that describes mean k through space", "", true);
+  parameters_.Bind<string>(PARAM_LINF_LAYER_LABEL, &l_inf_layer_label_, "Label for the numeric layer that describes mean L inf by area", "", true);
+  parameters_.Bind<string>(PARAM_K_LAYER_LABEL, &k_layer_label_, "Label for the numeric layer that describes mean k by area", "", true);
+  parameters_.Bind<string>(PARAM_T0_LAYER_LABEL, &t0_layer_label_, "Label for the numeric layer that describes mean t0 by area", "", true);
+
   parameters_.Bind<float>(PARAM_T0, &t0_, "The value for t0 default = 0", "", true);
   parameters_.Bind<string>(PARAM_A_LAYER_LABEL, &a_layer_label_, "Label for the numeric layer that describes mean a in the weight calcualtion through space", "", true);
   parameters_.Bind<string>(PARAM_B_LAYER_LABEL, &b_layer_label_, "Label for the numeric layer that describes mean b in the weight calcualtion through space", "", true);
@@ -53,6 +55,8 @@ void GrowthVonBertalanffyWithBasic::DoValidate() {
     LOG_ERROR_P(PARAM_A) << "You have specified both a value and a layer label for the 'a' parameter, you must pick one or the other";
   if (parameters_.Get(PARAM_B_LAYER_LABEL)->has_been_defined() & parameters_.Get(PARAM_B)->has_been_defined())
     LOG_ERROR_P(PARAM_B) << "You have specified both a value and a layer label for the 'b' parameter, you must pick one or the other";
+  if(parameters_.Get(PARAM_T0)->has_been_defined() & parameters_.Get(PARAM_T0_LAYER_LABEL)->has_been_defined())
+    LOG_ERROR_P(PARAM_LABEL) << "You have specified both a value or a layer label for the 't0' parameter, you must pick one or the other";
 
   if (!parameters_.Get(PARAM_LINF_LAYER_LABEL)->has_been_defined() & !parameters_.Get(PARAM_LINF)->has_been_defined())
     LOG_ERROR_P(PARAM_LABEL) << "You have not specified a value or a layer label for the 'L_inf' parameter, you must pick one of these options";
@@ -62,8 +66,9 @@ void GrowthVonBertalanffyWithBasic::DoValidate() {
     LOG_ERROR_P(PARAM_LABEL) << "You have not specified a value or a layer label for the 'a' parameter, you must pick one of these options";
   if (!parameters_.Get(PARAM_B_LAYER_LABEL)->has_been_defined() & !parameters_.Get(PARAM_B)->has_been_defined())
     LOG_ERROR_P(PARAM_LABEL) << "You have not specified a value or a layer label for the 'b' parameter, you must pick one of these options";
-  if(!parameters_.Get(PARAM_T0)->has_been_defined())
-    t0_.push_back(0.0);
+  if(!parameters_.Get(PARAM_T0)->has_been_defined() & !parameters_.Get(PARAM_T0_LAYER_LABEL)->has_been_defined())
+    t0_.push_back(0.0); // Default value of t0 = 0
+
 }
 
 
@@ -107,6 +112,16 @@ void GrowthVonBertalanffyWithBasic::DoBuild() {
       L_inf_layer_.push_back(temp_layer);
     }
   }
+  if (t0_layer_label_.size() > 0) {
+    niwa::layers::NumericLayer* temp_layer = nullptr;
+    for (unsigned i = 0; i < t0_layer_label_.size(); ++i) {
+      temp_layer = model_->managers().layer()->GetNumericLayer(t0_layer_label_[i]);
+      if (!temp_layer) {
+        LOG_FATAL_P(PARAM_T0_LAYER_LABEL) << "could not find the layer '" << t0_layer_label_[i] << "', please make sure it exists and that it is type 'numeric'";
+      }
+      t0_layer_.push_back(temp_layer);
+    }
+  }
   if (k_layer_label_.size() > 0) {
     niwa::layers::NumericLayer* temp_layer = nullptr;
     for (unsigned i = 0; i < k_layer_label_.size(); ++i) {
@@ -117,6 +132,7 @@ void GrowthVonBertalanffyWithBasic::DoBuild() {
       k_layer_.push_back(temp_layer);
     }
   }
+
 
   if (a_layer_label_.size() > 0) {
     niwa::layers::NumericLayer* temp_layer = nullptr;
@@ -148,6 +164,8 @@ void GrowthVonBertalanffyWithBasic::DoBuild() {
       k_layer_.assign(2, k_layer_[0]);
     if (L_inf_layer_.size() == 1)
       L_inf_layer_.assign(2, L_inf_layer_[0]);
+    if (t0_layer_.size() == 1)
+      t0_layer_.assign(2, t0_layer_[0]);
     if (l_inf_.size() == 1)
       l_inf_.assign(2, l_inf_[0]);
     if (k_.size() == 1)
@@ -198,7 +216,7 @@ void GrowthVonBertalanffyWithBasic::DoExecute() {
 void  GrowthVonBertalanffyWithBasic::draw_growth_param(unsigned row, unsigned col, unsigned number_of_draws, vector<vector<float>>& vec, unsigned sex) {
   LOG_FINE() << "sex " << sex;
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-  float mean_linf, mean_k, a, b;
+  float mean_linf, mean_k, a, b, t0;
   if (L_inf_layer_.size() > 0)
     mean_linf = L_inf_layer_[sex]->get_value(row, col);
   else
@@ -210,6 +228,11 @@ void  GrowthVonBertalanffyWithBasic::draw_growth_param(unsigned row, unsigned co
   else
     mean_k = k_[sex];
   LOG_FINE() << "k";
+
+  if (t0_layer_.size() > 0)
+    t0 = t0_layer_[sex]->get_value(row, col);
+  else
+    t0 = t0_[sex];
 
   if (a_layer_.size() > 0)
     a = a_layer_[sex]->get_value(row, col);
@@ -228,14 +251,23 @@ void  GrowthVonBertalanffyWithBasic::draw_growth_param(unsigned row, unsigned co
 	vec.resize(number_of_draws);
   LOG_FINE() << "mean_linf " << mean_linf << " mean_k " << mean_k << " a " << a << " b " << b;// << " t0 " << t0_[sex];
 
-	for (unsigned i = 0; i < number_of_draws; ++i) {
-	  vec[i].push_back(rng.lognormal(mean_linf, cv_));
-	  vec[i].push_back(rng.lognormal(mean_k, cv_));
-    vec[i].push_back(t0_[sex]);
-	  vec[i].push_back(a);
-	  vec[i].push_back(b);
-	}
-  LOG_FINE() << "";
+  if (distribution_ == PARAM_NORMAL) {
+    for (unsigned i = 0; i < number_of_draws; ++i) {
+      vec[i].push_back(rng.normal(mean_linf, cv_ * mean_linf));
+      vec[i].push_back(rng.normal(mean_k, cv_ * mean_k));
+      vec[i].push_back(t0);
+      vec[i].push_back(a);
+      vec[i].push_back(b);
+    }
+  } else {
+    for (unsigned i = 0; i < number_of_draws; ++i) {
+      vec[i].push_back(rng.lognormal(mean_linf, cv_));
+      vec[i].push_back(rng.lognormal(mean_k, cv_));
+      vec[i].push_back(t0);
+      vec[i].push_back(a);
+      vec[i].push_back(b);
+    }
+  }
 
 }
 // FillReportCache, called in the report class, it will print out additional information that is stored in

@@ -42,6 +42,8 @@ ProcessRemovalsByAge::ProcessRemovalsByAge(Model* model) : Observation(model) {
   parameters_.BindTable(PARAM_ERROR_VALUES, error_values_table_, "Table of error values of the observed values (note the units depend on the likelihood)", "", false);
   parameters_.Bind<string>(PARAM_LAYER_OF_CELLS, &layer_label_, "The layer that indicates what area to summarise observations over.", "");
   parameters_.Bind<string>(PARAM_CELLS, &cells_, "The cells we want to generate observations for from the layer of cells supplied", "");
+  parameters_.Bind<string>(PARAM_SEX, &sexed_, "You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female", "", PARAM_IGNORE)->set_allowed_values({PARAM_MALE,PARAM_FEMALE,PARAM_IGNORE});
+
   allowed_likelihood_types_.push_back(PARAM_LOGNORMAL);
   allowed_likelihood_types_.push_back(PARAM_MULTINOMIAL);
   allowed_likelihood_types_.push_back(PARAM_DIRICHLET);
@@ -73,6 +75,22 @@ void ProcessRemovalsByAge::DoValidate() {
     LOG_FINEST() << "year : " << year;
   	if((year < model_->start_year()) || (year > model_->final_year()))
   		LOG_ERROR_P(PARAM_YEARS) << "Years can't be less than start_year (" << model_->start_year() << "), or greater than final_year (" << model_->final_year() << "). Please fix this.";
+  }
+
+
+  if (sexed_ == PARAM_IGNORE) {
+    sexed_flag_ = false;
+    sex_match_ = 0;
+  } else if (sexed_ == PARAM_MALE) {
+    sexed_flag_ = true;
+    sex_match_ = 0;
+  } else if (sexed_ == PARAM_FEMALE) {
+    sexed_flag_ = true;
+    sex_match_ = 1;
+  }
+  if(!model_->get_sexed()) {
+    if (sexed_flag_)
+      LOG_WARNING() << "you asked for a sexed observation but the model isn't sexed so I am ignoring this and giving you unsexed results.";
   }
 
   /**
@@ -198,6 +216,8 @@ void ProcessRemovalsByAge::Simulate() {
    */
   if (first_simualtion_run_) {
     vector<processes::composition_data>& age_frequency = mortality_process_->get_removals_by_age();
+
+
     LOG_FINE() << "number of elements for this process block = " << age_frequency.size();
     unsigned age_offset = min_age_ - model_->min_age();
     // iterate over all the years that we want
@@ -210,8 +230,14 @@ void ProcessRemovalsByAge::Simulate() {
           if ((age_comp_data.year_ == year) && (layer_->get_value(age_comp_data.row_,age_comp_data.col_) == cell)) {
             // Lets accumulate the information for this cell and year
             LOG_FINE() << "row = " << age_comp_data.row_ << " col = " << age_comp_data.col_ << " cell = " << cell << " age comp = " << age_comp_data.frequency_.size();
-            for(unsigned i = 0; i < age_comp_data.frequency_.size(); ++i) {
-              accumulated_age_frequency[i] += age_comp_data.frequency_[i];
+            // check if sex specific observation
+            if (sexed_flag_ & (sex_match_ == 1)) {
+              for(unsigned i = 0; i < age_comp_data.frequency_.size(); ++i)
+                accumulated_age_frequency[i] += age_comp_data.female_frequency_[i];
+
+            } else {
+              for(unsigned i = 0; i < age_comp_data.frequency_.size(); ++i)
+                accumulated_age_frequency[i] += age_comp_data.frequency_[i];
             }
             cell_found = true;
           }

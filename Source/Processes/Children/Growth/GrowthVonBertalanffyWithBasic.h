@@ -43,8 +43,10 @@ public:
 protected:
   vector<string>				              l_inf_layer_label_;
   vector<string>				              k_layer_label_;
+  vector<string>                      t0_layer_label_;
   vector<niwa::layers::NumericLayer*> L_inf_layer_;
   vector<niwa::layers::NumericLayer*> k_layer_;
+  vector<niwa::layers::NumericLayer*> t0_layer_;
   vector<string>                      a_layer_label_;
   vector<string>                      b_layer_label_;
   vector<niwa::layers::NumericLayer*> a_layer_;

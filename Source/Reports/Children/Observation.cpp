@@ -65,44 +65,8 @@ void Observation::DoExecute() {
       }
     }
   }
+  observation_->FillReportCache(cache_);
 
-  if (observation_->type() == PARAM_MORTALITY_SCALES_AGE_FREQUENCY || observation_->type() == PARAM_MORTALITY_EVENT_BIOMASS_SCALED_AGE_FREQUENCY) {
-    // Print the age length key for curiosity
-    map<unsigned,map<string,vector<float>>>& LF = observation_->get_lf();
-    map<unsigned,map<string,vector<vector<float>>>>& ALK = observation_->get_alk();
-    cache_ << "length_freq_by_year_stratum "  <<REPORT_R_DATAFRAME <<"\n";
-    cache_ << "year_stratum ";
-    for (auto len : model_->length_bin_mid_points())
-      cache_ << len << " ";
-    cache_ << "\n";
-
-    for(auto& len_freq_by_year : LF) {
-      for(auto len_freq_by_year_strata : len_freq_by_year.second) {
-        cache_ << len_freq_by_year.first << "_" << len_freq_by_year_strata.first << " ";
-        for (unsigned i = 0; i < len_freq_by_year_strata.second.size(); ++i) {
-          cache_ << len_freq_by_year_strata.second[i] << " ";
-        }
-        cache_ << "\n";
-      }
-    }
-
-
-
-
-    for(auto& alk_by_year : ALK) {
-      for(auto alk_by_strata : alk_by_year.second) {
-        cache_ << "ALK_" << alk_by_year.first << "_" << alk_by_strata.first << " " <<REPORT_R_MATRIX <<"\n";
-        for (unsigned i = 0; i < alk_by_strata.second.size(); ++i) {
-          for (unsigned j = 0; j < alk_by_strata.second[i].size(); ++j) {
-            cache_ << alk_by_strata.second[i][j] << " ";
-          }
-          cache_ << "\n";
-        }
-      }
-    }
-
-
-  }
   ready_for_writing_ = true;
 }
 

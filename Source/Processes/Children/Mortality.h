@@ -43,14 +43,16 @@ struct census_data {
   unsigned year_;
   unsigned row_;
   unsigned col_;
-  float    biomass_; // Total biomass
+  float    biomass_; // Total biomass if unsexed otherwise male biomass in sexed model
+  float    female_biomass_; // Total female biomass
   vector<unsigned> fishery_ndx_;
   vector<unsigned> sex_;
   vector<unsigned> age_ndx_;
   vector<unsigned> length_ndx_;
   vector<float> scalar_;
+  vector<float> weight_;
   census_data(unsigned year, unsigned row, unsigned col) : year_(year),
-      row_(row), col_(col) { biomass_ = 0.0; }
+      row_(row), col_(col) { biomass_ = 0.0, female_biomass_ = 0.0; }
 };
 
 // Tag Recapture class

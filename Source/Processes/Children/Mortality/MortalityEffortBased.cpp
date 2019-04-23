@@ -280,6 +280,9 @@ void MortalityEffortBased::DoExecute() {
                     census_fishery.length_ndx_.push_back((*iter).get_length_bin_index());
                     census_fishery.scalar_.push_back((*iter).get_scalar());
                     census_fishery.biomass_+= (*iter).get_weight() * (*iter).get_scalar();
+                    census_fishery.weight_.push_back((*iter).get_weight());
+                    census_fishery.sex_.push_back((*iter).get_sex());
+
                     (*iter).dies();
                   }
                 }
@@ -298,6 +301,9 @@ void MortalityEffortBased::DoExecute() {
                     census_fishery.length_ndx_.push_back((*iter).get_length_bin_index());
                     census_fishery.scalar_.push_back((*iter).get_scalar());
                     census_fishery.biomass_+= (*iter).get_weight() * (*iter).get_scalar();
+                    census_fishery.weight_.push_back((*iter).get_weight());
+                    census_fishery.sex_.push_back((*iter).get_sex());
+
                     (*iter).dies();
                   }
                 }

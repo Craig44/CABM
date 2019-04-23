@@ -137,7 +137,7 @@ void RecruitmentConstant::DoExecute() {
     first_enter_execute_ = false;
   }
 
-  if (model_->state() == State::kInitialise) {
+  if (model_->state() == State::kInitialise || (model_->current_year() - model_->min_age() < model_->start_year())) {
     LOG_FINEST() << "applying recruitment in initialisation year " << model_->current_year();
     initialisationphases::Manager& init_phase_manager = *model_->managers().initialisation_phase();
     float SSB = derived_quantity_->GetLastValueFromInitialisation(init_phase_manager.last_executed_phase());
@@ -154,6 +154,10 @@ void RecruitmentConstant::DoExecute() {
           cell->birth_agents(new_agents, 1.0);
         }
       }
+    }
+    if (model_->state() != State::kInitialise) {
+      ssb_by_year_[model_->current_year()] = SSB;
+      recruits_by_year_[model_->current_year()] = initial_recruits_;
     }
   } else {
     float SSB = derived_quantity_->GetValue(model_->current_year() - model_->min_age());

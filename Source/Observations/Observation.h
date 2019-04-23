@@ -52,12 +52,13 @@ public:
   virtual void                DoReset() = 0;
   virtual void                Simulate() = 0;
   virtual bool                HasYear(unsigned year) const = 0;
+  virtual void                FillReportCache(ostringstream& cache) { };  // If we want to store and report more information within a process use this method
 
   // accessors
   string&                       likelihood() { return simulation_likelihood_label_; }
   map<unsigned,map<string,vector<obs::Comparison> > > & comparisons() { return comparisons_; }
-  map<unsigned,map<string,vector<vector<float>>>>&    get_alk() {return age_length_key_by_year_stratum_;}
-  map<unsigned,map<string,vector<float>>>&    get_lf() {return lf_by_year_stratum_;}
+  //map<unsigned,map<string,vector<vector<float>>>>&    get_alk() {return age_length_key_by_year_stratum_;}
+  //map<unsigned,map<string,vector<float>>>&    get_lf() {return lf_by_year_stratum_;}
 
 protected:
   // methods
@@ -72,9 +73,7 @@ protected:
   vector<string>              allowed_likelihood_types_;
   map<unsigned,map<string,vector<obs::Comparison> > > comparisons_;
 
-  // Only used in MortalityScaledAgeFrequency
-  map<unsigned,map<string,vector<vector<float>>>>     age_length_key_by_year_stratum_;
-  map<unsigned,map<string,vector<float>>>              lf_by_year_stratum_;
+
 
 
 };

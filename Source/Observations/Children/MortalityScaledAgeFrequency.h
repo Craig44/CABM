@@ -79,6 +79,9 @@ protected:
   map<unsigned, map<string, float>>  prop_lf_by_year_and_stratum_;
 
 
+  map<unsigned,map<string,vector<vector<float>>>>     age_length_key_by_year_stratum_;
+  map<unsigned,map<string,vector<float>>>              lf_by_year_stratum_;
+
 
 };
 

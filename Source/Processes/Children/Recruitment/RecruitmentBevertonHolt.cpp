@@ -164,14 +164,16 @@ void RecruitmentBevertonHolt::DoExecute() {
           float value = recruitment_layer_->get_value(row, col);
           unsigned new_agents = (unsigned)(initial_recruits_ * value);
           LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " initial agents = " << initial_recruits_ << " new agents = " << new_agents;
-
             cell->birth_agents(new_agents, 1.0);
-
         }
       }
     }
   } else {
+
     float SSB = derived_quantity_->GetValue(model_->current_year() - model_->min_age());
+    if (model_->current_year() - model_->min_age() < model_->start_year())
+      SSB *= model_->get_scalar(label_);
+
     ssb_by_year_[model_->current_year()] = SSB;
     float ssb_ratio = SSB / b0_;
     float SR = ssb_ratio / (1.0 - ((5.0 * steepness_ - 1.0) / (4.0 * steepness_)) * (1.0 - ssb_ratio));

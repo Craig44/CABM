@@ -274,8 +274,8 @@ void MortalityEventBiomassScaledAgeFrequency::DoBuild() {
 
       if (!utilities::To<float>(prop_lf_data[row_counter][i], value))
         LOG_FATAL_P(PARAM_PROPORTION_LF_SAMPLED) << " value (" << prop_lf_data[row_counter][i] << " at row = " << row_counter << " and column " << i << " could not be converted to a float";
-      if (value <= 0) {
-        LOG_ERROR_P(PARAM_PROPORTION_LF_SAMPLED) << "at row = " << row_counter << " and column " << i << " the value given = " << value << " this needs to be a positive integer.";
+      if ((value < 0) || (value > 1)) {
+        LOG_ERROR_P(PARAM_PROPORTION_LF_SAMPLED) << "at row = " << row_counter << " and column " << i << " the value given = " << value << " this needs to be >= 0.0 and <= 1.0r.";
       }
       LOG_FINE() << "stratum = " << stratum_order_from_lf_table[i] << " samples = " << value;
 
@@ -286,6 +286,12 @@ void MortalityEventBiomassScaledAgeFrequency::DoBuild() {
     allocation_type_ = AllocationType::kEqual;
   else if (ageing_allocation_ == PARAM_PROPORTIONAL)
     allocation_type_ = AllocationType::kProportional;
+
+  // Allocate memory
+  age_length_key_.resize(model_->age_spread());
+  for (unsigned i = 0; i < model_->age_spread(); ++i)
+    age_length_key_[i].resize(model_->number_of_length_bins(),0.0);
+
 }
 
 /**
@@ -309,11 +315,6 @@ void MortalityEventBiomassScaledAgeFrequency::Simulate() {
   LOG_MEDIUM() << "Simulating data for observation = " << label_;
 
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-
-  vector<vector<float>> age_length_key_;
-  age_length_key_.resize(model_->age_spread());
-  for (unsigned i = 0; i < model_->age_spread(); ++i)
-    age_length_key_[i].resize(model_->length_bin_mid_points().size(),0.0);
   vector<vector<processes::census_data>> fishery_age_data = mortality_process_->get_fishery_census_data(fishery_label_);
 
   if (fishery_age_data.size() == 0) {
@@ -345,7 +346,7 @@ void MortalityEventBiomassScaledAgeFrequency::Simulate() {
       census_stratum_ndx.clear();
       // clear ALK
       for (unsigned i = 0; i < model_->age_spread(); ++i)
-        age_length_key_[i].resize(model_->length_bin_mid_points().size(),0.0);
+        fill(age_length_key_[i].begin(), age_length_key_[i].end(),0.0);
 
       stratum_biomass_[cells_[stratum_ndx]] = 0.0;
 
@@ -409,8 +410,6 @@ void MortalityEventBiomassScaledAgeFrequency::Simulate() {
       // Generate an age-length-key for this stratum
 
       LOG_FINE() << "about to build Age length key";
-      unsigned max_iters = agents_available_to_sample * 10;
-      unsigned iter_to_check_max = 0;
       float total_agents_in_ALK = 0;
       vector<vector<float>> mis_matrix;
       if (apply_ageing_error)
@@ -443,35 +442,44 @@ void MortalityEventBiomassScaledAgeFrequency::Simulate() {
 
       LOG_FINE() << "samples to take " << samples_to_take;
       vector<unsigned> this_strata_age_freq(model_->age_spread(), 0.0);
-      for (unsigned sample_attempt = 0; sample_attempt < samples_to_take; ++iter_to_check_max) {
-        if (iter_to_check_max >= max_iters) {
+
+      unsigned attempt = 0, age_samples_taken = 0, sample_attempt= 0;
+      unsigned max_attempts =  agents_available_to_sample * 10;
+      bool use_systematic_to_finish_sub_selection = false;
+      // ------------------------
+      // The main while loop to
+      // allocate ages
+      // ------------------------
+      while (age_samples_taken < samples_to_take) {
+        ++attempt;
+        if (attempt > max_attempts) {
+          use_systematic_to_finish_sub_selection = true;
           LOG_WARNING() << "in the observation " << label_ << " for year = " << years_[year_ndx] << " and stratum = " << cells_[stratum_ndx] << ", we were trying to sample for too long to build an age-length key. This is set at 10 x "
-              "samples available to take. samples to include = " << samples_to_take << " samples taken = " << total_agents_in_ALK;
+              "samples available to take. samples to include = " << samples_to_take << " samples taken = " << total_agents_in_ALK << " using systematic methods to fill number of otoliths";
           break;
         }
-        // Randomly select a cell that a stratum belongs to
+        // (1) Randomly select a cell that a stratum belongs to
         census_ndx = census_stratum_ndx[rng.chance() * census_stratum_ndx.size()];
         processes::census_data& this_census = fishery_year_census[census_ndx];
 
-
-        // Randomly select an agent in that cell that was measured for length
-        agent_ndx = agents_ndx_measured_for_length[census_ndx][agents_ndx_measured_for_length[census_ndx].size() * rng.chance()];
-        LOG_FINEST() << "census index = " << census_ndx << " agent ndx = " << agent_ndx << " attempt = " << sample_attempt;
-
-        // We are sampling without replacement so check we haven't sampled this agent.
-        for (unsigned check_iter = 0; check_iter < census_sampled.size(); ++check_iter) {
-          if ((agents_sampled[check_iter] == agent_ndx) & (census_sampled[check_iter] == census_ndx))
-            LOG_FINEST() << "we have sampled this agent already, try again";
-          continue;
-        }
         // no agents to sample from this cell try again
         if (this_census.age_ndx_.size() <= 0) {
           LOG_FINEST() << "No agents in this cell so try again";
           continue;
         }
+        // (2) Randomly select an agent in that cell that was measured for length
+        agent_ndx = agents_ndx_measured_for_length[census_ndx][agents_ndx_measured_for_length[census_ndx].size() * rng.chance()];
+        LOG_FINEST() << "census index = " << census_ndx << " agent ndx = " << agent_ndx << " attempt = " << attempt;
+
+        // (3) We are sampling without replacement so check we haven't sampled this agent.
+        for (unsigned check_iter = 0; check_iter < census_sampled.size(); ++check_iter) {
+          if ((agents_sampled[check_iter] == agent_ndx) & (census_sampled[check_iter] == census_ndx))
+            LOG_FINEST() << "we have sampled this agent already, try again";
+          continue;
+        }
         length_ndx = this_census.length_ndx_[agent_ndx];
 
-        // apply allocation method
+        // (4) apply allocation method
         if (allocation_type_ != AllocationType::kRandom) {
            if (sampled_numbers_of_lf[length_ndx] >= expected_numbers_of_lf[length_ndx]) {
              // We have selected the neccassary number of agents to age in this length bin try another fish
@@ -481,19 +489,15 @@ void MortalityEventBiomassScaledAgeFrequency::Simulate() {
            }
         }
 
+        // Cooking with gas
 
-        // else lets remember that we have sampled this fish
-        census_sampled.push_back(census_ndx);
-        agents_sampled.push_back(agent_ndx);
-
-        // Are we applying ageing error which will be a multinomial probability
+        // (5) Are we applying ageing error which will be a multinomial probability
         age_ndx = this_census.age_ndx_[agent_ndx];
         if (apply_ageing_error) {
-          vector<float> prob_mis_classification = mis_matrix[age_ndx];
-          LOG_FINEST() << "Agent age = " << age_ndx << " length_ndx = " << length_ndx << " prob correct id = " << prob_mis_classification[age_ndx];
+          LOG_FINEST() << "Agent age = " << age_ndx << " length_ndx = " << length_ndx << " prob correct id = " << mis_matrix[age_ndx][age_ndx];
           float temp_prob = 0.0;
-          for (unsigned mis_ndx = 0; mis_ndx < prob_mis_classification.size(); ++mis_ndx) {
-            temp_prob += prob_mis_classification[mis_ndx];
+          for (unsigned mis_ndx = 0; mis_ndx < mis_matrix[age_ndx].size(); ++mis_ndx) {
+            temp_prob += mis_matrix[age_ndx][mis_ndx];
             if (rng.chance() <= temp_prob) {
               age_ndx = mis_ndx;
               break;
@@ -501,14 +505,75 @@ void MortalityEventBiomassScaledAgeFrequency::Simulate() {
           }
         }
         age_length_key_[age_ndx][length_ndx]++;
+
         ++total_agents_in_ALK;
         ++sample_attempt;
         this_strata_age_freq[age_ndx]++;
         sampled_numbers_of_lf[length_ndx]++;
+        ++age_samples_taken;
       }
 
+      // Systematically iterate through all the cells and agents to fill our number of otoliths
+      // Exact same algorithm as above without rng() calls
+      if (use_systematic_to_finish_sub_selection) {
+        LOG_FINE() << "could not allocate otoliths using probabilisitic methods so using systematic methods";
+        // This is a nested loop because we have cells then agents within cells that we are going to loop over
+        for (unsigned cell_ndx = 0; cell_ndx < census_stratum_ndx.size(); ++cell_ndx) {
+          census_ndx = census_stratum_ndx[cell_ndx];
+          processes::census_data& this_census = fishery_year_census[census_ndx];
+          // no agents to sample from this cell try again
+          if (this_census.age_ndx_.size() <= 0) {
+            LOG_FINEST() << "No agents in this cell so try again";
+            continue;
+          }
+          //Agent ndx
+          for (unsigned i = 0; i < this_census.age_ndx_.size(); ++i) {
+            if (age_samples_taken >= samples_to_take) {
+              LOG_FINE() << "we have our quota exit";
+              break;
+            }
+            // We are sampling without replacement so check we haven't sampled this agent.
+            for (unsigned check_iter = 0; check_iter < census_sampled.size(); ++check_iter) {
+              if ((agents_sampled[check_iter] == i) & (census_sampled[check_iter] == cell_ndx))
+                LOG_FINEST() << "we have sampled this agent already, try again";
+              continue;
+            }
+            length_ndx = this_census.length_ndx_[i];
 
-      LOG_FINE() << "total number in length frequency " << total_agents_in_ALK;
+            // apply allocation method
+            if (allocation_type_ != AllocationType::kRandom) {
+               if (sampled_numbers_of_lf[length_ndx] >= expected_numbers_of_lf[length_ndx]) {
+                 // We have selected the neccassary number of agents to age in this length bin try another fish
+                 // TODO this gets called alot, can we make this more effecient...
+                 LOG_FINEST() << " We have selected the neccassary number of agents to age in this length bin try another fish";
+                 continue;
+               }
+            }
+
+            age_ndx = this_census.age_ndx_[i];
+            if (apply_ageing_error) {
+              LOG_FINEST() << "Agent age = " << age_ndx << " length_ndx = " << length_ndx << " prob correct id = " << mis_matrix[age_ndx][age_ndx];
+              float temp_prob = 0.0;
+              for (unsigned mis_ndx = 0; mis_ndx < mis_matrix[age_ndx].size(); ++mis_ndx) {
+                temp_prob += mis_matrix[age_ndx][mis_ndx];
+                if (rng.chance() <= temp_prob) {
+                  age_ndx = mis_ndx;
+                  break;
+                }
+              }
+            }
+            age_length_key_[age_ndx][length_ndx]++;
+
+            ++total_agents_in_ALK;
+            ++sample_attempt;
+            this_strata_age_freq[age_ndx]++;
+            sampled_numbers_of_lf[length_ndx]++;
+            ++age_samples_taken;
+          }
+        }
+      }
+
+      LOG_FINE() << "total number in ALK frequency " << total_agents_in_ALK;
       age_length_key_by_year_stratum_[years_[year_ndx]][cells_[stratum_ndx]] = age_length_key_;
       lf_by_year_stratum_[years_[year_ndx]][cells_[stratum_ndx]] = stratum_length_frequency;
       // Convert ALK to proportions and apply LF

@@ -23,6 +23,7 @@
 #include "Observations/Children/ProcessRemovalsByLength.h"
 #include "Observations/Children/MortalityScaledAgeFrequency.h"
 #include "Observations/Children/MortalityEventBiomassScaledAgeFrequency.h"
+#include "Observations/Children/MortalityEventBiomassClusters.h"
 
 
 
@@ -48,6 +49,8 @@ Observation* Factory::Create(Model* model, const string& object_type, const stri
       result = new MortalityScaledAgeFrequency(model);
     if (sub_type == PARAM_MORTALITY_EVENT_BIOMASS_SCALED_AGE_FREQUENCY)
       result = new MortalityEventBiomassScaledAgeFrequency(model);
+    if (sub_type == PARAM_MORTALITY_EVENT_BIOMASS_CLUSTERS)
+      result = new MortalityEventBiomassClusters(model);
     if (sub_type == PARAM_PROPORTIONS_AT_AGE)
       result = new ProportionsAtAge(model);
     else if (sub_type == PARAM_PROCESS_REMOVALS_BY_LENGTH)
