@@ -113,8 +113,6 @@ cells r1-c1 r2-c1 r3-c1
 \end{verbatim}}}
 
 
-
-
 \subsubsection{Age frequency from scaled length frequency}\label{subsubsec:Mortalitysubsamle}\index{Observations!Age frequency from scaled length frequency}
 This observation class, generates an age frequency by getting all agents removed by an F method in user defined stratum, and returns a sub-sample of age and lengths that is used to generate an age length key. The user can ask for ageing-error to be applied to when generating an age length key, using the  \command{ageing\_error} block (see Section~\ref{subsec:ageing_error}). Calculations currently follow the following algorithm for each spatial stratum,
 
@@ -169,12 +167,71 @@ end_table
 \end{verbatim}}}
 
 
+\subsubsection{Age frequency from scaled length frequency for Mortality Event Biomass process}\label{subsubsec:MortalityEventBiomasssubsamle}\index{Observations!Age frequency from Mortality Event Biomass}
+This observation class, is an extension of the class Age frequency from scaled length frequency (Section~\ref{subsubsec:Mortalitysubsamle}) and is the recommended age-length method when generating mortality based age-frequencies from process of type \subcommand{mortality\_event\_biomass}. This is mainly because the process \subcommand{mortality\_event\_biomass} allows for multiple fisheries (gear types/vulnerabilities) and so generally we want to generate an age-frequency for a specific fishery. The algorithm is similar to that of the class is derives from with the following steps run.
+
+For each Stratum identify all agents that are measured for Length frequency.
+\begin{enumerate}
+	\item randomly sub sample cells that are within each stratum (can have many) 
+	\item For each cell randomly select all available agents for measuring length frequency (denoted by table \subcommand{proportion\_lf\_sampled})
+\end{enumerate}
+For all agents measured for length within the stratum ($N_n$) sub-sample agents available for otolith reading with a length based probability according to the subcommand \subcommand{age\_allocation\_method}. Where the probabilities are defined for an agent of length $l$ as,
+\begin{enumerate}
+		\item \subcommand{random} $\frac{1}{N_n}$
+		\item \subcommand{proportional} $\frac{N_{l,n}}{N_n}$
+		\item \subcommand{equal} $\frac{1}{n_l}$
+\end{enumerate}
+where $N_{l,n}$ is the numbers measured for length in length bin $l$ in stratum $n$ and $n_l$ is the number of length bins that are non zero. When sub-sampling for age occurs this sampling is \textbf{without} replacement. The algorithm will do it's best to allocate ages according to these probabilities, if after so many attempts it can't fully allocate the number of otoliths according to these probabilities. It will abandon random methods and try systematically find fish to complete the distribution. This will occur when is a low probability that by its very definition will take a long time to randomly generate a sample of. Once we have randomly sub-sampled ages we calculate an Age Length Key (ALK) (represented as proportions) and calculate final ages following. Ageing error is applied in the age-length key, so if an agent is of age 3 but misclassified as age 4 then it is put in the ALK as age 4.
+
+\begin{equation}
+N_{n,a} = \sum_l K_{a,l,n} N_{l,n}
+\end{equation}
+
+\begin{equation}
+N_{a} = \sum_n \sum_s N_{n,a,s}
+\end{equation}
+
+
+{\small{\begin{verbatim}
+		@observation scaled_age_freq
+		type mortality_event_biomass_scaled_age_frequency
+		years 1991
+		process_label summer_fishery
+		fishery_label fisheryTrwl
+		ageing_error none
+		stratum_weighting_method biomass
+		layer_of_stratum_definitions summery_fishery_catch_at_age_stratum
+		stratums_to_include Inshore Offshore
+		age_allocation_method proportional
+		
+		table samples ## number of individuals randomly selected to calculate age-length key
+		year   Inshore    Offshore
+		1991   400        200
+		end_table
+		
+		table proportion_lf_sampled ## proportion of catch that is sampled for Length frequency
+		year   Inshore    Offshore
+		1991   0.8        0.7
+		end_table
+		simulation_likelihood multinomial
+		
+		@layer summery_fishery_catch_at_age_stratum
+		type categorical
+		table layer 
+		Inshore Inshore Offshore Offshore Offshore
+		Inshore Inshore Offshore Offshore Offshore
+		Inshore Inshore Offshore Offshore Offshore
+		Inshore Inshore Offshore Offshore Offshore
+		end_table
+		\end{verbatim}}}
+
+
 \paragraph*{Cool things I will plan to do with this observation class}
 This will be a great class for investigating catch at age inputs, I will have to return to this as this is not yet in my scope of project but things you would need to add before this observation is useful or representative of applied protocol,
 
 \begin{itemize}
-	\item Add sex in these equations.
-	\item currently we only get spatial stratum based information, but somehow structuring fishery data to represent tows and fleets mights be quite handy in this type of investigation.
+	\item \sout{Add sex in these equations.}
+	\item \sout{currently we only get spatial stratum based information, but somehow structuring fishery data to represent tows and fleets mights be quite handy in this type of investigation.}
 	\item different methods for weighting, to generate scaled length frequency you would want to add the options to weight stratum by biomass, area, numbers or proportion
 	\item Bootstrap estimates, we could boot strap ALK and Scaled length frequencies to get CV for each age bin in the frequency, and calculate an effective sample size.
 \end{itemize}
