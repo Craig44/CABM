@@ -21,6 +21,7 @@
 #include "Reports/Children/DerivedQuantity.h"
 #include "Reports/Children/AgeingErrorMatrix.h"
 #include "Reports/Children/AgeFrequencyByCell.h"
+#include "Reports/Children/Likelihood.h"
 #include "Reports/Children/Process.h"
 #include "Reports/Children/InitialisationPartition.h"
 #include "Reports/Children/Observation.h"
@@ -63,6 +64,8 @@ Report* Factory::Create(Model* model, const string& object_type, const string& s
       result = new DerivedQuantity(model);
     else if (sub_type == PARAM_OBSERVATION)
       result = new Observation(model);
+    else if (sub_type == PARAM_LIKELIHOOD)
+      result = new Likelihood(model);
     else if (sub_type == PARAM_SIMULATED_OBSERVATION)
       result = new SimulatedObservation(model);
     else if (sub_type == PARAM_MODEL_ATTRIBUTES)

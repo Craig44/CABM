@@ -296,6 +296,9 @@ void LogisticNormal::calculate_covariance() {
     LOG_FINEST() << "Finished building covariance matrix";
 }
 
+
+// Calculate correlation structure for multivariate logistic normal
+//
 vector<float> LogisticNormal::GetRho(vector<float>& Phi, unsigned nBin, bool ARMA) {
   LOG_TRACE();
   // declare all variables that will be used in this function
@@ -581,6 +584,25 @@ float LogisticNormal::det_fast(const ublas::matrix<float>& matrix) {
    }
    return det;
 }
+
+/*
+ * If this likleihood is asked for a report it will print the correlation vector and covariance matrix
+*/
+void LogisticNormal::FillReportCache(ostringstream& cache) {
+  cache << "sigma: " << sigma_ << "\n";
+  cache << "rho: ";
+  for (auto& rho : rho_)
+    cache << rho << " ";
+  cache << "\n";
+
+  cache << "covariance " << REPORT_R_MATRIX<<"\n";
+  for(unsigned i = 0; i < covariance_matrix_.size1(); ++i){
+    for(unsigned j = 0; j < covariance_matrix_.size2(); ++j) {
+      cache << covariance_matrix_(i,j) << " ";
+    }
+    cache << "\n";
+  }
+};
 
 
 } /* namespace likelihoods */

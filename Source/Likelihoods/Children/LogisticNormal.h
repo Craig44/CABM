@@ -26,12 +26,13 @@ public:
   virtual                     ~LogisticNormal();
   void                        DoValidate() override final;
   void                        SimulateObserved(map<unsigned, map<string, vector<observations::Comparison> > >& comparisons) override final;
+  virtual void                FillReportCache(ostringstream& cache);  // If we want to store and report more information within a process use this method
 
 protected:
   // Estimable parameters
-  float                      sigma_;
+  float                       sigma_;
   vector<unsigned>            bins_;
-  vector<float>              rho_;
+  vector<float>               rho_;
   bool                        arma_;
   bool                        robust_;
   unsigned                    n_bins_;
@@ -43,16 +44,14 @@ protected:
   // Covariance containers
   ublas::matrix<float>       covariance_matrix_;
   ublas::matrix<float>       covariance_matrix_lt;
-  parameters::Table*          covariance_table_ = nullptr;
+  parameters::Table*         covariance_table_ = nullptr;
   // Methods
-  void                        calculate_covariance();
+  void                       calculate_covariance();
   vector<float>              GetRho(vector<float>& Phi, unsigned nBin, bool ARMA);
   vector<float>              RecursiveFilter(vector<float>& ar_coef, unsigned nBins, vector<float>& initial_vals);
-  bool                        DoCholeskyDecmposition();
-  bool                        InvertMatrix(const ublas::matrix<float>& input, ublas::matrix<float>& inverse);
+  bool                       DoCholeskyDecmposition();
+  bool                       InvertMatrix(const ublas::matrix<float>& input, ublas::matrix<float>& inverse);
   float                      det_fast(const ublas::matrix<float>& matrix);
-
-
 };
 
 } /* namespace likelihoods */

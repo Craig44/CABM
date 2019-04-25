@@ -38,6 +38,7 @@ public:
   void                        Reset() override final { };
   virtual void                SimulateObserved(map<unsigned, map<string, vector<observations::Comparison> > >& comparisons) { };
   virtual void                DoValidate() { };
+  virtual void                FillReportCache(ostringstream& cache) { };  // If we want to store and report more information within a process use this method
 
   // accessors
   void                        set_type(const string& type) { type_ = type; }
