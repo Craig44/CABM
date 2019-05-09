@@ -118,6 +118,7 @@ void CommandLineParser::Parse(int argc, char* argv[], RunParameters& options) {
    */
   unsigned run_mode_count = 0;
   run_mode_count += parameters.count("run");
+  run_mode_count += parameters.count("simulation");
 
   if (run_mode_count == 0)
     LOG_ERROR() << "No valid run mode has been specified on the command line. Please specify a valid run mode (e.g -r)";
@@ -126,7 +127,11 @@ void CommandLineParser::Parse(int argc, char* argv[], RunParameters& options) {
 
   if (parameters.count("run"))
     options.run_mode_ = RunMode::kBasic;
-  else {
+  else if (parameters.count("simulation")) {
+     options.simulation_candidates_ = parameters["simulation"].as<unsigned>();
+     options.run_mode_ = RunMode::kSimulation;
+
+   } else {
     LOG_ERROR() << "An invalid or unknown run mode has been specified on the command line.";
   }
 
@@ -136,8 +141,6 @@ void CommandLineParser::Parse(int argc, char* argv[], RunParameters& options) {
   if (parameters.count("seed")) {
     options.override_rng_seed_value_ = parameters["seed"].as<unsigned>();
     options.override_random_number_seed_ = true;
-  }  else if (parameters.count("simulation")) {
-    options.simulation_candidates_ = parameters["simulation"].as<unsigned>();
   }
 
 }

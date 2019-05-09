@@ -16,6 +16,7 @@ enum Type {
   kVersion      = 3,
   kHelp         = 4,
   kBasic        = 8,
+  kSimulation   = 64,
 };
 }
 

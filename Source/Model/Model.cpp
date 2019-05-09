@@ -193,7 +193,9 @@ bool Model::Start(RunMode::Type run_mode) {
   case RunMode::kBasic:
     RunBasic();
     break;
-
+  case RunMode::kSimulation:
+    RunBasic();
+    break;
   default:
     LOG_ERROR() << "Invalid run mode has been specified. This run mode is not supported: " << run_mode_;
     break;
@@ -400,14 +402,14 @@ void Model::RunBasic() {
    * - iterate over -s values
    */
   Addressables& addressables = *managers_->addressables();
-  LOG_FINE() << "Multi line value = " << adressable_values_count_;
+  LOG_MEDIUM() << "Multi line value = " << adressable_values_count_;
 
   int simulation_candidates = global_configuration_->simulation_candidates();
   if (simulation_candidates < 1) {
     LOG_FATAL() << "The number of simulations specified at the command line parser must be at least one";
   }
   unsigned suffix_width = (unsigned)floor(log10((double) (simulation_candidates) * (adressable_values_count_))) + 1;
-  LOG_FINE() << "suffix width = " << suffix_width << " value = " << (simulation_candidates) * (adressable_values_count_);
+  LOG_MEDIUM() << "suffix width = " << suffix_width << " value = " << (simulation_candidates) * (adressable_values_count_);
 
   for (unsigned i = 0; i < adressable_values_count_; ++i) {
     if (addressable_values_file_) {
@@ -417,7 +419,7 @@ void Model::RunBasic() {
     /**
      * Running the model now
      */
-    LOG_FINE() << "Model: State change to Initialisation";
+    LOG_MEDIUM() << "Model: State change to Initialisation";
     state_ = State::kInitialise;
     current_year_ = start_year_;
     // Iterate over all partition members and UpDate Mean Weight for the inital weight calculations
@@ -428,7 +430,7 @@ void Model::RunBasic() {
     init_phase_manager.Execute();
     managers_->report()->Execute(State::kInitialise);
 
-    LOG_FINE() << "Model: State change to Execute";
+    LOG_MEDIUM() << "Model: State change to Execute";
 
     state_ = State::kExecute;
 
@@ -450,7 +452,7 @@ void Model::RunBasic() {
       unsigned diff = suffix_width - iteration_width;
       report_suffix.append(diff,'0');
       report_suffix.append(utilities::ToInline<unsigned, string>((s + 1) + (i * adressable_values_count_)));
-      LOG_FINE() << "i = " << i + 1 << " s = " << s + 1 <<  " suffix = " << report_suffix << " what i think it should be doing " << (s + 1) + (i * adressable_values_count_);
+      LOG_MEDIUM() << "i = " << i + 1 << " s = " << s + 1 <<  " suffix = " << report_suffix << " what i think it should be doing " << (s + 1) + (i * adressable_values_count_);
       managers_->report()->set_report_suffix(report_suffix);
 
       managers_->observation()->SimulateData();
@@ -459,12 +461,14 @@ void Model::RunBasic() {
       for (auto executor : executors_[State::kExecute])
         executor->Execute();
        */
-      if (s != (simulation_candidates - 1)) // Only need to execute this s - 1 times as the last run will be done at line 451
-        managers_->report()->PrintObservations();
+      if (s != (simulation_candidates - 1)) { // Only need to execute this s - 1 times as the last run will be done at line 451
+        managers_->report()->Execute(State::kIterationComplete);
+        managers_->report()->WaitForReportsToFinish();
+      }
 
     }
     // Model has finished so we can run finalise.
-    LOG_FINE() << "Model: State change to Iteration Complete";
+    LOG_MEDIUM() << "Model: State change to Iteration Complete";
     managers_->report()->Execute(State::kIterationComplete);
   }
 }
@@ -476,7 +480,7 @@ void Model::RunBasic() {
  * it'll run multiple times.
  */
 void Model::Iterate() {
-  LOG_TRACE();
+  LOG_MEDIUM();
   // Create an instance of all categories
   state_ = State::kInitialise;
   current_year_ = start_year_;

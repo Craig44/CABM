@@ -64,6 +64,7 @@ int main(int argc, char * argv[]) {
     case RunMode::kLicense:
       break;
 
+    case RunMode::kSimulation:
     case RunMode::kBasic:
       if (!model.global_configuration().disable_standard_report()) {
          standard_report.Prepare();

@@ -32,7 +32,6 @@ namespace niwa {
 Observation::Observation(Model* model) : model_(model) {
   parameters_.Bind<string>(PARAM_LABEL, &label_, "Label", "");
   parameters_.Bind<string>(PARAM_TYPE, &type_, "Type of observation", "");
-  parameters_.Bind<string>(PARAM_SIMULATION_LIKELIHOOD, &simulation_likelihood_label_, "Simulation likelihood to use", "");
 }
 
 /**
@@ -53,18 +52,6 @@ void Observation::Validate() {
  */
 void Observation::Build() {
   LOG_TRACE();
-
-  likelihood_ = model_->managers().likelihood()->GetOrCreateLikelihood(model_, label_, simulation_likelihood_label_);
-  if (!likelihood_) {
-    LOG_FATAL_P(PARAM_SIMULATION_LIKELIHOOD) << "(" << simulation_likelihood_label_ << ") could not be found or constructed.";
-    return;
-  }
-  if (std::find(allowed_likelihood_types_.begin(), allowed_likelihood_types_.end(), likelihood_->type()) == allowed_likelihood_types_.end()) {
-    string allowed = boost::algorithm::join(allowed_likelihood_types_, ", ");
-    LOG_FATAL_P(PARAM_SIMULATION_LIKELIHOOD) << ": likelihood " << likelihood_->type() << " is not supported by the " << type_ << " observation."
-        << " Allowed types are: " << allowed;
-  }
-
   DoBuild();
 }
 

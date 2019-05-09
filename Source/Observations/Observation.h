@@ -64,7 +64,7 @@ protected:
   // methods
   void                        SaveComparison(unsigned age, float length, string row_col, float expected, float simulated, float error_value, unsigned year);
   void                        SaveComparison(unsigned age, unsigned sex, float length, string row_col, float expected, float simulated, float error_value, unsigned year);
-
+  void                        ClearComparison() {comparisons_.clear();} // Used by observations the repeat SaveComparisons() in the DoSimulate() function i.e. MortalityScaledAgeFrequencey
   // members
   Model*                      model_ = nullptr;
   float                       proportion_of_time_ = 0;
