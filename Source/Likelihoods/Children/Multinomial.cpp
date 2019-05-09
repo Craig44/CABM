@@ -45,10 +45,8 @@ void Multinomial::SimulateObserved(map<unsigned, map<string, vector<observations
         if (comparison.expected_ <= 0.0 || error_value <= 0.0)
           comparison.simulated_ = 0.0;
         else {
-          LOG_FINEST() << "expected = " << comparison.expected_;
           comparison.simulated_ = rng.binomial(comparison.expected_, error_value);
-          LOG_FINEST() << "Simulated = " << comparison.simulated_;
-
+          LOG_FINE() << "expected = " << comparison.expected_ <<  " Simulated = " << comparison.simulated_;
         }
       }
     }

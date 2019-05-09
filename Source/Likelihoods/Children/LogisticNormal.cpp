@@ -23,7 +23,6 @@ LogisticNormal::LogisticNormal(Model* model)  : Likelihood(model) {
   parameters_.Bind<string>(PARAM_LABEL, &label_, "Label for Logisitic Normal Likelihood", "");
   parameters_.Bind<string>(PARAM_TYPE, &type_, "Type of likelihood", "");
   covariance_table_ = new parameters::Table(PARAM_COVARIANCE_MATRIX);
-
   parameters_.Bind<float>(PARAM_RHO, &rho_, "The auto-correlation parameter $\rho$", "");
   parameters_.BindTable(PARAM_COVARIANCE_MATRIX, covariance_table_, "User defined Covariance matrix", "",false,true);
   parameters_.Bind<float>(PARAM_SIGMA, &sigma_, "Sigma parameter in the likelihood", "");
@@ -149,7 +148,7 @@ void LogisticNormal::SimulateObserved(map<unsigned, map<string, vector<observati
       }
     }
     if (!DoCholeskyDecmposition())
-      LOG_FATAL()<< "Cholesky decomposition failed. Cannot continue Simulating from a logisitic-normal likelihood";
+      LOG_FATAL() << "Cholesky decomposition failed. Cannot continue Simulating from a logisitic-normal likelihood";
     // Calculate multivariate normal distribution
     year_storer = 0;
     vector<float> normals(covariance_matrix_.size1(), 0.0);
@@ -158,36 +157,39 @@ void LogisticNormal::SimulateObserved(map<unsigned, map<string, vector<observati
       LOG_FINE() << "Simulating values for year: " << year_iterator->first;
       for (auto second_iter = year_iterator->second.begin(); second_iter != year_iterator->second.end(); ++second_iter) {
         LOG_FINE() << "Simulating values for cell: " << second_iter->first;
-        unsigned nbins = year_iterator->second.size();
+        unsigned nbins =  second_iter->second.size();
+        LOG_FINE() << "nbins = " << nbins;
+        unsigned i = 0;
         for (observations::Comparison& comparison : second_iter->second) {
-          for (unsigned i = 0; i < nbins; ++i) {
-            normals[i] = rng.normal();
+          for (unsigned k = 0; k < nbins; ++k) {
+            normals[k] = rng.normal();
           }
           row_sum = 0.0;
-          for (unsigned j = 0; j < nbins; ++j) {
-            row_sum += covariance_matrix_lt(j,0) * normals[j];
+
+          for (unsigned j = 0; j < nbins; ++j)
+            row_sum += covariance_matrix_lt(i, j) * normals[j]; // Opposite row-col index for the cholesky decomposition as R code, as one is the transpose of the other.
+
+          if (comparison.expected_ == 0) {
+            LOG_WARNING() << "for likelihood = " << label_ << " year = " << year_iterator->first << " cell = " << second_iter->first << " bin number = " << i + 1 << " found an expecation = 0, changing to  0.0001";
+            comparison.expected_ = 0.0001;
           }
+          // Skip 0 observations
           comparison.simulated_ = exp(row_sum + log(comparison.expected_));
-          //LOG_FINEST() << " age = " << comparison.age_ << " simuiulated val = " << comparison.observed_  << " expected = " << comparison.expected_  << " multivariate offset = " << row_sum << " log expectations = " << log(comparison.expected_);
+          LOG_FINE() << " age = " << comparison.age_ << " simuiulated val = " << comparison.simulated_  << " expected = " << comparison.expected_  << " multivariate offset = " << row_sum << " log expectations = " << log(comparison.expected_);
           year_totals[year_storer] += comparison.simulated_;
+
+          ++i;
         }
+        // Re-scale
+        // Do the logistic transformation to get our desired values.
+        for (observations::Comparison& comparison : second_iter->second)
+          comparison.simulated_ /= year_totals[year_storer];
+
       }
       ++year_storer;
     }
   }
-  // Do the logistic transformation to get our desired values.
-  year_storer = 0;
-  for (auto year_iterator = comparisons.begin(); year_iterator != comparisons.end(); ++year_iterator) {
-    LOG_FINEST() << "year = " << year_iterator->first;
-    for (auto second_iter = year_iterator->second.begin(); second_iter != year_iterator->second.end(); ++second_iter) {
-      LOG_FINE() << "Simulating values for cell: " << second_iter->first;
-      for (observations::Comparison& comparison : second_iter->second) {
-        comparison.simulated_ /= year_totals[year_storer];
-        LOG_FINEST() << "Simulated val = " << comparison.simulated_ << " expected = " << comparison.expected_;
-      }
-    }
-    ++year_storer;
-  }
+
   LOG_FINEST() << "check out the totals";
   for(auto num :year_totals)
     LOG_FINEST() << num ;
@@ -599,6 +601,14 @@ void LogisticNormal::FillReportCache(ostringstream& cache) {
   for(unsigned i = 0; i < covariance_matrix_.size1(); ++i){
     for(unsigned j = 0; j < covariance_matrix_.size2(); ++j) {
       cache << covariance_matrix_(i,j) << " ";
+    }
+    cache << "\n";
+  }
+
+  cache << "Cholesky " << REPORT_R_MATRIX<<"\n";
+  for(unsigned i = 0; i < covariance_matrix_lt.size1(); ++i){
+    for(unsigned j = 0; j < covariance_matrix_lt.size2(); ++j) {
+      cache << covariance_matrix_lt(i,j) << " ";
     }
     cache << "\n";
   }
