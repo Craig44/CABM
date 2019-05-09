@@ -60,6 +60,8 @@ protected:
   bool                             selectivity_length_based_ = false;
   float                           time_step_proportion_;
 
+
+
 };
 
 } /* namespace observations */

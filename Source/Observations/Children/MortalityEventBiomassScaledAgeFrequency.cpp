@@ -55,10 +55,6 @@ MortalityEventBiomassScaledAgeFrequency::MortalityEventBiomassScaledAgeFrequency
   parameters_.Bind<string>(PARAM_LAYER_OF_STRATUM_DEFINITIONS, &layer_label_, "The layer that indicates what the stratum boundaries are.", "");
   parameters_.Bind<string>(PARAM_STRATUMS_TO_INCLUDE, &cells_, "The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer", "", true);
 
-  allowed_likelihood_types_.push_back(PARAM_LOGNORMAL);
-  allowed_likelihood_types_.push_back(PARAM_MULTINOMIAL);
-  allowed_likelihood_types_.push_back(PARAM_DIRICHLET);
-  allowed_likelihood_types_.push_back(PARAM_LOGISTIC_NORMAL);
 }
 /**
  * Destructor
@@ -313,6 +309,7 @@ void MortalityEventBiomassScaledAgeFrequency::Execute() {
  */
 void MortalityEventBiomassScaledAgeFrequency::Simulate() {
   LOG_MEDIUM() << "Simulating data for observation = " << label_;
+  ClearComparison(); // Clear comparisons
 
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   vector<vector<processes::census_data>> fishery_age_data = mortality_process_->get_fishery_census_data(fishery_label_);
@@ -599,18 +596,33 @@ void MortalityEventBiomassScaledAgeFrequency::Simulate() {
       stratum_age_frequency_[cells_[stratum_ndx]].resize(model_->age_spread(),0.0);
       stratum_age_frequency_[cells_[stratum_ndx]].clear();
       for (unsigned age_bin_ndx = 0; age_bin_ndx < model_->age_spread(); ++age_bin_ndx) {
-        LOG_FINE() << "numbers at age before = " << stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx];
+        //LOG_FINE() << "numbers at age before = " << stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx];
         stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx] = 0.0;
         for (unsigned length_bin_ndx = 0; length_bin_ndx < stratum_length_frequency.size(); ++length_bin_ndx) {
           stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx] += age_length_key_[age_bin_ndx][length_bin_ndx] * stratum_length_frequency[length_bin_ndx];
-          LOG_FINE() << "length bin = " << length_bin_ndx << " ALK = " << age_length_key_[age_bin_ndx][length_bin_ndx] << " total length = " << stratum_length_frequency[length_bin_ndx];
+          //LOG_FINE() << "length bin = " << length_bin_ndx << " ALK = " << age_length_key_[age_bin_ndx][length_bin_ndx] << " total length = " << stratum_length_frequency[length_bin_ndx];
         }
         LOG_FINE() << "numbers at age = " << age_bin_ndx + model_->min_age() << " = " << stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx];
-        SaveComparison(age_bin_ndx + model_->min_age(), 0, cells_[stratum_ndx], stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx], 0.0, 0, years_[year_ndx]);
+        SaveComparison(age_bin_ndx + model_->min_age(), 0, cells_[stratum_ndx], stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx], 0.0, (float)samples_to_take, years_[year_ndx]);
       }
 
     } // Stratum loop
   } // year loop
+  for (auto& iter : comparisons_) {
+    for (auto& second_iter : iter.second) {  // cell
+      float total = 0.0;
+      LOG_FINE() << "cells = " << iter.second.size() << " second_iter.second " << second_iter.second.size();
+      for (auto& comparison : second_iter.second)
+        total += comparison.expected_;
+      LOG_FINE() << "total = " << total;
+      for (auto& comparison : second_iter.second)
+        comparison.expected_ /= total;
+      // No simulation in this, simulated = expected
+
+      for (auto& comparison : second_iter.second)
+        comparison.simulated_ = comparison.expected_;
+    }
+  }
 
 } // DoExecute
 

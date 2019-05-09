@@ -14,6 +14,7 @@
 
 #include "Model/Model.h"
 #include "Processes/Manager.h"
+#include "Likelihoods/Manager.h"
 #include "Layers/Manager.h"
 #include "Utilities/Map.h"
 #include "Utilities/Math.h"
@@ -37,6 +38,8 @@ ProcessRemovalsByLength::ProcessRemovalsByLength(Model* model) : Observation(mod
   parameters_.BindTable(PARAM_ERROR_VALUES, error_values_table_, "Table of error values of the observed values (note the units depend on the likelihood)", "", false);
   parameters_.Bind<string>(PARAM_LAYER_OF_CELLS, &layer_label_, "The layer that indicates what area to summarise observations over.", "");
   parameters_.Bind<string>(PARAM_CELLS, &cells_, "The cells we want to generate observations for from the layer of cells supplied", "");
+  parameters_.Bind<string>(PARAM_SIMULATION_LIKELIHOOD, &simulation_likelihood_label_, "Simulation likelihood to use", "");
+
   allowed_likelihood_types_.push_back(PARAM_LOGNORMAL);
   allowed_likelihood_types_.push_back(PARAM_MULTINOMIAL);
 }
@@ -105,6 +108,19 @@ void ProcessRemovalsByLength::DoValidate() {
  * the labels for other objects are valid.
  */
 void ProcessRemovalsByLength::DoBuild() {
+
+
+  likelihood_ = model_->managers().likelihood()->GetOrCreateLikelihood(model_, label_, simulation_likelihood_label_);
+  if (!likelihood_) {
+    LOG_FATAL_P(PARAM_SIMULATION_LIKELIHOOD) << "(" << simulation_likelihood_label_ << ") could not be found or constructed.";
+    return;
+  }
+  if (std::find(allowed_likelihood_types_.begin(), allowed_likelihood_types_.end(), likelihood_->type()) == allowed_likelihood_types_.end()) {
+    string allowed = boost::algorithm::join(allowed_likelihood_types_, ", ");
+    LOG_FATAL_P(PARAM_SIMULATION_LIKELIHOOD) << ": likelihood " << likelihood_->type() << " is not supported by the " << type_ << " observation."
+        << " Allowed types are: " << allowed;
+  }
+
     mortality_process_ = model_->managers().process()->GetMortalityProcess(process_label_);
     if (!mortality_process_)
       LOG_FATAL_P(PARAM_PROCESS_LABEL) << "could not find the process " << process_label_ << ", please make sure it exists";
@@ -190,7 +206,7 @@ void ProcessRemovalsByLength::Simulate() {
         comparison.expected_ /= total_expec;
     }
   }*/
-  //likelihood_->SimulateObserved(comparisons_);
+  likelihood_->SimulateObserved(comparisons_);
   // Simualte numbers at age, but we want proportion
   for (auto& iter : comparisons_) {
     for (auto& second_iter : iter.second) {  // cell

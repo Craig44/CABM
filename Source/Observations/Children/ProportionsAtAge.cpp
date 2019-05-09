@@ -17,6 +17,7 @@
 #include "Selectivities/Manager.h"
 #include "Layers/Manager.h"
 #include "AgeingErrors/Manager.h"
+#include "Likelihoods/Manager.h"
 
 #include "World/WorldView.h"
 #include "World/WorldCell.h"
@@ -51,6 +52,7 @@ ProportionsAtAge::ProportionsAtAge(Model* model) : Observation(model) {
   parameters_.Bind<string>(PARAM_LAYER_OF_CELLS, &layer_label_, "The layer that indicates what area to summarise observations over.", "");
   parameters_.Bind<string>(PARAM_CELLS, &cells_, "The cells we want to generate observations for from the layer of cells supplied", "");
   parameters_.Bind<string>(PARAM_TIME_STEP, &time_step_label_, "The label of time-step that the observation occurs in", "");
+  parameters_.Bind<string>(PARAM_SIMULATION_LIKELIHOOD, &simulation_likelihood_label_, "Simulation likelihood to use", "");
 
   allowed_likelihood_types_.push_back(PARAM_LOGNORMAL);
   allowed_likelihood_types_.push_back(PARAM_MULTINOMIAL);
@@ -146,6 +148,18 @@ void ProportionsAtAge::DoValidate() {
  */
 void ProportionsAtAge::DoBuild() {
   LOG_MEDIUM();
+
+
+  likelihood_ = model_->managers().likelihood()->GetOrCreateLikelihood(model_, label_, simulation_likelihood_label_);
+  if (!likelihood_) {
+    LOG_FATAL_P(PARAM_SIMULATION_LIKELIHOOD) << "(" << simulation_likelihood_label_ << ") could not be found or constructed.";
+    return;
+  }
+  if (std::find(allowed_likelihood_types_.begin(), allowed_likelihood_types_.end(), likelihood_->type()) == allowed_likelihood_types_.end()) {
+    string allowed = boost::algorithm::join(allowed_likelihood_types_, ", ");
+    LOG_FATAL_P(PARAM_SIMULATION_LIKELIHOOD) << ": likelihood " << likelihood_->type() << " is not supported by the " << type_ << " observation."
+        << " Allowed types are: " << allowed;
+  }
 
   // Build and validate layers
   layer_ = model_->managers().layer()->GetCategoricalLayer(layer_label_);

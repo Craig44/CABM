@@ -59,6 +59,8 @@ protected:
   string                        layer_label_;
 
 
+
+
 };
 
 } /* namespace observations */

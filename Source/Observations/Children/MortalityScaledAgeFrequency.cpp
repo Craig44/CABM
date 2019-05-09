@@ -291,6 +291,8 @@ void MortalityScaledAgeFrequency::Execute() {
  */
 void MortalityScaledAgeFrequency::Simulate() {
   LOG_MEDIUM() << "Simulating data for observation = " << label_;
+  ClearComparison(); // Clear comparisons
+
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
 
   vector<processes::census_data>& census_data = mortality_process_->get_census_data();
@@ -500,6 +502,20 @@ void MortalityScaledAgeFrequency::Simulate() {
       }
     } // Stratum loop
   } // year loop
+  for (auto& iter : comparisons_) {
+    for (auto& second_iter : iter.second) {  // cell
+      float total = 0.0;
+      for (auto& comparison : second_iter.second)
+        total += comparison.expected_;
+      for (auto& comparison : second_iter.second)
+        comparison.expected_ /= total;
+      // No simulation in this, simulated = expected
+      for (auto& comparison : second_iter.second)
+        comparison.simulated_ = comparison.expected_;
+    }
+  }
+
+
 } // DoExecute
 
 } /* namespace observations */

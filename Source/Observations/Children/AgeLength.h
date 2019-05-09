@@ -52,6 +52,8 @@ protected:
   string                          layer_label_;
   WorldView*                      world_ = nullptr;
   bool                            selectivity_length_based_ = false;
+
+
 };
 
 } /* namespace observations */

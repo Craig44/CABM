@@ -71,6 +71,8 @@ protected:
   string                        sexed_;
   unsigned                      sex_match_;
   bool                          sexed_flag_;
+
+
 };
 
 } /* namespace observations */

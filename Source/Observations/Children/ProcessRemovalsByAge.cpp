@@ -16,6 +16,8 @@
 #include "Processes/Manager.h"
 #include "Layers/Manager.h"
 #include "AgeingErrors/Manager.h"
+#include "Likelihoods/Manager.h"
+
 #include "Utilities/Map.h"
 #include "Utilities/Math.h"
 #include "Utilities/To.h"
@@ -43,6 +45,7 @@ ProcessRemovalsByAge::ProcessRemovalsByAge(Model* model) : Observation(model) {
   parameters_.Bind<string>(PARAM_LAYER_OF_CELLS, &layer_label_, "The layer that indicates what area to summarise observations over.", "");
   parameters_.Bind<string>(PARAM_CELLS, &cells_, "The cells we want to generate observations for from the layer of cells supplied", "");
   parameters_.Bind<string>(PARAM_SEX, &sexed_, "You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female", "", PARAM_IGNORE)->set_allowed_values({PARAM_MALE,PARAM_FEMALE,PARAM_IGNORE});
+  parameters_.Bind<string>(PARAM_SIMULATION_LIKELIHOOD, &simulation_likelihood_label_, "Simulation likelihood to use", "");
 
   allowed_likelihood_types_.push_back(PARAM_LOGNORMAL);
   allowed_likelihood_types_.push_back(PARAM_MULTINOMIAL);
@@ -148,6 +151,17 @@ void ProcessRemovalsByAge::DoValidate() {
  * the labels for other objects are valid.
  */
 void ProcessRemovalsByAge::DoBuild() {
+
+  likelihood_ = model_->managers().likelihood()->GetOrCreateLikelihood(model_, label_, simulation_likelihood_label_);
+  if (!likelihood_) {
+    LOG_FATAL_P(PARAM_SIMULATION_LIKELIHOOD) << "(" << simulation_likelihood_label_ << ") could not be found or constructed.";
+    return;
+  }
+  if (std::find(allowed_likelihood_types_.begin(), allowed_likelihood_types_.end(), likelihood_->type()) == allowed_likelihood_types_.end()) {
+    string allowed = boost::algorithm::join(allowed_likelihood_types_, ", ");
+    LOG_FATAL_P(PARAM_SIMULATION_LIKELIHOOD) << ": likelihood " << likelihood_->type() << " is not supported by the " << type_ << " observation."
+        << " Allowed types are: " << allowed;
+  }
   // Create a pointer to misclassification matrix
     if( ageing_error_label_ != "") {
       ageing_error_ = model_->managers().ageing_error()->GetAgeingError(ageing_error_label_);
@@ -284,9 +298,19 @@ void ProcessRemovalsByAge::Simulate() {
       }
     }*/
     first_simualtion_run_ = false;
+
   }
 
-  //likelihood_->SimulateObserved(comparisons_);
+  for (auto& iter : comparisons_) {
+    for (auto& second_iter : iter.second) {  // cell
+      float total = 0.0;
+      for (auto& comparison : second_iter.second)
+        total += comparison.expected_;
+      for (auto& comparison : second_iter.second)
+        comparison.expected_ /= total;
+    }
+  }
+  likelihood_->SimulateObserved(comparisons_);
   // Simualte numbers at age, but we want proportion
   for (auto& iter : comparisons_) {
     for (auto& second_iter : iter.second) {  // cell
