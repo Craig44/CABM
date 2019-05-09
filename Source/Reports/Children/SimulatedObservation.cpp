@@ -22,7 +22,7 @@ namespace reports {
  * default constructor
  */
 SimulatedObservation::SimulatedObservation(Model* model) : Report(model) {
-  run_mode_    = (RunMode::Type)(RunMode::kBasic);
+  run_mode_    = (RunMode::Type)(RunMode::kSimulation);
   model_state_ = State::kIterationComplete;
   skip_tags_   = true;
 
@@ -93,9 +93,10 @@ void SimulatedObservation::DoExecute() {
     // proportion at age obs
     cache_ << PARAM_TABLE << " " << PARAM_OBS << "\n";
     for (auto iter = comparisons.begin(); iter != comparisons.end(); ++iter) {
-      cache_ << iter->first << " ";
-      for (auto second_iter = iter->second.begin(); second_iter != iter->second.end(); ++second_iter) {
-        for (obs::Comparison comparison : second_iter->second) {
+      cache_ << iter->first << " ";  // Year
+      for (auto cell_iter = iter->second.begin(); cell_iter != iter->second.end(); ++cell_iter) {
+        // Cell
+        for (obs::Comparison comparison : cell_iter->second) {
           cache_ << comparison.simulated_  << " ";
         }
       }
