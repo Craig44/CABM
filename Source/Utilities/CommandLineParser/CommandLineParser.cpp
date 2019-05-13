@@ -54,7 +54,8 @@ void CommandLineParser::Parse(int argc, char* argv[], RunParameters& options) {
     ("config,c", value<string>(), "Configuration file")
     ("run,r", "Basic model run mode")
     ("input,i", value<string>(), "Load free parameter values from file")
-    ("seed,g", value<unsigned>(), "Random number seed")
+    (" ", value<unsigned>(), "Random number seed")
+    ("q", "suppress warnings")
     ("loglevel", value<string>(), "Set log level: finest, fine, trace, none(default)");
 
 
@@ -82,7 +83,11 @@ void CommandLineParser::Parse(int argc, char* argv[], RunParameters& options) {
     Logging::Instance().SetLogLevel(options.log_level_);
   }
 
-  LOG_TRACE();
+  if (parameters.count("q")) {
+    LOG_MEDIUM() << "surpressing warnings";
+    options.surpress_warnings_ = true;
+  }
+
 
 
   if (parameters.count("config"))

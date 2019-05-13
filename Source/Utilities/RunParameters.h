@@ -34,7 +34,9 @@ struct RunParameters {
   unsigned      random_number_seed_ = 123u;
   bool          debug_mode_ = false;
   bool          no_std_report_ = false;
-  string        log_level_ = "warning";
+  string        log_level_ = "none";
+  bool          surpress_warnings_ = false;
+
   string        output_ = "";
   unsigned      simulation_candidates_ = 1u;
   bool          override_random_number_seed_ = false;

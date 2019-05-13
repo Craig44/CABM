@@ -106,8 +106,10 @@ int main(int argc, char * argv[]) {
        if (logging.errors().size() > 0) {
          logging.FlushErrors();
          return_code = -1;
-       } else
+       } else if (not parameters.surpress_warnings_) {
+         //cout << "about to flush warnings() " << parameters.surpress_warnings_ << "\n";
          logging.FlushWarnings();
+       }
 
        if (!model.global_configuration().disable_standard_report())
          standard_report.Finalise();

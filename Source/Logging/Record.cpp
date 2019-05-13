@@ -57,6 +57,8 @@ void Record::BuildMessage() {
     o << "Message:\n";
     o << stream_.str() << "\n";
     break;
+  case Severity::kNone:
+    break;
   case Severity::kTrace:
     o << "[TRACE] " << file_name_ << "(line: " << line_number_ << ") - Method: " << function_ << "\n";
     break;
