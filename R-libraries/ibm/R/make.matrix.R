@@ -9,8 +9,7 @@
 function(lines)
 {
   columns <- string.to.vector.of.words(lines[1])
-  if(length(lines) < 2) 
-    return(NA)
+
   data <- matrix(0, length(lines), length(columns))
   for(i in 1:length(lines)) {
       line = string.to.vector.of.numbers(lines[i])

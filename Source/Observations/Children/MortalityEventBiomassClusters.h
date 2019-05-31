@@ -46,6 +46,9 @@ public:
   virtual void                FillReportCache(ostringstream& cache);
 
 protected:
+  // Methods
+  void                            ResetPreSimulation();
+
   // members
   vector<unsigned>                years_;
   vector<string>                  cells_;
@@ -99,10 +102,19 @@ protected:
 
   parameters::Table*              cluster_sample_table_ = nullptr;
 
-  map<unsigned, map<string, float>>  cluster_by_year_and_stratum_;
+  map<unsigned, map<string, unsigned>>  cluster_by_year_and_stratum_;
 
   map<unsigned,map<string,vector<vector<float>>>>     age_length_key_by_year_stratum_;
-  map<unsigned,map<string,vector<float>>>              lf_by_year_stratum_;
+  map<unsigned,map<string,vector<float>>>             lf_by_year_stratum_;
+  vector<float>                                       model_length_mid_points_;
+
+  // Storing cluster based information
+  vector<vector<vector<vector<unsigned>>>>    cluster_census_; // n_years x n_stratum x n_clusters x n_individuals (contains ages or lengths)
+  vector<vector<vector<float>>>               cluster_mean_; // n_years x n_stratum x n_clusters (contains ages or lengths mean for cluster)
+  vector<vector<vector<float>>>               cluster_weight_; // n_years x n_stratum x n_clusters (weight of cluster)
+  vector<vector<vector<vector<unsigned>>>>    cluster_length_samples_; // n_years x n_stratum x n_clusters x n_samples
+  vector<vector<vector<vector<unsigned>>>>    cluster_age_samples_; // n_years x n_stratum x n_clusters x n_samples
+
 
 };
 

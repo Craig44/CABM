@@ -262,6 +262,32 @@ void MortalityEventBiomassClusters::DoBuild() {
   age_length_key_.resize(model_->age_spread());
   for (unsigned i = 0; i < model_->age_spread(); ++i)
     age_length_key_[i].resize(model_->number_of_length_bins(),0.0);
+
+  cluster_census_.resize(years_.size());
+  cluster_length_samples_.resize(years_.size());
+  cluster_weight_.resize(years_.size());
+  cluster_mean_.resize(years_.size());
+  cluster_age_samples_.resize(years_.size());
+  for(unsigned i = 0; i < years_.size(); ++i) {
+    cluster_census_[i].resize(cells_.size());
+    cluster_length_samples_[i].resize(cells_.size());
+    cluster_age_samples_[i].resize(cells_.size());
+    cluster_weight_[i].resize(cells_.size());
+    cluster_mean_[i].resize(cells_.size());
+    for(unsigned j = 0; j < cells_.size(); ++j) {
+      cluster_census_[i][j].resize(cluster_by_year_and_stratum_[years_[i]][cells_[j]]);
+      cluster_length_samples_[i][j].resize(cluster_by_year_and_stratum_[years_[i]][cells_[j]]);
+      cluster_age_samples_[i][j].resize(cluster_by_year_and_stratum_[years_[i]][cells_[j]]);
+      cluster_weight_[i][j].resize(cluster_by_year_and_stratum_[years_[i]][cells_[j]],0.0);
+      cluster_mean_[i][j].resize(cluster_by_year_and_stratum_[years_[i]][cells_[j]],0.0);
+      for(unsigned k = 0; k < cluster_by_year_and_stratum_[years_[i]][cells_[j]]; ++k) {
+        cluster_length_samples_[i][j][k].resize(length_samples_per_clusters_,0);
+        cluster_age_samples_[i][j][k].resize(age_samples_per_clusters_,0);
+      }
+    }
+  }
+
+  model_length_mid_points_ = model_->length_bin_mid_points();
 }
 
 /**
@@ -277,13 +303,31 @@ void MortalityEventBiomassClusters::PreExecute() {
 void MortalityEventBiomassClusters::Execute() {
 
 }
+/**
+ *  Reset dynamic containers, in between simulations
+ */
+void MortalityEventBiomassClusters::ResetPreSimulation() {
+  for(unsigned i = 0; i < years_.size(); ++i) {
+    for(unsigned j = 0; j < cells_.size(); ++j) {
+      fill(cluster_weight_[i][j].begin(), cluster_weight_[i][j].end(),0.0);
+      fill(cluster_mean_[i][j].begin(), cluster_mean_[i][j].end(),0.0);
+      for(unsigned k = 0; k < cluster_by_year_and_stratum_[years_[i]][cells_[j]]; ++k) {
+        cluster_census_[i][j][k].clear();
+        fill(cluster_length_samples_[i][j][k].begin(),cluster_length_samples_[i][j][k].end(), 0);
+        fill(cluster_age_samples_[i][j][k].begin(),cluster_age_samples_[i][j][k].end(), 0);
+      }
+    }
+  }
+  ClearComparison(); // Clear comparisons
+
+}
 
 /**
  *
  */
 void MortalityEventBiomassClusters::Simulate() {
   LOG_MEDIUM() << "Simulating data for observation = " << label_;
-  ClearComparison(); // Clear comparisons
+  ResetPreSimulation();
   LOG_MEDIUM() << "size clusters " << comparisons_.size();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   vector<vector<processes::census_data>> fishery_age_data = mortality_process_->get_fishery_census_data(fishery_label_);
@@ -408,12 +452,16 @@ void MortalityEventBiomassClusters::Simulate() {
             total_stratum_biomass -= cluster_size;
           }
 
+
           // Draw the first value of each cluster
           agent_ndx = agents_available * rng.chance();
           if (age_based_clusters_)
             cluster_mean = census.age_ndx_[agent_ndx];
           else
-            cluster_mean = census.length_ndx_[agent_ndx];
+            cluster_mean = model_length_mid_points_[census.length_ndx_[agent_ndx]];
+
+          cluster_mean_[year_ndx][stratum_ndx][cluster_ndx] = cluster_mean;
+          cluster_weight_[year_ndx][stratum_ndx][cluster_ndx] = cluster_size;
 
           agent_ndx_cluster_[total_cluster_ndx].push_back(agent_ndx);
           census_ndx_cluster_[total_cluster_ndx].push_back(census_stratum_ndx[cell_ndx]);
@@ -442,14 +490,16 @@ void MortalityEventBiomassClusters::Simulate() {
               if (rng.chance() < exp(-cluster_lambda_ * fabs(census.age_ndx_[agent_ndx] - cluster_mean))) {
                 agent_ndx_cluster_[total_cluster_ndx].push_back(agent_ndx);
                 census_ndx_cluster_[total_cluster_ndx].push_back(census_stratum_ndx[cell_ndx]);
+                cluster_census_[year_ndx][stratum_ndx][cluster_ndx].push_back(census.age_ndx_[agent_ndx]);
                 cluster_size -= census.weight_[agent_ndx];
                 ++agent_counter;
               }
             } else {
-              if (rng.chance() < exp(-cluster_lambda_ * fabs(census.length_ndx_[agent_ndx] - cluster_mean))) {
+              if (rng.chance() < exp(-cluster_lambda_ * fabs(model_length_mid_points_[census.length_ndx_[agent_ndx]] - cluster_mean))) {
                 agent_ndx_cluster_[total_cluster_ndx].push_back(agent_ndx);
                 census_ndx_cluster_[total_cluster_ndx].push_back(census_stratum_ndx[cell_ndx]);
                 cluster_size -= census.weight_[agent_ndx];
+                cluster_census_[year_ndx][stratum_ndx][cluster_ndx].push_back(census.age_ndx_[agent_ndx]);
                 ++agent_counter;
               }
             }
@@ -510,6 +560,8 @@ void MortalityEventBiomassClusters::Simulate() {
 
             stratum_lf_[census.length_ndx_[agent_ndx]]++;
 
+            cluster_length_samples_[year_ndx][stratum_ndx][cluster_ndx][slot] = census.length_ndx_[agent_ndx];
+
             --lengths_to_sample;
             ++slot;
           }
@@ -523,18 +575,40 @@ void MortalityEventBiomassClusters::Simulate() {
               ++non_zero_length_bins;
             tot += len;
           }
+          unsigned total_expect = 0;
           LOG_FINE() << "number in individuals in length distribution = " << tot;
           if (allocation_type_ == AllocationType::kEqual) {
             for (unsigned len_bin = 0; len_bin < cluster_length_freq_.size(); ++len_bin) {
-              if (cluster_length_freq_[len_bin] > 0)
-                expected_aged_length_freq_[len_bin] = (unsigned) (age_samples_per_clusters_ * (1/non_zero_length_bins));
+              if (cluster_length_freq_[len_bin] > 0) {
+                expected_aged_length_freq_[len_bin] = (unsigned) (round((float)age_samples_per_clusters_ * (1/non_zero_length_bins)));
+                total_expect += expected_aged_length_freq_[len_bin];
+                if (total_expect > age_samples_per_clusters_) {
+                  expected_aged_length_freq_[len_bin] -= (total_expect - age_samples_per_clusters_);
+                  total_expect  -=  (total_expect - age_samples_per_clusters_);
+                }
+              }
             }
+            if(total_expect != age_samples_per_clusters_)
+              LOG_WARNING() << "suppose to tage " << age_samples_per_clusters_ << " age samples but code wants to take " << total_expect << " error in the code";
+
           } else if (allocation_type_ == AllocationType::kProportional) {
             for (unsigned len_bin = 0; len_bin < cluster_length_freq_.size(); ++len_bin) {
-              if (cluster_length_freq_[len_bin] > 0)
-                expected_aged_length_freq_[len_bin] = (unsigned) (age_samples_per_clusters_ * (cluster_length_freq_[len_bin]/tot));
+              if (cluster_length_freq_[len_bin] > 0) {
+                expected_aged_length_freq_[len_bin] = (unsigned) (round((float)age_samples_per_clusters_ * (cluster_length_freq_[len_bin]/tot)));
+                total_expect += expected_aged_length_freq_[len_bin];
+                LOG_FINE() << "total = " << total_expect << " number = " << expected_aged_length_freq_[len_bin] << " proportion = " << (cluster_length_freq_[len_bin]/tot);
+                if (total_expect > age_samples_per_clusters_) {
+                  expected_aged_length_freq_[len_bin] -= (total_expect - age_samples_per_clusters_);
+                  total_expect  -=  (total_expect - age_samples_per_clusters_);
+                }
+              }
             }
+            if(total_expect != age_samples_per_clusters_)
+              LOG_WARNING() << "suppose to tage " << age_samples_per_clusters_ << " age samples but code wants to take " << total_expect << " error in the code";
+
           }
+
+
           unsigned age_samples_taken = 0;
           unsigned age_ndx = 0;
           unsigned length_ndx = 0;
@@ -557,8 +631,8 @@ void MortalityEventBiomassClusters::Simulate() {
             }
             check_len_ndx =  size_int_for_random_sampling * rng.chance();
             agent_ndx = agent_ndx_for_length_subsample_within_cluster_[check_len_ndx];
-            /*
-            // Check we haven't already sampled this agent
+
+            // Check we haven't already aged this agent from the length sample
             for (unsigned check_iter = 0; check_iter < age_samples_taken; ++check_iter) {
               if ((agent_ndx_for_age_subsample_within_cluster_[check_iter] == agent_ndx)) {
                 LOG_FINE() << "we have sampled this agent already, try again " << agent_ndx_for_age_subsample_within_cluster_[check_iter] << " actual index = " << agent_ndx << " attempt = " << attempt;
@@ -568,7 +642,7 @@ void MortalityEventBiomassClusters::Simulate() {
             }
             if(skip_iter)
               continue;
-            */
+
             length_ndx = census.length_ndx_[agent_ndx];
             // apply allocation method
             if (allocation_type_ != AllocationType::kRandom) {
@@ -588,6 +662,10 @@ void MortalityEventBiomassClusters::Simulate() {
 
             // Are we applying ageing error which will be a multinomial probability
             age_ndx = census.age_ndx_[agent_ndx];
+
+            // Note this is pre age misspecification
+            cluster_age_samples_[year_ndx][stratum_ndx][cluster_ndx][age_samples_taken] = age_ndx;
+
             if (apply_ageing_error) {
               LOG_FINEST() << "Agent age = " << age_ndx << " length_ndx = " << length_ndx << " prob correct id = " << mis_matrix[age_ndx][age_ndx];
               float temp_prob = 0.0;
@@ -600,15 +678,18 @@ void MortalityEventBiomassClusters::Simulate() {
               }
             }
 
+
             age_length_key_[age_ndx][length_ndx]++;
             stratum_af_[age_ndx]++;
             ++total_agents_in_ALK;
             ++age_samples_taken;
+            LOG_FINE() << age_samples_taken;
+
           }
 
           // Only enter this if we couldn't (within reasonable time) find the right age samples to match length distributions
           if (use_systematic_to_finish_sub_selection) {
-            LOG_FINE() << "need to randomly select fish so that we get our desired number";
+            LOG_FINE() << "need to systematically select fish so that we get our desired number";
             for (unsigned i = 0; i < agent_ndx_for_length_subsample_within_cluster_.size(); ++i) {
               if (age_samples_taken >= age_samples_per_clusters_) {
                 LOG_FINE() << "we have our quota exit";
@@ -638,6 +719,10 @@ void MortalityEventBiomassClusters::Simulate() {
               //------------------------------
               agent_ndx_for_age_subsample_within_cluster_[age_samples_taken] = agent_ndx;
               sampled_aged_length_freq_[length_ndx]++;
+              age_ndx = census.age_ndx_[agent_ndx];
+
+              cluster_age_samples_[year_ndx][stratum_ndx][cluster_ndx][age_samples_taken] = age_ndx;
+
 
               if (apply_ageing_error) {
                 LOG_FINEST() << "Agent age = " << age_ndx << " length_ndx = " << length_ndx << " prob correct id = " << mis_matrix[age_ndx][age_ndx];
@@ -650,12 +735,26 @@ void MortalityEventBiomassClusters::Simulate() {
                   }
                 }
               }
+
+
               age_length_key_[age_ndx][length_ndx]++;
               stratum_af_[age_ndx]++;
               ++age_samples_taken;
               ++total_agents_in_ALK;
+              LOG_FINE() << age_samples_taken;
+
             }
           }
+/*          LOG_MEDIUM() << "expected LF for age samples = \n";
+          for(auto & ecpect_val : expected_aged_length_freq_)
+            std::cerr << ecpect_val << " ";
+          LOG_MEDIUM() << "\n sampled LF for age samples = ";
+          for(auto & sampled_val : sampled_aged_length_freq_)
+            std::cerr << sampled_val << " ";
+          std::cerr << "\n";
+*/
+
+
           total_cluster_ndx++;
         } // clusters within each cell
       } // cells
@@ -746,6 +845,69 @@ void MortalityEventBiomassClusters::FillReportCache(ostringstream& cache) {
       }
     }
   }
+
+
+  // Cluster weight
+  for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    cache << "cluster_biomass-" << years_[year_ndx] << " "  << REPORT_R_MATRIX <<"\n";
+    for(unsigned stratum_ndx = 0; stratum_ndx < cells_.size(); ++stratum_ndx) {
+      for(unsigned cluster_ndx = 0; cluster_ndx < cluster_weight_[year_ndx][stratum_ndx].size(); ++cluster_ndx)
+        cache << cluster_weight_[year_ndx][stratum_ndx][cluster_ndx] << " ";
+      cache << "\n";
+    }
+  }
+  // Cluster mean
+  for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    cache << "cluster_mean-" << years_[year_ndx] << " " << REPORT_R_MATRIX <<"\n";
+    for(unsigned stratum_ndx = 0; stratum_ndx < cells_.size(); ++stratum_ndx) {
+      for(unsigned cluster_ndx = 0; cluster_ndx < cluster_mean_[year_ndx][stratum_ndx].size(); ++cluster_ndx)
+        cache << cluster_mean_[year_ndx][stratum_ndx][cluster_ndx] << " ";
+      cache << "\n";
+    }
+  }
+
+  // Cluster age sample
+  for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    for(unsigned stratum_ndx = 0; stratum_ndx < cells_.size(); ++stratum_ndx) {
+      cache << "cluster_age_sample-" << years_[year_ndx] << "-" << cells_[stratum_ndx] << " "  << REPORT_R_MATRIX <<"\n";
+      for(unsigned cluster_ndx = 0; cluster_ndx < cluster_age_samples_[year_ndx][stratum_ndx].size(); ++cluster_ndx) {
+        //cache << cluster_ndx + 1 << " ";
+        for (auto& cluster_val : cluster_age_samples_[year_ndx][stratum_ndx][cluster_ndx])
+          cache << cluster_val << " ";
+        cache << "\n";
+      }
+    }
+  }
+
+  // Cluster length sample
+  for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    for(unsigned stratum_ndx = 0; stratum_ndx < cells_.size(); ++stratum_ndx) {
+      cache << "cluster_length_sample-" << years_[year_ndx] << "-" << cells_[stratum_ndx] << " "  << REPORT_R_MATRIX <<"\n";
+      for(unsigned cluster_ndx = 0; cluster_ndx < cluster_length_samples_[year_ndx][stratum_ndx].size(); ++cluster_ndx) {
+        //cache << cluster_ndx + 1 << " ";
+        for (auto& cluster_val : cluster_length_samples_[year_ndx][stratum_ndx][cluster_ndx])
+          cache << cluster_val << " ";
+        cache << "\n";
+      }
+    }
+  }
+
+  // Cluster Census
+  for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    for(unsigned stratum_ndx = 0; stratum_ndx < cells_.size(); ++stratum_ndx) {
+      for(unsigned cluster_ndx = 0; cluster_ndx < cluster_census_[year_ndx][stratum_ndx].size(); ++cluster_ndx) {
+        cache << "cluster_census_age-"<< years_[year_ndx] << "-" << cells_[stratum_ndx] << "-" << cluster_ndx + 1 <<  ": ";
+        for (auto& cluster_val : cluster_census_[year_ndx][stratum_ndx][cluster_ndx])
+          cache << cluster_val << " ";
+        cache << "\n";
+      }
+    }
+  }
+
+
+
+
+
 }
 
 } /* namespace observations */
