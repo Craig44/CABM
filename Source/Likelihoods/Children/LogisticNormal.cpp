@@ -375,8 +375,9 @@ vector<float> LogisticNormal::GetRho(vector<float>& Phi, unsigned nBin, bool ARM
             x1 = psi[0] * theta[i];
             x2 = psi[1] * theta[i + q];
             float val = 0.0;
-            if (!utilities::To<float, float>(math::Sum({ x1, x2 }), val))
-              LOG_CODE_ERROR() << " val " << math::Sum({ x1, x2 }) << " could not be converted in to a float";
+            vector<float> vec_vals = { x1, x2 };
+            if (!utilities::To<float, float>(math::Sum(vec_vals), val))
+              LOG_CODE_ERROR() << " val " << math::Sum(vec_vals) << " could not be converted in to a float";
             rhs[i] = val;
           }
           rhs[2] = 0.0;

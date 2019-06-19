@@ -1,5 +1,5 @@
 /**
- * @file MortalityEventBiomassClusters.h
+ * @file MortalityEventBiomassClustersOriginal.h
  * @author  C.Marsh github.com/Craig44
  * @date 4/11/2018
  * @section LICENSE
@@ -10,8 +10,8 @@
  * This class takes census information from a mortality process, generates clusters (tow/trip level tags) then randomly selects a sub sample of ages and lengths
  *  to then generate an age frequency either via age length key or direct ageing.
  */
-#ifndef OBSERVATIONS_MORTALITY_EVENT_BIOMASS_CLUSTERS_H_
-#define OBSERVATIONS_MORTALITY_EVENT_BIOMASS_CLUSTERS_H_
+#ifndef OBSERVATIONS_MORTALITY_EVENT_BIOMASS_CLUSTERS_ORIGINAL_H_
+#define OBSERVATIONS_MORTALITY_EVENT_BIOMASS_CLUSTERS_ORIGINAL_H_
 
 // headers
 #include "Observations/Observation.h"
@@ -20,7 +20,6 @@
 #include "AgeingErrors/AgeingError.h"
 //#include "Processes/Children/Mortality.h"
 #include "Processes/Children/Mortality/MortalityEventBiomass.h"
-#include <boost/math/distributions/normal.hpp>
 
 
 // namespaces
@@ -32,11 +31,11 @@ using processes::MortalityEventBiomass;
 /**
  * class definition
  */
-class MortalityEventBiomassClusters : public niwa::Observation {
+class MortalityEventBiomassClustersOriginal : public niwa::Observation {
 public:
   // methods
-  MortalityEventBiomassClusters(Model* model);
-  virtual                     ~MortalityEventBiomassClusters();
+  MortalityEventBiomassClustersOriginal(Model* model);
+  virtual                     ~MortalityEventBiomassClustersOriginal();
   void                        DoValidate() override final;
   virtual void                DoBuild() override;
   void                        DoReset() override final { };
@@ -61,18 +60,12 @@ protected:
   AllocationType                  allocation_type_ = AllocationType::kRandom;
   string                          sexed_;
   unsigned                        sex_match_;
-  unsigned                        min_age_;
-  unsigned                        max_age_;
-  unsigned                        age_spread_;
-
   bool                            sexed_flag_;
-  vector<float>                   length_bins_;
-  vector<float>                   age_bins_;
 
   // cluster info
   float                           average_cluster_weight_;
   float                           cluster_cv_;
-  float                           cluster_rho_;
+  float                           cluster_lambda_;
   string                          cluster_distribution_;
   string                          cluster_attribute_;
   unsigned                        age_samples_per_clusters_;
@@ -128,4 +121,4 @@ protected:
 } /* namespace observations */
 } /* namespace niwa */
 
-#endif /* OBSERVATIONS_MORTALITY_EVENT_BIOMASS_CLUSTERS_H_ */
+#endif /* OBSERVATIONS_MORTALITY_EVENT_BIOMASS_CLUSTERS_ORIGINAL_H_ */

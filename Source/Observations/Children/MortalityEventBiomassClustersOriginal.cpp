@@ -1,5 +1,5 @@
 /**
- * @file MortalityEventBiomassClusters.cpp
+ * @file MortalityEventBiomassClustersOriginal.cpp
  * @author  C.Marsh github.com/Craig44
  * @date 4/11/2018
  * @section LICENSE
@@ -8,7 +8,7 @@
  */
 
 // headers
-#include "MortalityEventBiomassClusters.h"
+#include "MortalityEventBiomassClustersOriginal.h"
 
 
 #include "Processes/Manager.h"
@@ -23,7 +23,6 @@
 #include "Utilities/RandomNumberGenerator.h"
 #include "Utilities/To.h"
 #include "Utilities/Map.h"
-#include "Utilities/Math.h"
 #include "Utilities/DoubleCompare.h"
 
 // namespaces
@@ -31,13 +30,11 @@ namespace niwa {
 namespace observations {
 
 namespace utils = niwa::utilities;
-namespace math = niwa::utilities::math;
-
 
 /**
  * Default constructor
  */
-MortalityEventBiomassClusters::MortalityEventBiomassClusters(Model* model) : Observation(model) {
+MortalityEventBiomassClustersOriginal::MortalityEventBiomassClustersOriginal(Model* model) : Observation(model) {
   cluster_sample_table_ = new parameters::Table(PARAM_CLUSTERS_SAMPLED);
 
   parameters_.BindTable(PARAM_CLUSTERS_SAMPLED, cluster_sample_table_, "Number of clusters samples, by year (row) and stratum (col)", "", false);
@@ -47,15 +44,12 @@ MortalityEventBiomassClusters::MortalityEventBiomassClusters(Model* model) : Obs
   parameters_.Bind<string>(PARAM_PROCESS_LABEL, &process_label_, "Label of of removal process", "", "");
   parameters_.Bind<string>(PARAM_FISHERY_LABEL, &fishery_label_, "Label of of removal process", "");
 
-  parameters_.Bind<unsigned>(PARAM_MIN_AGE, &min_age_, "Minimum age", "");
-  parameters_.Bind<unsigned>(PARAM_MAX_AGE, &max_age_, "Maximum age", "");
-
   // Cluster Inputs
   parameters_.Bind<float>(PARAM_AVERAGE_CLUSTER_WEIGHT, &average_cluster_weight_, "Mean size in weight of the cluster size could be tow or trip intepretation", "");
   parameters_.Bind<float>(PARAM_CLUSTER_CV, &cluster_cv_, "CV for randomly selecting clusters", "");
   //parameters_.Bind<string>(PARAM_CLUSTER_DISTRIBUTION, &cluster_distribution_, "The distribution for generating random cluster sizes", "", PARAM_NORMAL)->set_allowed_values({PARAM_NORMAL, PARAM_LOGNORMAL});
   parameters_.Bind<string>(PARAM_CLUSTER_ATTRIBUTE, &cluster_attribute_, "What attribute do you want to link clusters by, either age or length", "", PARAM_AGE)->set_allowed_values({PARAM_AGE, PARAM_LENGTH});
-  parameters_.Bind<float>(PARAM_CLUSTER_CORRELATION_LAMBDA, &cluster_rho_, "The probability of being associated to a cluster based on distrance from attribute", "")->set_range(0.0, 1.0, true, true);
+  parameters_.Bind<float>(PARAM_CLUSTER_CORRELATION_LAMBDA, &cluster_lambda_, "The probability of being associated to a cluster based on distrance from attribute", "")->set_range(0.0, 1.0, true, true);
   parameters_.Bind<unsigned>(PARAM_AGE_SAMPLES_PER_CLUSTER, &age_samples_per_clusters_, "Number of age samples available to be aged per cluster", "");
   parameters_.Bind<unsigned>(PARAM_LENGTH_SAMPLES_PER_CLUSTER, &length_samples_per_clusters_, "Number of age samples available to be aged per cluster", "");
   parameters_.Bind<float>(PARAM_MINIMUM_CLUSTER_WEIGHT_TO_SAMPLE, &minimum_cluster_weight_to_sample_, "The minimum weight (tonnes) threshold to consider sampling, should be well in the distribution of cluster sizes", "");
@@ -73,13 +67,13 @@ MortalityEventBiomassClusters::MortalityEventBiomassClusters(Model* model) : Obs
 /**
  * Destructor
  */
-MortalityEventBiomassClusters::~MortalityEventBiomassClusters() {
+MortalityEventBiomassClustersOriginal::~MortalityEventBiomassClustersOriginal() {
   delete cluster_sample_table_;
 }
 /**
  *
  */
-void MortalityEventBiomassClusters::DoValidate() {
+void MortalityEventBiomassClustersOriginal::DoValidate() {
   LOG_TRACE();
   for (auto year : years_) {
     LOG_FINE() << "year : " << year;
@@ -108,20 +102,13 @@ void MortalityEventBiomassClusters::DoValidate() {
     age_based_clusters_ = false;
   }
 
-  if(min_age_ < model_->min_age())
-    LOG_ERROR_P(PARAM_MIN_AGE) << "min age = " << min_age_ << " model min_age is " << model_->min_age() << " you cannot specify an age less than model min age";
-  if(max_age_ < model_->max_age())
-    LOG_ERROR_P(PARAM_MAX_AGE) << "max age = " << max_age_ << " model min_age is " << model_->max_age() << " you cannot specify an age less than model max age";
-
-  age_spread_ = (max_age_ - min_age_) + 1;
-
 
 }
 
 /**
  *
  */
-void MortalityEventBiomassClusters::DoBuild() {
+void MortalityEventBiomassClustersOriginal::DoBuild() {
   LOG_TRACE();
   // Create a pointer to misclassification matrix
   if (ageing_error_label_ != PARAM_NONE) {
@@ -266,7 +253,7 @@ void MortalityEventBiomassClusters::DoBuild() {
 
   cluster_length_freq_.resize(model_->number_of_length_bins(), 0);
   stratum_lf_.resize(model_->number_of_length_bins(), 0);
-  stratum_af_.resize(age_spread_, 0);
+  stratum_af_.resize(model_->age_spread(), 0);
   expected_aged_length_freq_.resize(model_->number_of_length_bins(), 0);
   sampled_aged_length_freq_.resize(model_->number_of_length_bins(), 0);
   agent_ndx_for_length_subsample_within_cluster_.resize(length_samples_per_clusters_, 0);
@@ -295,23 +282,9 @@ void MortalityEventBiomassClusters::DoBuild() {
       cluster_mean_[i][j].resize(cluster_by_year_and_stratum_[years_[i]][cells_[j]],0.0);
       for(unsigned k = 0; k < cluster_by_year_and_stratum_[years_[i]][cells_[j]]; ++k) {
         cluster_length_samples_[i][j][k].resize(length_samples_per_clusters_,0);
-        cluster_age_samples_[i][j][k].resize(age_samples_per_clusters_, 0);
+        cluster_age_samples_[i][j][k].resize(age_samples_per_clusters_,0);
       }
     }
-  }
-
-
-  // calculate age and length bins for binning probabilties
-  LOG_FINE() << "check out bins";
-  length_bins_.resize(model_->length_bins().size(),0.0);
-  for(unsigned i = 0; i < model_->length_bins().size(); ++i) {
-    length_bins_[i] = (float)model_->length_bins()[i];
-    LOG_FINE() <<  length_bins_[i];
-  }
-  age_bins_.resize(age_spread_ + 1,0.0);
-  for(unsigned i = 0; i < (age_spread_ + 1); ++i) {
-    age_bins_[i] = (float)(min_age_ + i) - 0.5;
-    LOG_FINE() <<  age_bins_[i];
   }
 
   model_length_mid_points_ = model_->length_bin_mid_points();
@@ -320,20 +293,20 @@ void MortalityEventBiomassClusters::DoBuild() {
 /**
  *
  */
-void MortalityEventBiomassClusters::PreExecute() {
+void MortalityEventBiomassClustersOriginal::PreExecute() {
 
 }
 
 /**
  *
  */
-void MortalityEventBiomassClusters::Execute() {
+void MortalityEventBiomassClustersOriginal::Execute() {
 
 }
 /**
  *  Reset dynamic containers, in between simulations
  */
-void MortalityEventBiomassClusters::ResetPreSimulation() {
+void MortalityEventBiomassClustersOriginal::ResetPreSimulation() {
   for(unsigned i = 0; i < years_.size(); ++i) {
     for(unsigned j = 0; j < cells_.size(); ++j) {
       fill(cluster_weight_[i][j].begin(), cluster_weight_[i][j].end(),0.0);
@@ -341,7 +314,7 @@ void MortalityEventBiomassClusters::ResetPreSimulation() {
       for(unsigned k = 0; k < cluster_by_year_and_stratum_[years_[i]][cells_[j]]; ++k) {
         cluster_census_[i][j][k].clear();
         fill(cluster_length_samples_[i][j][k].begin(),cluster_length_samples_[i][j][k].end(), 0);
-        fill(cluster_age_samples_[i][j][k].begin(),cluster_age_samples_[i][j][k].end(), 999);
+        fill(cluster_age_samples_[i][j][k].begin(),cluster_age_samples_[i][j][k].end(), 0);
       }
     }
   }
@@ -352,7 +325,7 @@ void MortalityEventBiomassClusters::ResetPreSimulation() {
 /**
  *
  */
-void MortalityEventBiomassClusters::Simulate() {
+void MortalityEventBiomassClustersOriginal::Simulate() {
   LOG_MEDIUM() << "Simulating data for observation = " << label_;
   ResetPreSimulation();
   LOG_MEDIUM() << "size clusters " << comparisons_.size();
@@ -396,16 +369,22 @@ void MortalityEventBiomassClusters::Simulate() {
       }
       LOG_FINE() << "clusters to sample " << clusters_to_sampled << " - " << census_ndx_cluster_.size();
       census_stratum_ndx.clear();
-      //unsigned total_agents_in_ALK = 0;
+      unsigned total_agents_in_ALK = 0;
       // Reset Stratum Objects
+      fill(stratum_lf_.begin(),stratum_lf_.end(), 0);
+      for (unsigned i = 0; i < model_->age_spread(); ++i)
+        fill(age_length_key_[i].begin(),age_length_key_[i].end(), 0);
+
       stratum_biomass_[cells_[stratum_ndx]] = 0.0;
       fill(stratum_af_.begin(),stratum_af_.end(), 0);
+      fill(stratum_lf_.begin(),stratum_lf_.end(), 0);
 
       // -- Find which census objects relate to this year and stratum
       //    save that information to do a look up later.
       // -- if more than one cell in stratum find biomass weights by sex
       unsigned census_ndx = 0; // links back to the census
       LOG_FINE() << "number of cells in this year and fishery = " << fishery_year_census.size();
+      vector<vector<unsigned>> agents_ndx_measured_for_length(fishery_year_census.size());
       float total_stratum_biomass = 0.0;
       vector<float> biomass_by_cell;
       for (processes::census_data& census : fishery_year_census) {
@@ -446,215 +425,249 @@ void MortalityEventBiomassClusters::Simulate() {
       // -------------------
       // Generate clusters
       // For each cell
-      // Four versions, for different distributions (normal and lognormal) and different cluster attributes (age, length)
+      // Four versions of the same code, for different distributions (normal and lognormal) and different cluster attributes (age, length)
       // -------------------
       float cluster_size = 0, cluster_original_size = 0;
-      unsigned cluster_size_numbers = 0;
       unsigned attempt = 0;
-      vector<unsigned> expected_cluster_numbers;
-      vector<float> prob_cluster_numbers;
       unsigned max_attempts = 1000;
       unsigned agents_available = 1000;
       unsigned agent_ndx = 0;
-      float cluster_mean = 0.0, cluster_ssw = 0.0, cluster_ssto = 0.0, cluster_sd = 0.0;
-      float mean_weight_of_agents = 0.0;
+      float cluster_mean = 0.0;
       unsigned total_cluster_ndx = 0;
       for (unsigned cell_ndx = 0; cell_ndx < census_stratum_ndx.size(); ++cell_ndx) {
-        attempt = 0;
         unsigned clusters_to_collate = clusters_to_sample_by_cell[cell_ndx];
         processes::census_data& census = fishery_year_census[census_stratum_ndx[cell_ndx]];
         LOG_FINE() << "Biomass available in this cell = " << census.biomass_;
         agents_available = census.age_ndx_.size();
-        // calculate mean weight for each cell, we are going to randomly draw a sampling unit (landing/tow) which is weight based
-        // Then based on characteristics of clusters, we convert this to numbers using this 'mean_weight_of_agents' value
-        mean_weight_of_agents = census.biomass_ / math::Sum(census.scalar_);
-        LOG_FINE() << "number of individuals = " << math::Sum(census.scalar_);
-        //unsigned agent_counter = 0;
-        cluster_size = 0.0;
+        unsigned agent_counter = 0;
         for (unsigned cluster_ndx = 0; cluster_ndx < clusters_to_collate; ++cluster_ndx) {
+          LOG_FINE() << "cluster ndx = " << total_cluster_ndx;
           max_attempts = agents_available * 20;
 
           attempt = 0;
           // Find a cluster size that is greater than mimimum weight threshold and take into account
           // that each trial was a missed cluster and so there is a finite number of attempts based on total_stratum_biomass;
-          while (cluster_size < minimum_cluster_weight_to_sample_) {
+          while ((cluster_size < minimum_cluster_weight_to_sample_) | (total_stratum_biomass > 0)) {
             cluster_size = rng.lognormal(average_cluster_weight_, cluster_cv_);
+            total_stratum_biomass -= cluster_size;
           }
 
-          cluster_size_numbers = (unsigned)(cluster_size / mean_weight_of_agents); // turn to numbers
-          LOG_FINE() << "cluster ndx = " << total_cluster_ndx << " cluster size = " << cluster_size << " average cluster weight " << average_cluster_weight_ << " numbers = " << cluster_size_numbers << " mean weight of agents = " << mean_weight_of_agents;
 
-          // Randomly draw the mean value for the cluster based on the age/lenght frequency of the population
+          // Draw the first value of each cluster
           agent_ndx = agents_available * rng.chance();
-          if (age_based_clusters_) {
+          if (age_based_clusters_)
             cluster_mean = census.age_ndx_[agent_ndx];
-            cluster_ssto = math::Var(census.age_ndx_) * (float)age_samples_per_clusters_ * float(clusters_to_collate);
-            cluster_ssw = cluster_ssto * (1.0 - cluster_rho_);
-            cluster_sd = sqrt(cluster_ssw/((float)clusters_to_collate*((float)age_samples_per_clusters_ - 1.0)));
-            expected_cluster_numbers.resize(age_spread_, 0);
-
-            prob_cluster_numbers = math::block_cdf(age_bins_, cluster_mean, cluster_sd);
-
-/*
-            vector<float> prob(age_bins_.size(), 0.0);
-            vector<float> prob_bins(age_bins_.size() - 1, 0.0);
-            unsigned index = 0;
-            bool check_max_of_one = false;
-            for(auto& val : age_bins_) {
-              prob[index] = math::pnorm(val, cluster_mean, cluster_sd);
-              //LOG_FINE() << "prob = " << prob[index] << " val = " << val;
-              if (prob[index] >= 1.0)
-                check_max_of_one = true;
-              ++index;
-            }
-            if (not check_max_of_one)
-              prob[age_bins_.size() - 1] += (1.0 - prob[age_bins_.size() - 1]);
-            // calculate difference between bins
-            for(unsigned i = 0; i < (age_bins_.size() - 1); ++i)
-              prob_bins[i] = prob[i + 1] - prob[i];
-            if (prob[0] > 0.0)
-              prob_bins[0] += prob[0];
-
-            for (unsigned pdf = 0; pdf < prob.size(); ++pdf)
-              LOG_FINE() << prob[pdf];
-*/
-
-            unsigned total_expected_numbers = 0;
-            for (unsigned i = 0; i < age_spread_; ++i) {
-              expected_cluster_numbers[i] = (unsigned)(prob_cluster_numbers[i] * cluster_size_numbers);
-              total_expected_numbers += expected_cluster_numbers[i];
-              LOG_MEDIUM() << "age = " << min_age_ + i << " numbers = " << expected_cluster_numbers[i] << " prob = " << prob_cluster_numbers[i];
-            }
-
-            cluster_size_numbers = total_expected_numbers;
-            // Calculate cluster sd
-          } else {
+          else
             cluster_mean = model_length_mid_points_[census.length_ndx_[agent_ndx]];
-            float mean = 0;
-            for (unsigned i = 0; i < census.length_ndx_.size(); ++i)
-              mean += model_length_mid_points_[census.length_ndx_[i]];
-            mean /= (float)census.length_ndx_.size();
-            for (unsigned i = 0; i < census.length_ndx_.size(); ++i)
-              cluster_ssto += (model_length_mid_points_[census.length_ndx_[i]] - mean) * (model_length_mid_points_[census.length_ndx_[i]] - mean);
-            cluster_ssto /= ((float)census.length_ndx_.size() - 1.0);
-            cluster_ssto *= (float)length_samples_per_clusters_ * (float)clusters_to_collate;
-            cluster_ssw = cluster_ssto * (1.0 - cluster_rho_);
-            cluster_sd = sqrt(cluster_ssw/((float)clusters_to_collate*((float)age_samples_per_clusters_ - 1.0)));
 
-            expected_cluster_numbers.resize(model_length_mid_points_.size(),0);
-            prob_cluster_numbers = math::block_cdf(length_bins_, cluster_mean, cluster_sd);
+          cluster_mean_[year_ndx][stratum_ndx][cluster_ndx] = cluster_mean;
+          cluster_weight_[year_ndx][stratum_ndx][cluster_ndx] = cluster_size;
 
-
-            unsigned total_expected_numbers = 0;
-            for (unsigned i = 0; i < model_length_mid_points_.size(); ++i) {
-              expected_cluster_numbers[i] = (unsigned)(prob_cluster_numbers[i] * cluster_size_numbers);
-              total_expected_numbers += expected_cluster_numbers[i];
-              LOG_MEDIUM() << expected_cluster_numbers[i];
-            }
-            cluster_size_numbers = total_expected_numbers;
-          }
-          LOG_MEDIUM() << "rho = " << cluster_rho_ << " cluster numbers to take = " << cluster_size_numbers << " cluster mean = " << cluster_mean << " cluster sd = " << cluster_sd << " cluster ssto = " << cluster_ssto << " cluster ssw = " << cluster_ssw;
-
-          cluster_mean_[year_ndx][stratum_ndx][total_cluster_ndx] = cluster_mean;
-          cluster_weight_[year_ndx][stratum_ndx][total_cluster_ndx] = cluster_size;
           agent_ndx_cluster_[total_cluster_ndx].push_back(agent_ndx);
           census_ndx_cluster_[total_cluster_ndx].push_back(census_stratum_ndx[cell_ndx]);
-          LOG_MEDIUM() <<"max_attempts " << max_attempts <<  " cluster mean = " << cluster_mean << " cluster size = " << cluster_size << ", number of agents = " << census.age_ndx_.size();
+          LOG_FINE() <<"max_attempts " << max_attempts <<  " cluster mean = " << cluster_mean << " cluster size = " << cluster_size << ", number of agents = " << census.age_ndx_.size();
+
+          cluster_original_size = cluster_size;
 
           if(census_ndx_cluster_[total_cluster_ndx].size() > 1) {
             LOG_CODE_ERROR() << "'census_ndx_cluster_[total_cluster_ndx].size() > 1', this should be 1 something is going wrong it is = " << census_ndx_cluster_[total_cluster_ndx].size() << " it means this observation has been previously run";
           }
-          unsigned age_ndx = 0;
-          unsigned age_offset = min_age_ - model_->min_age();
-          //Build up symetric cluster based
-          while (cluster_size_numbers > 0) {
+          while (cluster_size > 0) {
             ++attempt;
             if (attempt > max_attempts) {
               LOG_WARNING() << "Observation " << label_ << " Not enough agents to build cluster, tried to 5 x the number of agents available, either not enough agents or the cluster requirements to computationslly difficult  e.g. too high lambda. Weight (tonnes) left to add to this cluster = " << cluster_size << " we wanted " << cluster_original_size;
               break;
             }
-            agent_ndx = agents_available * rng.chance();
 
-            //LOG_FINE() << "ndx = " << agent_ndx << " attempt = " << attempt;
+            agent_ndx = agents_available * rng.chance();
             // check we haven't sampled this agent or should we let it fly, because they represent multiple individuals?
             /*
             if (find(agent_ndx_cluster_[total_cluster_ndx].begin(), agent_ndx_cluster_[total_cluster_ndx].end(), agent_ndx) != agent_ndx_cluster_[total_cluster_ndx].end())
               continue;
             */
+            // check we haven't sampled this agent or should we let it fly, because they represent multiple individuals?
             if (age_based_clusters_) {
-
-              age_ndx = census.age_ndx_[agent_ndx];
-              if ((age_ndx + model_->min_age()) > max_age_)
-                age_ndx = age_spread_ - 1;
-              if ((age_ndx + model_->min_age()) < min_age_)
-                age_ndx = 0;
-
-              if (expected_cluster_numbers[age_ndx - age_offset] > 0) {
-                //LOG_FINE() << "ndx = " << agent_ndx << " expected collection for this age = " << expected_cluster_numbers[census.age_ndx_[agent_ndx]];
-                expected_cluster_numbers[age_ndx - age_offset] -= 1;
+              if (rng.chance() < exp(-cluster_lambda_ * fabs(census.age_ndx_[agent_ndx] - cluster_mean))) {
                 agent_ndx_cluster_[total_cluster_ndx].push_back(agent_ndx);
                 census_ndx_cluster_[total_cluster_ndx].push_back(census_stratum_ndx[cell_ndx]);
-                cluster_census_[year_ndx][stratum_ndx][total_cluster_ndx].push_back(census.age_ndx_[agent_ndx]);
-                --cluster_size_numbers;
-              } else
-                continue;
-
+                cluster_census_[year_ndx][stratum_ndx][cluster_ndx].push_back(census.age_ndx_[agent_ndx]);
+                cluster_size -= census.weight_[agent_ndx];
+                ++agent_counter;
+              }
             } else {
-              if (expected_cluster_numbers[census.length_ndx_[agent_ndx]] > 0) {
-                expected_cluster_numbers[census.length_ndx_[agent_ndx]] -= 1;
+              if (rng.chance() < exp(-cluster_lambda_ * fabs(model_length_mid_points_[census.length_ndx_[agent_ndx]] - cluster_mean))) {
                 agent_ndx_cluster_[total_cluster_ndx].push_back(agent_ndx);
                 census_ndx_cluster_[total_cluster_ndx].push_back(census_stratum_ndx[cell_ndx]);
-                cluster_census_[year_ndx][stratum_ndx][total_cluster_ndx].push_back(census.age_ndx_[agent_ndx]);
-                --cluster_size_numbers;
-              } else
-                continue;
+                cluster_size -= census.weight_[agent_ndx];
+                cluster_census_[year_ndx][stratum_ndx][cluster_ndx].push_back(census.age_ndx_[agent_ndx]);
+                ++agent_counter;
+              }
             }
           }
-          for(unsigned i = 0; i < expected_cluster_numbers.size(); ++i)
-            LOG_FINE() << "numbers remaining for age = " << min_age_ + i << " = " << expected_cluster_numbers[i];
-          /*
-           * Now collate the final age-comp
-          */
-          unsigned final_samples_to_take = age_samples_per_clusters_;
-          if (final_samples_to_take > agent_ndx_cluster_[total_cluster_ndx].size()) {
-            // take them all
-            final_samples_to_take = agent_ndx_cluster_[total_cluster_ndx].size();
+          LOG_FINE() << "attempts to calculate cluster = " << attempt;
+
+          if (agent_counter < length_samples_per_clusters_) {
+            LOG_WARNING() << "for observation " << label_ << ", the number of agents in cluster '" << total_cluster_ndx << "' = " << agent_counter << " you want " << length_samples_per_clusters_ << " lengths sampled, this ain't going to work. Maybe you need to add more agents into the system";
           }
-          LOG_MEDIUM() << "attempts to calculate cluster = " << attempt << " remaining cluster numbers = " << cluster_size_numbers << " samples to take = " << final_samples_to_take << " we wont = " << age_samples_per_clusters_;
 
-          agents_available = agent_ndx_cluster_[total_cluster_ndx].size();
-          stratum_age_frequency_[cells_[stratum_ndx]].resize(model_->age_spread(), 0.0);
+          //-----------------------------------------
+          // Now lets sub-sample lengths from cluster
+          //-----------------------------------------
+
+          fill(cluster_length_freq_.begin(),cluster_length_freq_.end(), 0);
+          fill(expected_aged_length_freq_.begin(),expected_aged_length_freq_.end(), 0);
+          fill(sampled_aged_length_freq_.begin(),sampled_aged_length_freq_.end(), 0);
+          // Perhaps not appropriate to fill with 0's this means the first agent will never get picked... probably worth the memory allocation
+          // time saving.
+          fill(agent_ndx_for_length_subsample_within_cluster_.begin(), agent_ndx_for_length_subsample_within_cluster_.end(), 0);
+          fill(agent_ndx_for_age_subsample_within_cluster_.begin(), agent_ndx_for_age_subsample_within_cluster_.end(), 0);
+
+          unsigned lengths_to_sample = length_samples_per_clusters_;
+          unsigned slot = 0;
+          unsigned size_int_for_random_sampling = agent_ndx_cluster_[total_cluster_ndx].size();
           attempt = 0;
-          age_ndx = 0;
-          // This is without replacement
-          unsigned counter = 0;
-          vector<unsigned> subsample_agent_ndx;
+          bool skip_iter = false;
+          max_attempts = size_int_for_random_sampling * 5;
+          LOG_FINE() << "number available for sampling = " << size_int_for_random_sampling << " lengths allowed = " << cluster_length_freq_.size();
+          LOG_FINE() << "number of agents in census = " << census.length_ndx_.size();
+          LOG_FINE() << "cluster ndx = " << total_cluster_ndx << " - " << cluster_ndx;
+          unsigned sample_ndx = 0;
 
-          while (final_samples_to_take > 0) {
-            //LOG_FINE() << "counter = " << counter << " samples = " << final_samples_to_take;
+          while (lengths_to_sample > 0) {
             ++attempt;
+            //skip_iter = false;
             if (attempt > max_attempts) {
-              LOG_WARNING() << "Observation " << label_ << " Not enough agents to build cluster, tried to 5 x the number of agents available, either not enough agents or the cluster requirements to computationslly difficult  e.g. too high lambda. Weight (tonnes) left to add to this cluster = " << cluster_size << " we wanted " << cluster_original_size;
+              LOG_WARNING() << "could not sample all lengths in observation " << label_ << " for cluster = " << total_cluster_ndx;
               break;
             }
+            sample_ndx = size_int_for_random_sampling * rng.chance();
 
-            agent_ndx = agents_available * rng.chance();
-            // check we haven't sampled this agent
-            if (find(subsample_agent_ndx.begin(), subsample_agent_ndx.end(), agent_ndx) != subsample_agent_ndx.end()) {
-              //LOG_FINE() << "agent_ndx already sampled " << agent_ndx;
-              continue;
+            agent_ndx = agent_ndx_cluster_[total_cluster_ndx][sample_ndx];
+            /*
+            // Check we haven't already selected this agent for lengths
+            for(unsigned i = 0; i < slot; ++i) {
+              if (agent_ndx == agent_ndx_for_length_subsample_within_cluster_[i]) {
+                skip_iter = true;
+                break;
+              }
             }
+            if (skip_iter)
+              continue;
+            */
+            agent_ndx_for_length_subsample_within_cluster_[slot] = agent_ndx;
 
+            cluster_length_freq_[census.length_ndx_[agent_ndx]]++;
+
+            stratum_lf_[census.length_ndx_[agent_ndx]]++;
+
+            cluster_length_samples_[year_ndx][stratum_ndx][cluster_ndx][slot] = census.length_ndx_[agent_ndx];
+
+            --lengths_to_sample;
+            ++slot;
+          }
+          LOG_FINE() << "attempts = " << attempt;
+          // Now lets sub-sample ages from length samples
+          float non_zero_length_bins = 0;
+          // number of length bins with non-zero entry
+          float tot = 0;
+          for (auto& len : cluster_length_freq_) {
+            if (len > 0)
+              ++non_zero_length_bins;
+            tot += len;
+          }
+          unsigned total_expect = 0;
+          LOG_FINE() << "number in individuals in length distribution = " << tot;
+          if (allocation_type_ == AllocationType::kEqual) {
+            for (unsigned len_bin = 0; len_bin < cluster_length_freq_.size(); ++len_bin) {
+              if (cluster_length_freq_[len_bin] > 0) {
+                expected_aged_length_freq_[len_bin] = (unsigned) (round((float)age_samples_per_clusters_ * (1/non_zero_length_bins)));
+                total_expect += expected_aged_length_freq_[len_bin];
+                if (total_expect > age_samples_per_clusters_) {
+                  expected_aged_length_freq_[len_bin] -= (total_expect - age_samples_per_clusters_);
+                  total_expect  -=  (total_expect - age_samples_per_clusters_);
+                }
+              }
+            }
+            if(total_expect != age_samples_per_clusters_)
+              LOG_WARNING() << "suppose to tage " << age_samples_per_clusters_ << " age samples but code wants to take " << total_expect << " error in the code";
+
+          } else if (allocation_type_ == AllocationType::kProportional) {
+            for (unsigned len_bin = 0; len_bin < cluster_length_freq_.size(); ++len_bin) {
+              if (cluster_length_freq_[len_bin] > 0) {
+                expected_aged_length_freq_[len_bin] = (unsigned) (round((float)age_samples_per_clusters_ * (cluster_length_freq_[len_bin]/tot)));
+                total_expect += expected_aged_length_freq_[len_bin];
+                LOG_FINE() << "total = " << total_expect << " number = " << expected_aged_length_freq_[len_bin] << " proportion = " << (cluster_length_freq_[len_bin]/tot);
+                if (total_expect > age_samples_per_clusters_) {
+                  expected_aged_length_freq_[len_bin] -= (total_expect - age_samples_per_clusters_);
+                  total_expect  -=  (total_expect - age_samples_per_clusters_);
+                }
+              }
+            }
+            if(total_expect != age_samples_per_clusters_)
+              LOG_WARNING() << "suppose to tage " << age_samples_per_clusters_ << " age samples but code wants to take " << total_expect << " error in the code";
+
+          }
+
+
+          unsigned age_samples_taken = 0;
+          unsigned age_ndx = 0;
+          unsigned length_ndx = 0;
+          attempt = 0;
+          max_attempts = length_samples_per_clusters_ * 5;
+          bool use_systematic_to_finish_sub_selection = false;
+          // First try and get all otoliths based on allocation method,
+          // if two difficult (constituted by 5 x number length samples) just randomly get the rest.
+          LOG_FINE() << "max attempts = " << max_attempts << " samples to take = " << age_samples_per_clusters_ << " attempt = " << attempt;
+          LOG_FINE() << "number of agents sampled for lengths = " << agent_ndx_for_length_subsample_within_cluster_.size();
+          unsigned check_len_ndx = 0;
+          size_int_for_random_sampling = agent_ndx_for_length_subsample_within_cluster_.size();
+          while (age_samples_taken < age_samples_per_clusters_) {
+            ++attempt;
+            skip_iter = false;
+
+            if (attempt > max_attempts) {
+              use_systematic_to_finish_sub_selection = true;
+              break;
+            }
+            check_len_ndx =  size_int_for_random_sampling * rng.chance();
+            agent_ndx = agent_ndx_for_length_subsample_within_cluster_[check_len_ndx];
+
+            // Check we haven't already aged this agent from the length sample
+            for (unsigned check_iter = 0; check_iter < age_samples_taken; ++check_iter) {
+              if ((agent_ndx_for_age_subsample_within_cluster_[check_iter] == agent_ndx)) {
+                LOG_FINE() << "we have sampled this agent already, try again " << agent_ndx_for_age_subsample_within_cluster_[check_iter] << " actual index = " << agent_ndx << " attempt = " << attempt;
+                skip_iter = true;
+                break;
+              }
+            }
+            if(skip_iter)
+              continue;
+
+            length_ndx = census.length_ndx_[agent_ndx];
+            // apply allocation method
+            if (allocation_type_ != AllocationType::kRandom) {
+               if (sampled_aged_length_freq_[length_ndx] >= expected_aged_length_freq_[length_ndx]) {
+                 // We have selected the neccassary number of agents to age in this length bin try another fish
+                 skip_iter = true;
+                 continue;
+               }
+            }
+            if(skip_iter)
+              continue;
             //------------------------------
             // We are going to age this agent
             //------------------------------
-            subsample_agent_ndx.push_back(agent_ndx);
+            agent_ndx_for_age_subsample_within_cluster_[age_samples_taken] = agent_ndx;
+            sampled_aged_length_freq_[length_ndx]++;
+
             // Are we applying ageing error which will be a multinomial probability
-            age_ndx = census.age_ndx_[agent_ndx_cluster_[total_cluster_ndx][agent_ndx]];
-            cluster_age_samples_[year_ndx][stratum_ndx][total_cluster_ndx][counter] = age_ndx;
-            //LOG_FINE() << "counter = " << counter << " val = " << cluster_age_samples_[year_ndx][stratum_ndx][total_cluster_ndx][counter];
+            age_ndx = census.age_ndx_[agent_ndx];
+
+            // Note this is pre age misspecification
+            cluster_age_samples_[year_ndx][stratum_ndx][cluster_ndx][age_samples_taken] = age_ndx;
+
             if (apply_ageing_error) {
-              LOG_FINEST() << "Agent age = " << age_ndx <<  " prob correct id = " << mis_matrix[age_ndx][age_ndx];
+              LOG_FINEST() << "Agent age = " << age_ndx << " length_ndx = " << length_ndx << " prob correct id = " << mis_matrix[age_ndx][age_ndx];
               float temp_prob = 0.0;
               for (unsigned mis_ndx = 0; mis_ndx < mis_matrix[age_ndx].size(); ++mis_ndx) {
                 temp_prob += mis_matrix[age_ndx][mis_ndx];
@@ -664,19 +677,126 @@ void MortalityEventBiomassClusters::Simulate() {
                 }
               }
             }
-            final_samples_to_take--;
-            counter++;
-            stratum_age_frequency_[cells_[stratum_ndx]][age_ndx]++;
+
+
+            age_length_key_[age_ndx][length_ndx]++;
             stratum_af_[age_ndx]++;
+            ++total_agents_in_ALK;
+            ++age_samples_taken;
+            LOG_FINE() << age_samples_taken;
+
           }
-          LOG_FINE() << "leaving cluster " << total_cluster_ndx;
+
+          // Only enter this if we couldn't (within reasonable time) find the right age samples to match length distributions
+          if (use_systematic_to_finish_sub_selection) {
+            LOG_FINE() << "need to systematically select fish so that we get our desired number";
+            for (unsigned i = 0; i < agent_ndx_for_length_subsample_within_cluster_.size(); ++i) {
+              if (age_samples_taken >= age_samples_per_clusters_) {
+                LOG_FINE() << "we have our quota exit";
+                break;
+              }
+
+              agent_ndx = agent_ndx_for_length_subsample_within_cluster_[i];
+              /*
+              // Check we haven't already sampled this agent
+              for (unsigned check_iter = 0; check_iter <= age_samples_taken; ++check_iter) {
+                if ((agent_ndx_for_age_subsample_within_cluster_[check_iter] == agent_ndx))
+                  LOG_FINE() << "we have sampled this agent already, try again";
+                continue;
+              }
+              */
+              length_ndx = census.length_ndx_[agent_ndx];
+              // apply allocation method
+              if (allocation_type_ != AllocationType::kRandom) {
+                 if (sampled_aged_length_freq_[length_ndx] >= expected_aged_length_freq_[length_ndx]) {
+                   // We have selected the neccassary number of agents to age in this length bin try another fish
+                   continue;
+                 }
+              }
+
+              //------------------------------
+              // We are going to age this agent
+              //------------------------------
+              agent_ndx_for_age_subsample_within_cluster_[age_samples_taken] = agent_ndx;
+              sampled_aged_length_freq_[length_ndx]++;
+              age_ndx = census.age_ndx_[agent_ndx];
+
+              cluster_age_samples_[year_ndx][stratum_ndx][cluster_ndx][age_samples_taken] = age_ndx;
+
+
+              if (apply_ageing_error) {
+                LOG_FINEST() << "Agent age = " << age_ndx << " length_ndx = " << length_ndx << " prob correct id = " << mis_matrix[age_ndx][age_ndx];
+                float temp_prob = 0.0;
+                for (unsigned mis_ndx = 0; mis_ndx < mis_matrix[age_ndx].size(); ++mis_ndx) {
+                  temp_prob += mis_matrix[age_ndx][mis_ndx];
+                  if (rng.chance() <= temp_prob) {
+                    age_ndx = mis_ndx;
+                    break;
+                  }
+                }
+              }
+
+
+              age_length_key_[age_ndx][length_ndx]++;
+              stratum_af_[age_ndx]++;
+              ++age_samples_taken;
+              ++total_agents_in_ALK;
+              LOG_FINE() << age_samples_taken;
+
+            }
+          }
+/*          LOG_MEDIUM() << "expected LF for age samples = \n";
+          for(auto & ecpect_val : expected_aged_length_freq_)
+            std::cerr << ecpect_val << " ";
+          LOG_MEDIUM() << "\n sampled LF for age samples = ";
+          for(auto & sampled_val : sampled_aged_length_freq_)
+            std::cerr << sampled_val << " ";
+          std::cerr << "\n";
+*/
+
+
           total_cluster_ndx++;
         } // clusters within each cell
       } // cells
-      // Save AF
+      LOG_FINE() << "total number in Age-length Key " << total_agents_in_ALK;
+      age_length_key_by_year_stratum_[years_[year_ndx]][cells_[stratum_ndx]] = age_length_key_;
+      lf_by_year_stratum_[years_[year_ndx]][cells_[stratum_ndx]] = stratum_lf_;
+      // Convert ALK to proportions and apply LF
+      for (unsigned j = 0; j < model_->length_bin_mid_points().size(); ++j) {
+        float length_sum = 0;
+        for (unsigned i = 0; i < model_->age_spread(); ++i) {
+          length_sum += age_length_key_[i][j];
+        }
+        LOG_FINE() << "for length bin " << j << " length sum = " << length_sum;
+        if (length_sum >= 0) {
+          for (unsigned i = 0; i < model_->age_spread(); ++i) {
+            if (!utils::doublecompare::IsZero(length_sum)) { // check for divide by zero situation
+              age_length_key_[i][j] /= length_sum;
+            } else {
+              age_length_key_[i][j] = 0.0;
+            }
+          }
+        }
+      }
+
+
+      LOG_FINE() << "about to calculate a frequency via age length key";
+      stratum_age_frequency_[cells_[stratum_ndx]].resize(model_->age_spread(),0.0);
+      stratum_age_frequency_[cells_[stratum_ndx]].clear();
       for (unsigned age_bin_ndx = 0; age_bin_ndx < model_->age_spread(); ++age_bin_ndx) {
         LOG_FINE() << "numbers at age before = " << stratum_af_[age_bin_ndx];
-        SaveComparison(age_bin_ndx + model_->min_age(), 0, cells_[stratum_ndx], stratum_af_[age_bin_ndx], 0.0, 0, years_[year_ndx]);
+        stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx] = 0.0;
+        if (ageing_protocol_ == PARAM_DIRECT_AGEING) {
+          SaveComparison(age_bin_ndx + model_->min_age(), 0, cells_[stratum_ndx], stratum_af_[age_bin_ndx], 0.0, 0, years_[year_ndx]);
+
+        } else if (ageing_protocol_ == PARAM_AGE_LENGTH_KEY) {
+          for (unsigned length_bin_ndx = 0; length_bin_ndx < stratum_length_frequency.size(); ++length_bin_ndx) {
+            stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx] += age_length_key_[age_bin_ndx][length_bin_ndx] * stratum_lf_[length_bin_ndx];
+            LOG_FINE() << "length bin = " << length_bin_ndx << " ALK = " << age_length_key_[age_bin_ndx][length_bin_ndx] << " total length = " << stratum_lf_[length_bin_ndx];
+          }
+          LOG_FINE() << "numbers at age = " << age_bin_ndx + model_->min_age() << " = " << stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx];
+          SaveComparison(age_bin_ndx + model_->min_age(), 0, cells_[stratum_ndx], stratum_age_frequency_[cells_[stratum_ndx]][age_bin_ndx], 0.0, (float)total_agents_in_ALK, years_[year_ndx]);
+        }
       }
     } // Stratum loop
   } // year loop
@@ -696,9 +816,8 @@ void MortalityEventBiomassClusters::Simulate() {
 
 
 
-void MortalityEventBiomassClusters::FillReportCache(ostringstream& cache) {
+void MortalityEventBiomassClustersOriginal::FillReportCache(ostringstream& cache) {
   // Print the age length key for curiosity
-  /*
   cache << "length_freq_by_year_stratum "  <<REPORT_R_DATAFRAME <<"\n";
   cache << "year_stratum ";
   for (auto len : model_->length_bin_mid_points())
@@ -726,7 +845,7 @@ void MortalityEventBiomassClusters::FillReportCache(ostringstream& cache) {
       }
     }
   }
-*/
+
 
   // Cluster weight
   for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
@@ -742,7 +861,7 @@ void MortalityEventBiomassClusters::FillReportCache(ostringstream& cache) {
     cache << "cluster_mean-" << years_[year_ndx] << " " << REPORT_R_MATRIX <<"\n";
     for(unsigned stratum_ndx = 0; stratum_ndx < cells_.size(); ++stratum_ndx) {
       for(unsigned cluster_ndx = 0; cluster_ndx < cluster_mean_[year_ndx][stratum_ndx].size(); ++cluster_ndx)
-        cache << cluster_mean_[year_ndx][stratum_ndx][cluster_ndx] + model_->min_age() << " ";
+        cache << cluster_mean_[year_ndx][stratum_ndx][cluster_ndx] << " ";
       cache << "\n";
     }
   }
@@ -754,13 +873,12 @@ void MortalityEventBiomassClusters::FillReportCache(ostringstream& cache) {
       for(unsigned cluster_ndx = 0; cluster_ndx < cluster_age_samples_[year_ndx][stratum_ndx].size(); ++cluster_ndx) {
         //cache << cluster_ndx + 1 << " ";
         for (auto& cluster_val : cluster_age_samples_[year_ndx][stratum_ndx][cluster_ndx])
-          cache << cluster_val + model_->min_age() << " ";
+          cache << cluster_val << " ";
         cache << "\n";
       }
     }
   }
 
-/*
   // Cluster length sample
   for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     for(unsigned stratum_ndx = 0; stratum_ndx < cells_.size(); ++stratum_ndx) {
@@ -773,7 +891,6 @@ void MortalityEventBiomassClusters::FillReportCache(ostringstream& cache) {
       }
     }
   }
-*/
 
   // Cluster Census
   for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
@@ -781,7 +898,7 @@ void MortalityEventBiomassClusters::FillReportCache(ostringstream& cache) {
       for(unsigned cluster_ndx = 0; cluster_ndx < cluster_census_[year_ndx][stratum_ndx].size(); ++cluster_ndx) {
         cache << "cluster_census_age-"<< years_[year_ndx] << "-" << cells_[stratum_ndx] << "-" << cluster_ndx + 1 <<  ": ";
         for (auto& cluster_val : cluster_census_[year_ndx][stratum_ndx][cluster_ndx])
-          cache << cluster_val + model_->min_age() << " ";
+          cache << cluster_val << " ";
         cache << "\n";
       }
     }

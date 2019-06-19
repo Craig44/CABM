@@ -11,31 +11,12 @@
 
 // headers
 #include "Normal.h"
-
-#include <boost/math/distributions/normal.hpp>
+#include "Utilities/Math.h"
 
 // mamespaces
 namespace niwa {
 namespace ageingerrors {
 
-/**
- * Normal Distribution CDF Method
- *
- * @param x X value
- * @param mu Mu value
- * @param sigma Sigma value
- * @return Normal CDF
- */
-
-float NormalCDF(float x, float mu, float sigma) {
-  if (sigma <= 0.0 && x < mu)
-    return 0;
-  else if (sigma <= 0.0 && x >= mu)
-    return 1;
-
-  boost::math::normal s(mu, sigma);
-  return cdf(s, (x));
-}
 
 
 /**
@@ -89,11 +70,11 @@ void Normal::DoReset() {
       min_age_class = (min_age_ + j) - 0.5;
 
       if (j == 0)
-        mis_matrix_[i][j] = NormalCDF(min_age_class + 1.0, age, age * cv_);
+        mis_matrix_[i][j] = utilities::math::NormalCDF(min_age_class + 1.0, age, age * cv_);
       else if (j == age_spread_ - 1 && plus_group_)
-        mis_matrix_[i][j] = 1.0 - NormalCDF(min_age_class, age, age * cv_);
+        mis_matrix_[i][j] = 1.0 - utilities::math::NormalCDF(min_age_class, age, age * cv_);
       else
-        mis_matrix_[i][j] = NormalCDF(min_age_class + 1.0, age, age * cv_) - NormalCDF(min_age_class, age, age * cv_);
+        mis_matrix_[i][j] = utilities::math::NormalCDF(min_age_class + 1.0, age, age * cv_) - utilities::math::NormalCDF(min_age_class, age, age * cv_);
     }
   }
 

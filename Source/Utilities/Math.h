@@ -22,6 +22,7 @@
 
 #include "Utilities/DoubleCompare.h"
 #include "Utilities/Types.h"
+#include <boost/math/distributions/normal.hpp>
 
 #define PI 3.14159265358979
 
@@ -58,6 +59,26 @@ inline double LnFactorial(double t) {
 /*
  *
 */
+
+/**
+ * Normal Distribution CDF Method
+ *
+ * @param x X value
+ * @param mu Mu value
+ * @param sigma Sigma value
+ * @return Normal CDF
+ */
+
+inline float NormalCDF(float x, float mu, float sigma) {
+  if (sigma <= 0.0 && x < mu)
+    return 0;
+  else if (sigma <= 0.0 && x >= mu)
+    return 1;
+
+  boost::math::normal s(mu, sigma);
+  return cdf(s, (x));
+}
+
 
 /**
  * dnorm: return the pdf for the normal
@@ -97,6 +118,30 @@ inline double pnorm(const double& x, const double& mu = 0.0, const double& sigma
   return(p);
 }
 
+/**
+ * given class bins (lower and upper bin definitions) iterate over all bins and apportion the CDF into each bin
+ */
+inline vector<float> block_cdf(const vector<float>& class_bins, const double& mu = 0.0, const double& sigma = 1.0) {
+  vector<float> prob(class_bins.size(), 0.0);
+  vector<float> prob_bins(class_bins.size() - 1, 0.0);
+  unsigned index = 0;
+  bool check_max_of_one = false;
+  for(auto& val : class_bins) {
+    prob[index] = pnorm(val, mu, sigma);
+    //LOG_FINE() << "prob = " << prob[index] << " val = " << val;
+    if (prob[index] >= 1.0)
+      check_max_of_one = true;
+    ++index;
+  }
+  if (not check_max_of_one)
+    prob[class_bins.size() - 1] += (1.0 - prob[class_bins.size() - 1]);
+  // calculate difference between bins
+  for(unsigned i = 0; i < (class_bins.size() - 1); ++i)
+    prob_bins[i] = prob[i + 1] - prob[i];
+  if (prob[0] > 0.0)
+    prob_bins[0] += prob[0];
+  return(prob_bins);
+}
 /**
  * pnorm2: return the cdf for the normal that may be more expensive (computationally) but is a better approximation.
  */
@@ -285,6 +330,15 @@ inline double mean(const vector<double>& Values){
   return mu;
 }
 
+// Return the mean for a vector
+inline double mean(const vector<unsigned>& Values){
+  unsigned total = 0.0;
+  for (const auto& value : Values)
+    total += value;
+  double n = Values.size();
+  return (double)total / n;
+}
+
 // Return the mean for an unsigned map
 inline double mean(const map<unsigned, double>& Values){
   double mu = 0.0;
@@ -302,6 +356,18 @@ inline double Var(const vector<double>& Values){
   double variance = 0;
   for (const auto& value : Values)
     variance += (value - mean_) * (value - mean_);
+  double n = Values.size();
+  double var = variance / (n - 1.0);
+  return var;
+}
+
+
+// Return the Variance for a vector
+inline double Var(const vector<unsigned>& Values){
+  double mean_ = math::mean(Values);
+  double variance = 0;
+  for (const auto& value : Values)
+    variance += (double)((value - mean_) * (value - mean_));
   double n = Values.size();
   double var = variance / (n - 1.0);
   return var;
@@ -335,6 +401,14 @@ inline double std_dev(const map<unsigned, double>& Values){
 // Return the Sum of a vector
 inline double Sum(const vector<double>& Values){
   double total = 0;
+  for (auto val : Values)
+    total += val;
+  return total;
+}
+
+// Return the Sum of a vector
+inline float Sum(const vector<float>& Values){
+  float total = 0;
   for (auto val : Values)
     total += val;
   return total;

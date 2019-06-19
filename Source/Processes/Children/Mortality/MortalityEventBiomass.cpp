@@ -829,23 +829,22 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
         cache << "\n" << REPORT_R_LIST_END << "\n";
       }
     }
-    /*
-    LOG_FINE() << removals_census_.size() << " census vals";
+
+    LOG_FINE() << fishery_census_data_.size() << " census vals";
     // Print census information
-    for (auto& census : removals_census_) {
-      cache << "census_info-" << census.year_ << "-" << census.row_ << "-" << census.col_ << " " << REPORT_R_MATRIX << "\n";
-      //cache << "age length scalar\n";
-      for (unsigned ndx = 0; ndx < census.age_ndx_.size(); ++ndx)
-        cache << census.age_ndx_[ndx] + model_->min_age() << " ";
-      cache << "\n";
-      for (unsigned ndx = 0; ndx < census.age_ndx_.size(); ++ndx)
-        cache << model_->length_bin_mid_points()[census.length_ndx_[ndx]] << " ";
-      cache << "\n";
-      for (unsigned ndx = 0; ndx < census.age_ndx_.size(); ++ndx)
-        cache << census.scalar_[ndx] << " ";
-      cache << "\n";
+    for(unsigned fish_ndx = 0; fish_ndx < fishery_census_data_.size(); ++fish_ndx) {
+      for(unsigned year_ndx = 0; year_ndx < fishery_census_data_[fish_ndx].size(); ++year_ndx) {
+        for(unsigned cell_ndx = 0; cell_ndx < fishery_census_data_[fish_ndx][year_ndx].size(); ++cell_ndx) {
+          cache << "census_info-" << fishery_label_[fishery_index_[fish_ndx]] << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].year_ << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].row_ << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].col_ << " " << REPORT_R_MATRIX << "\n";
+          for (unsigned age_ndx = 0; age_ndx < fishery_census_data_[fish_ndx][year_ndx][cell_ndx].age_ndx_.size(); ++age_ndx)
+            cache << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].age_ndx_[age_ndx] + model_->min_age() << " ";
+          cache << "\n";
+          for (unsigned length_ndx = 0; length_ndx < fishery_census_data_[fish_ndx][year_ndx][cell_ndx].length_ndx_.size(); ++length_ndx)
+            cache << model_->length_bin_mid_points()[fishery_census_data_[fish_ndx][year_ndx][cell_ndx].length_ndx_[length_ndx]] << " ";
+          cache << "\n";
+        }
+      }
     }
-    */
   }
 
 }
