@@ -9,4 +9,7 @@ platforms
 
 
 - SteadyStateModel is a deterministic model run with a single area to check that everything works as expected
-- SingleAreaVariability is a the same as SteadyStateModel but add variability in M and growth to look at consequences on equilibrium run time and derived quantities
+- SimpleModel single area model that has recruitment variability, similar to a simple stock assessment model
+- 3Area similar to the SNA1 assessment configuration.
+- SpatialModel is a 10x10 spatial model with 4 seasons one fishery and movement
+
