@@ -92,10 +92,39 @@ time_step_ratio 0.5 0.5
 # Fishing Mortality
 @process fishing
 type mortality_event_biomass
-years 1990:2013 
-catch_layers  1990_catch 1991_catch 1992_catch 1993_catch 1994_catch 1995_catch 1996_catch 1997_catch 1998_catch 1999_catch 2000_catch 2001_catch 2002_catch 2003_catch 2004_catch 2005_catch 2006_catch 2007_catch 2008_catch 2009_catch 2010_catch 2011_catch 2012_catch 2013_catch
-selectivity Sel_LL
-print_extra_info true
+print_extra_info true ## print census info for catch, used to ground truth observations investigate bias etc.
+table catch
+year Fishing_LL
+1990	1990_catch
+1991	1991_catch
+1992	1992_catch
+1993	1993_catch
+1994	1994_catch
+1995	1995_catch
+1996	1996_catch
+1997	1997_catch
+1998	1998_catch
+1999	1999_catch
+2000	2000_catch
+2001	2001_catch
+2002	2002_catch
+2003	2003_catch
+2004	2004_catch
+2005	2005_catch
+2006	2006_catch
+2007	2007_catch
+2008	2008_catch
+2009	2009_catch
+2010	2010_catch
+2011	2011_catch
+2012	2012_catch
+2013	2013_catch
+end_table
+
+table method_info
+method 	 	selectivity	 	minimum_legel_length  handling_mortality
+Fishing_LL     Sel_LL	0			0
+end_table
 
 # Movement
 @process Movement_home
