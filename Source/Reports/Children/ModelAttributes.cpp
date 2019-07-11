@@ -55,6 +55,11 @@ void ModelAttributes::DoExecute() {
   for (unsigned length_ndx = 0; length_ndx < length_mid_point.size(); ++length_ndx)
     cache_ << length_mid_point[length_ndx] << " ";
   cache_ << "\n";
+  cache_ << "length_bins: ";
+  vector<unsigned> length_bins = model_->length_bins();
+  for (unsigned length_ndx = 0; length_ndx < length_bins.size(); ++length_ndx)
+    cache_ << length_bins[length_ndx] << " ";
+  cache_ << "\n";
   ready_for_writing_ = true;
 
 }

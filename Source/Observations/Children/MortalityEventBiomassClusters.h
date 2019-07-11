@@ -72,9 +72,9 @@ protected:
   // cluster info
   float                           average_cluster_weight_;
   float                           cluster_cv_;
-  float                           cluster_rho_;
-  string                          cluster_distribution_;
-  string                          cluster_attribute_;
+  float                           cluster_sigma_;
+  //string                          cluster_distribution_;
+  //string                          cluster_attribute_;
   unsigned                        age_samples_per_clusters_;
   bool                            normal_clusters_ = true;
   bool                            age_based_clusters_ = true;
@@ -84,7 +84,7 @@ protected:
   vector<unsigned>                agent_ndx_for_length_subsample_within_cluster_;
   vector<unsigned>                agent_ndx_for_age_subsample_within_cluster_;
 
-  vector<vector<unsigned>>        agent_ndx_cluster_;
+  vector<unsigned>                agent_ndx_cluster_;
   vector<vector<unsigned>>        census_ndx_cluster_;
   vector<float>                   stratum_lf_;
   vector<float>                   stratum_af_;
@@ -92,6 +92,10 @@ protected:
   vector<unsigned>                expected_aged_length_freq_;
   vector<unsigned>                sampled_aged_length_freq_;
   //unsigned                        number_of_bootstraps_ = 0;
+
+  //
+  vector<float>                   target_length_distribution_;
+  unsigned                        n_length_bins_;
 
   string                          fishery_label_;
   MortalityEventBiomass*          mortality_process_ = nullptr;
@@ -119,8 +123,10 @@ protected:
   vector<vector<vector<vector<unsigned>>>>    cluster_census_; // n_years x n_stratum x n_clusters x n_individuals (contains ages or lengths)
   vector<vector<vector<float>>>               cluster_mean_; // n_years x n_stratum x n_clusters (contains ages or lengths mean for cluster)
   vector<vector<vector<float>>>               cluster_weight_; // n_years x n_stratum x n_clusters (weight of cluster)
+  vector<vector<vector<float>>>               cluster_length_sample_weight_;
   vector<vector<vector<vector<unsigned>>>>    cluster_length_samples_; // n_years x n_stratum x n_clusters x n_samples
   vector<vector<vector<vector<unsigned>>>>    cluster_age_samples_; // n_years x n_stratum x n_clusters x n_samples
+  vector<vector<vector<float>>>            length_target_; // n_years x n_stratum x length_bins
 
 
 };
