@@ -153,17 +153,20 @@ void LogisticNormal::SimulateObserved(map<unsigned, map<string, vector<observati
     year_storer = 0;
     vector<float> normals(covariance_matrix_.size1(), 0.0);
     float row_sum;
+    // iterate over year
     for (auto year_iterator = comparisons.begin(); year_iterator != comparisons.end(); ++year_iterator) {
       LOG_FINE() << "Simulating values for year: " << year_iterator->first;
+      // iterate over cell
       for (auto second_iter = year_iterator->second.begin(); second_iter != year_iterator->second.end(); ++second_iter) {
         LOG_FINE() << "Simulating values for cell: " << second_iter->first;
         unsigned nbins =  second_iter->second.size();
         LOG_FINE() << "nbins = " << nbins;
         unsigned i = 0;
+        for (unsigned k = 0; k < nbins; ++k) {
+          normals[k] = rng.normal();
+        }
+        // iter over each bin in each year
         for (observations::Comparison& comparison : second_iter->second) {
-          for (unsigned k = 0; k < nbins; ++k) {
-            normals[k] = rng.normal();
-          }
           row_sum = 0.0;
 
           for (unsigned j = 0; j < nbins; ++j)
@@ -182,6 +185,7 @@ void LogisticNormal::SimulateObserved(map<unsigned, map<string, vector<observati
         }
         // Re-scale
         // Do the logistic transformation to get our desired values.
+        // Ob = exp(Xb)/sumc(exp(Xc))
         for (observations::Comparison& comparison : second_iter->second)
           comparison.simulated_ /= year_totals[year_storer];
 
