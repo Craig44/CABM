@@ -423,11 +423,23 @@ void Model::RunBasic() {
     state_ = State::kInitialise;
     current_year_ = start_year_;
     // Iterate over all partition members and UpDate Mean Weight for the inital weight calculations
-
     initialisationphases::Manager& init_phase_manager = *managers_->initialisation_phase();
     timevarying::Manager& time_varying_manager = *managers_->time_varying();
+    if (i == 0) {
+      LOG_MEDIUM() << "first initialisation phase.";
+      init_phase_manager.Execute();
+      if (not re_run_initialisation_) {
+        LOG_MEDIUM() << "Cache initialsiation";
+        world_view_->CachedWorldForInit();
+      }
+    } else if (re_run_initialisation_) {
+      LOG_MEDIUM() << "Re-run initialisation";
+      init_phase_manager.Execute();
+    } else {
+      LOG_MEDIUM() << "resetting initial world view";
+      world_view_->MergeWorldForInit();
+    }
 
-    init_phase_manager.Execute();
     managers_->report()->Execute(State::kInitialise);
 
     LOG_MEDIUM() << "Model: State change to Execute";

@@ -266,6 +266,29 @@ addressable::Type Object::GetAddressableType(const string& label) const {
 }
 
 /**
+ *
+ */
+
+addressable::Usage Object::GetAddressableUsage(const string& label) const {
+  if (addressable_usage_.find(label) == addressable_usage_.end()) {
+    LOG_CODE_ERROR() << "Unable to find the addressable type with the label: " << label;
+  }
+
+  return addressable_usage_.find(label)->second;
+}
+
+/**
+ *
+ */
+
+addressable::rerun_initialisation Object::GetAddressableInit(const string& label) const {
+  if (addressable_initphase_.find(label) == addressable_initphase_.end()) {
+    LOG_CODE_ERROR() << "Unable to find the addressable type with the label: " << label;
+  }
+
+  return addressable_initphase_.find(label)->second;
+}
+/**
  * This method will register a variable as an object
  * that can be targeted by an estimate to be used as part of an
  * estimation process or MCMC.
@@ -273,10 +296,11 @@ addressable::Type Object::GetAddressableType(const string& label) const {
  * @param label The label to register the addressable under
  * @param variable The variable to register as an addressable
  */
-void Object::RegisterAsAddressable(const string& label, float* variable, addressable::Usage usage) {
+void Object::RegisterAsAddressable(const string& label, float* variable, addressable::Usage usage, addressable::rerun_initialisation re_run_init) {
   addressables_[label]      = variable;
   addressable_types_[label] = addressable::kSingle;
   addressable_usage_[label] = usage;
+  addressable_initphase_[label] = re_run_init;
 }
 
 /**
@@ -287,10 +311,11 @@ void Object::RegisterAsAddressable(const string& label, float* variable, address
  * @param label The label to register the addressable under
  * @param variables Vector containing all the elements to register
  */
-void Object::RegisterAsAddressable(const string& label, vector<float>* variables, addressable::Usage usage) {
+void Object::RegisterAsAddressable(const string& label, vector<float>* variables, addressable::Usage usage, addressable::rerun_initialisation re_run_init) {
   addressable_vectors_[label] = variables;
   addressable_types_[label]   = addressable::kVector;
   addressable_usage_[label] = usage;
+  addressable_initphase_[label] = re_run_init;
 }
 
 /**
@@ -302,15 +327,17 @@ void Object::RegisterAsAddressable(const string& label, vector<float>* variables
  * @param label The label for the process
  * @param variables Map containing index and float values to store
  */
-void Object::RegisterAsAddressable(const string& label, OrderedMap<string, float>* variables, addressable::Usage usage) {
+void Object::RegisterAsAddressable(const string& label, OrderedMap<string, float>* variables, addressable::Usage usage, addressable::rerun_initialisation re_run_init) {
   addressable_s_maps_[label]  = variables;
   addressable_types_[label]   = addressable::kStringMap;
   addressable_usage_[label] = usage;
+  addressable_initphase_[label] = re_run_init;
 }
-void Object::RegisterAsAddressable(const string& label, map<unsigned, float>* variables, addressable::Usage usage) {
+void Object::RegisterAsAddressable(const string& label, map<unsigned, float>* variables, addressable::Usage usage, addressable::rerun_initialisation re_run_init) {
   addressable_u_maps_[label]  = variables;
   addressable_types_[label]   = addressable::kUnsignedMap;
   addressable_usage_[label] = usage;
+  addressable_initphase_[label] = re_run_init;
 }
 
 /**

@@ -124,7 +124,6 @@ public:
   bool                        get_sexed() const {return sex_;};
   float                       get_male_proportions(unsigned year)  {return proportion_male_[year];};
   void                        set_male_proportions(map<unsigned, float> male_props)  {proportion_male_ = male_props;};
-
   unsigned                    get_max_threads() const {return max_threads_;}
   bool                        lat_and_long_supplied();
   virtual const float&        min_lat() const {return min_lat_;}
@@ -133,6 +132,8 @@ public:
   virtual const float&        max_lon() const {return max_lon_;}
   void                        increment_time_step() {++time_step_counter_;}
   virtual const unsigned      get_time_step_counter() const {return time_step_counter_;}
+  void                        re_run_initialisation() {re_run_initialisation_ = true;}
+
   // manager accessors
   virtual Managers&           managers();
   virtual Objects&            objects();
@@ -194,6 +195,7 @@ protected:
   vector<string>              maturity_ogives_;
   unsigned                    max_threads_ = 1;
   unsigned                    time_step_counter_ = 1; // This will keep track of the time steps for things such as tagging it would be helpful if we have multiple time steps in years.
+  bool                        re_run_initialisation_ = false; // parameters that can change this are M, B0 and growth
 
   Managers*                   managers_ = nullptr;
   Objects*                    objects_ = nullptr;

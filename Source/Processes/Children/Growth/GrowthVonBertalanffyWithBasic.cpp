@@ -41,8 +41,8 @@ GrowthVonBertalanffyWithBasic::GrowthVonBertalanffyWithBasic(Model* model) : Gro
   parameters_.Bind<float>(PARAM_A, &a_, "alpha value for weight at length function", "", true);
   parameters_.Bind<float>(PARAM_B, &b_, "beta value for weight at length function", "", true);
 
-  RegisterAsAddressable(PARAM_LINF, &l_inf_);
-  RegisterAsAddressable(PARAM_K, &k_);
+  RegisterAsAddressable(PARAM_LINF, &l_inf_, addressable::kAll, addressable::kyes);
+  RegisterAsAddressable(PARAM_K, &k_, addressable::kAll, addressable::kyes);
 }
 
 // check users have defined spatial or non_spatial

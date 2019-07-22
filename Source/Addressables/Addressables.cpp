@@ -66,12 +66,22 @@ void Addressables::LoadValues(unsigned index) {
    * load our estimables if they haven't been loaded already
    */
   if (addressables_.size() == 0) {
+    LOG_FINE() << "need to set addressables, hasn't been called before";
     string error = "";
     for (auto iter : addressable_value_) {
       if (!model_->objects().VerfiyAddressableForUse(iter.first, addressable::kInputRun, error)) {
         LOG_FATAL() << "The addressable " << iter.first << " could not be verified for use in -i run. Error was " << error;
       }
+
+      // Check to see if this addressable required the model to re-run the initialisation phase.
+      addressable::rerun_initialisation check_init = model_->objects().GetAddressableInit(iter.first);
+      if (check_init == addressable::kyes) {
+        LOG_MEDIUM() << "forcing us to re-run initialisation phase.";
+        model_->re_run_initialisation();
+      }
+
       float* ptr = model_->objects().GetAddressable(iter.first);
+
       addressables_[iter.first] = ptr;
     }
   }

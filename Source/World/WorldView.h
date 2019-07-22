@@ -67,6 +67,8 @@ public:
   vector<unsigned>            get_enabled_rows() {return enabled_rows_; };
   vector<unsigned>            get_enabled_cols() {return enabled_cols_; };
 
+  void                        CachedWorldForInit();
+  void                        MergeWorldForInit();
   void                        MergeCachedGrid();
   void                        MergeCachedGrid(bool update_lat_long);
   void                        get_world_age_frequency(vector<unsigned>& world_age_freq);
@@ -81,6 +83,7 @@ protected:
   // members
   WorldCell                   **base_grid_;
   WorldCell                   **cached_grid_;
+  WorldCell                   **init_cached_grid_;
   niwa::layers::NumericLayer*     base_layer_ = nullptr;
   unsigned                    width_;
   unsigned                    height_;

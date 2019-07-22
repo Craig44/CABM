@@ -24,6 +24,7 @@ WorldView::WorldView(Model* model) :
     model_(model) {
   base_grid_ = 0;
   cached_grid_ = 0;
+  init_cached_grid_ = 0;
 }
 
 // DeConstructor
@@ -44,6 +45,15 @@ WorldView::~WorldView() {
       base_grid_[i] = 0;
     }
     delete[] base_grid_;
+  }
+
+  // delete initialisation grid.
+  if (init_cached_grid_ != 0) {
+    for (unsigned i = 0; i < height_; ++i) {
+      delete[] init_cached_grid_[i];
+      init_cached_grid_[i] = 0;
+    }
+    delete[] init_cached_grid_;
   }
 }
 
@@ -84,6 +94,12 @@ void WorldView::Build() {
   for (unsigned i = 0; i < height_; ++i) {
     cached_grid_[i] = new WorldCell[width_];
   }
+  // Allocate Our Difference Grid
+  init_cached_grid_ = new WorldCell*[height_];
+  for (unsigned i = 0; i < height_; ++i) {
+    init_cached_grid_[i] = new WorldCell[width_];
+  }
+
 
   if (model_->lat_and_long_supplied()) {
     lat_bounds_ = model_->get_lat_bounds();
@@ -108,6 +124,7 @@ void WorldView::Build() {
       LOG_FINE() << "Building cell " << i << "-" << j << " lat = " << lat << " long = " << lon;
       base_grid_[i][j].Build(i, j, lat, lon, model_);
       cached_grid_[i][j].Build(i, j, lat, lon, model_);
+      init_cached_grid_[i][j].Build(i, j, lat, lon, model_);
     }
   }
 
@@ -210,6 +227,34 @@ void WorldView::MergeCachedGrid(bool update_lat_long) {
     }
   }
   LOG_FINE() << "finished merging world";
+}
+
+/*
+ * Temporary cache world grid to save re-running initialisation phase
+ *
+*/
+void WorldView::CachedWorldForInit() {
+  LOG_MEDIUM() ;
+  for (unsigned i = 0; i < height_; ++i) {  // Can't thread this, each cell has a pointer to growth and mortality for update agent, so there is a hidden shared resouce....
+    for (unsigned j = 0; j < width_; ++j) {
+      init_cached_grid_[i][j].agents_ = base_grid_[i][j].agents_;
+    }
+  }
+}
+
+/*
+ * fill the row and col parameter with the cell index that contains the lat and lon given
+ * Make sure that anything that calls this checks the model that lat and longs have been provided else this will cause
+ * a SegFault
+ *
+*/
+void WorldView::MergeWorldForInit() {
+  LOG_MEDIUM() ;
+  for (unsigned i = 0; i < height_; ++i) {  // Can't thread this, each cell has a pointer to growth and mortality for update agent, so there is a hidden shared resouce....
+    for (unsigned j = 0; j < width_; ++j) {
+      base_grid_[i][j].agents_ = init_cached_grid_[i][j].agents_;
+    }
+  }
 }
 /*
  * fill the row and col parameter with the cell index that contains the lat and lon given

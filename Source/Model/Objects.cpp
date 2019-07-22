@@ -103,6 +103,20 @@ addressable::Type Objects::GetAddressableType(const string& parameter_absolute_n
   return target->GetAddressableType(parameter_index.first);
 }
 
+
+/**
+ * This method will find the type of addressable in the system defined by the absolute
+ * parameter name.
+ *
+ * @param parameter_absolute_name The absolute parameter name e.g. process[recruitment].r0
+ * @return The addressable type, set to invalid if it's not found
+ */
+addressable::rerun_initialisation Objects::GetAddressableInit(const string& parameter_absolute_name) {
+  std::pair<string, string> parameter_index = ExplodeParameterAndIndex(parameter_absolute_name);
+  base::Object* target = FindObjectOrNull(parameter_absolute_name); //
+  return target->GetAddressableInit(parameter_index.first);
+}
+
 /**
  * This method will search the model for the specific addressable and
  * return a pointer to it if it exists.

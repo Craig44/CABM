@@ -43,6 +43,8 @@ public:
   // methods
   bool                        VerfiyAddressableForUse(const string& parameter_absolute_name, addressable::Usage usage, string& error);
   addressable::Type           GetAddressableType(const string& parameter_absolute_name);
+  addressable::rerun_initialisation  GetAddressableInit(const string& parameter_absolute_name);
+
   Double*                     GetAddressable(const string& addressable_absolute_name);
   vector<Double*>*            GetAddressables(const string& addressable_absolute_name);
   map<unsigned, Double>*      GetAddressableUMap(const string& addressable_absolute_name);

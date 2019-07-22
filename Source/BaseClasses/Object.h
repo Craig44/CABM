@@ -48,14 +48,15 @@ enum Type {
 enum Usage {
   kNone         = 0,
   kLookup       = 1, // Assert, Additional Prior, Equation, Reports
-  kEstimate     = 2,
   kInputRun     = 4,
-  kProfile      = 8,
-  kProject      = 16,
   kSimulate     = 32,
-  kSingleStep   = 64,
   kTimeVarying  = 128,
   kAll          = 255
+};
+
+enum rerun_initialisation {
+  kno         = 0,
+  kyes         = 1
 };
 };
 
@@ -84,6 +85,9 @@ public:
   OrderedMap<string, float>*      GetAddressableSMap(const string& label);
   vector<float>*                  GetAddressableVector(const string& label);
   addressable::Type               GetAddressableType(const string& label) const;
+  addressable::Usage              GetAddressableUsage(const string& label) const;
+  addressable::rerun_initialisation GetAddressableInit(const string& label) const;
+
   void                            PrintParameterQueryInfo();
   void                            SubscribeToRebuildCache(Object* subscriber);
   void                            NotifySubscribers();
@@ -106,10 +110,10 @@ public:
 
 protected:
   // Methods
-  void                        RegisterAsAddressable(const string& label, float* variable, addressable::Usage usage = addressable::kAll);
-  void                        RegisterAsAddressable(const string& label, vector<float>* variables, addressable::Usage usage = addressable::kAll);
-  void                        RegisterAsAddressable(const string& label, OrderedMap<string, float>* variables, addressable::Usage usage = addressable::kAll);
-  void                        RegisterAsAddressable(const string& label, map<unsigned, float>* variables, addressable::Usage usage = addressable::kAll);
+  void                        RegisterAsAddressable(const string& label, float* variable, addressable::Usage usage = addressable::kAll, addressable::rerun_initialisation re_run_init = addressable::kno);
+  void                        RegisterAsAddressable(const string& label, vector<float>* variables, addressable::Usage usage = addressable::kAll, addressable::rerun_initialisation re_run_init = addressable::kno);
+  void                        RegisterAsAddressable(const string& label, OrderedMap<string, float>* variables, addressable::Usage usage = addressable::kAll, addressable::rerun_initialisation re_run_init = addressable::kno);
+  void                        RegisterAsAddressable(const string& label, map<unsigned, float>* variables, addressable::Usage usage = addressable::kAll, addressable::rerun_initialisation re_run_init = addressable::kno);
   void                        RegisterAsAddressable(map<string, vector<float>>* variables);
 
   // Members
@@ -123,6 +127,8 @@ protected:
   map<string, vector<float*> >    addressable_custom_vectors_;
   map<string, addressable::Type>  addressable_types_;
   map<string, addressable::Usage> addressable_usage_;
+  map<string, addressable::rerun_initialisation> addressable_initphase_;
+
   vector<Object*>                 rebuild_cache_subscribers_;
 
   map<string, map<unsigned, float>* >      addressable_u_maps_;

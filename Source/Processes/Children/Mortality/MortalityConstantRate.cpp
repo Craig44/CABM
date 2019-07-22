@@ -36,7 +36,7 @@ MortalityConstantRate::MortalityConstantRate(Model* model) : Mortality(model) {
   parameters_.Bind<bool>(PARAM_UPDATE_MORTALITY_PARAMETERS, &update_natural_mortality_parameters_, "If an agent/individual moves do you want it to take on the natural mortality parameters of the new spatial cell", "");
   parameters_.Bind<float>(PARAM_TIME_STEP_RATIO, &ratios_, "Time step ratios for the mortality rates to apply in each time step. See manual for how this is applied", "");
 
-  RegisterAsAddressable(PARAM_M, &m_);
+  RegisterAsAddressable(PARAM_M, &m_, addressable::kAll, addressable::kyes);
 
 }
 

@@ -30,6 +30,9 @@ Recruitment::Recruitment(Model* model) : Process(model) {
   parameters_.Bind<string>(PARAM_RECRUITMENT_LAYER_LABEL, &recruitment_layer_label_, "A label for the recruitment layer, that describes spatial distribution of recruits.", "");
   parameters_.Bind<string>(PARAM_SSB, &ssb_label_, "A label for the SSB derived quantity", "");
   parameters_.Bind<float>(PARAM_PROPORTION_MALE, &prop_male_, "Proportion of recruits male", "", 1.0);
+
+  RegisterAsAddressable(PARAM_B0, &b0_, addressable::kAll, addressable::kyes);
+
 }
 
 void Recruitment::DoBuild() {
