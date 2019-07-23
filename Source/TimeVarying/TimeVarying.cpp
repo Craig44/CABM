@@ -141,6 +141,7 @@ void TimeVarying::Reset() {
   string error = "";
   if (addressable_ != nullptr)
     original_value_ = *addressable_;
+  DoReset();
 }
 
 } /* namespace niwa */
