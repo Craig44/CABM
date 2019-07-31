@@ -41,7 +41,7 @@ public:
   unsigned                     get_length_bin_index();
   virtual const bool&          get_maturity() const {return mature_ ;};
   virtual const unsigned&      get_sex() const {return sex_ ;};
-  virtual const float&         get_scalar() const {return scalar_;};
+  virtual float&               get_scalar() {return scalar_;};
   virtual const float&         get_weight() const {return weight_;};
   virtual const float&         get_length() const {return length_;};
   virtual const float&         get_m() const {return M_;};
