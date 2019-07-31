@@ -40,7 +40,7 @@ public:
   virtual                     ~ProcessRemovalsByAge();
   void                        DoValidate() override final;
   void                        DoBuild() override final;
-  void                        DoReset() override final { };
+  void                        DoReset() override final {first_simualtion_run_ = true;};
   void                        PreExecute() override final;
   void                        Execute() override final;
   void                        Simulate() override final;
