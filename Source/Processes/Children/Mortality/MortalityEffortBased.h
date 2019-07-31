@@ -40,7 +40,7 @@ public:
   virtual                     ~MortalityEffortBased() = default;
   virtual void                        DoValidate() override final;
   virtual void                        DoBuild() override final;
-  virtual void                        DoReset() override final { };
+  virtual void                        DoReset() override final;
   virtual void                        DoExecute() override final;
   virtual double                      SolveBaranov() override final;
 

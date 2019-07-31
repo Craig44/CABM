@@ -350,6 +350,8 @@ void MovementPreference::DoExecute() {
                 } else {
                   destination_cell = world_->get_cached_square(destination_row, destination_col);
                   if (destination_cell->is_enabled()) {
+                    destination_cell->add_agent_alive((*iter).get_scalar());
+                    origin_cell->remove_agent_alive((*iter).get_scalar());
                     // We are moving 'splice' this agent to the destination cache cell
                     store_infor.destination_of_agents_moved_[destination_row][destination_col]++;
                     //#pragma omp critical

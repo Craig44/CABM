@@ -153,6 +153,17 @@ void MortalityEffortBased::DoBuild() {
 }
 
 /**
+ * DoReset
+ */
+void MortalityEffortBased::DoReset() {
+  LOG_FINE() << "clearing containers";
+  removals_by_age_and_area_.clear();
+  removals_by_length_and_area_.clear();
+  removals_census_.clear();
+  removals_tag_recapture_.clear();
+}
+
+/**
  * DoExecute
  */
 void MortalityEffortBased::DoExecute() {
@@ -283,6 +294,7 @@ void MortalityEffortBased::DoExecute() {
                     census_fishery.weight_.push_back((*iter).get_weight());
                     census_fishery.sex_.push_back((*iter).get_sex());
 
+                    cell->remove_agent_alive((*iter).get_scalar());
                     (*iter).dies();
                   }
                 }
@@ -304,6 +316,7 @@ void MortalityEffortBased::DoExecute() {
                     census_fishery.weight_.push_back((*iter).get_weight());
                     census_fishery.sex_.push_back((*iter).get_sex());
 
+                    cell->remove_agent_alive((*iter).get_scalar());
                     (*iter).dies();
                   }
                 }

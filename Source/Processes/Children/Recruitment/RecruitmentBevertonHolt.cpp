@@ -134,8 +134,8 @@ void RecruitmentBevertonHolt::DoBuild() {
   recruitment_index = model_->managers().time_step()->GetProcessIndex(label_);
 
   LOG_FINEST() << "recruitment index = " << recruitment_index << " ssb index = " << derived_quantity_index;
-  if (recruitment_index < derived_quantity_index)
-    LOG_ERROR_P(PARAM_SSB) << "it seems the derived quantity " << ssb_label_ << " occurs after the recruitment event, for obvious reasons this can't happen. If this doesn't make much sense look at the usermanual under mortality blocks";
+  if ((recruitment_index <= derived_quantity_index) & (model_->min_age() < 1))
+    LOG_ERROR_P(PARAM_SSB) << "it seems the derived quantity " << ssb_label_ << " occurs after (or in the same time-step) the recruitment process. For models that start with age = 0, this is not allowed. If this doesn't make much sense look at the usermanual under mortality blocks";
 
 
 
@@ -146,24 +146,27 @@ void RecruitmentBevertonHolt::DoBuild() {
 void RecruitmentBevertonHolt::DoExecute() {
   LOG_FINE();
 
-  if (first_enter_execute_) {
-    initial_recruits_ = model_->get_r0(label_);
-    first_enter_execute_ = false;
-  }
 
   if (model_->state() == State::kInitialise) {
     LOG_FINEST() << "applying recruitment in initialisation year " << model_->current_year();
     initialisationphases::Manager& init_phase_manager = *model_->managers().initialisation_phase();
-    float SSB = derived_quantity_->GetLastValueFromInitialisation(init_phase_manager.last_executed_phase());
-    model_->set_ssb(label_, SSB);
-    scalar_ = b0_ / SSB;
+
+    if (first_enter_execute_) {
+      initial_recruits_ = model_->get_r0(label_);
+      first_enter_execute_ = false;
+      // Don't ask for SSB on the first run,
+    } else {
+      float SSB = derived_quantity_->GetLastValueFromInitialisation(init_phase_manager.last_executed_phase());
+      model_->set_ssb(label_, SSB);
+      scalar_ = b0_ / SSB;
+    }
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
           float value = recruitment_layer_->get_value(row, col);
           unsigned new_agents = (unsigned)(initial_recruits_ * value);
-          LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " initial agents = " << initial_recruits_ << " new agents = " << new_agents;
+          LOG_FINE() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " initial agents = " << initial_recruits_ << " new agents = " << new_agents;
             cell->birth_agents(new_agents, 1.0);
         }
       }
@@ -183,7 +186,7 @@ void RecruitmentBevertonHolt::DoExecute() {
     ssb_ratio_[model_->current_year()] = ssb_ratio;
     SR_[model_->current_year()] = SR;
     true_ycs_[model_->current_year()] = true_ycs;
-    LOG_FINEST() << "applying recruitment in year " << model_->current_year() << " SR = " << SR << " ssb_ratio = " << ssb_ratio << " true ycs = " << true_ycs << " intial recruits = " << initial_recruits_;
+    LOG_FINE() << "applying recruitment in year " << model_->current_year() << " SR = " << SR << " ssb_ratio = " << ssb_ratio << " true ycs = " << true_ycs << " intial recruits = " << initial_recruits_;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
@@ -200,6 +203,14 @@ void RecruitmentBevertonHolt::DoExecute() {
   }
 }
 
+
+// DoExecute
+void RecruitmentBevertonHolt::DoReset() {
+  LOG_FINE();
+  if(model_->is_initialisation_being_re_run())
+    first_enter_execute_ = true;
+
+}
 // FillReportCache, called in the report class, it will print out additional information that is stored in
 // containers in this class.
 void RecruitmentBevertonHolt::FillReportCache(ostringstream& cache) {

@@ -148,6 +148,8 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
  */
 void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
   LOG_TRACE();
+  LOG_FINE() << scalar << " agents = " << birth_agents;
+  float temp = total_individuals_alive_;
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   vector<float> mort_par;
   mortality_->draw_rate_param(row_, col_, birth_agents, mort_par);
@@ -170,6 +172,7 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
   unsigned sex;
   unsigned agent_bin = 0;
   for (unsigned agent = 0; agent < birth_agents; ++agent) {
+    total_individuals_alive_ += scalar;
     sex = 0;
     if (sexed) {
       if (rng.chance() >= male_prop)
@@ -207,6 +210,7 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
       }
     }
   }
+  LOG_FINE() << "added values = " << total_individuals_alive_ - temp << " temp = " << temp << " total_individuals_alive_ " << total_individuals_alive_;
 }
 
 /*
@@ -453,4 +457,19 @@ void  WorldCell::get_female_frequency(vector<unsigned>& age_freq) {
     }
   }
 }
+
+/*
+ * calculate the number of individuals alive
+*/
+void  WorldCell::calculate_individuals_alive() {
+  LOG_FINE() << "calculate_individuals_alive";
+  total_individuals_alive_ = 0.0;
+  for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
+    if ((*iter).is_alive()) {
+      total_individuals_alive_ += (*iter).get_scalar();
+    }
+  }
+}
+
+
 } /* namespace niwa */

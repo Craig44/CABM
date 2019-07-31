@@ -34,7 +34,7 @@ public:
   virtual                     ~MortalityConstantRate() = default;
   virtual void                        DoValidate() override final { };
   virtual void                        DoBuild() override final;
-  virtual void                        DoReset() override final  { };
+  virtual void                        DoReset() override final;
   virtual void                        DoExecute() override final;
   void                                draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) override final;
   void                                FillReportCache(ostringstream& cache) override final;

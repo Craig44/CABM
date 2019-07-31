@@ -172,6 +172,7 @@ void Tagging::DoExecute() {
                   // Lets see if it survives handling
                   if (handling_mortality_random_numbers_[cell_offset_[row][col] + counter] <= handling_mort_by_space_[row][col]) {
                     // It died we will never see this or know about this tagged fish so I am just going to skip the rest of the algorithm
+                    cell->remove_agent_alive(this_agent.get_scalar());
                     this_agent.dies();
                     continue;
                   }

@@ -205,6 +205,18 @@ void MortalityBaranov::DoBuild() {
   }
 }
 
+
+/**
+ * DoReset
+ */
+void MortalityBaranov::DoReset() {
+  LOG_FINE() << "clearing containers";
+  removals_by_age_and_area_.clear();
+  removals_by_length_and_area_.clear();
+  removals_census_.clear();
+  removals_tag_recapture_.clear();
+}
+
 /**
  * DoExecute
  */
@@ -230,6 +242,7 @@ void MortalityBaranov::DoExecute() {
                 if (rng.chance() <= (1 - std::exp(- (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())))) {
                   (*iter).dies();
                   initial_size--;
+                  cell->remove_agent_alive((*iter).get_scalar());
                 }
               }
 
@@ -252,6 +265,7 @@ void MortalityBaranov::DoExecute() {
                 if (rng.chance() <= (1 - std::exp(- (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index())))) {
                   (*iter).dies();
                   initial_size--;
+                  cell->remove_agent_alive((*iter).get_scalar());
                 }
               }
             }
@@ -361,7 +375,7 @@ void MortalityBaranov::DoExecute() {
                       }
                     }
                   } // else it dies from M and we don't care about reporting that
-
+                  cell->remove_agent_alive((*iter).get_scalar());
                   (*iter).dies();
                   initial_size--;
                 }
@@ -433,6 +447,7 @@ void MortalityBaranov::DoExecute() {
                       }
                     }
                   } // else it dies from M and we don't care about reporting that
+                  cell->remove_agent_alive((*iter).get_scalar());
                   (*iter).dies();
                   initial_size--;
                 }
@@ -504,6 +519,7 @@ void MortalityBaranov::DoExecute() {
                       }
                     }
                   } // else it dies from M and we don't care about reporting that
+                  cell->remove_agent_alive((*iter).get_scalar());
                   (*iter).dies();
                   initial_size--;
                 }
@@ -575,6 +591,7 @@ void MortalityBaranov::DoExecute() {
                       }
                     }
                   } // else it dies from M and we don't care about reporting that
+                  cell->remove_agent_alive((*iter).get_scalar());
                   (*iter).dies();
                   initial_size--;
                 }

@@ -34,7 +34,7 @@ public:
   virtual                     ~RecruitmentBevertonHolt() = default;
   void                        DoValidate() override final;
   void                        DoBuild() override final;
-  void                        DoReset() override final { };
+  void                        DoReset() override final;
   void                        DoExecute() override final;
   void                        FillReportCache(ostringstream& cache) override final;
 

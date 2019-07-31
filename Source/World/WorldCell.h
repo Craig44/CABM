@@ -48,12 +48,21 @@ public:
   bool                        is_enabled() {return enabled_; };
   void                        set_area(float area) {area_ = area;}
   float                       get_area() {return area_;}
+
+  // Functions for keeping track of individuals to agents when calculating probability of encounter etc.
+  void                        calculate_individuals_alive();
+  void                        remove_agent_alive(float& scalar) {total_individuals_alive_-= scalar;};
+  void                        add_agent_alive(float& scalar) {total_individuals_alive_ += scalar;};
+  double&                      get_total_individuals_alive() {return total_individuals_alive_;}
+  void                        set_total_individuals_alive(double& val) {total_individuals_alive_ = val;}
+
   void                        seed_agents(unsigned number_agents_to_seed, const float& seed_z);
   void                        birth_agents(unsigned number_agents_to_birth, float scalar);
   void                        set_scalar();
   void                        get_age_frequency(vector<unsigned>& age_freq);
   void                        get_female_frequency(vector<unsigned>& age_freq);
   void                        get_male_frequency(vector<unsigned>& age_freq);
+
 
   float                       get_abundance();
   float                       get_biomass();
@@ -79,6 +88,8 @@ protected:
   float                        area_;
   unsigned                     row_;
   unsigned                     col_;
+  double                       total_individuals_alive_ = 0.0;
+
   // These are model attributes but because I don't know how to give the constructor parameters
   // when its being build as an array by the WorldView I can't give this class a model pointer, pretty annoying.
   float                        lon_ = 0.0;

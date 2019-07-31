@@ -221,6 +221,8 @@ void Iterative::Execute() {
             //LOG_FINEST() << "setting scalar, home row = " << (*iter).get_home_row()  << " col = " << (*iter).get_home_col() << " scalar = " << (*iter).get_scalar();
           }
         }
+        cell->calculate_individuals_alive();
+        LOG_MEDIUM() << "cell = " << row << "-" << col << " individuals = " << cell->get_total_individuals_alive();
       }
     }
   }
