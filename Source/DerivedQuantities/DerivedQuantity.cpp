@@ -75,7 +75,8 @@ void DerivedQuantity::Build() {
  * Reset our derived quantity values
  */
 void DerivedQuantity::Reset() {
-  initialisation_values_.clear();
+  if (model_->is_initialisation_being_re_run())
+    initialisation_values_.clear();
 
   // initialise the values variable
   for (unsigned year = model_->start_year(); year <= model_->final_year(); ++year) {
