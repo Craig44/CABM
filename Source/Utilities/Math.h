@@ -413,6 +413,7 @@ inline float Sum(const vector<float>& Values){
     total += val;
   return total;
 }
+
 // Return the maximum value for a vector
 inline double Max(const vector<double>& Values){
   double max = 0.0;
@@ -465,6 +466,15 @@ inline vector<size_t> sort_indexes(const vector<T> &v) {
 
   return idx;
 }
+
+// Cumulatively sum a vector
+template <typename T>
+inline vector<T> cumsum(const vector<T> &v) {
+  vector<T> result(v.size());
+  partial_sum(v.begin(), v.end(), result.begin(), std::plus<T>());
+  return result;
+}
+
 
 } /* namespace math */
 } /* namespace utilities */

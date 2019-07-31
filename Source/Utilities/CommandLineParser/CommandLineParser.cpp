@@ -54,7 +54,7 @@ void CommandLineParser::Parse(int argc, char* argv[], RunParameters& options) {
     ("config,c", value<string>(), "Configuration file")
     ("run,r", "Basic model run mode")
     ("input,i", value<string>(), "Load free parameter values from file")
-    (" ", value<unsigned>(), "Random number seed")
+    ("seed,g", value<unsigned>(), "Random number seed")
     ("q", "suppress warnings")
     ("loglevel", value<string>(), "Set log level: finest, fine, trace, none(default)");
 
