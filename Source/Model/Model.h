@@ -133,6 +133,7 @@ public:
   void                        increment_time_step() {++time_step_counter_;}
   virtual const unsigned      get_time_step_counter() const {return time_step_counter_;}
   void                        re_run_initialisation() {re_run_initialisation_ = true;}
+  virtual bool                is_initialisation_being_re_run() {return re_run_initialisation_;}
 
   // manager accessors
   virtual Managers&           managers();

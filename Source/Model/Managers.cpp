@@ -36,7 +36,7 @@ namespace niwa {
  * Default constructor
  */
 Managers::Managers(Model* model) {
-  LOG_TRACE();
+  LOG_FINE();
 
   model_ = model;
 
@@ -81,7 +81,7 @@ Managers::~Managers() {
 }
 
 void Managers::Validate() {
-  LOG_TRACE();
+  LOG_FINE();
   ageing_error_->Validate();
   time_step_->Validate(model_);
   initialisation_phase_->Validate();
@@ -100,7 +100,7 @@ void Managers::Validate() {
 }
 
 void Managers::Build() {
-  LOG_TRACE();
+  LOG_FINE();
   ageing_error_->Build();
   time_step_->Build();
   assert_->Build();
@@ -118,7 +118,7 @@ void Managers::Build() {
 
 // bit of a hack to get around dependencies
 void Managers::BuildPreWorldView() {
-  LOG_TRACE();
+  LOG_FINE();
   layer_->BuildPreWorldLayers();
   selectivity_->Build();
   process_->BuildGrowthAndMortalityProcesses();
@@ -127,7 +127,7 @@ void Managers::BuildPreWorldView() {
 
 
 void Managers::Reset() {
-  LOG_TRACE();
+  LOG_FINE();
   ageing_error_->Reset();
   assert_->Reset();
   derived_quantity_->Reset();

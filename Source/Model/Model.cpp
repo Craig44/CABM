@@ -139,7 +139,7 @@ WorldView* Model::world_view() {
  * each step.
  */
 bool Model::Start(RunMode::Type run_mode) {
-  LOG_TRACE();
+  LOG_MEDIUM();
   Logging& logging = Logging::Instance();
   if (logging.errors().size() > 0) {
     logging.FlushErrors();
@@ -157,7 +157,7 @@ bool Model::Start(RunMode::Type run_mode) {
 
   managers_->report()->Execute(State::kStartUp);
 
-  LOG_FINE() << "Model: State Change to Validate";
+  LOG_MEDIUM() << "Model: State Change to Validate";
   state_ = State::kValidate;
   Validate();
   if (logging.errors().size() > 0) {
@@ -167,7 +167,7 @@ bool Model::Start(RunMode::Type run_mode) {
 
   managers_->report()->Execute(state_);
 
-  LOG_FINE() << "Model: State Change to Build";
+  LOG_MEDIUM() << "Model: State Change to Build";
   state_ = State::kBuild;
   Build();
   if (logging.errors().size() > 0) {
@@ -176,7 +176,7 @@ bool Model::Start(RunMode::Type run_mode) {
   }
   managers_->report()->Execute(state_);
 
-  LOG_FINE() << "Model: State Change to Verify";
+  LOG_MEDIUM() << "Model: State Change to Verify";
   state_ = State::kVerify;
   Verify();
   if (logging.errors().size() > 0) {
@@ -202,7 +202,7 @@ bool Model::Start(RunMode::Type run_mode) {
   }
 
   // finalise all reports
-  LOG_FINE() << "Finalising Reports";
+  LOG_MEDIUM() << "Finalising Reports";
   state_ = State::kFinalise;
   for (auto executor : executors_[state_])
     executor->Execute();
@@ -313,6 +313,9 @@ void Model::Build() {
     max_lat_ = lat_bounds_[lat_bounds_.size() - 1];
     LOG_FINE() << "min lat = " << min_lat_ << " max lat = " << max_lat_ << " min long = " << min_lon_ << " max lon " << max_lon_;
   }
+
+
+
   /*
    * An important sequence in the code, if you cannot obtain pointers at build the order of managers will be important
   */
@@ -327,12 +330,6 @@ void Model::Build() {
   if (!process_manager.GetMortalityProcess(natural_mortality_label_)) {
     LOG_FATAL_P(PARAM_NATURAL_MORTALITY_PROCESS_LABEL) << "Does the mortality process " << natural_mortality_label_ << " exist? please check that it does, and is a mortality process";
   }
-
-
-  world_view_->Build(); // This needs processes to be built, but others want world to be built by DoBuild to do checks, hmmm
-  managers_->Build();
-
-
   if (maturity_ogives_.size() > 2) {
     LOG_ERROR_P(PARAM_NATURAL_MORTALITY_PROCESS_LABEL) << "You have specified '" << maturity_ogives_.size() << "' maturity ogives, we only use one if it is unsexed or two if it is sexed";
   }
@@ -352,6 +349,12 @@ void Model::Build() {
       }
     }
   }
+
+  world_view_->Build(); // This needs processes to be built, but others want world to be built by DoBuild to do checks, hmmm
+  managers_->Build();
+
+
+
 
   // Check thread logic
   unsigned procs = omp_get_max_threads() - 2; // Default to number availble threads less two one for other stuff and another for reports
@@ -385,8 +388,7 @@ void Model::Verify() {
  *
  */
 void Model::Reset() {
-  LOG_TRACE();
-
+  LOG_MEDIUM();
   world_view_->Reset();
   managers_->Reset();
 }
@@ -414,14 +416,15 @@ void Model::RunBasic() {
   for (unsigned i = 0; i < adressable_values_count_; ++i) {
     if (addressable_values_file_) {
       addressables.LoadValues(i);
-       Reset();
+      LOG_MEDIUM() << "about to reset";
+      Reset();
      }
     /**
      * Running the model now
      */
     LOG_MEDIUM() << "Model: State change to Initialisation";
     state_ = State::kInitialise;
-    current_year_ = start_year_;
+    current_year_ = start_year_ - 1;
     // Iterate over all partition members and UpDate Mean Weight for the inital weight calculations
     initialisationphases::Manager& init_phase_manager = *managers_->initialisation_phase();
     timevarying::Manager& time_varying_manager = *managers_->time_varying();
@@ -457,27 +460,28 @@ void Model::RunBasic() {
       time_step_manager.Execute(current_year_);
       LOG_FINE() << "finished year exectution";
     }
+
+    LOG_MEDIUM() << " Heading into simulation mode";
     for (int s = 0; s < simulation_candidates; ++s) {
       string report_suffix = ".";
-      unsigned iteration_width = (unsigned)floor(log10((s + 1) + (i * adressable_values_count_))) + 1;
+      unsigned iteration_width = (unsigned)floor(log10((i + 1) + (s * simulation_candidates))) + 1;
 
       unsigned diff = suffix_width - iteration_width;
       report_suffix.append(diff,'0');
-      report_suffix.append(utilities::ToInline<unsigned, string>((s + 1) + (i * adressable_values_count_)));
-      LOG_MEDIUM() << "i = " << i + 1 << " s = " << s + 1 <<  " suffix = " << report_suffix << " what i think it should be doing " << (s + 1) + (i * adressable_values_count_);
+      report_suffix.append(utilities::ToInline<unsigned, string>((i + 1) + (s * simulation_candidates)));
+      LOG_MEDIUM() << "i = " << i + 1 << " s = " << s + 1 <<  " suffix = " << report_suffix << " what i think it should be doing " << (i + 1) + (s * simulation_candidates) << " diff = " << diff << " iteration width = " << iteration_width;
       managers_->report()->set_report_suffix(report_suffix);
 
       managers_->observation()->SimulateData();
 
-      /*// Not convinced this is doing anything
+      // Not convinced this is doing anything
       for (auto executor : executors_[State::kExecute])
         executor->Execute();
-       */
-      if (s != (simulation_candidates - 1)) { // Only need to execute this s - 1 times as the last run will be done at line 451
+
+      if (s != (simulation_candidates - 1)) { // Only need to execute this s - 1 times as the last run will be done at line 485
         managers_->report()->Execute(State::kIterationComplete);
         managers_->report()->WaitForReportsToFinish();
       }
-
     }
     // Model has finished so we can run finalise.
     LOG_MEDIUM() << "Model: State change to Iteration Complete";
