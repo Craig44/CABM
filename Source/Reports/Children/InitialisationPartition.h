@@ -37,7 +37,7 @@ public:
 private:
   bool                        first_run_ = true;
   WorldView*                  world_;
-  bool                        call_number_ = true; // initialisation phase reports are called twice once in the middle of initialisation and one once it is complete.
+  bool                        call_number_ = true; // initialisation phase reports are called twice once in the middle of initialisation DoExecute and one once it is complete in RunBasic Model.cpp
 };
 
 } /* namespace reports */

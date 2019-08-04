@@ -178,8 +178,8 @@ void MortalityConstantRate::DoExecute() {
             if ((*iter).is_alive()) {
               //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
               if (random_numbers_[cell_offset_[row][col] + counter] <= (1 - std::exp(- ratio * (*iter).get_m() * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())))) {
-                (*iter).dies();
                 cell->remove_agent_alive((*iter).get_scalar());
+                (*iter).dies();
                 initial_size--;
                 agents_removed++;
               }
@@ -194,11 +194,13 @@ void MortalityConstantRate::DoExecute() {
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
+        double temp = 0.0;
         if (cell->is_enabled()) {
+          LOG_FINE() << "before " << row << "-" << col << " = " << cell->get_total_individuals_alive();
+
           // need thread safe access to rng
           unsigned time_step = model_->managers().time_step()->current_time_step();
           float ratio = time_step_ratios_[time_step];
-          WorldCell* cell = world_->get_base_square(row, col);
           unsigned counter = 0;
           unsigned initial_size = cell->agents_.size();
           LOG_FINEST() << initial_size << " initial agents, ratio = " << ratio;
@@ -206,8 +208,9 @@ void MortalityConstantRate::DoExecute() {
             if ((*iter).is_alive()) {
               //LOG_FINEST() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " survivorship = " << (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()])) << " M = " << (*iter).get_m();
               if (random_numbers_[cell_offset_[row][col] + counter] <= (1.0 - std::exp(- ratio * (*iter).get_m() * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index())))) {
-                (*iter).dies();
                 cell->remove_agent_alive((*iter).get_scalar());
+                temp += (*iter).get_scalar();
+                (*iter).dies();
                 initial_size--;
                 agents_removed++;
               }
@@ -215,6 +218,7 @@ void MortalityConstantRate::DoExecute() {
           }
           LOG_FINEST() << initial_size << " after mortality";
         }
+        LOG_FINE() << "cell " << row << "-" << col << " = " << cell->get_total_individuals_alive() << " to take = " << temp;
       }
     }
   }
@@ -235,7 +239,7 @@ void  MortalityConstantRate::draw_rate_param(unsigned row, unsigned col, unsigne
   else
     mean_m = m_;
 
-  LOG_FINE() << "mean M = " << mean_m;
+  //LOG_FINE() << "mean M = " << mean_m;
   vector.clear();
   vector.resize(number_of_draws);
 

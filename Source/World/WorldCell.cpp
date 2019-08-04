@@ -148,6 +148,8 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
  */
 void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
   LOG_TRACE();
+  if (birth_agents == 0)
+    return;
   LOG_FINE() << scalar << " agents = " << birth_agents;
   float temp = total_individuals_alive_;
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
@@ -210,7 +212,7 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
       }
     }
   }
-  LOG_FINE() << "added values = " << total_individuals_alive_ - temp << " temp = " << temp << " total_individuals_alive_ " << total_individuals_alive_;
+  LOG_FINE() << "cell: " << row_ << "-" << col_ <<  "added values = " << total_individuals_alive_ - temp << " temp = " << temp << " total_individuals_alive_ " << total_individuals_alive_;
 }
 
 /*

@@ -221,13 +221,11 @@ void  GrowthVonBertalanffyWithBasic::draw_growth_param(unsigned row, unsigned co
     mean_linf = L_inf_layer_[sex]->get_value(row, col);
   else
     mean_linf = l_inf_[sex];
-  LOG_FINE() << "L_inf";
 
   if (k_layer_.size() > 0)
 	  mean_k = k_layer_[sex]->get_value(row, col);
   else
     mean_k = k_[sex];
-  LOG_FINE() << "k";
 
   if (t0_layer_.size() > 0)
     t0 = t0_layer_[sex]->get_value(row, col);
@@ -238,14 +236,11 @@ void  GrowthVonBertalanffyWithBasic::draw_growth_param(unsigned row, unsigned co
     a = a_layer_[sex]->get_value(row, col);
   else
     a = a_[sex];
-  LOG_FINE() << "a";
 
   if (b_layer_.size() > 0)
     b = b_layer_[sex]->get_value(row, col);
   else
     b = b_[sex];
-
-  LOG_FINE() << "b";
 
   vec.clear();
 	vec.resize(number_of_draws);

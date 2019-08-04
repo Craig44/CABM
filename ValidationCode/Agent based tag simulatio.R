@@ -70,7 +70,7 @@ catch = 50
 ## We won't have this information we have biomass, but we won't know numbers because this is stochastic and
 ## because there is a selectivity involved it, makes it tricky
 
-boot<- 1000
+boot<- 50
 #######################
 
 RunDet<-list()
@@ -148,7 +148,9 @@ for(bt in 1:boot){
       }
   }
   norectags<- sum(catch_tag[,5])
-  if(!is.null(del_vec)) agent_mat<-agent_mat[del_vec,]
+  ## remove tags from original partition
+  if(!is.null(del_vec)) 
+    agent_mat<-agent_mat[del_vec,]
 
   #print( catch_tag, row.names = F)
   
@@ -244,35 +246,42 @@ Freq.y=tabulate(weights,nbins=max(weights))/length(weights)
 ## agents would be = 1
 prob = weights / sum(weights)
 ## resample ndx 
-N_rep = 500
+N_rep = 50
 N_sample = 1000
-R_sample = my_sample = matrix(NA,nrow = N_rep, ncol = N_sample);
+R_sample = my_sample = alt_sample = matrix(NA,nrow = N_rep, ncol = N_sample);
 
 for(i in 1:N_rep) {
-	full_draw = sample(weights, replace = F, size = length(weights), prob = prob)
-	my_sample[i,] = full_draw[1:N_sample]
+	full_draw = sample(1:length(weights), replace = F, size = length(weights), prob = prob)
+	my_sample[i,] = weights[full_draw[1:N_sample]]
 	R_sample[i,] = sample(weights, replace = F, size = N_sample, prob = prob)
+	alt_sample[i,] = sample(x = vals, size = N_sample, prob = Freq.y, replace = T)
 }
 
 Freq.R=tabulate(as.vector(R_sample),nbins=max(weights))/(N_rep* N_sample)
 Freq.my=tabulate(as.vector(my_sample),nbins=max(weights))/(N_rep* N_sample)
+Freq.alt=tabulate(as.vector(alt_sample),nbins=max(weights))/(N_rep* N_sample)
 
-barplot(rbind(Freq.y,Freq.R, Freq.my),beside=T,main="")
+barplot(Freq.y,main="", names = vals)
+for(i in 1:N_rep) {
+  check = tabulate(my_sample[i,], nbins =max(weights))
+  check = check / sum(check)
+}
 
-hist(weights
+barplot(rbind(Freq.y,Freq.alt,Freq.R, Freq.my),beside=T,main="")
+
 
 
 ## Also find out at what point should we even care about this. when does this really become an issue
 ## vulnerable in a fishing event
 boots = 500;
 set.seed(123)
-tags_to_look_at = c(1000, 10000, 20000, 50000)
+tags_to_look_at = c(100, 1000, 2000, 5000)
+scalars = c(1,10,50)
 results = array(0, dim = c(boots, length(scalars), length(tags_to_look_at)))
-scalars = c(1,10,50,100)
 
 ## should possible look at these two
-catch = 10000 # abundance - individuals, scanning 
-n_agents = 500000
+catch = 1000 # abundance - individuals, scanning 
+n_agents = 5000
 
 startTime<-Sys.time()
 scalar_ndx = 1;
@@ -340,7 +349,6 @@ dimnames(true) = dimnames(bias) = dimnames(cv) = dimnames(estimated) = list(scal
 bias
 
 ## so makes a big difference if small tag population to overall population.
-
 weighted_Random_Sample <- function(
     .data,
     .weights,
@@ -354,26 +362,28 @@ weighted_Random_Sample <- function(
 ## repeat with new algorithm
 boots = 500;
 set.seed(123)
-tags_to_look_at = c(1000, 10000, 20000)
-catches = c(10000, 50000, 100000)
-catches = 1000
-scalars = c(10,50,100, 250)
+tags_to_look_at = c(100, 1000, 2000)
+catches = c(1000, 5000)
+scalars = c(10,50,100)
 results = tag_counts = array(0, dim = c(boots,length(catches), length(scalars), length(tags_to_look_at)))
-
+n_tags = 1000
 ## should possible look at these two
-n_agents = 50000
 
+population = 100000
+scalar = 1
+catch = 2000
 startTime<-Sys.time()
 scalar_ndx = 1;
 tag_ndx = 1;
 catch_ndx = 1;
 #for(catch in catches) {
 	scalar_ndx = 1;
-	for(scalar in scalars) {
+	#for(scalar in scalars) {
 		print(scalar)
 		tag_ndx = 1;
-		for(n_tags in tags_to_look_at) {
+		#for(n_tags in tags_to_look_at) {
 			print(paste0("tag = ", n_tags))
+		  n_agents = as.integer(population / scalar)
 			population = n_agents * scalar
 			tags = rep(0,n_agents)
 			weights = rep(scalar, n_agents)
@@ -387,7 +397,9 @@ catch_ndx = 1;
 			tags = c(tags, rep(1,n_tags))
 			reshuffle_ndx = sample(1:n_new_agents)
 			weights = weights[reshuffle_ndx]
-			
+			prob_untagged = sum(weights[tags == 0]) / sum(weights)
+			prob_tagged = sum(weights[tags == 1]) / sum(weights)
+			#full_prob = c(prob_tagged, prob_untagged)
 			prob = weights / sum(weights)
 			tags = tags[reshuffle_ndx]
 			pop_est = NULL
@@ -406,19 +418,32 @@ catch_ndx = 1;
 					temp_catch = temp_catch - temp_weights[this_agent_ndx]
 					temp_weights[this_agent_ndx] = 0
 				}	
-				
+				print(tag_count)
 				pop_est = ((n_tags+1)*(catch+1)/(tag_count+1))-1
 				results[bt,catch_ndx, scalar_ndx, tag_ndx] = pop_est
 				tag_counts[bt,catch_ndx, scalar_ndx, tag_ndx] = tag_count
 			}
-			tag_ndx = tag_ndx + 1;
-		}
-		scalar_ndx = scalar_ndx + 1;
-	}
-	catch_ndx = catch_ndx + 1;
+			#tag_ndx = tag_ndx + 1;
+		#}
+		#scalar_ndx = scalar_ndx + 1;
+	
+	#catch_ndx = catch_ndx + 1;
 #}
 endTime<- Sys.time() - startTime
 endTime
+
+## run with some specific settings
+# -scalar = 1, catch = 2000, pop = 1e+5, n_tags = 1000, boots = 500 summary(tags) = 
+summary(tag_counts[,catch_ndx, scalar_ndx, tag_ndx])
+#Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#8.00   17.00   20.00   20.04   23.00   33.00 
+
+## we should get something similar, with scalar = 10
+# -scalar = 10, catch = 2000, pop = 1e+5, n_tags = 1000, boots = 500 summary(tags) = 
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# 3.00    9.00   11.00   11.54   14.00   23.00 
+
+
 
 # 8.2 mins
 bias = estimated = cv = true = matrix(NA,nrow = length(scalars), ncol = length(tags_to_look_at))
@@ -443,6 +468,82 @@ bias
 
 
 
+## repeat with new algorithm
+boots = 500;
+set.seed(125)
+tags_to_look_at = c(100, 1000, 2000)
+catches = c(1000, 5000)
+scalars = c(10,50,100)
+results = tag_counts = array(0, dim = c(boots,length(catches), length(scalars), length(tags_to_look_at)))
+n_tags = 1000
+## should possible look at these two
 
+population = 100000
+scalar = 10
+catch = 2000
+startTime<-Sys.time()
+scalar_ndx = 1;
+tag_ndx = 1;
+catch_ndx = 1;
+#for(catch in catches) {
+scalar_ndx = 1;
+#for(scalar in scalars) {
+print(scalar)
+tag_ndx = 1;
+#for(n_tags in tags_to_look_at) {
+print(paste0("tag = ", n_tags))
+n_agents = as.integer(population / scalar)
+population = n_agents * scalar
+tags = rep(0,n_agents)
+weights = rep(scalar, n_agents)
+# apply tagging, all agents have equal prob of being tagged
+tag_agent_ndx = sample(x = n_agents, size = n_tags, replace = F)
+## pull out tagged individuals take away the scalar
+weights[tag_agent_ndx] = weights[tag_agent_ndx] - 1
+## initially append taged agents at end and then reshuffle
+n_new_agents = n_agents + n_tags
+weights = c(weights, rep(1,n_tags))
+tags = c(tags, rep(1,n_tags))
+reshuffle_ndx = sample(1:n_new_agents)
+weights = weights[reshuffle_ndx]
+prob_untagged = sum(weights[tags == 0]) / sum(weights)
+prob_tagged = sum(weights[tags == 1]) / sum(weights)
+#full_prob = c(prob_tagged, prob_untagged)
+prob = weights / sum(weights)
+tags = tags[reshuffle_ndx]
+pop_est = NULL
+for(bt in 1:boots) {
+  temp_weights = weights
+  temp_catch = catch
+  ## now do recapture event first treating this is as equal probability
+  tag_count = 0
+  while(temp_catch > 0) {
+    agent_tag = rbinom(n = c(1), size = 1, prob = prob_tagged)
+    ## now find agent and sample
+    for(i in 1:length(tags)) { ## could be issues if this vector isn't random.
+      if (tags[i] == agent_tag & temp_weights[i] != 0) {
+        temp_catch = temp_catch - temp_weights[i]
+        temp_weights[i] = 0
+        if (tags[i] == 1)
+          tag_count = tag_count + 1;
+        break;
+      }
+    }
+  }
+  pop_est = ((n_tags+1)*(catch+1)/(tag_count+1))-1
+  results[bt,catch_ndx, scalar_ndx, tag_ndx] = pop_est
+  tag_counts[bt,catch_ndx, scalar_ndx, tag_ndx] = tag_count
+}
+#tag_ndx = tag_ndx + 1;
+#}
+#scalar_ndx = scalar_ndx + 1;
 
+#catch_ndx = catch_ndx + 1;
+#}
+endTime<- Sys.time() - startTime
+endTime
+
+summary(tag_counts[,catch_ndx, scalar_ndx, tag_ndx])
+#Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#8.00   17.00   20.00   20.31   23.00   36.00 
 

@@ -8,7 +8,9 @@
  *                WorldSquare maintains a list of Agents
  *                The number of 'entity' in each cell
  *
- *
+ * - TODO
+ *  - ADD Slot agent function, the code is repeasted quite often.
+ *  - Think about how, best to integtate Tagged partition, and perhaps expand it, larvae etc.
  */
 #ifndef WORLD_CELL_H_
 #define WORLD_CELL_H_
@@ -53,7 +55,7 @@ public:
   void                        calculate_individuals_alive();
   void                        remove_agent_alive(float& scalar) {total_individuals_alive_-= scalar;};
   void                        add_agent_alive(float& scalar) {total_individuals_alive_ += scalar;};
-  double&                      get_total_individuals_alive() {return total_individuals_alive_;}
+  const double&               get_total_individuals_alive() {return total_individuals_alive_;}
   void                        set_total_individuals_alive(double& val) {total_individuals_alive_ = val;}
 
   void                        seed_agents(unsigned number_agents_to_seed, const float& seed_z);
@@ -75,6 +77,8 @@ public:
 
 
   vector<Agent>               agents_;
+  vector<Agent>               tagged_agents_;
+
   string                      get_cell_label() {return cell_label_;};
   float                       get_lat() {return lat_;};
   float                       get_lon() {return lon_;};

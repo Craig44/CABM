@@ -144,7 +144,7 @@ void RecruitmentBevertonHolt::DoBuild() {
 
 // DoExecute
 void RecruitmentBevertonHolt::DoExecute() {
-  LOG_FINE();
+  LOG_FINE() << label_;
 
 
   if (model_->state() == State::kInitialise) {

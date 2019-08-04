@@ -185,6 +185,7 @@ void WorldView::MergeCachedGrid() {
            }
         }
         cached_grid_[i][j].agents_.clear();
+        LOG_FINE() << "cell " << i << "-" << j << " = " << base_grid_[i][j].get_total_individuals_alive();
       }
     }
   }
@@ -230,8 +231,7 @@ void WorldView::MergeCachedGrid(bool update_lat_long) {
            }
         }
         cached_grid_[i][j].agents_.clear();
-        LOG_FINE() << "after = " << base_grid_[i][j].get_total_individuals_alive() << " diff = " << base_grid_[i][j].get_total_individuals_alive()  - start;
-
+        LOG_FINE() << "cell " << i << "-" << j << " = " << base_grid_[i][j].get_total_individuals_alive();
       }
     }
   }
@@ -245,11 +245,13 @@ void WorldView::MergeCachedGrid(bool update_lat_long) {
 */
 void WorldView::CachedWorldForInit() {
   LOG_MEDIUM() ;
+  double individuals = 0.0;
   for (unsigned i = 0; i < height_; ++i) {  // Can't thread this, each cell has a pointer to growth and mortality for update agent, so there is a hidden shared resouce....
     for (unsigned j = 0; j < width_; ++j) {
       if (base_grid_[i][j].is_enabled()) {
         init_cached_grid_[i][j].agents_ = base_grid_[i][j].agents_;
-        init_cached_grid_[i][j].set_total_individuals_alive(base_grid_[i][j].get_total_individuals_alive());
+        individuals = base_grid_[i][j].get_total_individuals_alive();
+        init_cached_grid_[i][j].set_total_individuals_alive(individuals);
       }
     }
   }
@@ -263,11 +265,13 @@ void WorldView::CachedWorldForInit() {
 */
 void WorldView::MergeWorldForInit() {
   LOG_MEDIUM() ;
+  double individuals = 0.0;
   for (unsigned i = 0; i < height_; ++i) {  // Can't thread this, each cell has a pointer to growth and mortality for update agent, so there is a hidden shared resouce....
     for (unsigned j = 0; j < width_; ++j) {
       if (base_grid_[i][j].is_enabled()) {
         base_grid_[i][j].agents_ = init_cached_grid_[i][j].agents_;
-        base_grid_[i][j].set_total_individuals_alive(init_cached_grid_[i][j].get_total_individuals_alive());
+        individuals = base_grid_[i][j].get_total_individuals_alive();
+        base_grid_[i][j].set_total_individuals_alive(individuals);
       }
     }
   }

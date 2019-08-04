@@ -133,7 +133,7 @@ void MovementBoxTransfer::DoBuild() {
  *  Execute process
  */
 void MovementBoxTransfer::DoExecute() {
-  LOG_FINE();
+  LOG_FINE() << "label: " << label_;
 
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   // Pre-calculate agents in the world to set aside our random numbers needed for the operation
@@ -268,11 +268,11 @@ void MovementBoxTransfer::DoExecute() {
     LOG_FINE() << "applying Natal Homeing movement";
     // Iterate over origin cells
     // #pragma omp parallel for collapse(2) // I am not 100% confident this can be threaded
-    double overall_temp = 0.0;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
-        LOG_FINEST() << "row = " << row << " col = " << col  << " thread id = " << omp_get_thread_num();
         WorldCell* origin_cell = world_->get_base_square(row, col);
+        LOG_FINE() <<"cell: " << row << "-" << col <<  " start = " << origin_cell->get_total_individuals_alive();
+        double temp = 0.0;
         WorldCell* destination_cell;
         if (origin_cell->is_enabled()) {
           unsigned current_cell = 0;
@@ -333,11 +333,10 @@ void MovementBoxTransfer::DoExecute() {
               }
             }
           } else {
-            LOG_FINE() << "selectivity is Age based";
-            double temp = 0;
-            double another_temp = origin_cell->get_total_individuals_alive();
+            //LOG_FINE() << "selectivity is Age based";
             for (auto iter = origin_cell->agents_.begin(); iter != origin_cell->agents_.end(); ++iter) {
               if ((*iter).is_alive()) {
+                temp += (*iter).get_scalar();
                 if (rng.chance() <= selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index())) {
                   ++counter;
                   origin_element = 0;
@@ -363,14 +362,13 @@ void MovementBoxTransfer::DoExecute() {
                       store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]]++;
                       // if we are moving to this cell lets not just move to the next agent
                       if ((possible_rows_[potential_destination] == row) && (possible_cols_[potential_destination] == col)) {
+
                         break;
                       }
                       // destination_cell->add_agent_alive((*iter).get_scalar()); // this is done in the WorldView when merging
                       origin_cell->remove_agent_alive((*iter).get_scalar());
                       destination_cell = world_->get_cached_square(possible_rows_[potential_destination], possible_cols_[potential_destination]);
                       destination_cell->agents_.push_back((*iter));
-                      temp += (*iter).get_scalar();
-                      overall_temp +=  (*iter).get_scalar();
                       // Essentially we have to kill an individual here as it is gone off to be merged
                       (*iter).dies();
                       break;
@@ -379,7 +377,7 @@ void MovementBoxTransfer::DoExecute() {
                 }
               }
             }
-            LOG_FINE() << "row = " << row << "-" << col  << " moving " << temp << " at the beginning = " << another_temp << " now = " << origin_cell->get_total_individuals_alive();
+            LOG_FINE() << "now = " << origin_cell->get_total_individuals_alive() << " to take = " << temp;
           }
           unsigned total = 0;
           for (unsigned i = 0; i < store_infor.destination_of_agents_moved_.size(); ++i) {
@@ -394,7 +392,7 @@ void MovementBoxTransfer::DoExecute() {
         }
       }
     }
-    LOG_FINE() << "overall moving individuals = " << overall_temp;
+    //LOG_FINE() << "overall moving individuals = " << overall_temp;
   } // if (movement_type_ == MovementType::kNatal_homing)
   // merge destination agents into the actual grid
   world_->MergeCachedGrid(true);

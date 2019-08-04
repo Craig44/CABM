@@ -301,7 +301,7 @@ void MortalityEventBiomass::DoExecute() {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance(); // shared resource
   vector<unsigned> global_age_freq(model_->age_spread(), 0);
   unsigned time_step = model_->get_time_step_counter();
-
+  account_for_tag_population_ = false;
   auto iter = catch_year_.begin();
   if (model_->state() != State::kInitialise) {
     if (find(iter, catch_year_.end(), model_->current_year()) != catch_year_.end()) {
@@ -320,6 +320,7 @@ void MortalityEventBiomass::DoExecute() {
           LOG_FINE() << "i = " << scanning_proportion_by_fishery_[i][scan_ndx];
           if (scanning_proportion_by_fishery_[i][scan_ndx] > 0) {
             scanning_this_year_[i] = true;
+            account_for_tag_population_ = true;
             LOG_FINE() << "scanning for fishery " << fishery_label_[i] << " in year " << model_->current_year();
           } else {
             scanning_this_year_[i] = false;
@@ -371,7 +372,188 @@ void MortalityEventBiomass::DoExecute() {
               world_catch_to_take += catch_taken;
               LOG_FINE() << "need to remove " << catch_taken << " weight of fish across all fisheries";
               unsigned counter = 0;
-              if (catch_taken > 0) {
+              //unsigned agent_counter = 0;
+                if (catch_taken > 0) {
+                  LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << catch_taken;
+                  census_data census_fishery(model_->current_year(), row, col);
+                  tag_recapture tag_recapture_info(model_->current_year(), row, col, time_step);
+
+                  composition_data age_freq(PARAM_AGE,  model_->current_year(), row, col, model_->age_spread());
+                  composition_data length_freq(PARAM_LENGTH,  model_->current_year(), row, col, model_->number_of_length_bins());
+
+                  catch_attempts = 1;
+                  catch_max = cell->agents_.size() * 2;
+                  LOG_FINEST() << "individuals = " << catch_max;
+                  unsigned fishery_ndx = 0;
+                  float random_fish, temp_sum;
+                  double vulnerable_total_in_cell = 0.0; // an approximation. assumes catches proportion for entire population, it's also stochastic with selectivity
+                  double tagged_fish = 0;
+                  double prob_of_untagged_fish = 0.0;
+                  // vulnerable biomass an approximation
+                  if (account_for_tag_population_) {
+                    for(auto& agent : cell->agents_) {
+                      if (agent.is_alive()) {
+                        if(agent.get_number_tags() > 0)
+                          tagged_fish += agent.get_scalar();
+                        temp_sum = 0.0;
+                        random_fish = rng.chance();
+                        for (unsigned i = 0; i < fisheries_to_sample_from.size(); ++i) {
+                          temp_sum += prop_catch_by_fishery[i];
+                          if (temp_sum >= random_fish) {
+                            fishery_ndx = fisheries_to_sample_from[i];
+                            break;
+                          }
+                        }
+                        if (rng.chance() <= fishery_selectivity_[fishery_ndx][agent.get_sex()]->GetResult(agent.get_age_index()))
+                          vulnerable_total_in_cell += agent.get_scalar();
+                      }
+                    }
+                    prob_of_untagged_fish = tagged_fish / vulnerable_total_in_cell;
+                  }
+
+                  LOG_FINE() <<"individuals_in_cell = " << vulnerable_total_in_cell << " tagged fish = " << tagged_fish << " prob of untagged fish = " << prob_of_untagged_fish;
+
+                  unsigned agent_has_tag = 0;
+                  unsigned agent_counter = 0;
+                  bool already_checked_selec = false;
+                  unsigned max_agent_counter = 0;
+                  //unsigned individual_ndx = 0;
+                  /*
+                   *  Main loop
+                  */
+                  while (catch_taken > 0) {
+                    LOG_FINEST() << "catch taken = " << catch_taken << " attempts = " << catch_attempts;
+                    ++catch_attempts;
+                    already_checked_selec = false;
+                    // calculate fishery based on proportion of catch
+                    temp_sum = 0.0;
+                    random_fish = rng.chance();
+                    for (unsigned i = 0; i < fisheries_to_sample_from.size(); ++i) {
+                      temp_sum += prop_catch_by_fishery[i];
+                      if (temp_sum >= random_fish) {
+                        fishery_ndx = fisheries_to_sample_from[i];
+                        break;
+                      }
+                    }
+                    if (catch_to_take_by_fishery_[fishery_ndx] > 0) {
+
+                      if (scanning_this_year_[fishery_ndx])
+                        LOG_FINE() << "about to calculate agent";
+                    // randomly find agent
+                    auto& this_agent = cell->agents_[rng.chance() * cell->agents_.size()];
+                    if (scanning_this_year_[fishery_ndx]) {
+                      agent_has_tag = (unsigned)rng.binomial(prob_of_untagged_fish, 1);
+                      LOG_FINE() << "find value " << agent_counter << " " << cell->agents_.size() << " fishery ndx = " << fishery_ndx << " agents has tag = " << agent_has_tag;
+
+                      // systematically find a tagged
+                      if (agent_counter == (cell->agents_.size() - 1))
+                        agent_counter = 0;
+                      for ( ; agent_counter < cell->agents_.size(); max_agent_counter++) {
+                        agent_counter++;
+                        LOG_FINE() << "agent_counter = " << agent_counter << " is alive = " << cell->agents_[agent_counter].is_alive() << " tags =  " << cell->agents_[agent_counter].get_number_tags() << " fishery nex = " << fishery_selectivity_.size();
+                        if (cell->agents_[agent_counter].is_alive() & (cell->agents_[agent_counter].get_number_tags() >= agent_has_tag) & (rng.chance() <= (fishery_selectivity_[fishery_ndx][cell->agents_[agent_counter].get_sex()]->GetResult(cell->agents_[agent_counter].get_age_index())))) {
+                          this_agent = cell->agents_[agent_counter];
+                          already_checked_selec = true;
+                          break;
+                        }
+                        // systematically find a tagged
+                        if (agent_counter == (cell->agents_.size() - 1))
+                          agent_counter = 0;
+
+                        if (max_agent_counter > (cell->agents_.size() * 5)) {
+                          LOG_WARNING() << "couldnt't find agent within a reasonable time length. something is not configured right.";
+                          break;
+                        }
+                      }
+                      LOG_FINE() << "checked = " << already_checked_selec <<  "catch taken = " << catch_taken << " attempts = " << catch_attempts << " tags = " << this_agent.get_number_tags() << " suppose = " << agent_has_tag << " counter = " << agent_counter << " age = " << this_agent.get_age() << " should be = " << cell->agents_[agent_counter].get_age();
+                    }
+
+                    if (this_agent.is_alive()) {
+                        if ((rng.chance() <= fishery_selectivity_[fishery_ndx][this_agent.get_sex()]->GetResult(this_agent.get_age_index())) | already_checked_selec) {
+                          // check under MLS and apply some handling mortality
+                          if (this_agent.get_length() < fishery_mls_[fishery_ndx]) {
+                            if (rng.chance() <= fishery_hand_mort_[fishery_ndx]) {
+                              cell->remove_agent_alive(this_agent.get_scalar());
+                              this_agent.dies();
+                            }
+                          } else {
+                            // record information
+                            //LOG_FINE() << catch_taken << " " <<  this_agent.get_sex() << " " << this_agent.get_weight() << " " << this_agent.get_scalar();
+                            catch_taken -= this_agent.get_weight() * this_agent.get_scalar();
+                            catch_to_take_by_fishery_[fishery_ndx] -= this_agent.get_weight() * this_agent.get_scalar();
+                            fishery_actual_catch_taken_[fishery_ndx][catch_ndx] += this_agent.get_weight() * this_agent.get_scalar();
+                            age_freq.frequency_[this_agent.get_age_index()] += this_agent.get_scalar(); // This actually represents many individuals.
+                            length_freq.frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
+
+                            if (this_agent.get_sex() == 0) {
+                              age_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].frequency_[this_agent.get_age_index()] += this_agent.get_scalar();
+                              length_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
+                              fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].biomass_+= this_agent.get_weight() * this_agent.get_scalar();
+                            } else {
+                              age_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].female_frequency_[this_agent.get_age_index()] += this_agent.get_scalar();
+                              length_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].female_frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
+                              fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].female_biomass_+= this_agent.get_weight() * this_agent.get_scalar();
+                            }
+                            global_age_freq[this_agent.get_age_index()] += this_agent.get_scalar();
+                            fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].age_ndx_.push_back(this_agent.get_age_index());
+                            fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].sex_.push_back(this_agent.get_sex());
+                            fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].fishery_ndx_.push_back(fishery_ndx);
+                            fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].length_ndx_.push_back(this_agent.get_length_bin_index());
+                            fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].scalar_.push_back(this_agent.get_scalar());
+                            fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].weight_.push_back(this_agent.get_weight());
+
+                            if (scanning_ & scanning_this_year_[fishery_ndx]) {
+                              // Probability of scanning agent
+                              if (rng.chance() <= scanning_proportion_by_fishery_[fishery_ndx][catch_ndx]) {
+                                // We scanned this agent
+                                tag_recapture_info.scanned_fish_+= this_agent.get_scalar();
+                                if (this_agent.get_number_tags() > 0) {
+                                  //fish has a tag record it
+                                  tag_recapture_info.age_.push_back(this_agent.get_age());
+                                  tag_recapture_info.sex_.push_back(this_agent.get_sex());
+                                  tag_recapture_info.length_.push_back(this_agent.get_length());
+                                  tag_recapture_info.fishery_ndx_.push_back(fishery_ndx);
+                                  tag_recapture_info.time_at_liberty_.push_back(this_agent.get_time_at_liberty(time_step));
+                                  tag_recapture_info.length_increment_.push_back(this_agent.get_length_increment_since_tag());
+                                  tag_recapture_info.tag_row_.push_back(this_agent.get_tag_row());
+                                  tag_recapture_info.tag_col_.push_back(this_agent.get_tag_col());
+                                }
+                              }
+                            }
+                          }
+                          cell->remove_agent_alive(this_agent.get_scalar());
+                          this_agent.dies();
+                        }
+                      }
+                      // Make sure we don't end up fishing for infinity
+                      if (catch_attempts >= catch_max) {
+                       LOG_WARNING() << "Too many attempts to catch an agent in the process " << label_ << " in year " << model_->current_year() << " in row " << row + 1 << " and column " << col + 1 << ", remaining catch to take = " << catch_taken << " this most likely means you have" <<
+                           " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation. attempts = " << catch_attempts << " max attempts allowed = " << catch_max;
+                       // Kick out of this cell
+                       break;
+                      }
+                      ++counter;
+                    }
+                  } // while (catch_taken > 0
+
+                  for (auto& catch_ : catch_to_take_by_fishery_) {
+                    LOG_FINE() << catch_;
+                  }
+                  removals_by_length_and_area_.push_back(length_freq);
+                  removals_by_age_and_area_.push_back(age_freq);
+                  removals_census_.push_back(census_fishery);
+                  if (scanning_ & (tag_recapture_info.age_.size() > 0)) {
+                    LOG_FINE() << "saving tag-recapture";
+                    removals_tag_recapture_.push_back(tag_recapture_info);
+                  }
+                } //if (catch_taken > 0) {
+              } // cell ->is_enabled()
+            } // col
+          } // row
+/*
+
+
+                             if (catch_taken > 0) {
                 LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << catch_taken;
                 census_data census_fishery(model_->current_year(), row, col);
                 tag_recapture tag_recapture_info(model_->current_year(), row, col, time_step);
@@ -383,104 +565,145 @@ void MortalityEventBiomass::DoExecute() {
                 catch_max = cell->agents_.size() * 2;
                 LOG_FINEST() << "individuals = " << catch_max;
                 unsigned fishery_ndx = 0;
+
                 float random_fish, temp_sum;
-                double individuals_in_cell = cell->get_total_individuals_alive();
-                double double_check = 0;
-                for(auto& agent : cell->agents_) {
-                  if (agent.is_alive())
-                    double_check += agent.get_scalar();
+                double vulnerable_total_in_cell = 0.0; // an approximation. assumes catches proportion for entire population, it's also stochastic with selectivity
+                double tagged_fish = 0;
+                double prob_of_untagged_fish = 0.0;
+                // vulnerable biomass an approximation
+                if (account_for_tag_population_) {
+                  for(auto& agent : cell->agents_) {
+                    if (agent.is_alive()) {
+                      if(agent.get_number_tags() > 0)
+                        tagged_fish += agent.get_scalar();
+                      temp_sum = 0.0;
+                      random_fish = rng.chance();
+                      for (unsigned i = 0; i < fisheries_to_sample_from.size(); ++i) {
+                        temp_sum += prop_catch_by_fishery[i];
+                        if (temp_sum >= random_fish) {
+                          fishery_ndx = fisheries_to_sample_from[i];
+                          break;
+                        }
+                      }
+                      if (rng.chance() <= fishery_selectivity_[fishery_ndx][agent.get_sex()]->GetResult(agent.get_age_index()))
+                        vulnerable_total_in_cell += agent.get_scalar();
+                    }
+                  }
+                  prob_of_untagged_fish = tagged_fish / vulnerable_total_in_cell;
                 }
-                LOG_FINE() <<"individuals_in_cell = " << individuals_in_cell << " but we count = " << double_check;
-                if (individuals_in_cell > 0)
-                  LOG_FINE() << "do this";
-                //unsigned individual_ndx = 0;
-                /*
+
+                LOG_FINE() <<"individuals_in_cell = " << vulnerable_total_in_cell << " tagged fish = " << tagged_fish << " prob of untagged fish = " << prob_of_untagged_fish;
+
+                ///test binomial random number generator
+                if (account_for_tag_population_) {
+                  for (unsigned i = 0; i < 100; ++i)
+                    LOG_FINE() << (unsigned)rng.binomial(0.8,1);
+                }
+
                  *  Main loop
-                */
+
+                Agent& this_agent = cell->agents_[rng.chance() * cell->agents_.size()];
+                // Just to initialise
+                unsigned agent_has_tag = 0;
                 while (catch_taken > 0) {
-                  LOG_FINEST() << "catch taken = " << catch_taken << " attempts = " << catch_attempts;
                   ++catch_attempts;
-                  // Account for unequal probability
-                  // randomly find agent
-                  auto& this_agent = cell->agents_[rng.chance() * cell->agents_.size()];
-                  if (this_agent.is_alive()) {
-                    // calculate fishery based on proportion of catch
-                    temp_sum = 0.0;
-                    random_fish = rng.chance();
-                    for (unsigned i = 0; i < fisheries_to_sample_from.size(); ++i) {
-                      temp_sum += prop_catch_by_fishery[i];
-                      if (temp_sum >= random_fish) {
-                        fishery_ndx = fisheries_to_sample_from[i];
-                        break;
+
+                  // generate a random fishery
+                  temp_sum = 0.0;
+                  random_fish = rng.chance();
+                  for (unsigned i = 0; i < fisheries_to_sample_from.size(); ++i) {
+                    temp_sum += prop_catch_by_fishery[i];
+                    if (temp_sum >= random_fish) {
+                      fishery_ndx = fisheries_to_sample_from[i];
+                      break;
+                    }
+                  }
+                  if (catch_to_take_by_fishery_[fishery_ndx] > 0) {
+                    // Account for unequal probability
+                    if (account_for_tag_population_) {
+                      agent_has_tag = (unsigned)rng.binomial(prob_of_untagged_fish, 1);
+                      // systematically find a tagged
+                      if (agent_counter == (cell->agents_.size() - 1))
+                        agent_counter = 0;
+                      for (; agent_counter < cell->agents_.size(); ++agent_counter) {
+                        if (cell->agents_[agent_counter].is_alive() & (cell->agents_[agent_counter].get_number_tags() >= agent_has_tag) & (rng.chance() <= fishery_selectivity_[fishery_ndx][cell->agents_[agent_counter].get_sex()]->GetResult(cell->agents_[agent_counter].get_age_index()))) {
+                          this_agent = cell->agents_[agent_counter];
+                          break;
+                        }
+                      }
+                      LOG_FINE() << "catch taken = " << catch_taken << " attempts = " << catch_attempts << " tags = " << this_agent.get_number_tags() << " suppose = " << agent_has_tag << " counter = " << agent_counter;
+                    } else {
+                      // Get a random agent, check if it is alive and vulnerable
+                      this_agent = cell->agents_[rng.chance() * cell->agents_.size()];
+                      if (not this_agent.is_alive() & (rng.chance() <= fishery_selectivity_[fishery_ndx][this_agent.get_sex()]->GetResult(this_agent.get_age_index()))) {
+                        //LOG_FINE() << "skipping this agent " << this_agent.is_alive()  << " with age = " << this_agent.get_age();
+                        continue;
                       }
                     }
-                    // Do we need to take catch from this fishery
-                    if (catch_to_take_by_fishery_[fishery_ndx] > 0) {
-                      if (rng.chance() <= fishery_selectivity_[fishery_ndx][this_agent.get_sex()]->GetResult(this_agent.get_age_index())) {
-                        // check under MLS and apply some handling mortality
-                        if (this_agent.get_length() < fishery_mls_[fishery_ndx]) {
-                          if (rng.chance() <= fishery_hand_mort_[fishery_ndx]) {
-                            cell->remove_agent_alive(this_agent.get_scalar());
-                            this_agent.dies();
-                          }
-                        } else {
-                          // record information
-                          //LOG_FINE() << catch_taken << " " <<  this_agent.get_sex() << " " << this_agent.get_weight() << " " << this_agent.get_scalar();
-                          catch_taken -= this_agent.get_weight() * this_agent.get_scalar();
-                          catch_to_take_by_fishery_[fishery_ndx] -= this_agent.get_weight() * this_agent.get_scalar();
-                          fishery_actual_catch_taken_[fishery_ndx][catch_ndx] += this_agent.get_weight() * this_agent.get_scalar();
-                          age_freq.frequency_[this_agent.get_age_index()] += this_agent.get_scalar(); // This actually represents many individuals.
-                          length_freq.frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
-
-                          if (this_agent.get_sex() == 0) {
-                            age_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].frequency_[this_agent.get_age_index()] += this_agent.get_scalar();
-                            length_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
-                            fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].biomass_+= this_agent.get_weight() * this_agent.get_scalar();
-                          } else {
-                            age_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].female_frequency_[this_agent.get_age_index()] += this_agent.get_scalar();
-                            length_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].female_frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
-                            fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].female_biomass_+= this_agent.get_weight() * this_agent.get_scalar();
-                          }
-                          global_age_freq[this_agent.get_age_index()] += this_agent.get_scalar();
-                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].age_ndx_.push_back(this_agent.get_age_index());
-                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].sex_.push_back(this_agent.get_sex());
-                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].fishery_ndx_.push_back(fishery_ndx);
-                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].length_ndx_.push_back(this_agent.get_length_bin_index());
-                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].scalar_.push_back(this_agent.get_scalar());
-                          fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].weight_.push_back(this_agent.get_weight());
-
-                          if (scanning_ & scanning_this_year_[fishery_ndx]) {
-                            // Probability of scanning agent
-                            if (rng.chance() <= scanning_proportion_by_fishery_[fishery_ndx][catch_ndx]) {
-                              // We scanned this agent
-                              tag_recapture_info.scanned_fish_+= this_agent.get_scalar();
-                              if (this_agent.get_number_tags() > 0) {
-                                //fish has a tag record it
-                                tag_recapture_info.age_.push_back(this_agent.get_age());
-                                tag_recapture_info.sex_.push_back(this_agent.get_sex());
-                                tag_recapture_info.length_.push_back(this_agent.get_length());
-                                tag_recapture_info.fishery_ndx_.push_back(fishery_ndx);
-                                tag_recapture_info.time_at_liberty_.push_back(this_agent.get_time_at_liberty(time_step));
-                                tag_recapture_info.length_increment_.push_back(this_agent.get_length_increment_since_tag());
-                                tag_recapture_info.tag_row_.push_back(this_agent.get_tag_row());
-                                tag_recapture_info.tag_col_.push_back(this_agent.get_tag_col());
-                              }
-                            }
-                          }
-                        }
+                    // check under MLS (discard) and apply some handling mortality
+                    if (this_agent.get_length() < fishery_mls_[fishery_ndx]) {
+                      if (rng.chance() <= fishery_hand_mort_[fishery_ndx]) {
                         cell->remove_agent_alive(this_agent.get_scalar());
                         this_agent.dies();
                       }
+                    } else {
+                      // record information
+                      //LOG_FINE() << catch_taken << " " <<  this_agent.get_sex() << " " << this_agent.get_weight() << " " << this_agent.get_scalar();
+                      catch_taken -= this_agent.get_weight() * this_agent.get_scalar();
+                      catch_to_take_by_fishery_[fishery_ndx] -= this_agent.get_weight() * this_agent.get_scalar();
+                      fishery_actual_catch_taken_[fishery_ndx][catch_ndx] += this_agent.get_weight() * this_agent.get_scalar();
+                      age_freq.frequency_[this_agent.get_age_index()] += this_agent.get_scalar(); // This actually represents many individuals.
+                      length_freq.frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
+
+                      if (this_agent.get_sex() == 0) {
+                        age_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].frequency_[this_agent.get_age_index()] += this_agent.get_scalar();
+                        length_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
+                        fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].biomass_ += this_agent.get_weight() * this_agent.get_scalar();
+                      } else {
+                        age_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].female_frequency_[this_agent.get_age_index()] += this_agent.get_scalar();
+                        length_comp_by_fishery_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].female_frequency_[this_agent.get_length_bin_index()] += this_agent.get_scalar();
+                        fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].female_biomass_ += this_agent.get_weight() * this_agent.get_scalar();
+                      }
+                      global_age_freq[this_agent.get_age_index()] += this_agent.get_scalar();
+                      fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].age_ndx_.push_back(this_agent.get_age_index());
+                      fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].sex_.push_back(this_agent.get_sex());
+                      fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].fishery_ndx_.push_back(fishery_ndx);
+                      fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].length_ndx_.push_back(this_agent.get_length_bin_index());
+                      fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].scalar_.push_back(this_agent.get_scalar());
+                      fishery_census_data_[fishery_ndx][catch_ndx][cell_ndx_[fishery_ndx]].weight_.push_back(this_agent.get_weight());
+
+                      if (scanning_ & scanning_this_year_[fishery_ndx]) {
+                        // Probability of scanning agent
+                        if (rng.chance() <= scanning_proportion_by_fishery_[fishery_ndx][catch_ndx]) {
+                          // We scanned this agent
+                          tag_recapture_info.scanned_fish_ += this_agent.get_scalar();
+                          if (this_agent.get_number_tags() > 0) {
+                            //fish has a tag record it
+                            tag_recapture_info.age_.push_back(this_agent.get_age());
+                            tag_recapture_info.sex_.push_back(this_agent.get_sex());
+                            tag_recapture_info.length_.push_back(this_agent.get_length());
+                            tag_recapture_info.fishery_ndx_.push_back(fishery_ndx);
+                            tag_recapture_info.time_at_liberty_.push_back(this_agent.get_time_at_liberty(time_step));
+                            tag_recapture_info.length_increment_.push_back(this_agent.get_length_increment_since_tag());
+                            tag_recapture_info.tag_row_.push_back(this_agent.get_tag_row());
+                            tag_recapture_info.tag_col_.push_back(this_agent.get_tag_col());
+                          }
+                        }
+                      }
+                      LOG_FINE() << "skipping this agent " << this_agent.is_alive()  << " with age = " << this_agent.get_age();
+                      cell->remove_agent_alive(this_agent.get_scalar());
+                      this_agent.dies();
+                      LOG_FINE() << "this_agent is alive = " << this_agent.is_alive();
                     }
-                    // Make sure we don't end up fishing for infinity
-                    if (catch_attempts >= catch_max) {
-                     LOG_WARNING() << "Too many attempts to catch an agent in the process " << label_ << " in year " << model_->current_year() << " in row " << row + 1 << " and column " << col + 1 << ", remaining catch to take = " << catch_taken << " this most likely means you have" <<
-                         " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation. attempts = " << catch_attempts << " max attempts allowed = " << catch_max;
-                     // Kick out of this cell
-                     break;
-                    }
-                    ++counter;
                   }
+                  // Make sure we don't end up fishing for infinity
+                  if (catch_attempts >= catch_max) {
+                   LOG_WARNING() << "Too many attempts to catch an agent in the process " << label_ << " in year " << model_->current_year() << " in row " << row + 1 << " and column " << col + 1 << ", remaining catch to take = " << catch_taken << " this most likely means you have" <<
+                       " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation. attempts = " << catch_attempts << " max attempts allowed = " << catch_max;
+                   // Kick out of this cell
+                   break;
+                  }
+                  ++counter;
                 } // while (catch_taken > 0
 
                 for (auto& catch_ : catch_to_take_by_fishery_) {
@@ -494,9 +717,11 @@ void MortalityEventBiomass::DoExecute() {
                   removals_tag_recapture_.push_back(tag_recapture_info);
                 }
               } //if (catch_taken > 0) {
+              LOG_FINE() << "cell " << row << "-" << col << " = " << cell->get_total_individuals_alive();
             } // cell ->is_enabled()
           } // col
         } // row
+*/
         } else {
         LOG_FINE() << "Applying length based F";
         float world_catch_to_take = 0;
@@ -834,31 +1059,33 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
   if (print_extra_info_) {
     if (removals_tag_recapture_.size() > 0) {
       for (auto& tag_recapture : removals_tag_recapture_) {
-        cache << "tag_recapture_info-" << tag_recapture.year_ << "-" << tag_recapture.row_ << "-" << tag_recapture.col_ << " " << REPORT_R_LIST << "\n";
-        cache << "scanned_fish: " << tag_recapture.scanned_fish_ << "\n";
-        cache << "values " << REPORT_R_MATRIX << "\n";
+        if (tag_recapture.age_.size() > 0) {
+          cache << "tag_recapture_info-" << tag_recapture.year_ << "-" << tag_recapture.row_ << "-" << tag_recapture.col_ << " " << REPORT_R_LIST << "\n";
+          cache << "scanned_fish: " << tag_recapture.scanned_fish_ << "\n";
+          cache << "values " << REPORT_R_MATRIX << "\n";
 
-        LOG_MEDIUM() << "ages = " << tag_recapture.age_.size();
+          LOG_MEDIUM() << "ages = " << tag_recapture.age_.size();
 
-        //cache << "age length length-increment time_at_liberty\n";
-        for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
-          cache << tag_recapture.age_[ndx] << " ";
-        cache << "\n";
-        for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
-          cache << tag_recapture.length_[ndx] << " ";
-        cache << "\n";
-        for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
-          cache << tag_recapture.time_at_liberty_[ndx] << " ";
-        cache << "\n";
-        for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
-          cache << tag_recapture.length_increment_[ndx] << " ";
-        cache << "\n";
-        for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
-          cache << tag_recapture.tag_row_[ndx] << " ";
-        cache << "\n";
-        for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
-          cache << tag_recapture.tag_col_[ndx] << " ";
-        cache << "\n" << REPORT_R_LIST_END << "\n";
+          //cache << "age length length-increment time_at_liberty\n";
+          for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+            cache << tag_recapture.age_[ndx] << " ";
+          cache << "\n";
+          for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+            cache << tag_recapture.length_[ndx] << " ";
+          cache << "\n";
+          for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+            cache << tag_recapture.time_at_liberty_[ndx] << " ";
+          cache << "\n";
+          for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+            cache << tag_recapture.length_increment_[ndx] << " ";
+          cache << "\n";
+          for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+            cache << tag_recapture.tag_row_[ndx] << " ";
+          cache << "\n";
+          for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
+            cache << tag_recapture.tag_col_[ndx] << " ";
+          cache << "\n" << REPORT_R_LIST_END << "\n";
+        }
       }
     }
 
@@ -867,13 +1094,15 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
     for(unsigned fish_ndx = 0; fish_ndx < fishery_census_data_.size(); ++fish_ndx) {
       for(unsigned year_ndx = 0; year_ndx < fishery_census_data_[fish_ndx].size(); ++year_ndx) {
         for(unsigned cell_ndx = 0; cell_ndx < fishery_census_data_[fish_ndx][year_ndx].size(); ++cell_ndx) {
-          cache << "census_info-" << fishery_label_[fishery_index_[fish_ndx]] << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].year_ << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].row_ << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].col_ << " " << REPORT_R_MATRIX << "\n";
-          for (unsigned age_ndx = 0; age_ndx < fishery_census_data_[fish_ndx][year_ndx][cell_ndx].age_ndx_.size(); ++age_ndx)
-            cache << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].age_ndx_[age_ndx] + model_->min_age() << " ";
-          cache << "\n";
-          for (unsigned length_ndx = 0; length_ndx < fishery_census_data_[fish_ndx][year_ndx][cell_ndx].length_ndx_.size(); ++length_ndx)
-            cache << model_->length_bin_mid_points()[fishery_census_data_[fish_ndx][year_ndx][cell_ndx].length_ndx_[length_ndx]] << " ";
-          cache << "\n";
+          if (fishery_census_data_[fish_ndx][year_ndx][cell_ndx].age_ndx_.size() > 0) {
+            cache << "census_info-" << fishery_label_[fishery_index_[fish_ndx]] << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].year_ << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].row_ << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].col_ << " " << REPORT_R_MATRIX << "\n";
+            for (unsigned age_ndx = 0; age_ndx < fishery_census_data_[fish_ndx][year_ndx][cell_ndx].age_ndx_.size(); ++age_ndx)
+              cache << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].age_ndx_[age_ndx] + model_->min_age() << " ";
+            cache << "\n";
+            for (unsigned length_ndx = 0; length_ndx < fishery_census_data_[fish_ndx][year_ndx][cell_ndx].length_ndx_.size(); ++length_ndx)
+              cache << model_->length_bin_mid_points()[fishery_census_data_[fish_ndx][year_ndx][cell_ndx].length_ndx_[length_ndx]] << " ";
+            cache << "\n";
+          }
         }
       }
     }

@@ -66,6 +66,7 @@ protected:
   vector<unsigned>                    scanning_years_;
   vector<vector<float>>               scanning_proportion_by_fishery_; // n_fishery * n_years;
   bool                                scanning_ = false;
+  bool                                account_for_tag_population_ = false;
   vector<bool>                        scanning_this_year_; // n_fishery
 
   // For reporting
