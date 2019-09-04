@@ -270,61 +270,86 @@ for(i in 1:N_rep) {
 barplot(rbind(Freq.y,Freq.alt,Freq.R, Freq.my),beside=T,main="")
 
 
-
 ## Also find out at what point should we even care about this. when does this really become an issue
 ## vulnerable in a fishing event
-boots = 500;
+boots = 1000;
 set.seed(123)
 tags_to_look_at = c(100, 1000, 2000, 5000)
-scalars = c(1,10,50)
-results = array(0, dim = c(boots, length(scalars), length(tags_to_look_at)))
-
+scalars = c(100,50,10,5,1)
+tag_counts = results = array(0, dim = c(boots, length(scalars), length(tags_to_look_at)))
+population = 1000000
 ## should possible look at these two
-catch = 1000 # abundance - individuals, scanning 
-n_agents = 5000
+catch = 5000 # abundance - individuals, scanning 
 
 startTime<-Sys.time()
 scalar_ndx = 1;
 tag_ndx = 1;
 for(scalar in scalars) {
 	print(scalar)
-  	tag_ndx = 1;
+  tag_ndx = 1;
 	for(n_tags in tags_to_look_at) {
 		print(paste0("tag = ", n_tags))
-		population = n_agents * scalar
+	  n_agents = as.integer(population / scalar)
 		tags = rep(0,n_agents)
 		weights = rep(scalar, n_agents)
 		# apply tagging, all agents have equal prob of being tagged
 		tag_agent_ndx = sample(x = n_agents, size = n_tags, replace = F)
 		## pull out tagged individuals take away the scalar
 		weights[tag_agent_ndx] = weights[tag_agent_ndx] - 1
-		## initially append taged agents at end and then reshuffle
-		n_new_agents = n_agents + n_tags
-		weights = c(weights, rep(1,n_tags))
-		tags = c(tags, rep(1,n_tags))
-		reshuffle_ndx = sample(1:n_new_agents)
-		weights = weights[reshuffle_ndx]
-		tags = tags[reshuffle_ndx]
-		pop_est = NULL
-		for(i in 1:boots) {
-			## now do recapture event first treating this is as equal probability
-			temp_catch = catch;
-			agent_sampled = c();
-			tag_count = 0;
-			while(temp_catch > 0) {
-			  ndx = reshuffle_ndx = sample(n_new_agents, size = 1)
-			  ## our own ineffecient without replacement sampler, think about moving this two the worldCell
-			  ## and allow sampling without replacement, i.e update probabilities
-			  if(ndx %in% agent_sampled)
-			    next;
-
-			  agent_sampled = c(agent_sampled, ndx)
-			  if (tags[ndx] == 1)
-			    tag_count = tag_count + 1;
-			  temp_catch = temp_catch - weights[ndx]
-			}
-			pop_est = ((n_tags+1)*(catch+1)/(tag_count+1))-1
-			results[i,scalar_ndx, tag_ndx] = pop_est
+		untagged_pop = data.frame(weight = weights, tagged = 0)
+		tagged_pop = data.frame(weight = rep(1,n_tags), tagged = 1)
+		
+		## now do recapture event first treating this is as equal probability
+	  prob_untagged = sum(untagged_pop$weight) / population
+	  prob_tagged = sum(tagged_pop$weight) / population
+	  #full_prob = c(prob_tagged, prob_untagged)
+	  ## Adapt probability for sampling of entire agents at a time
+	  prob_untagged = prob_untagged / scalar
+	  prob_tagged = prob_tagged / (prob_untagged + prob_tagged)
+	  prob_untagged = 1 - prob_tagged
+	  pop_est = NULL
+	  for(bt in 1:boots) {
+	    temp_untagged_pop = untagged_pop
+	    temp_tagged_pop = tagged_pop
+	    temp_catch = catch
+	    ## now do recapture event first treating this is as equal probability
+	    tag_count = 0
+	    agent_ndx_sampled = c()
+	    while(temp_catch > 0) {
+	      agent_tag = rbinom(n = c(1), size = 1, prob = prob_tagged)
+	      ## now find agent and sample
+	      if (agent_tag == 0) {
+	        agent_ndx = sample(1:nrow(temp_untagged_pop), size = 1)
+	        counter = 0;
+	        while ((temp_untagged_pop$weight[agent_ndx] == 0) | (counter > 5)) {
+	          agent_ndx = sample(1:nrow(temp_untagged_pop), size = 1)
+	          counter = counter + 1
+	        }
+          if (counter > 5)
+            break
+	        agent_ndx_sampled = c(agent_ndx_sampled,agent_ndx)
+	        temp_catch = temp_catch - temp_untagged_pop$weight[agent_ndx];
+	        temp_untagged_pop$weight[agent_ndx] = 0.0
+        } else  {
+	        agent_ndx = sample(1:nrow(temp_tagged_pop), size = 1)
+	        counter = 0;
+	        while ((temp_tagged_pop$weight[agent_ndx] == 0) | (counter > 5)) {
+	          agent_ndx = sample(1:nrow(temp_tagged_pop), size = 1)
+	          counter = counter + 1
+	        }
+          if (counter > 5)
+            break
+	        agent_ndx_sampled = c(agent_ndx_sampled,agent_ndx)
+	        temp_catch = temp_catch - temp_tagged_pop$weight[agent_ndx];
+	        temp_tagged_pop$weight[agent_ndx] = 0.0
+	        tag_count = tag_count + 1;
+	      }
+	    }
+	    #tag_count 
+	    #catch * sum(tagged_pop$weight) / population
+	    pop_est = ((n_tags+1)*(catch+1)/(tag_count+1))-1
+	    results[bt, scalar_ndx, tag_ndx] = pop_est
+	    tag_counts[bt, scalar_ndx, tag_ndx] = tag_count
 		}
 		tag_ndx = tag_ndx + 1;
 	}
@@ -336,7 +361,7 @@ bias = estimated = cv = true = matrix(0,nrow = length(scalars), ncol = length(ta
 scalar_ndx = 1;
 tag_ndx = 1;
 for(scalar_ndx in 1:length(scalars)) {
-	population = n_agents * scalars[scalar_ndx]
+  n_agents = population / scalars[scalar_ndx]
 	for(tag_ndx in 1:length(tags_to_look_at)) {
 		rmsd = RMSD(population, results[,scalar_ndx, tag_ndx])
 		bias[scalar_ndx,tag_ndx] = rmsd[1,"bias"]
@@ -345,8 +370,16 @@ for(scalar_ndx in 1:length(scalars)) {
 		true[scalar_ndx,tag_ndx] = rmsd[1,"true"]
 	}
 }
+
+
 dimnames(true) = dimnames(bias) = dimnames(cv) = dimnames(estimated) = list(scalars, tags_to_look_at)
 bias
+estimated
+true
+
+write.table(bias, file = make.filename(file = "Tables\\Bias.txt", path = DIR$Base), quote = F)
+write.table(true, file = make.filename(file = "Tables\\true.txt", path = DIR$Base), quote = F)
+write.table(estimated, file = make.filename(file = "Tables\\estimated.txt", path = DIR$Base), quote = F)
 
 ## so makes a big difference if small tag population to overall population.
 weighted_Random_Sample <- function(
