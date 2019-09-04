@@ -23,7 +23,7 @@
 #include "Utilities/DoubleCompare.h"
 #include "Utilities/Types.h"
 #include <boost/math/distributions/normal.hpp>
-
+#include <numeric>
 #define PI 3.14159265358979
 
 // Namespaces

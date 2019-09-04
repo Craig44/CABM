@@ -239,10 +239,11 @@ void LogisticNormal::calculate_covariance() {
         binlab.push_back(ages);
         cout << ages << " ";
       }
-      if (arma_ && n_phi == 2)
+      if (arma_ && n_phi == 2) {
         rhovec = GetRho(rho_,unique_bins_,arma_);
-      else if (!arma_ && n_phi == 2)
+      } else if (!arma_ && n_phi == 2) {
         rhovec = GetRho(rho_,unique_bins_ + 1,arma_);
+      }
         vector<int> col_vec, row_vec, offset_vec;
 
         for (unsigned row = 0; row < n_bins_; ++row) {
