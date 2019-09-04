@@ -56,10 +56,10 @@
     ## create a labels for blocks that do not take a label following the @block statement
     exception_blocks = c("model","categories")
     ## a list of tables that don't have headers    
-    non_header_tables = c("obs","data","error_values","table")
+    non_header_tables = c("obs","data","error_values","table", "layer")
     ## there are three types of tables, 1) tables with headers (Instant mortality) 2) tables with row labels (observations and error values) and 3)tables that are just a matrix (ageing error)
     ans <- list()
-    print(paste("The 'csl' input parameter file has", length(file[substring(file, 1, 1) == "@"]), "commands, and", length(file), "lines"))
+    print(paste("The 'ibm' input parameter file has", length(file[substring(file, 1, 1) == "@"]), "commands, and", length(file), "lines"))
     CommandCount <- 0
     ## A global variable to tell us if we are still inputing a table
     in_table = FALSE;
@@ -141,6 +141,12 @@
                     } else {
                        mat = rbind(mat, temp); 
                     }
+                  } else if (Label == "layer") {
+                    if (header == 2) {
+                       mat = temp;
+                    } else {
+                       mat = rbind(mat, temp); 
+                    }                  
                   } else {  
                     table_list[[temp[1]]] = temp[-1];
                   }
@@ -151,7 +157,7 @@
                  ## we are leaving the table inputs
                  in_table = FALSE;  
                  header = 1;
-                 if (!Label == "table") {
+                 if (!Label %in% c("table","layer")) {
                   for (k in 1:length(names(table_list))) {
                     eval(parse(text= paste("ans[['",Command,"']]$Table$",Label,"[['",names(table_list)[k], "']] = table_list$'",names(table_list)[k] ,"'" ,sep="")));
                   }
