@@ -185,6 +185,25 @@ void WorldView::MergeCachedGrid() {
            }
         }
         cached_grid_[i][j].agents_.clear();
+        // Now do tagged agents
+        last_agent_ndx = 0;
+        for (unsigned cache_agent_ndx = 0; cache_agent_ndx < cached_grid_[i][j].tagged_agents_.size(); ++cache_agent_ndx) {
+          base_grid_[i][j].add_agent_alive(cached_grid_[i][j].tagged_agents_[cache_agent_ndx].get_scalar());
+
+          while(last_agent_ndx < base_grid_[i][j].tagged_agents_.size()) {
+            if (not base_grid_[i][j].tagged_agents_[last_agent_ndx].is_alive()) {
+              base_grid_[i][j].tagged_agents_[last_agent_ndx] = cached_grid_[i][j].tagged_agents_[cache_agent_ndx];
+              break;
+            } else {
+              last_agent_ndx++;
+            }
+          }
+          //LOG_FINEST() << "last_agent_ndx " << last_agent_ndx << " size = " << base_grid_[i][j].agents_.size();
+          if (last_agent_ndx >= base_grid_[i][j].tagged_agents_.size()) {
+              base_grid_[i][j].tagged_agents_.push_back(cached_grid_[i][j].tagged_agents_[cache_agent_ndx]);
+           }
+        }
+        cached_grid_[i][j].tagged_agents_.clear();
         LOG_FINE() << "cell " << i << "-" << j << " = " << base_grid_[i][j].get_total_individuals_alive();
       }
     }
@@ -194,22 +213,17 @@ void WorldView::MergeCachedGrid() {
 
 void WorldView::MergeCachedGrid(bool update_lat_long) {
   LOG_FINE();
-  double overall = 0.0;
   for (unsigned i = 0; i < height_; ++i) {  // Can't thread this, each cell has a pointer to growth and mortality for update agent, so there is a hidden shared resouce....
     for (unsigned j = 0; j < width_; ++j) {
       if (base_grid_[i][j].is_enabled()) {
-        double start = base_grid_[i][j].get_total_individuals_alive();
-        LOG_FINE() << "before = " << start;
         float lat_mid = base_grid_[i][j].get_lat();
         float lon_mid = base_grid_[i][j].get_lon();
-
         LOG_FINE() << "agents to merge into row " << i << " col = " << j  << " = " << cached_grid_[i][j].agents_.size();
         // Are we updateing agents parameters
         cached_grid_[i][j].update_agent_parameters();
         // Iterate over all source agents and find dead agents to override
         unsigned last_agent_ndx = 0;
         for (unsigned cache_agent_ndx = 0; cache_agent_ndx < cached_grid_[i][j].agents_.size(); ++cache_agent_ndx) {
-          overall += cached_grid_[i][j].agents_[cache_agent_ndx].get_scalar();
           base_grid_[i][j].add_agent_alive(cached_grid_[i][j].agents_[cache_agent_ndx].get_scalar());
 
           if (update_lat_long) {
@@ -231,11 +245,34 @@ void WorldView::MergeCachedGrid(bool update_lat_long) {
            }
         }
         cached_grid_[i][j].agents_.clear();
-        LOG_FINE() << "cell " << i << "-" << j << " = " << base_grid_[i][j].get_total_individuals_alive();
+
+        last_agent_ndx = 0;
+        for (unsigned cache_agent_ndx = 0; cache_agent_ndx < cached_grid_[i][j].tagged_agents_.size(); ++cache_agent_ndx) {
+          base_grid_[i][j].add_agent_alive(cached_grid_[i][j].tagged_agents_[cache_agent_ndx].get_scalar());
+
+          if (update_lat_long) {
+            cached_grid_[i][j].tagged_agents_[cache_agent_ndx].set_lat(lat_mid);
+            cached_grid_[i][j].tagged_agents_[cache_agent_ndx].set_lon(lon_mid);
+          }
+
+          while(last_agent_ndx < base_grid_[i][j].tagged_agents_.size()) {
+            if (not base_grid_[i][j].tagged_agents_[last_agent_ndx].is_alive()) {
+              base_grid_[i][j].tagged_agents_[last_agent_ndx] = cached_grid_[i][j].tagged_agents_[cache_agent_ndx];
+              break;
+            } else {
+              last_agent_ndx++;
+            }
+          }
+          //LOG_FINEST() << "last_agent_ndx " << last_agent_ndx << " size = " << base_grid_[i][j].agents_.size();
+          if (last_agent_ndx >= base_grid_[i][j].tagged_agents_.size()) {
+              base_grid_[i][j].tagged_agents_.push_back(cached_grid_[i][j].tagged_agents_[cache_agent_ndx]);
+           }
+        }
+        cached_grid_[i][j].tagged_agents_.clear();
+
       }
     }
   }
-  LOG_FINE() << "moved overall = " << overall;
   LOG_FINE() << "finished merging world";
 }
 
@@ -250,6 +287,8 @@ void WorldView::CachedWorldForInit() {
     for (unsigned j = 0; j < width_; ++j) {
       if (base_grid_[i][j].is_enabled()) {
         init_cached_grid_[i][j].agents_ = base_grid_[i][j].agents_;
+        init_cached_grid_[i][j].tagged_agents_ = base_grid_[i][j].tagged_agents_;
+
         individuals = base_grid_[i][j].get_total_individuals_alive();
         init_cached_grid_[i][j].set_total_individuals_alive(individuals);
       }
@@ -270,6 +309,7 @@ void WorldView::MergeWorldForInit() {
     for (unsigned j = 0; j < width_; ++j) {
       if (base_grid_[i][j].is_enabled()) {
         base_grid_[i][j].agents_ = init_cached_grid_[i][j].agents_;
+        base_grid_[i][j].tagged_agents_ = init_cached_grid_[i][j].tagged_agents_;
         individuals = base_grid_[i][j].get_total_individuals_alive();
         base_grid_[i][j].set_total_individuals_alive(individuals);
       }
@@ -302,11 +342,11 @@ void WorldView::get_cell_element(unsigned& row, unsigned& col, const float lat, 
  * This method gets the age frequencey of the world, this is called in intialisation to see if we have meet an equilibrium state
  *
 */
-void WorldView::get_world_age_frequency(vector<unsigned>& world_age_freq) {
+void WorldView::get_world_age_frequency(vector<float>& world_age_freq) {
   LOG_TRACE();
   world_age_freq.clear();
   world_age_freq.resize(model_->age_spread());
-  vector<unsigned> temp;
+  vector<float> temp;
   for (unsigned i = 0; i < height_; ++i) {
     for (unsigned j = 0; j < width_; ++j) {
       if (base_grid_[i][j].is_enabled()) {
@@ -342,7 +382,6 @@ void WorldView::rebuild_agent_time_varying_params() {
           }
           if (update_mortality_params_)
             base_grid_[i][j].apply_mortality_time_varying();
-
         }
       }
     }

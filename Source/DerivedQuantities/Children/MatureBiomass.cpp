@@ -84,7 +84,7 @@ void MatureBiomass::PreExecute() {
  */
 void MatureBiomass::Execute() {
   LOG_FINE() << "DQ " << label_;
-  float value = 0.0;
+  value_ = 0.0;
   if (!utilities::doublecompare::IsZero(time_step_proportion_)) {
     unsigned time_step_index = model_->managers().time_step()->current_time_step();
     LOG_FINE() << "Time step for calculating biomass = " << time_step_index;
@@ -96,11 +96,11 @@ void MatureBiomass::Execute() {
           continue;
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
-          value += cell->get_mature_biomass();
+          value_ += cell->get_mature_biomass();
         }
       }
     }
-    LOG_FINEST() << "executing and value = " << value;
+    LOG_FINEST() << "executing and value = " << value_;
   }
 
   if (model_->state() == State::kInitialise) {
@@ -116,22 +116,22 @@ void MatureBiomass::Execute() {
       b0_value = cache_value_;
       initialisation_values_[initialisation_phase].push_back(b0_value);
     } else if (utilities::doublecompare::IsOne(time_step_proportion_)) {
-      b0_value = value;
+      b0_value = value_;
       initialisation_values_[initialisation_phase].push_back(b0_value);
     } else {
-      b0_value = cache_value_ + ((value - cache_value_) * time_step_proportion_);
+      b0_value = cache_value_ + ((value_ - cache_value_) * time_step_proportion_);
       initialisation_values_[initialisation_phase].push_back(b0_value);
     }
-    LOG_FINEST() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value << " Final value " << *initialisation_values_[initialisation_phase].rbegin();
+    LOG_FINEST() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value_ << " Final value " << *initialisation_values_[initialisation_phase].rbegin();
   } else {
     if (utilities::doublecompare::IsZero(time_step_proportion_))
       values_[model_->current_year()] = cache_value_;
     else if (utilities::doublecompare::IsOne(time_step_proportion_))
-      values_[model_->current_year()] = value;
+      values_[model_->current_year()] = value_;
     else
-      values_[model_->current_year()] = cache_value_ + ((value - cache_value_) * time_step_proportion_);
+      values_[model_->current_year()] = cache_value_ + ((value_ - cache_value_) * time_step_proportion_);
 
-    LOG_FINEST() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value << " Final value " << values_[model_->current_year()];
+    LOG_FINEST() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value_ << " Final value " << values_[model_->current_year()];
 
   }
 

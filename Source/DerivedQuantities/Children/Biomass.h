@@ -16,6 +16,7 @@
 #include "DerivedQuantities/DerivedQuantity.h"
 
 #include "Layers/Children/IntLayer.h"
+#include "Agents/Agent.h"
 
 // namespaces
 namespace niwa {
@@ -33,12 +34,13 @@ public:
   void                        Execute() override final;
   void                        DoValidate() override final;
   void                        DoBuild() override final;
+  void                        CalcBiomass(vector<Agent>& agents, float& value);
 
 protected:
   string                      biomass_layer_label_;
   niwa::layers::IntLayer*     biomass_layer_ = nullptr;
-  vector<string>                      selectivity_label_;
-  vector<Selectivity*>                selectivity_;
+  vector<string>              selectivity_label_;
+  vector<Selectivity*>        selectivity_;
   bool                        length_based_selectivity_ = false;
 };
 

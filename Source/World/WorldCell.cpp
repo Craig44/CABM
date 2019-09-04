@@ -222,13 +222,16 @@ void  WorldCell::apply_mortality_time_varying() {
   LOG_FINE() << " ";
   unsigned counter = 0;
   vector<float> mort_par;
-  mortality_->draw_rate_param(row_, col_, agents_.size(), mort_par);
+  mortality_->draw_rate_param(row_, col_, agents_.size() + tagged_agents_.size(), mort_par);
   LOG_FINE() << " ";
   for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
     if ( (*iter).is_alive())
       (*iter).set_m(mort_par[counter]);
   }
-
+  for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
+    if ( (*iter).is_alive())
+      (*iter).set_m(mort_par[counter]);
+  }
 }
 
 /*
@@ -240,12 +243,29 @@ void  WorldCell::apply_growth_time_varying() {
   unsigned counter = 0;
   vector<vector<float>> growth_pars;
   vector<vector<float>> female_growth_pars;
-  growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars, 0);
+  growth_->draw_growth_param(row_, col_, agents_.size() + tagged_agents_.size(), growth_pars, 0);
   if (model_->get_sexed()) {
-    growth_->draw_growth_param(row_, col_, agents_.size(), female_growth_pars, 1);
+    growth_->draw_growth_param(row_, col_, agents_.size() + tagged_agents_.size(), female_growth_pars, 1);
   }
 
   for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+    if ( (*iter).is_alive()) {
+      if ((*iter).get_sex() == 0) {
+        (*iter).set_first_age_length_par(growth_pars[counter][0]);
+        (*iter).set_second_age_length_par(growth_pars[counter][1]);
+        (*iter).set_third_age_length_par(growth_pars[counter][2]);
+        (*iter).set_first_length_weight_par(growth_pars[counter][3]);
+        (*iter).set_second_length_weight_par(growth_pars[counter][4]);
+      } else {
+        (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+        (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+        (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+        (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
+        (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+      }
+    }
+  }
+  for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
     if ( (*iter).is_alive()) {
       if ((*iter).get_sex() == 0) {
         (*iter).set_first_age_length_par(growth_pars[counter][0]);
@@ -275,9 +295,9 @@ void  WorldCell::update_agent_parameters() {
     mortality_->draw_rate_param(row_, col_, agents_.size(), mort_par);
     vector<vector<float>> growth_pars;
     vector<vector<float>> female_growth_pars;
-    growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars, 0);
+    growth_->draw_growth_param(row_, col_, agents_.size() + tagged_agents_.size(), growth_pars, 0);
     if (model_->get_sexed()) {
-      growth_->draw_growth_param(row_, col_, agents_.size(), female_growth_pars, 1);
+      growth_->draw_growth_param(row_, col_, agents_.size() + tagged_agents_.size(), female_growth_pars, 1);
     }
 
     for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
@@ -298,10 +318,33 @@ void  WorldCell::update_agent_parameters() {
         (*iter).set_m(mort_par[counter]);
       }
     }
+    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
+      if ( (*iter).is_alive()) {
+        if ((*iter).get_sex() == 0) {
+          (*iter).set_first_age_length_par(growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(growth_pars[counter][2]);
+          (*iter).set_first_length_weight_par(growth_pars[counter][3]);
+          (*iter).set_second_length_weight_par(growth_pars[counter][4]);
+        } else {
+          (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+          (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
+          (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+        }
+        (*iter).set_m(mort_par[counter]);
+      }
+    }
   } else if (!growth_->update_growth() && mortality_->update_mortality()) {
     vector<float> mort_par;
-    mortality_->draw_rate_param(row_, col_, agents_.size(), mort_par);
+    mortality_->draw_rate_param(row_, col_, agents_.size() + tagged_agents_.size(), mort_par);
     for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+      if ( (*iter).is_alive()) {
+        (*iter).set_m(mort_par[counter]);
+      }
+    }
+    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
       if ( (*iter).is_alive()) {
         (*iter).set_m(mort_par[counter]);
       }
@@ -309,11 +352,28 @@ void  WorldCell::update_agent_parameters() {
   } else if (growth_->update_growth() && !mortality_->update_mortality()) {
     vector<vector<float>> growth_pars;
     vector<vector<float>> female_growth_pars;
-    growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars, 0);
+    growth_->draw_growth_param(row_, col_, agents_.size() + tagged_agents_.size(), growth_pars, 0);
     if (model_->get_sexed()) {
-      growth_->draw_growth_param(row_, col_, agents_.size(), female_growth_pars, 1);
+      growth_->draw_growth_param(row_, col_, agents_.size() + tagged_agents_.size(), female_growth_pars, 1);
     }
     for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+      if ( (*iter).is_alive()) {
+        if ((*iter).get_sex() == 0) {
+          (*iter).set_first_age_length_par(growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(growth_pars[counter][2]);
+          (*iter).set_first_length_weight_par(growth_pars[counter][3]);
+          (*iter).set_second_length_weight_par(growth_pars[counter][4]);
+        } else {
+          (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+          (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
+          (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+        }
+      }
+    }
+    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
       if ( (*iter).is_alive()) {
         if ((*iter).get_sex() == 0) {
           (*iter).set_first_age_length_par(growth_pars[counter][0]);
@@ -340,8 +400,13 @@ void  WorldCell::update_mortality_params() {
   LOG_FINE() << "this method assumes the mean values have been changed in the corresponding class, for example the M value has changed";
   vector<float> mort_par;
   unsigned counter = 0;
-  mortality_->draw_rate_param(row_, col_, agents_.size(), mort_par);
+  mortality_->draw_rate_param(row_, col_, agents_.size() + tagged_agents_.size(), mort_par);
   for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+    if ( (*iter).is_alive()) {
+      (*iter).set_m(mort_par[counter]);
+    }
+  }
+  for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
     if ( (*iter).is_alive()) {
       (*iter).set_m(mort_par[counter]);
     }
@@ -355,12 +420,29 @@ void  WorldCell::update_growth_params() {
   LOG_FINE() << "Updating growth params based on time varying parameters";
   vector<vector<float>> growth_pars;
   vector<vector<float>> female_growth_pars;
-  growth_->draw_growth_param(row_, col_, agents_.size(), growth_pars, 0);
+  growth_->draw_growth_param(row_, col_, agents_.size() + tagged_agents_.size (), growth_pars, 0);
   if (model_->get_sexed()) {
-    growth_->draw_growth_param(row_, col_, agents_.size(), female_growth_pars, 1);
+    growth_->draw_growth_param(row_, col_, agents_.size() + tagged_agents_.size(), female_growth_pars, 1);
   }
   unsigned counter = 0;
   for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+    if ( (*iter).is_alive()) {
+      if ((*iter).get_sex() == 0) {
+        (*iter).set_first_age_length_par(growth_pars[counter][0]);
+        (*iter).set_second_age_length_par(growth_pars[counter][1]);
+        (*iter).set_third_age_length_par(growth_pars[counter][2]);
+        (*iter).set_first_length_weight_par(growth_pars[counter][3]);
+        (*iter).set_second_length_weight_par(growth_pars[counter][4]);
+      } else {
+        (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+        (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+        (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+        (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
+        (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+      }
+    }
+  }
+  for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
     if ( (*iter).is_alive()) {
       if ((*iter).get_sex() == 0) {
         (*iter).set_first_age_length_par(growth_pars[counter][0]);
@@ -388,6 +470,12 @@ float  WorldCell::get_abundance() {
     if (agent.is_alive())
       abundance += agent.get_scalar();
   }
+  for (auto& agent : tagged_agents_) {
+    if (agent.is_alive() & agent.get_maturity()) {
+      //LOG_FINEST() << "weight = " << agent.get_weight() << " scalar = " << agent.get_scalar();
+      abundance += agent.get_scalar();
+    }
+  }
   return abundance;
 }
 
@@ -399,6 +487,12 @@ float  WorldCell::get_biomass() {
   for (auto& agent : agents_) {
     if (agent.is_alive())
       biomass += agent.get_weight() * agent.get_scalar();
+  }
+  for (auto& agent : tagged_agents_) {
+    if (agent.is_alive() & agent.get_maturity()) {
+      //LOG_FINEST() << "weight = " << agent.get_weight() << " scalar = " << agent.get_scalar();
+      biomass += agent.get_weight() * agent.get_scalar();
+    }
   }
   return biomass;
 }
@@ -414,6 +508,12 @@ float  WorldCell::get_mature_biomass() {
       biomass += agent.get_weight() * agent.get_scalar();
     }
   }
+  for (auto& agent : tagged_agents_) {
+    if (agent.is_alive() & agent.get_maturity()) {
+      //LOG_FINEST() << "weight = " << agent.get_weight() << " scalar = " << agent.get_scalar();
+      biomass += agent.get_weight() * agent.get_scalar();
+    }
+  }
   return biomass;
 }
 
@@ -421,12 +521,17 @@ float  WorldCell::get_mature_biomass() {
 /*
  * Returns the age frequency of agents in this cell
 */
-void  WorldCell::get_age_frequency(vector<unsigned>& age_freq) {
+void  WorldCell::get_age_frequency(vector<float>& age_freq) {
   age_freq.clear();
   age_freq.resize(model_->age_spread(),0);
   for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
     if ((*iter).is_alive()) {
-      age_freq[(*iter).get_age_index()]++;
+      age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
+    }
+  }
+  for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
+    if ((*iter).is_alive()) {
+      age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
     }
   }
 }
@@ -436,12 +541,17 @@ void  WorldCell::get_age_frequency(vector<unsigned>& age_freq) {
 /*
  * Return male age frequency
 */
-void  WorldCell::get_male_frequency(vector<unsigned>& age_freq) {
+void  WorldCell::get_male_frequency(vector<float>& age_freq) {
   age_freq.clear();
   age_freq.resize(model_->age_spread(),0);
   for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
     if ((*iter).is_alive() and (*iter).get_sex() == 0) {
-      age_freq[(*iter).get_age_index()]++;
+      age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
+    }
+  }
+  for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
+    if ((*iter).is_alive() and (*iter).get_sex() == 0) {
+      age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
     }
   }
 }
@@ -450,12 +560,17 @@ void  WorldCell::get_male_frequency(vector<unsigned>& age_freq) {
 /*
  * Returns total female age frequency
 */
-void  WorldCell::get_female_frequency(vector<unsigned>& age_freq) {
+void  WorldCell::get_female_frequency(vector<float>& age_freq) {
   age_freq.clear();
   age_freq.resize(model_->age_spread(),0);
   for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
     if ((*iter).is_alive() and (*iter).get_sex() == 1) {
-      age_freq[(*iter).get_age_index()]++;
+      age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
+    }
+  }
+  for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
+    if ((*iter).is_alive() and (*iter).get_sex() == 1) {
+      age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
     }
   }
 }

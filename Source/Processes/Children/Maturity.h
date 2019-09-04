@@ -15,7 +15,7 @@
 
 // headers
 #include "Processes/Process.h"
-#include <omp.h>
+#include "Agents/Agent.h"
 
 // namespaces
 namespace niwa {
@@ -34,6 +34,8 @@ public:
   void                        DoBuild() override final;
   void                        DoReset() override final { };
   void                        DoExecute() override final;
+  void                        ApplyStochasticMaturity(vector<Agent>& agents);
+
   void                        FillReportCache(ostringstream& cache) override final;
 
 protected:
@@ -45,7 +47,7 @@ protected:
   vector<float>                       random_numbers_;
   unsigned                            n_agents_;
   vector<vector<unsigned>>            cell_offset_;
-
+  unsigned                            mature_conversion_ = 0;
   bool                                length_based_selectivity_ = false;
 };
 

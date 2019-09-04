@@ -59,12 +59,13 @@ void WorldAgeFrequency::DoExecute() {
   cache_ << "*"<< type_ << "[" << label_ << "]" << "\n";
   cache_ << "year: " << model_->current_year() << "\n";
   cache_ << "time_step: " << time_step_ << "\n";
+  LOG_FINE() << "current time-step = " << model_->get_time_step_counter();
   cache_ << "values "<< REPORT_R_DATAFRAME<<"\n";
   for (unsigned i = model_->min_age(); i <=  model_->max_age(); ++i)
     cache_ << i << " ";
   cache_ << "\n";
 
-  vector<unsigned> age_freq;
+  vector<float> age_freq;
   world_->get_world_age_frequency(age_freq);
   LOG_FINEST() << "size of age freq = " << age_freq.size();
 

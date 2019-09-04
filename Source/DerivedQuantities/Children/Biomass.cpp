@@ -85,6 +85,31 @@ void Biomass::DoBuild() {
   }
 }
 
+
+/**
+ * The main function for calculating biomass
+ */
+void Biomass::CalcBiomass(vector<Agent>& agents, float& value) {
+  utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+  if (not length_based_selectivity_) {
+    for(auto& agent : agents) {
+      if (agent.is_alive()) {
+        if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index())) {
+          value += agent.get_weight() * agent.get_scalar();
+        }
+      }
+    }
+  } else {
+    for(auto& agent : agents) {
+      if (agent.is_alive()) {
+        if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index())) {
+          value += agent.get_weight() * agent.get_scalar();
+        }
+      }
+    }
+  }
+}
+
 /**
  * Calculate the cached value to use
  * for any interpolation
@@ -93,73 +118,19 @@ void Biomass::PreExecute() {
   LOG_FINE();
   if (utilities::doublecompare::IsOne(time_step_proportion_))
     return;
-
-  utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-
-  // Pre-calculate agents in the world to set aside our random numbers needed for the operation
-  n_agents_ = 0;
+  cache_value_ = 0.0;
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
+      unsigned val = biomass_layer_->get_value(row, col);
+      if (val <= 0)
+        continue;
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
-        cell_offset_[row][col] = n_agents_;
-        n_agents_ += cell->agents_.size();
+        CalcBiomass(cell->agents_, cache_value_);
+        CalcBiomass(cell->tagged_agents_, cache_value_);
       }
     }
   }
-  // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
-  random_numbers_.resize(n_agents_);
-  for (unsigned i = 0; i < n_agents_; ++i)
-    random_numbers_[i] = rng.chance();
-
-  unsigned time_step_index = model_->managers().time_step()->current_time_step();
-  LOG_FINE() << "Time step for calculating biomass = " << time_step_index;
-
-  cache_value_ = 0.0;
-  if (not length_based_selectivity_) {
-    #pragma omp parallel for collapse(2)
-    for (unsigned row = 0; row < model_->get_height(); ++row) {
-      for (unsigned col = 0; col < model_->get_width(); ++col) {
-        unsigned val = biomass_layer_->get_value(row, col);
-        if (val <= 0)
-          continue;
-        WorldCell* cell = world_->get_base_square(row, col);
-        if (cell->is_enabled()) {
-          unsigned counter = 0;
-          for (Agent& agent : cell->agents_) {
-            if (agent.is_alive()) {
-              if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index())) {
-                cache_value_ += agent.get_weight() * agent.get_scalar();
-              }
-            }
-            ++counter;
-          }
-        }
-      }
-    }
-  } else {
-    #pragma omp parallel for collapse(2)
-    for (unsigned row = 0; row < model_->get_height(); ++row) {
-      for (unsigned col = 0; col < model_->get_width(); ++col) {
-        unsigned val = biomass_layer_->get_value(row, col);
-        if (val <= 0)
-          continue;
-        WorldCell* cell = world_->get_base_square(row, col);
-        if (cell->is_enabled()) {
-          unsigned counter = 0;
-          for (Agent& agent : cell->agents_) {
-            if (agent.is_alive()) {
-              if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index())) {
-                cache_value_ += agent.get_weight() * agent.get_scalar();
-              }
-            }
-            ++counter;
-          }
-        }
-      }
-    }
-  }
-  LOG_TRACE();
 }
 
 /**
@@ -173,70 +144,17 @@ void Biomass::PreExecute() {
  */
 void Biomass::Execute() {
   LOG_FINE();
-  float value = 0.0;
-
+  value_ = 0.0;
   if (!utilities::doublecompare::IsZero(time_step_proportion_)) {
-
-    utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-    // Pre-calculate agents in the world to set aside our random numbers needed for the operation
-    n_agents_ = 0;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
+        unsigned val = biomass_layer_->get_value(row, col);
+        if (val <= 0)
+          continue;
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
-          cell_offset_[row][col] = n_agents_;
-          n_agents_ += cell->agents_.size();
-        }
-      }
-    }
-    // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
-    random_numbers_.resize(n_agents_);
-    for (unsigned i = 0; i < n_agents_; ++i)
-      random_numbers_[i] = rng.chance();
-
-    unsigned time_step_index = model_->managers().time_step()->current_time_step();
-    LOG_FINE() << "Time step for calculating biomass = " << time_step_index;
-
-    if (not length_based_selectivity_) {
-      #pragma omp parallel for collapse(2)
-      for (unsigned row = 0; row < model_->get_height(); ++row) {
-        for (unsigned col = 0; col < model_->get_width(); ++col) {
-          unsigned val = biomass_layer_->get_value(row, col);
-          if (val <= 0)
-            continue;
-          WorldCell* cell = world_->get_base_square(row, col);
-          if (cell->is_enabled()) {
-            unsigned counter = 0;
-            for (Agent& agent : cell->agents_) {
-              if (agent.is_alive()) {
-                if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index())) {
-                  value += agent.get_weight() * agent.get_scalar();
-                }
-              }
-              ++counter;
-            }
-          }
-        }
-      }
-    } else {
-      #pragma omp parallel for collapse(2)
-      for (unsigned row = 0; row < model_->get_height(); ++row) {
-        for (unsigned col = 0; col < model_->get_width(); ++col) {
-          unsigned val = biomass_layer_->get_value(row, col);
-          if (val <= 0)
-            continue;
-          WorldCell* cell = world_->get_base_square(row, col);
-          if (cell->is_enabled()) {
-            unsigned counter = 0;
-            for (Agent& agent : cell->agents_) {
-              if (agent.is_alive()) {
-                if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index())) {
-                  value += agent.get_weight() * agent.get_scalar();
-                }
-              }
-              ++counter;
-            }
-          }
+          CalcBiomass(cell->agents_, value_);
+          CalcBiomass(cell->tagged_agents_, value_);
         }
       }
     }
@@ -253,21 +171,21 @@ void Biomass::Execute() {
       b0_value = cache_value_;
       initialisation_values_[initialisation_phase].push_back(b0_value);
     } else if (utilities::doublecompare::IsOne(time_step_proportion_)) {
-      b0_value = value;
+      b0_value = value_;
       initialisation_values_[initialisation_phase].push_back(b0_value);
     } else  {
-      b0_value = cache_value_ + ((value - cache_value_) * time_step_proportion_);
+      b0_value = cache_value_ + ((value_ - cache_value_) * time_step_proportion_);
       initialisation_values_[initialisation_phase].push_back(b0_value);
     }
   } else {
     if (utilities::doublecompare::IsZero(time_step_proportion_))
       values_[model_->current_year()] = cache_value_;
     else if (utilities::doublecompare::IsOne(time_step_proportion_))
-      values_[model_->current_year()] = value;
+      values_[model_->current_year()] = value_;
     else
-      values_[model_->current_year()] = cache_value_ + ((value - cache_value_) * time_step_proportion_);
+      values_[model_->current_year()] = cache_value_ + ((value_ - cache_value_) * time_step_proportion_);
 
-    LOG_FINEST() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value << " Final value ";
+    LOG_FINEST() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value_ << " Final value ";
   }
 }
 

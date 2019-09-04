@@ -166,11 +166,21 @@ void Biomass::DoBuild() {
 
 }
 
+void Biomass::DoReset() {
+ // clear containers
+  for (auto& year : years_) {
+    for(auto& cell : cells_) {
+      pre_obs_values_by_year_[year][cell] = 0.0;
+      obs_values_by_year_[year][cell] = 0.0;
+    }
+  }
+
+}
 /**
  *
  */
 void Biomass::PreExecute() {
-  LOG_TRACE();
+  LOG_FINE() << label_;
   unsigned year = model_->current_year();
   if (find(years_.begin(), years_.end(), year) != years_.end()) {
 
@@ -231,50 +241,48 @@ void Biomass::PreExecute() {
  *
  */
 void Biomass::Execute() {
-  LOG_TRACE();
+  LOG_FINE() << label_;
   unsigned year = model_->current_year();
   if (find(years_.begin(), years_.end(), year) != years_.end()) {
     utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-    if (!utilities::doublecompare::IsZero(time_step_proportion_)) {
-      if (selectivity_length_based_) {
-        for (unsigned row = 0; row < model_->get_height(); ++row) {
-          for (unsigned col = 0; col < model_->get_width(); ++col) {
-            string cell_label = layer_->get_value(row, col);
-            if (find(cells_.begin(), cells_.end(), cell_label) == cells_.end())
-              continue;
-            WorldCell* cell = world_->get_base_square(row, col);
-            if (cell->is_enabled()) {
-              LOG_FINEST() << "about to convert " << cell->agents_.size() << " through the maturity process";
-              //unsigned counter = 1;
-              float probability;
-              for (Agent& agent : cell->agents_) {
-                if (agent.is_alive()) {
-                  probability = selectivities_[agent.get_sex()]->GetResult(agent.get_length_bin_index());
-                  if (rng.chance() <= probability) {
-                    obs_values_by_year_[year][cell_label] += agent.get_weight() * agent.get_scalar();
-                  }
+    if (selectivity_length_based_) {
+      for (unsigned row = 0; row < model_->get_height(); ++row) {
+        for (unsigned col = 0; col < model_->get_width(); ++col) {
+          string cell_label = layer_->get_value(row, col);
+          if (find(cells_.begin(), cells_.end(), cell_label) == cells_.end())
+            continue;
+          WorldCell* cell = world_->get_base_square(row, col);
+          if (cell->is_enabled()) {
+            LOG_FINEST() << "about to convert " << cell->agents_.size() << " through the maturity process";
+            //unsigned counter = 1;
+            float probability;
+            for (Agent& agent : cell->agents_) {
+              if (agent.is_alive()) {
+                probability = selectivities_[agent.get_sex()]->GetResult(agent.get_length_bin_index());
+                if (rng.chance() <= probability) {
+                  obs_values_by_year_[year][cell_label] += agent.get_weight() * agent.get_scalar();
                 }
               }
             }
           }
         }
-      } else {
-        for (unsigned row = 0; row < model_->get_height(); ++row) {
-          for (unsigned col = 0; col < model_->get_width(); ++col) {
-            string cell_label = layer_->get_value(row, col);
-            if (find(cells_.begin(), cells_.end(), cell_label) == cells_.end())
-              continue;
-            WorldCell* cell = world_->get_base_square(row, col);
-            if (cell->is_enabled()) {
-              LOG_FINEST() << "about to convert " << cell->agents_.size() << " through the maturity process";
-              //unsigned counter = 1;
-              float probability;
-              for (Agent& agent : cell->agents_) {
-                if (agent.is_alive()) {
-                  probability = selectivities_[agent.get_sex()]->GetResult(agent.get_age_index());
-                  if (rng.chance() <= probability) {
-                    obs_values_by_year_[year][cell_label] += agent.get_weight() * agent.get_scalar();
-                  }
+      }
+    } else {
+      for (unsigned row = 0; row < model_->get_height(); ++row) {
+        for (unsigned col = 0; col < model_->get_width(); ++col) {
+          string cell_label = layer_->get_value(row, col);
+          if (find(cells_.begin(), cells_.end(), cell_label) == cells_.end())
+            continue;
+          WorldCell* cell = world_->get_base_square(row, col);
+          if (cell->is_enabled()) {
+            LOG_FINEST() << "about to convert " << cell->agents_.size() << " through the maturity process";
+            //unsigned counter = 1;
+            float probability;
+            for (Agent& agent : cell->agents_) {
+              if (agent.is_alive()) {
+                probability = selectivities_[agent.get_sex()]->GetResult(agent.get_age_index());
+                if (rng.chance() <= probability) {
+                  obs_values_by_year_[year][cell_label] += agent.get_weight() * agent.get_scalar();
                 }
               }
             }
@@ -282,12 +290,16 @@ void Biomass::Execute() {
         }
       }
     }
+
     for (auto& second_iter : obs_values_by_year_[year]) {
       if (utilities::doublecompare::IsZero(time_step_proportion_)) {
+        LOG_FINE() << label_ << " Biomass obs mort = 0.0";
         SaveComparison(0, 0, second_iter.first, pre_obs_values_by_year_[year][second_iter.first] * catchability_value_, 0.0, error_values_by_year_[year], year);
       } else if (utilities::doublecompare::IsOne(time_step_proportion_)) {
+        LOG_FINE() << label_ << " Biomass obs mort = 1.0";
         SaveComparison(0, 0, second_iter.first, obs_values_by_year_[year][second_iter.first] * catchability_value_, 0.0, error_values_by_year_[year], year);
       } else {
+        LOG_FINE() << label_ << " Biomass obs mort between 0.0 - 1.0";
         float value = 0.0;
         value = pre_obs_values_by_year_[year][second_iter.first] + ((obs_values_by_year_[year][second_iter.first] - pre_obs_values_by_year_[year][second_iter.first]) * time_step_proportion_);
         SaveComparison(0, 0, second_iter.first, value * catchability_value_, 0.0, error_values_by_year_[year], year);

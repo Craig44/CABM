@@ -11,6 +11,7 @@
 
 // headers
 #include "DerivedQuantities/DerivedQuantity.h"
+#include "Agents/Agent.h"
 
 
 namespace niwa {
@@ -30,6 +31,7 @@ public:
   void                        Execute() override final;
   void                        DoValidate() override final;
   void                        DoBuild() override final;
+  void                        CalcBiomass(vector<Agent>& agents, float& value);
 
 protected:
   // Variables

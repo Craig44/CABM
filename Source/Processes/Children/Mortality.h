@@ -62,6 +62,8 @@ struct tag_recapture {
   unsigned col_;
   unsigned time_step_;
   unsigned scanned_fish_ = 0;
+  unsigned agents_sampled_ = 0;
+  float proportion_tagged_ = 0;
   vector<unsigned> age_;
   vector<unsigned> sex_;
   vector<unsigned> fishery_ndx_;

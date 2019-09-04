@@ -138,92 +138,53 @@ void MortalityConstantRate::DoReset() {
 }
 
 /**
- * DoExecute
+ * The main function of this class. pulled out of DoExcute so that I can apply it to many different vectors.
  */
-void MortalityConstantRate::DoExecute() {
-  LOG_MEDIUM();
+void MortalityConstantRate::ApplyStochasticMortality(vector<Agent>& agents) {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-  // Pre-calculate agents in the world to set aside our random numbers needed for the operation
-  n_agents_ = 0;
-  for (unsigned row = 0; row < model_->get_height(); ++row) {
-    for (unsigned col = 0; col < model_->get_width(); ++col) {
-      WorldCell* cell = world_->get_base_square(row, col);
-      if (cell->is_enabled()) {
-        cell_offset_[row][col] = n_agents_;
-        n_agents_ += cell->agents_.size();
-      }
-    }
-  }
-  // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
-  random_numbers_.resize(n_agents_);
-  for (unsigned i = 0; i < n_agents_; ++i)
-    random_numbers_[i] = rng.chance();
+  unsigned time_step = model_->managers().time_step()->current_time_step();
+  float ratio = time_step_ratios_[time_step];
 
-  LOG_FINE() << "number of agents = " << n_agents_;
-  unsigned agents_removed = 0;
   if (selectivity_length_based_) {
-    //#pragma omp parallel for collapse(2)
-    for (unsigned row = 0; row < model_->get_height(); ++row) {
-      for (unsigned col = 0; col < model_->get_width(); ++col) {
-        // get the ratio to apply first
-        unsigned time_step = model_->managers().time_step()->current_time_step();
-        float ratio = time_step_ratios_[time_step];
-        WorldCell* cell = world_->get_base_square(row, col);
-
-        if (cell->is_enabled()) {
-          unsigned counter = 0;
-          unsigned initial_size = cell->agents_.size();
-          LOG_FINEST() << initial_size << " initial agents";
-          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter,++iter) {
-            if ((*iter).is_alive()) {
-              //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
-              if (random_numbers_[cell_offset_[row][col] + counter] <= (1 - std::exp(- ratio * (*iter).get_m() * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())))) {
-                cell->remove_agent_alive((*iter).get_scalar());
-                (*iter).dies();
-                initial_size--;
-                agents_removed++;
-              }
-            }
-          }
-          LOG_FINEST() << initial_size << " after mortality";
+    for(auto& agent : agents) {
+      if (agent.is_alive()) {
+        //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
+        if (rng.chance() <= (1 - std::exp(- ratio * agent.get_m() * selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index())))) {
+          agent.dies();
+          agents_removed_++;
         }
       }
     }
   } else {
-    //#pragma omp parallel for collapse(2)
-    for (unsigned row = 0; row < model_->get_height(); ++row) {
-      for (unsigned col = 0; col < model_->get_width(); ++col) {
-        WorldCell* cell = world_->get_base_square(row, col);
-        double temp = 0.0;
-        if (cell->is_enabled()) {
-          LOG_FINE() << "before " << row << "-" << col << " = " << cell->get_total_individuals_alive();
-
-          // need thread safe access to rng
-          unsigned time_step = model_->managers().time_step()->current_time_step();
-          float ratio = time_step_ratios_[time_step];
-          unsigned counter = 0;
-          unsigned initial_size = cell->agents_.size();
-          LOG_FINEST() << initial_size << " initial agents, ratio = " << ratio;
-          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter,++iter) {
-            if ((*iter).is_alive()) {
-              //LOG_FINEST() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " survivorship = " << (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()])) << " M = " << (*iter).get_m();
-              if (random_numbers_[cell_offset_[row][col] + counter] <= (1.0 - std::exp(- ratio * (*iter).get_m() * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index())))) {
-                cell->remove_agent_alive((*iter).get_scalar());
-                temp += (*iter).get_scalar();
-                (*iter).dies();
-                initial_size--;
-                agents_removed++;
-              }
-            }
-          }
-          LOG_FINEST() << initial_size << " after mortality";
+    for(auto& agent : agents) {
+      if (agent.is_alive()) {
+        if (rng.chance() <= (1 - std::exp(- ratio * agent.get_m() * selectivity_[agent.get_sex()]->GetResult(agent.get_age_index())))) {
+          agent.dies();
+          agents_removed_++;
         }
-        LOG_FINE() << "cell " << row << "-" << col << " = " << cell->get_total_individuals_alive() << " to take = " << temp;
+      }
+    }
+  }
+}
+/**
+ * DoExecute
+ */
+void MortalityConstantRate::DoExecute() {
+  LOG_MEDIUM();
+  agents_removed_ = 0;
+  for (unsigned row = 0; row < model_->get_height(); ++row) {
+    for (unsigned col = 0; col < model_->get_width(); ++col) {
+      // get the ratio to apply first
+      WorldCell* cell = world_->get_base_square(row, col);
+      if (cell->is_enabled()) {
+        // Apply mortality to elements in a cell.
+        ApplyStochasticMortality(cell->agents_);
+        ApplyStochasticMortality(cell->tagged_agents_);
       }
     }
   }
   if (model_->state() != State::kInitialise)
-    removals_by_year_[model_->current_year()] += agents_removed;
+    removals_by_year_[model_->current_year()] += agents_removed_;
 }
 
 

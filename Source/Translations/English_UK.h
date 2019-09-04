@@ -175,6 +175,7 @@
 #define PARAM_CATEGORIES                          "categories"
 #define PARAM_CATEGORY                            "category"
 #define PARAM_CELL_LENGTH                         "cell_length"
+#define PARAM_CELL                                "cell"
 #define PARAM_CELLS                               "cells"
 #define PARAM_CLASS_MINIMUMS                      "class_minimums"
 #define PARAM_CLUSTER_ATTRIBUTE                   "cluster_attribute"

@@ -16,6 +16,7 @@
 #include "DerivedQuantities/DerivedQuantity.h"
 
 #include "Layers/Children/IntLayer.h"
+#include "Agents/Agent.h"
 
 // namespaces
 namespace niwa {
@@ -33,6 +34,7 @@ public:
   void                        Execute() override final;
   void                        DoValidate() override final;
   void                        DoBuild() override final;
+  void                        CalcAbundance(vector<Agent>& agents, float& value);
 
 protected:
   string                      abundance_layer_label_;

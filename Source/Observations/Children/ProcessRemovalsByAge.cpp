@@ -201,6 +201,8 @@ void ProcessRemovalsByAge::DoBuild() {
     if(not mortality_process_->check_years(years_)) {
       LOG_ERROR_P(PARAM_YEARS) << "there was a year that the mortality process doesn't not execute in, can you please check that the years you have supplied for this observation are years that the mortality process occurs in cheers.";
     }
+
+    accumulated_age_frequency_.resize(model_->age_spread(),0.0);
 }
 
 /**
@@ -239,7 +241,7 @@ void ProcessRemovalsByAge::Simulate() {
     for (unsigned year : years_) {
       for (string cell : cells_) {
         cell_found = false;
-        vector<float> accumulated_age_frequency(model_->age_spread(), 0.0);
+        fill(accumulated_age_frequency_.begin(), accumulated_age_frequency_.end(),0.0);
         for (auto age_comp_data : age_frequency) {
           if ((age_comp_data.year_ == year) && (layer_->get_value(age_comp_data.row_,age_comp_data.col_) == cell)) {
             // Lets accumulate the information for this cell and year
@@ -247,11 +249,11 @@ void ProcessRemovalsByAge::Simulate() {
             // check if sex specific observation
             if (sexed_flag_ & (sex_match_ == 1)) {
               for(unsigned i = 0; i < age_comp_data.frequency_.size(); ++i)
-                accumulated_age_frequency[i] += age_comp_data.female_frequency_[i];
+                accumulated_age_frequency_[i] += age_comp_data.female_frequency_[i];
 
             } else {
               for(unsigned i = 0; i < age_comp_data.frequency_.size(); ++i)
-                accumulated_age_frequency[i] += age_comp_data.frequency_[i];
+                accumulated_age_frequency_[i] += age_comp_data.frequency_[i];
             }
             cell_found = true;
           }
@@ -260,14 +262,15 @@ void ProcessRemovalsByAge::Simulate() {
         if (not cell_found)
           continue; // to next cell
         if (ageing_error_) {
-          vector<float> temp(model_->age_spread(), 0.0);
+          vector<float> temp(model_->age_spread(), 0.0); // TODO remove this memory to build
           vector<vector<float>> &mis_matrix = ageing_error_->mis_matrix();
           for (unsigned i = 0; i < mis_matrix.size(); ++i) {
             for (unsigned j = 0; j < mis_matrix[i].size(); ++j) {
-              temp[j] += accumulated_age_frequency[i] * mis_matrix[i][j];
+              temp[j] += accumulated_age_frequency_[i] * mis_matrix[i][j];
             }
           }
-          accumulated_age_frequency = temp;
+          for(unsigned i = 0; i < temp.size(); ++i)
+            accumulated_age_frequency_[i] = temp[i];
         }
 
         /*
@@ -276,12 +279,12 @@ void ProcessRemovalsByAge::Simulate() {
         float plus_group = 0.0;
         for (unsigned k = 0; k < model_->age_spread(); ++k) {
           if (k >= age_offset && (k - age_offset + min_age_) < max_age_)
-            SaveComparison(k + model_->min_age(), 0, cell, accumulated_age_frequency[k], 0.0, error_values_by_year_[year][k - age_offset], year);
+            SaveComparison(k + model_->min_age(), 0, cell, accumulated_age_frequency_[k], 0.0, error_values_by_year_[year][k - age_offset], year);
           // Deal with the plus group
           if (((k - age_offset + min_age_) >= max_age_) && plus_group_)
-            plus_group += accumulated_age_frequency[k];
+            plus_group += accumulated_age_frequency_[k];
           else if (((k - age_offset + min_age_) == max_age_) && !plus_group_)
-            plus_group = accumulated_age_frequency[k]; // no plus group and we are max age
+            plus_group = accumulated_age_frequency_[k]; // no plus group and we are max age
 
         }
         SaveComparison(max_age_, 0, cell, plus_group, 0.0, error_values_by_year_[year][max_age_ - min_age_], year);

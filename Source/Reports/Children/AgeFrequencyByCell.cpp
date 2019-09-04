@@ -63,7 +63,7 @@ void AgeFrequencyByCell::DoExecute() {
       cache_ << " " << i;
     cache_ << "\n";
 
-    vector<unsigned> age_freq_male;
+    vector<float> age_freq_male;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
@@ -82,7 +82,7 @@ void AgeFrequencyByCell::DoExecute() {
       cache_ << " " << i;
     cache_ << "\n";
 
-    vector<unsigned> age_freq_female;
+    vector<float> age_freq_female;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
@@ -102,7 +102,7 @@ void AgeFrequencyByCell::DoExecute() {
       cache_ << " " << i;
     cache_ << "\n";
 
-    vector<unsigned> age_freq;
+    vector<float> age_freq;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);

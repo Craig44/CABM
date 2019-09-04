@@ -184,6 +184,22 @@ void GrowthVonBertalanffyWithBasic::DoBuild() {
 	// Check that the layers are all positive
 }
 
+// The work horse of the function.
+void GrowthVonBertalanffyWithBasic::ApplyStochasticGrowth(vector<Agent>& agents) {
+  float new_length = 0.0;
+  float weight = 0.0;
+  float length_prop = time_step_ratios_[model_->managers().time_step()->current_time_step()];
+  for(auto& agent : agents) {
+    if (agent.is_alive()) {
+      new_length =  agent.get_length() + length_prop * (agent.get_first_age_length_par() - agent.get_length()) * (1 - exp(-agent.get_second_age_length_par()));
+      weight = agent.get_first_length_weight_par() * pow(new_length, agent.get_second_length_weight_par());
+      //LOG_FINEST() << "old length = " << (*iter).get_length() << " new length = " << new_length << " weight = " << weight << " k = " << (*iter).get_second_age_length_par() << " linf = " << (*iter).get_first_age_length_par();
+      agent.set_length(new_length);
+      agent.set_weight(weight);
+    }
+  }
+}
+
 // Execute the process
 void GrowthVonBertalanffyWithBasic::DoExecute() {
   LOG_MEDIUM();
@@ -192,18 +208,10 @@ void GrowthVonBertalanffyWithBasic::DoExecute() {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
-        float length_prop = time_step_ratios_[model_->managers().time_step()->current_time_step()];
-        //LOG_FINE() << "length prop = " << length_prop;
-        for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter) {
-          if ((*iter).is_alive()) {
-            //LOG_FINEST() << "length = " << (*iter).get_length() << " weight = " << (*iter).get_weight() << " L-inf " << (*iter).get_first_age_length_par() << " k = " << (*iter).get_second_age_length_par() << " prop = " << length_prop;
-            float new_length =  (*iter).get_length() + length_prop * ((*iter).get_first_age_length_par() - (*iter).get_length()) * (1 - exp(-(*iter).get_second_age_length_par()));
-            float weight = (*iter).get_first_length_weight_par() * pow(new_length, (*iter).get_second_length_weight_par());
-            LOG_FINEST() << "old length = " << (*iter).get_length() << " new length = " << new_length << " weight = " << weight << " k = " << (*iter).get_second_age_length_par() << " linf = " << (*iter).get_first_age_length_par();
-            (*iter).set_length(new_length);
-            (*iter).set_weight(weight);
-          }
-        }
+        // Apply growth to elements in a cell.
+        ApplyStochasticGrowth(cell->agents_);
+        ApplyStochasticGrowth(cell->tagged_agents_);
+
       }
     }
   }

@@ -61,9 +61,9 @@ public:
   void                        seed_agents(unsigned number_agents_to_seed, const float& seed_z);
   void                        birth_agents(unsigned number_agents_to_birth, float scalar);
   void                        set_scalar();
-  void                        get_age_frequency(vector<unsigned>& age_freq);
-  void                        get_female_frequency(vector<unsigned>& age_freq);
-  void                        get_male_frequency(vector<unsigned>& age_freq);
+  void                        get_age_frequency(vector<float>& age_freq);
+  void                        get_female_frequency(vector<float>& age_freq);
+  void                        get_male_frequency(vector<float>& age_freq);
 
 
   float                       get_abundance();

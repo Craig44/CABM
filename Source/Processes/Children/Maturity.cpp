@@ -52,77 +52,51 @@ void Maturity::DoBuild() {
 
 }
 
-
 /**
  * Execute process
  */
-void Maturity::DoExecute() {
-  LOG_TRACE();
-  LOG_MEDIUM();
+void Maturity::ApplyStochasticMaturity(vector<Agent>& agents) {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-  // Pre-calculate agents in the world to set aside our random numbers needed for the operation
-  n_agents_ = 0;
-  for (unsigned row = 0; row < model_->get_height(); ++row) {
-    for (unsigned col = 0; col < model_->get_width(); ++col) {
-      WorldCell* cell = world_->get_base_square(row, col);
-      if (cell->is_enabled()) {
-        cell_offset_[row][col] = n_agents_;
-        n_agents_ += cell->agents_.size();
-      }
-    }
-  }
-  // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
-  random_numbers_.resize(n_agents_);
-  for (unsigned i = 0; i < n_agents_; ++i)
-    random_numbers_[i] = rng.chance();
-
-  unsigned mature_conversion = 0;
-  // Iterate over all cells
   if (not length_based_selectivity_) {
-    #pragma omp parallel for collapse(2)
-    for (unsigned row = 0; row < model_->get_height(); ++row) {
-      for (unsigned col = 0; col < model_->get_width(); ++col) {
-        WorldCell* cell = world_->get_base_square(row, col);
-        if (cell->is_enabled()) {
-          LOG_FINEST() << "about to convert " << cell->agents_.size() << " through the maturity process";
-          unsigned counter = 0;
-          for (Agent& agent : cell->agents_) {
-            if (not agent.get_maturity()) {
-              if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index())) {
-                agent.set_maturity(true);
-                ++mature_conversion;
-              }
-            }
-            ++counter;
-          }
+    for (auto& agent : agents) {
+      if (not agent.get_maturity() & agent.is_alive()) {
+        if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index())) {
+          agent.set_maturity(true);
+          ++mature_conversion_;
         }
       }
     }
   } else {
-    #pragma omp parallel for collapse(2)
-    for (unsigned row = 0; row < model_->get_height(); ++row) {
-      for (unsigned col = 0; col < model_->get_width(); ++col) {
-        WorldCell* cell = world_->get_base_square(row, col);
-        if (cell->is_enabled()) {
-          LOG_FINEST() << "about to convert " << cell->agents_.size() << " through the maturity process";
-          unsigned counter = 0;
-          for (Agent& agent : cell->agents_) {
-            if (not agent.get_maturity()) {
-              if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index())) {
-                agent.set_maturity(true);
-                ++mature_conversion;
-              }
-            }
-            ++counter;
-          }
+    for (auto& agent : agents) {
+      if (not agent.get_maturity() & agent.is_alive()) {
+        if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index())) {
+          agent.set_maturity(true);
+          ++mature_conversion_;
         }
       }
     }
   }
 
+}
+/**
+ * Execute process
+ */
+void Maturity::DoExecute() {
+  LOG_MEDIUM();
+  mature_conversion_ = 0;
+  for (unsigned row = 0; row < model_->get_height(); ++row) {
+    for (unsigned col = 0; col < model_->get_width(); ++col) {
+      WorldCell* cell = world_->get_base_square(row, col);
+      if (cell->is_enabled()) {
+        LOG_FINEST() << "about to convert " << cell->agents_.size() << " through the maturity process";
+        ApplyStochasticMaturity(cell->agents_);
+        ApplyStochasticMaturity(cell->tagged_agents_);
+
+      }
+    }
+  }
   if (model_->state() != State::kInitialise)
-    mature_individuals_by_year_[model_->current_year()] = mature_conversion;
-  LOG_TRACE();
+    mature_individuals_by_year_[model_->current_year()] = mature_conversion_;
 }
 
 

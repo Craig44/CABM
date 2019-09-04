@@ -17,7 +17,7 @@
 // headers
 #include "Processes/Children/Movement.h"
 #include "Layers/Children/NumericLayer.h"
-#include <omp.h>
+#include "Agents/Agent.h"
 
 // namespaces
 namespace niwa {
@@ -45,6 +45,8 @@ public:
   void                        DoBuild() override final;
   void                        DoReset() override final { };
   void                        DoExecute() override final;
+  void                        ApplyStochasticMovement(vector<Agent>& agents, MovementData& store_infor, bool tagged_partition, unsigned& origin_element, unsigned& row, unsigned& col);
+
   void                        FillReportCache(ostringstream& cache)  override final;
 protected:
   vector<string>              origin_cell_;

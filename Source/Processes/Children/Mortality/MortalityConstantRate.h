@@ -17,6 +17,7 @@
 #include "Processes/Children/Mortality.h"
 
 #include "Layers/Children/NumericLayer.h"
+#include "Agents/Agent.h"
 #include <omp.h>
 
 // namespaces
@@ -39,6 +40,8 @@ public:
   void                                draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) override final;
   void                                FillReportCache(ostringstream& cache) override final;
   void                                RebuildCache() override final;
+  void                                ApplyStochasticMortality(vector<Agent>& agents);
+
 
 protected:
   string                              m_layer_label_;
@@ -56,6 +59,7 @@ protected:
   vector<vector<unsigned>>            cell_offset_;
   vector<float>                       ratios_;
   map<unsigned, float>                time_step_ratios_;
+  unsigned                            agents_removed_ = 0;
 
 
 

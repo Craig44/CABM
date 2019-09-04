@@ -65,6 +65,8 @@ protected:
   map<unsigned, float>        values_;
   map<unsigned, vector<vector<float>>> values_by_space_;  // year x row x col
   float                       cache_value_;
+  float                       value_;
+
   string                      proportion_method_;
   float                       time_step_proportion_;
   bool                        spatial_ = false;

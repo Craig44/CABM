@@ -29,7 +29,7 @@ Selectivity::Selectivity(Model* model)
   parameters_.Bind<string>(PARAM_LABEL, &label_, "The label for this selectivity", "");
   parameters_.Bind<string>(PARAM_TYPE, &type_, "The type of selectivity", "");
   parameters_.Bind<bool>(PARAM_LENGTH_BASED, &length_based_, "Is the selectivity length based", "", false);
-  parameters_.Bind<bool>(PARAM_INCLUDE_AGE_ZERO_INDIVIDUALS, &include_zero_age_values_, "Include 0 aged fish in selectivity (more for comparing with population models that start modelling fish at age = 1)", "", true);
+  parameters_.Bind<bool>(PARAM_INCLUDE_AGE_ZERO_INDIVIDUALS, &include_zero_age_values_, "Include 0 aged fish in selectivity (more for comparing with population models that start modelling fish at age = 1)", "", false);
 
 }
 

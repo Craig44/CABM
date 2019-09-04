@@ -34,7 +34,7 @@ public:
   virtual                     ~Biomass() = default;
   void                        DoValidate() override final;
   virtual void                DoBuild() override;
-  void                        DoReset() override final { };
+  void                        DoReset() override final;
   void                        PreExecute() override final;
   void                        Execute() override final;
   void                        Simulate() override final;
@@ -44,10 +44,10 @@ protected:
   // members
   vector<unsigned>                years_;
   float                           catchability_value_;
-  map<unsigned, float>           error_values_by_year_;
+  map<unsigned, float>            error_values_by_year_;
   map<unsigned,map<string, float>> pre_obs_values_by_year_;
   map<unsigned,map<string, float>> obs_values_by_year_;
-  vector<float>                  error_values_;
+  vector<float>                   error_values_;
   string                          catchability_label_;
   //Catchability*                   catchability_ = nullptr;
   vector<string>                  selectivity_labels_;

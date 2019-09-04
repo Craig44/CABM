@@ -71,6 +71,7 @@ protected:
   string                        sexed_;
   unsigned                      sex_match_;
   bool                          sexed_flag_;
+  vector<float>                 accumulated_age_frequency_;
 
 
 };

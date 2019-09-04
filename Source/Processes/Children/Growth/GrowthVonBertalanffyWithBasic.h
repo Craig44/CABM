@@ -17,6 +17,7 @@
 #include "Processes/Children/Growth.h"
 
 #include "Layers/Children/NumericLayer.h"
+#include "Agents/Agent.h"
 
 // namespaces
 namespace niwa {
@@ -37,6 +38,7 @@ public:
   void                        DoExecute() override final;
   void                        RebuildCache() override final;
   void                        FillReportCache(ostringstream& cache) override final;
+  void                        ApplyStochasticGrowth(vector<Agent>& agents);
 
   void                        draw_growth_param(unsigned row, unsigned col, unsigned number_of_draws, vector<vector<float>>& vec, unsigned sex) override final;
 

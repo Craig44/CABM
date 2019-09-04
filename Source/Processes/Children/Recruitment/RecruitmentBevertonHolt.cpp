@@ -34,6 +34,8 @@ namespace processes {
 RecruitmentBevertonHolt::RecruitmentBevertonHolt(Model* model) : Recruitment(model) {
   parameters_.Bind<float>(PARAM_STEEPNESS, &steepness_, "Steepness", "", 1.0);
   parameters_.Bind<float>(PARAM_YCS_VALUES, &ycs_values_, "YCS (Year-Class-Strength) Values", "");
+
+  RegisterAsAddressable(PARAM_YCS_VALUES, &ycs_values_by_year_);
 }
 
 // DoValidate
@@ -59,6 +61,13 @@ void RecruitmentBevertonHolt::DoValidate() {
   prop_male_by_year_[0] = prop_male_[0];
 
   model_->set_male_proportions(prop_male_by_year_);
+
+  // move to validate because ycs_values_by_year_ is addressable and so will be reset for -i runs
+  unsigned iter = 0;
+  for (unsigned year = model_->start_year(); year <= model_->final_year(); ++year, ++iter) {
+    ycs_values_by_year_[year] = ycs_values_[iter];
+  }
+
 }
 
 
@@ -69,10 +78,6 @@ void RecruitmentBevertonHolt::DoBuild() {
     LOG_ERROR_P(PARAM_YCS_VALUES) << "number of years '" << model_->years().size() <<  "' doesn't match number of ycs values you supplied '" << ycs_values_.size() << "' please make sure these are the same";
   }
 
-  unsigned iter = 0;
-  for (unsigned year = model_->start_year(); year <= model_->final_year(); ++year, ++iter) {
-    ycs_values_by_year_[year] = ycs_values_[iter];
-  }
 
   derived_quantity_ = model_->managers().derived_quantity()->GetDerivedQuantity(ssb_label_);
   if (!derived_quantity_)

@@ -56,9 +56,9 @@ Model::Model() {
   parameters_.Bind<unsigned>(PARAM_MIN_AGE, &min_age_, "Minimum age of individuals in the population", R"($0 \le$ age\textlow{min} $\le$ age\textlow{max})", 0);
   parameters_.Bind<unsigned>(PARAM_MAX_AGE, &max_age_, "Maximum age of individuals in the population", R"($0 \le$ age\textlow{min} $\le$ age\textlow{max})", 0);
   parameters_.Bind<bool>(PARAM_AGE_PLUS, &age_plus_, "Define the oldest age or extra length midpoint (plus group size) as a plus group", "true, false", false);
-  parameters_.Bind<string>(PARAM_INITIALISATION_PHASE_LABELS, &initialisation_phases_, "Define the labels of the phases of the initialisation", R"(A list of valid labels defined by \texttt{@initialisation_phase})", true);
+  parameters_.Bind<string>(PARAM_INITIALISATION_PHASE_LABELS, &initialisation_phases_, "Define the labels of the phases of the initialisation", R"(A list of valid labels defined by \texttt{@initialisation_phase})", false);
   parameters_.Bind<string>(PARAM_TIME_STEPS, &time_steps_, "Define the labels of the time steps, in the order that they are applied, to form the annual cycle", R"(A list of valid labels defined by \texttt{@time_step})");
-  parameters_.Bind<unsigned>(PARAM_LENGTH_BINS, &length_bins_, "", "", true);
+  parameters_.Bind<unsigned>(PARAM_LENGTH_BINS, &length_bins_, "", "", false);
   parameters_.Bind<bool>(PARAM_LENGTH_PLUS, &length_plus_, "Is the last bin a plus group", "", false);
   parameters_.Bind<string>(PARAM_BASE_LAYER_LABEL, &base_layer_, "Label for the base layer", "");
   parameters_.Bind<float>(PARAM_LATITUDE_BOUNDS, &lat_bounds_, "Latitude bounds for the spatial domain, should include lower and upper bound, so there should be rows + 1 values", "", true);
@@ -239,6 +239,7 @@ void Model::Validate() {
 
   if (sex_ & (maturity_ogives_.size() != 2))
     LOG_FATAL_P(PARAM_MATRUITY_OGIVE_LABEL) << "if you have specified a model with sex, you need to supply two maturity ogives one for each sex (they can be the same)";
+
   /**
    * Do some simple checks
    * e.g Validate that the length_bins are strictly increasing order
@@ -261,8 +262,9 @@ void Model::Validate() {
 
 
   // Call validation for the other objects required by the model
+  LOG_FINE() << "About to validate world";
   world_view_->Validate();
-
+  LOG_FINE() << "About to validate the rest of the managers";
   managers_->Validate();
 
   /**
@@ -279,7 +281,7 @@ void Model::Validate() {
     if (!time_step_mngr.GetTimeStep(time_step))
       LOG_ERROR_P(PARAM_TIME_STEPS) << "(" << time_step << ") has not been defined. Please ensure you have defined it";
   }
-
+  LOG_FINE() << "Exit validation";
 }
 
 /**
@@ -410,9 +412,9 @@ void Model::RunBasic() {
   if (simulation_candidates < 1) {
     LOG_FATAL() << "The number of simulations specified at the command line parser must be at least one";
   }
-  unsigned suffix_width = (unsigned)floor(log10((double) (simulation_candidates) * (adressable_values_count_))) + 1;
+  unsigned suffix_width = (unsigned)(floor(log10((double) (simulation_candidates) * (adressable_values_count_))) + 1);
   LOG_MEDIUM() << "suffix width = " << suffix_width << " value = " << (simulation_candidates) * (adressable_values_count_);
-
+  unsigned suffix_counter = 0;
   for (unsigned i = 0; i < adressable_values_count_; ++i) {
     if (addressable_values_file_) {
       addressables.LoadValues(i);
@@ -463,20 +465,24 @@ void Model::RunBasic() {
 
     LOG_MEDIUM() << " Heading into simulation mode";
     for (int s = 0; s < simulation_candidates; ++s) {
+      suffix_counter++;
       string report_suffix = ".";
-      unsigned iteration_width = (unsigned)floor(log10((i + 1) + (s * simulation_candidates))) + 1;
 
+      unsigned iteration_width = (unsigned)(floor(log10((i + 1) + (s + 1))) + 1);
+      LOG_FINE() << "iteration_width = " << iteration_width << " suffix_width = " << suffix_width;
       unsigned diff = suffix_width - iteration_width;
+      LOG_FINE() << "diff = " << diff;
+      LOG_FINE() << "(i + 1) + (s * simulation_candidates)) = " << (i + 1) + (s * simulation_candidates);
       report_suffix.append(diff,'0');
-      report_suffix.append(utilities::ToInline<unsigned, string>((i + 1) + (s * simulation_candidates)));
+      report_suffix.append(utilities::ToInline<unsigned, string>(suffix_counter));
       LOG_MEDIUM() << "i = " << i + 1 << " s = " << s + 1 <<  " suffix = " << report_suffix << " what i think it should be doing " << (i + 1) + (s * simulation_candidates) << " diff = " << diff << " iteration width = " << iteration_width;
       managers_->report()->set_report_suffix(report_suffix);
 
       managers_->observation()->SimulateData();
 
       // Not convinced this is doing anything
-      for (auto executor : executors_[State::kExecute])
-        executor->Execute();
+      //for (auto executor : executors_[State::kExecute])
+      //  executor->Execute();
 
       if (s != (simulation_candidates - 1)) { // Only need to execute this s - 1 times as the last run will be done at line 485
         managers_->report()->Execute(State::kIterationComplete);

@@ -82,7 +82,29 @@ void BiomassByCell::DoBuild() {
   }
 }
 
-
+/**
+ * The main function for calculating biomass
+ */
+void BiomassByCell::CalcBiomass(vector<Agent>& agents, float& value) {
+  utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+  if (not length_based_selectivity_) {
+    for(auto& agent : agents) {
+      if (agent.is_alive()) {
+        if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index())) {
+          value += agent.get_weight() * agent.get_scalar();
+        }
+      }
+    }
+  } else {
+    for(auto& agent : agents) {
+      if (agent.is_alive()) {
+        if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index())) {
+          value += agent.get_weight() * agent.get_scalar();
+        }
+      }
+    }
+  }
+}
 /*
  * PreExecute
 */
@@ -90,65 +112,17 @@ void BiomassByCell::PreExecute() {
   LOG_FINE();
   if (utilities::doublecompare::IsOne(time_step_proportion_))
     return;
-
-  utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-
-  // Pre-calculate agents in the world to set aside our random numbers needed for the operation
-  n_agents_ = 0;
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
-        cell_offset_[row][col] = n_agents_;
-        n_agents_ += cell->agents_.size();
-      }
-    }
-  }
-  // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
-  random_numbers_.resize(n_agents_);
-  for (unsigned i = 0; i < n_agents_; ++i)
-    random_numbers_[i] = rng.chance();
 
-  if (not length_based_selectivity_) {
-    #pragma omp parallel for collapse(2)
-    for (unsigned row = 0; row < model_->get_height(); ++row) {
-      for (unsigned col = 0; col < model_->get_width(); ++col) {
-        WorldCell* cell = world_->get_base_square(row, col);
-        if (cell->is_enabled()) {
-          unsigned counter = 0;
-          cache_in_space_[row][col] = 0.0;
-          for (Agent& agent : cell->agents_) {
-            if (agent.is_alive()) {
-              if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index())) {
-                cache_in_space_[row][col] += agent.get_weight() * agent.get_scalar();
-              }
-            }
-            ++counter;
-          }
-        }
-      }
-    }
-  } else {
-    #pragma omp parallel for collapse(2)
-    for (unsigned row = 0; row < model_->get_height(); ++row) {
-      for (unsigned col = 0; col < model_->get_width(); ++col) {
-        WorldCell* cell = world_->get_base_square(row, col);
-        if (cell->is_enabled()) {
-          unsigned counter = 0;
-          cache_in_space_[row][col] = 0.0;
-          for (Agent& agent : cell->agents_) {
-            if (agent.is_alive()) {
-              if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index())) {
-                cache_in_space_[row][col] += agent.get_weight() * agent.get_scalar();
-              }
-            }
-            ++counter;
-          }
-        }
+        cache_in_space_[row][col] = 0.0;
+        CalcBiomass(cell->agents_, cache_in_space_[row][col]);
+        CalcBiomass(cell->tagged_agents_, cache_in_space_[row][col]);
       }
     }
   }
-  LOG_TRACE();
 }
 /*
  * PreExecute
@@ -156,59 +130,13 @@ void BiomassByCell::PreExecute() {
 void BiomassByCell::Execute() {
   LOG_FINE();
   if (!utilities::doublecompare::IsZero(time_step_proportion_)) {
-    utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-    // Pre-calculate agents in the world to set aside our random numbers needed for the operation
-    n_agents_ = 0;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
-          cell_offset_[row][col] = n_agents_;
-          n_agents_ += cell->agents_.size();
-        }
-      }
-    }
-    // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
-    random_numbers_.resize(n_agents_);
-    for (unsigned i = 0; i < n_agents_; ++i)
-      random_numbers_[i] = rng.chance();
-
-    if (not length_based_selectivity_) {
-      #pragma omp parallel for collapse(2)
-      for (unsigned row = 0; row < model_->get_height(); ++row) {
-        for (unsigned col = 0; col < model_->get_width(); ++col) {
-          WorldCell* cell = world_->get_base_square(row, col);
-          if (cell->is_enabled()) {
-            unsigned counter = 0;
-            value_in_space_[row][col] = 0.0;
-            for (Agent& agent : cell->agents_) {
-              if (agent.is_alive()) {
-                if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index())) {
-                  value_in_space_[row][col] += agent.get_weight() * agent.get_scalar();
-                }
-              }
-              ++counter;
-            }
-          }
-        }
-      }
-    } else {
-      #pragma omp parallel for collapse(2)
-      for (unsigned row = 0; row < model_->get_height(); ++row) {
-        for (unsigned col = 0; col < model_->get_width(); ++col) {
-          WorldCell* cell = world_->get_base_square(row, col);
-          if (cell->is_enabled()) {
-            unsigned counter = 0;
-            value_in_space_[row][col] = 0.0;
-            for (Agent& agent : cell->agents_) {
-              if (agent.is_alive()) {
-                if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index())) {
-                  value_in_space_[row][col] += agent.get_weight() * agent.get_scalar();
-                }
-              }
-              ++counter;
-            }
-          }
+          value_in_space_[row][col] = 0.0;
+          CalcBiomass(cell->agents_, value_in_space_[row][col]);
+          CalcBiomass(cell->tagged_agents_, value_in_space_[row][col]);
         }
       }
     }

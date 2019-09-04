@@ -30,7 +30,7 @@ class Tagging : public Process {
 public:
   // methods
   explicit                            Tagging(Model* model);
-  virtual                             ~Tagging() = default;
+  virtual                             ~Tagging();
   void                                DoValidate() override final;
   void                                DoBuild() override final;
   void                                DoReset() override final { };
@@ -42,7 +42,7 @@ protected:
   vector<string>                      selectivity_labels_;
   vector<Selectivity*>                selectivities_;
   bool                                selectivity_length_based_;
-
+  bool                                apply_using_proportions_ = false;
   // objects for thread safety of rng
   vector<float>                       random_numbers_;
   vector<float>                       selectivity_random_numbers_;
@@ -64,6 +64,16 @@ protected:
   // Reporting
   map<unsigned,vector<unsigned>>      age_distribution_of_tagged_fish_by_year_;
   map<unsigned,vector<unsigned>>      length_distribution_of_tagged_fish_by_year_;
+
+  vector<vector<vector<vector<unsigned>>>>    length_distribution_of_tagged_fish_by_year_cell_; // year * row * col * length_bins
+  vector<vector<vector<vector<unsigned>>>>    age_distribution_of_tagged_fish_by_year_cell_; // year * row * col * age_bins
+
+  parameters::Table*                  proportions_table_ = nullptr;
+  vector<vector<float>>               proportions_data_; // n_rows x n_length_bins
+  vector<unsigned>                    table_rows_;
+  vector<unsigned>                    table_cols_;
+  vector<unsigned>                    table_years_;
+
 
 };
 
