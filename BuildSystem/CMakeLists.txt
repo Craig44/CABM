@@ -12,7 +12,7 @@ STRING(REPLACE "BuildSystem" "Source" PROJECT_HOME_DIRECTORY ${CMAKE_HOME_DIRECT
 
 # GLOBAL BUILD VARIABLES AND LIBRARIES
 IF (DEBUG)
- SET(COMPILE_OPTIONS " -O0 -g3 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs")
+ SET(COMPILE_OPTIONS " -O0 -g2 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs")
 ELSEIF (RELEASE)
  SET(COMPILE_OPTIONS " -O2 -g0 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs")
 ELSE()
