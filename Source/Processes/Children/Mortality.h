@@ -92,6 +92,8 @@ public:
   vector<composition_data>&           get_removals_by_age() {return removals_by_age_and_area_;};
   vector<composition_data>&           get_removals_by_length() {return removals_by_length_and_area_;};
   vector<census_data>&                get_census_data() {return removals_census_;};
+  vector<tag_recapture>&              get_tag_recapture_info() {return removals_tag_recapture_;};
+
 
   virtual bool                        update_mortality() {return update_natural_mortality_parameters_;};
   virtual double                      SolveBaranov() { return 1.0;};

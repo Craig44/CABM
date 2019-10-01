@@ -409,13 +409,14 @@ void MortalityEventBiomass::DoExecute() {
                         if (rng.chance() <= fishery_selectivity_[fishery_ndx][agent.get_sex()]->GetResult(agent.get_age_index())) {
                           vulnerable_total_in_cell += agent.get_scalar();
                           average_counter++;
+                          }
                         }
                       }
-                    }
-                    // Tagged partition
-                    for(auto& agent : cell->tagged_agents_) {
-                      if (agent.is_alive()) {
-                        tagged_fish += agent.get_scalar();                      }
+                      // Tagged partition
+                      for(auto& agent : cell->tagged_agents_) {
+                        if (agent.is_alive()) {
+                          tagged_fish += agent.get_scalar();
+                        }
 
                         temp_sum = 0.0;
                         random_fish = rng.chance();

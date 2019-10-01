@@ -25,6 +25,8 @@
 #include "Observations/Children/MortalityEventBiomassScaledAgeFrequency.h"
 #include "Observations/Children/MortalityEventBiomassClusters.h"
 #include "Observations/Children/MortalityEventBiomassAgeClusters.h"
+#include "Observations/Children/TagRecaptureByLength.h"
+#include "Observations/Children/TagRecaptureByAge.h"
 
 
 
@@ -62,6 +64,10 @@ Observation* Factory::Create(Model* model, const string& object_type, const stri
       result = new Biomass(model);
     else if (sub_type == PARAM_AGE_LENGTH)
       result = new AgeLength(model);
+    else if (sub_type == PARAM_TAG_RECAPTURE_BY_AGE)
+      result = new TagRecaptureByAge(model);
+    else if (sub_type == PARAM_TAG_RECAPTURE_BY_LENGTH)
+      result = new TagRecaptureByLength(model);
 
     if (result)
       model->managers().observation()->AddObject(result);
