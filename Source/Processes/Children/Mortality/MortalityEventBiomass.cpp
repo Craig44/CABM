@@ -394,6 +394,8 @@ void MortalityEventBiomass::DoExecute() {
                   double prob_of_tagged_fish = 0.0;
 
                   // vulnerable biomass an approximation
+				  // we want to find the proportion of vulnerable tagged fish (can argue they are all vulnerable) to vulnerable untagged fish
+				  // TODO: probably should be fishery specific, because of different selectivities, for now it is a mixed value
                   if (account_for_tag_population_) {
                     for(auto& agent : cell->agents_) {
                       if (agent.is_alive()) {
@@ -415,28 +417,31 @@ void MortalityEventBiomass::DoExecute() {
                       // Tagged partition
                       for(auto& agent : cell->tagged_agents_) {
                         if (agent.is_alive()) {
-                          tagged_fish += agent.get_scalar();
-                        }
-
-                        temp_sum = 0.0;
-                        random_fish = rng.chance();
-                        for (unsigned i = 0; i < fisheries_to_sample_from.size(); ++i) {
-                          temp_sum += prop_catch_by_fishery[i];
-                          if (temp_sum >= random_fish) {
-                            fishery_ndx = fisheries_to_sample_from[i];
-                            break;
-                          }
-                        }
-                        if (rng.chance() <= fishery_selectivity_[fishery_ndx][agent.get_sex()]->GetResult(agent.get_age_index()))
-                          tagged_fish_vulnerable += agent.get_scalar();
+                          tagged_fish += agent.get_scalar(); // if all tagged fish are vulnerable to fishing
+							temp_sum = 0.0;
+							random_fish = rng.chance();
+							for (unsigned i = 0; i < fisheries_to_sample_from.size(); ++i) {
+							  temp_sum += prop_catch_by_fishery[i];
+							  if (temp_sum >= random_fish) {
+								fishery_ndx = fisheries_to_sample_from[i];
+								break;
+							  }
+							}
+							// Assuming law of large numbers allows this to go for 
+							if (rng.chance() <= fishery_selectivity_[fishery_ndx][agent.get_sex()]->GetResult(agent.get_age_index()))
+							  tagged_fish_vulnerable += agent.get_scalar();
+						  
+					  }
                     }
 
+					tag_recapture_info.expected_scanned_ = vulnerable_total_in_cell + tagged_fish;
 
-                    prob_of_untagged_fish = vulnerable_total_in_cell / (vulnerable_total_in_cell + tagged_fish_vulnerable);
+                    prob_of_untagged_fish = vulnerable_total_in_cell / (vulnerable_total_in_cell + tagged_fish);
                     prob_of_tagged_fish = 1 - prob_of_untagged_fish;
 
 
-                    LOG_FINE() <<"prob untagged = " << prob_of_untagged_fish << " prob_of_tagged_fish = " << prob_of_tagged_fish << " avg scalar = " << (vulnerable_total_in_cell / average_counter);
+                    LOG_MEDIUM() <<"prob untagged = " << prob_of_untagged_fish << " prob_of_tagged_fish = " << prob_of_tagged_fish << " avg scalar = " << (vulnerable_total_in_cell / average_counter);
+                    LOG_MEDIUM() <<"individuals_in_cell = " << vulnerable_total_in_cell << " tagged fish = " << tagged_fish << " prob of untagged fish = " << prob_of_untagged_fish << " tagged fish that are vulnerable = " << tagged_fish_vulnerable << " prob untagged = " << prob_of_untagged_fish << " prob tagged = " << prob_of_tagged_fish;
 
                     tag_recapture_info.proportion_tagged_ = prob_of_tagged_fish;
                     // Account for sampling of entire agents
@@ -447,7 +452,6 @@ void MortalityEventBiomass::DoExecute() {
                   }
 
 
-                  LOG_FINE() <<"individuals_in_cell = " << vulnerable_total_in_cell << " tagged fish = " << tagged_fish << " prob of untagged fish = " << prob_of_untagged_fish << " tagged fish that are vulnerable = " << tagged_fish_vulnerable << " prob untagged = " << prob_of_untagged_fish << " prob tagged = " << prob_of_tagged_fish;
 
                   unsigned agent_has_tag = 0;
                   unsigned agent_counter = 0;
@@ -461,6 +465,7 @@ void MortalityEventBiomass::DoExecute() {
                    *  Main loop
                   */
                   while (catch_taken > 0) {
+					agent_counter = 0;
                     LOG_FINEST() << "catch taken = " << catch_taken << " attempts = " << catch_attempts;
                     ++catch_attempts;
                     already_checked_selec = false;
@@ -483,7 +488,7 @@ void MortalityEventBiomass::DoExecute() {
                     if (scanning_this_year_[fishery_ndx]) {
                       agent_has_tag = (unsigned)rng.binomial(prob_of_tagged_fish, 1);
                       LOG_FINEST() << "find value " << agent_counter << " " << cell->agents_.size() << " fishery ndx = " << fishery_ndx << " agents has tag = " << agent_has_tag;
-
+					  tag_recapture_info.tag_draws_ += agent_has_tag;
                       // find an untagged fish that is vulnerable and alive
                       if (agent_has_tag == 0) {
                         already_checked_selec = false;
@@ -567,6 +572,7 @@ void MortalityEventBiomass::DoExecute() {
                                   tag_recapture_info.length_increment_.push_back((*this_agent).get_length_increment_since_tag());
                                   tag_recapture_info.tag_row_.push_back((*this_agent).get_tag_row());
                                   tag_recapture_info.tag_col_.push_back((*this_agent).get_tag_col());
+								  tag_recapture_info.tag_release_year_.push_back((*this_agent).get_tag_release_year());
                                 }
                               }
                             }
@@ -736,6 +742,7 @@ void MortalityEventBiomass::DoExecute() {
                             tag_recapture_info.length_increment_.push_back(this_agent.get_length_increment_since_tag());
                             tag_recapture_info.tag_row_.push_back(this_agent.get_tag_row());
                             tag_recapture_info.tag_col_.push_back(this_agent.get_tag_col());
+							tag_recapture_info.tag_release_year_.push_back((*this_agent).get_tag_release_year());
                           }
                         }
                       }
@@ -896,6 +903,7 @@ void MortalityEventBiomass::DoExecute() {
                                 tag_recapture_info.length_increment_.push_back(this_agent.get_length_increment_since_tag());
                                 tag_recapture_info.tag_row_.push_back(this_agent.get_tag_row());
                                 tag_recapture_info.tag_col_.push_back(this_agent.get_tag_col());
+								tag_recapture_info.tag_release_year_.push_back(this_agent.get_tag_release_year());
                               }
                             }
                           }
@@ -967,60 +975,8 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
       cache << "\n";
     }
   }
-
-  // Get rid of this later, but check census data is the same as age-freq which has been validated
-  if (fishery_census_data_.size() > 0) {
-    if (model_->get_sexed()) {
-      for (auto& fishery : fishery_index_) {
-        cache << "age_freq-census-male-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
-        cache << "year ";
-        for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
-          cache << age << " ";
-        cache << "\n";
-        for (unsigned year_ndx = 0; year_ndx < fishery_census_data_[fishery].size(); ++year_ndx) {
-          vector<unsigned> temp_age_freq(model_->age_spread(), 0.0);
-          cache << catch_year_[year_ndx] << " ";
-          for (unsigned cell_ndx = 0; cell_ndx < fishery_census_data_[fishery][year_ndx].size(); ++cell_ndx) {
-            if (fishery_census_data_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
-              for (unsigned age_ndx = 0; age_ndx < fishery_census_data_[fishery][year_ndx][cell_ndx].age_ndx_.size(); ++age_ndx) {
-                if (fishery_census_data_[fishery][year_ndx][cell_ndx].sex_[age_ndx] == 0)
-                  temp_age_freq[fishery_census_data_[fishery][year_ndx][cell_ndx].age_ndx_[age_ndx]]++;
-              }
-            }
-          }
-          for (auto& age_freq : temp_age_freq)
-            cache << age_freq << " ";
-          cache << "\n";
-        }
-      }
-      for (auto& fishery : fishery_index_) {
-        cache << "age_freq-census-female-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
-        cache << "year ";
-        for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
-          cache << age << " ";
-        cache << "\n";
-        for (unsigned year_ndx = 0; year_ndx < fishery_census_data_[fishery].size(); ++year_ndx) {
-          vector<unsigned> temp_age_freq(model_->age_spread(), 0.0);
-          cache << catch_year_[year_ndx] << " ";
-          for (unsigned cell_ndx = 0; cell_ndx < fishery_census_data_[fishery][year_ndx].size(); ++cell_ndx) {
-            if (fishery_census_data_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
-              for (unsigned age_ndx = 0; age_ndx < fishery_census_data_[fishery][year_ndx][cell_ndx].age_ndx_.size(); ++age_ndx) {
-                if (fishery_census_data_[fishery][year_ndx][cell_ndx].sex_[age_ndx] == 1)
-                  temp_age_freq[fishery_census_data_[fishery][year_ndx][cell_ndx].age_ndx_[age_ndx]]++;
-              }
-            }
-          }
-          for (auto& age_freq : temp_age_freq)
-            cache << age_freq << " ";
-          cache << "\n";
-        }
-      }
-    }
-  }
-
   // age frequency by sex fishery and year
   if (age_comp_by_fishery_.size() > 0) {
-
     if (model_->get_sexed()) {
       for (auto& fishery : fishery_index_) {
         cache << "age_freq-male-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
@@ -1104,15 +1060,69 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
       cache << "\n";
     }
   }
+  
+    // Get rid of this later, but check census data is the same as age-freq which has been validated
+if (print_extra_info_) {
+  if (fishery_census_data_.size() > 0) {
+    if (model_->get_sexed()) {
+      for (auto& fishery : fishery_index_) {
+        cache << "age_freq-census-male-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
+        cache << "year ";
+        for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
+          cache << age << " ";
+        cache << "\n";
+        for (unsigned year_ndx = 0; year_ndx < fishery_census_data_[fishery].size(); ++year_ndx) {
+          vector<unsigned> temp_age_freq(model_->age_spread(), 0.0);
+          cache << catch_year_[year_ndx] << " ";
+          for (unsigned cell_ndx = 0; cell_ndx < fishery_census_data_[fishery][year_ndx].size(); ++cell_ndx) {
+            if (fishery_census_data_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
+              for (unsigned age_ndx = 0; age_ndx < fishery_census_data_[fishery][year_ndx][cell_ndx].age_ndx_.size(); ++age_ndx) {
+                if (fishery_census_data_[fishery][year_ndx][cell_ndx].sex_[age_ndx] == 0)
+                  temp_age_freq[fishery_census_data_[fishery][year_ndx][cell_ndx].age_ndx_[age_ndx]]++;
+              }
+            }
+          }
+          for (auto& age_freq : temp_age_freq)
+            cache << age_freq << " ";
+          cache << "\n";
+        }
+      }
+      for (auto& fishery : fishery_index_) {
+        cache << "age_freq-census-female-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
+        cache << "year ";
+        for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
+          cache << age << " ";
+        cache << "\n";
+        for (unsigned year_ndx = 0; year_ndx < fishery_census_data_[fishery].size(); ++year_ndx) {
+          vector<unsigned> temp_age_freq(model_->age_spread(), 0.0);
+          cache << catch_year_[year_ndx] << " ";
+          for (unsigned cell_ndx = 0; cell_ndx < fishery_census_data_[fishery][year_ndx].size(); ++cell_ndx) {
+            if (fishery_census_data_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
+              for (unsigned age_ndx = 0; age_ndx < fishery_census_data_[fishery][year_ndx][cell_ndx].age_ndx_.size(); ++age_ndx) {
+                if (fishery_census_data_[fishery][year_ndx][cell_ndx].sex_[age_ndx] == 1)
+                  temp_age_freq[fishery_census_data_[fishery][year_ndx][cell_ndx].age_ndx_[age_ndx]]++;
+              }
+            }
+          }
+          for (auto& age_freq : temp_age_freq)
+            cache << age_freq << " ";
+          cache << "\n";
+        }
+      }
+    }
+  }
+}
+  if (removals_tag_recapture_.size() > 0) {
+    for (auto& tag_recapture : removals_tag_recapture_) {
+	  if (tag_recapture.age_.size() > 0) {
+	    cache << "tag_recapture_info-" << tag_recapture.year_ << "-" << tag_recapture.row_ << "-" << tag_recapture.col_ << " " << REPORT_R_LIST << "\n";
+	    cache << "scanned_fish: " << tag_recapture.scanned_fish_ << "\n";
+		cache << "expected_scanned_fish: " << tag_recapture.expected_scanned_ << "\n";
+	    cache << "prob_tagged_fish: " << tag_recapture.proportion_tagged_ << "\n";
+	    cache << "agents_sampled: " << tag_recapture.agents_sampled_ << "\n";
+		cache << "binomial_samples: " << tag_recapture.tag_draws_ << "\n";
+        if (print_extra_info_) {
 
-  if (print_extra_info_) {
-    if (removals_tag_recapture_.size() > 0) {
-      for (auto& tag_recapture : removals_tag_recapture_) {
-        if (tag_recapture.age_.size() > 0) {
-          cache << "tag_recapture_info-" << tag_recapture.year_ << "-" << tag_recapture.row_ << "-" << tag_recapture.col_ << " " << REPORT_R_LIST << "\n";
-          cache << "scanned_fish: " << tag_recapture.scanned_fish_ << "\n";
-          cache << "prob_tagged_fish: " << tag_recapture.proportion_tagged_ << "\n";
-          cache << "agents_sampled: " << tag_recapture.agents_sampled_ << "\n";
           cache << "values " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
           LOG_MEDIUM() << "ages = " << tag_recapture.age_.size();
           cache << "rowlabs ";
@@ -1144,29 +1154,32 @@ void  MortalityEventBiomass::FillReportCache(ostringstream& cache) {
           for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
             cache << tag_recapture.tag_col_[ndx] << " ";
           cache << "\n" << REPORT_R_LIST_END << "\n";
-        }
-      }
-    }
 
-    LOG_FINE() << fishery_census_data_.size() << " census vals";
-    // Print census information
-    for(unsigned fish_ndx = 0; fish_ndx < fishery_census_data_.size(); ++fish_ndx) {
-      for(unsigned year_ndx = 0; year_ndx < fishery_census_data_[fish_ndx].size(); ++year_ndx) {
-        for(unsigned cell_ndx = 0; cell_ndx < fishery_census_data_[fish_ndx][year_ndx].size(); ++cell_ndx) {
-          if (fishery_census_data_[fish_ndx][year_ndx][cell_ndx].age_ndx_.size() > 0) {
-            cache << "census_info-" << fishery_label_[fishery_index_[fish_ndx]] << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].year_ << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].row_ << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].col_ << " " << REPORT_R_MATRIX << "\n";
-            for (unsigned age_ndx = 0; age_ndx < fishery_census_data_[fish_ndx][year_ndx][cell_ndx].age_ndx_.size(); ++age_ndx)
-              cache << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].age_ndx_[age_ndx] + model_->min_age() << " ";
-            cache << "\n";
-            for (unsigned length_ndx = 0; length_ndx < fishery_census_data_[fish_ndx][year_ndx][cell_ndx].length_ndx_.size(); ++length_ndx)
-              cache << model_->length_bin_mid_points()[fishery_census_data_[fish_ndx][year_ndx][cell_ndx].length_ndx_[length_ndx]] << " ";
-            cache << "\n";
-          }
-        }
-      }
+    
+
+		LOG_FINE() << fishery_census_data_.size() << " census vals";
+		// Print census information
+		for(unsigned fish_ndx = 0; fish_ndx < fishery_census_data_.size(); ++fish_ndx) {
+		  for(unsigned year_ndx = 0; year_ndx < fishery_census_data_[fish_ndx].size(); ++year_ndx) {
+			for(unsigned cell_ndx = 0; cell_ndx < fishery_census_data_[fish_ndx][year_ndx].size(); ++cell_ndx) {
+			  if (fishery_census_data_[fish_ndx][year_ndx][cell_ndx].age_ndx_.size() > 0) {
+				cache << "census_info-" << fishery_label_[fishery_index_[fish_ndx]] << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].year_ << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].row_ << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].col_ << " " << REPORT_R_MATRIX << "\n";
+				for (unsigned age_ndx = 0; age_ndx < fishery_census_data_[fish_ndx][year_ndx][cell_ndx].age_ndx_.size(); ++age_ndx)
+				  cache << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].age_ndx_[age_ndx] + model_->min_age() << " ";
+				cache << "\n";
+				for (unsigned length_ndx = 0; length_ndx < fishery_census_data_[fish_ndx][year_ndx][cell_ndx].length_ndx_.size(); ++length_ndx)
+				  cache << model_->length_bin_mid_points()[fishery_census_data_[fish_ndx][year_ndx][cell_ndx].length_ndx_[length_ndx]] << " ";
+				cache << "\n";
+			  }
+			}
+		  }
+		}
+	  } else {
+		  cache << REPORT_R_LIST_END << "\n";
+	  }
+	  }
     }
   }
-
 }
 
 // true means all years are found, false means there is a mismatch in years

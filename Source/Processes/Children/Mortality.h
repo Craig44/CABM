@@ -62,6 +62,9 @@ struct tag_recapture {
   unsigned col_;
   unsigned time_step_;
   unsigned scanned_fish_ = 0;
+  double   expected_scanned_ = 0;
+  unsigned tag_draws_ = 0;
+
   unsigned agents_sampled_ = 0;
   float proportion_tagged_ = 0;
   vector<unsigned> age_;
@@ -71,6 +74,7 @@ struct tag_recapture {
   vector<unsigned> time_at_liberty_;
   vector<unsigned> tag_row_;
   vector<unsigned> tag_col_;
+  vector<unsigned> tag_release_year_;
   vector<float> length_increment_;
   tag_recapture(unsigned year, unsigned row, unsigned col, unsigned time_step) : year_(year),
       row_(row), col_(col), time_step_(time_step) {}

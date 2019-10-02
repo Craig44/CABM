@@ -57,6 +57,8 @@ public:
   virtual const unsigned&      get_number_tags() const {return tag_;};
   virtual const unsigned&      get_tag_row() const {return tag_row_;};
   virtual const unsigned&      get_tag_col() const {return tag_col_;};
+  virtual const unsigned&      get_tag_release_year() const {return tag_year_;};
+
   float                        get_length_increment_since_tag()  {return length_ - length_at_tag_;};
   unsigned                     get_time_at_liberty(unsigned current_time_step)  {return current_time_step - tag_time_step_;};
 
@@ -92,17 +94,18 @@ protected:
   float                       second_length_weight_par_;   // b
   // TODO link an agent to its home for natal homing dynamics
   Model*                      model_ = nullptr; // might not need
-  bool                        mature_ = false;
+  bool                        mature_ = false;  // if maturity is in the partition, are all these agents mature?
   unsigned                    sex_ = 0; // 1 = male, 0 = female TODO
-  float                       scalar_ = 1.0;
-  unsigned                    home_row_;
-  unsigned                    home_col_;
+  float                       scalar_ = 1.0; // number of individuals this agent represents
+  unsigned                    home_row_; // Row agent born in 
+  unsigned                    home_col_; // col agent born in 
   unsigned                    tag_ = 0; // number of tags, fish can be double tagged
+  unsigned					  tag_year_;
   float                       length_at_tag_ = 0.0;
   unsigned                    tag_time_step_ = 0; // number of tags, fish can be double tagged
   bool                        alive_ = true;
-  unsigned                    tag_row_;
-  unsigned                    tag_col_;
+  unsigned                    tag_row_;			   // row agent tagged
+  unsigned                    tag_col_;				// col agent was tagged
   unsigned                    life_stage_;  // 1 = larvae, 2 = immature, 3 = mature. // TODO perhaps this could be dealt with in the WorldCell level partition the agents for each cell, then processes can call
                                             // The life history of interest.
 

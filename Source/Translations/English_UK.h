@@ -625,6 +625,7 @@
 #define PARAM_TAG_LOSS                            "tag_loss"
 #define PARAM_TAG_RECAPTURE_BY_AGE                "tag_recapture_by_age"
 #define PARAM_TAG_RECAPTURE_BY_LENGTH             "tag_recapture_by_length"
+#define PARAM_TAG_RELEASE_YEAR					  "tag_release_year"
 #define PARAM_TAU1                                "tau1"
 #define PARAM_TAU2                                "tau2"
 #define PARAM_TARGET_CATEGORIES                   "categories2"

@@ -36,6 +36,8 @@ namespace utils = niwa::utilities;
 TagRecaptureByLength::TagRecaptureByLength(Model* model) : Observation(model) {
 
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "The years of the observed values", "");
+  parameters_.Bind<unsigned>(PARAM_TAG_RELEASE_YEAR, &tag_release_year_, "The years that the tagged fish were released", "");
+
   parameters_.Bind<bool>(PARAM_SEXED, &sexed_, "Seperate observation by sex", "", true);
   parameters_.Bind<string>(PARAM_PROCESS_LABEL, &process_label_, "Label of of removal process", "", "");
   parameters_.Bind<string>(PARAM_LAYER_OF_STRATUM_DEFINITIONS, &layer_label_, "The layer that indicates what the stratum boundaries are.", "");
@@ -99,12 +101,6 @@ void TagRecaptureByLength::DoBuild() {
             cell_found = true;
             stratum_rows_[cell].push_back(row);
             stratum_cols_[cell].push_back(col);
-
-            if (stratum_weight_method_ == PARAM_AREA) {
-              WorldCell* world_cell = world_->get_base_square(row, col);
-              if (world_cell->is_enabled())
-                stratum_area_[cell] = world_cell->get_area();
-            }
           }
         }
       }
@@ -120,11 +116,6 @@ void TagRecaptureByLength::DoBuild() {
         stratum_cols_[temp_cell].push_back(col);
         if (find(cells_.begin(), cells_.end(), temp_cell) == cells_.end())
           cells_.push_back(temp_cell);
-        if (stratum_weight_method_ == PARAM_AREA) {
-          WorldCell* world_cell = world_->get_base_square(row, col);
-          if (world_cell->is_enabled())
-            stratum_area_[temp_cell] = world_cell->get_area();
-        }
       }
     }
   }
@@ -167,7 +158,7 @@ void TagRecaptureByLength::Simulate() {
   LOG_MEDIUM() << "Simulating data for observation = " << label_;
   ClearComparison(); // Clear comparisons
 
-  utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+  //utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
 
   vector<processes::tag_recapture>& tag_recapture_data = mortality_process_->get_tag_recapture_info();
   //vector<processes::composition_data>& length_frequency = mortality_process_->get_removals_by_length();
@@ -178,6 +169,7 @@ void TagRecaptureByLength::Simulate() {
     LOG_FINE() << "About to sort our info for year " << years_[year_ndx];
     for (unsigned stratum_ndx = 0; stratum_ndx < cells_.size(); ++stratum_ndx) {
 
+		
     }
   }
 } // DoExecute
