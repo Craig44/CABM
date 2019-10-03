@@ -89,7 +89,7 @@ void Logistic::RebuildCache() {
       else if (threshold < -5.0)
         length_values_[length_bin_index] = alpha_;
       else
-        length_values_[length_bin_index] = alpha_ - (alpha_ / (1.0 + pow(19.0, threshold)));
+        length_values_[length_bin_index] = alpha_ / (1.0 + pow(19.0, threshold));
     }
   }
 }
