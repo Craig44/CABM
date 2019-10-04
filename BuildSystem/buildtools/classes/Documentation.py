@@ -418,7 +418,7 @@ class VariableLoader:
         pieces = re.split(',|<|>|;|(|)', short_line)
         pieces = filter(None, pieces)
 
-        if len(pieces) != 3 and len(pieces) != 2 and len(pieces) != 1:
+        if len(pieces) != 4 and len(pieces) != 3 and len(pieces) != 2 and len(pieces) != 1:
             return Globals.PrintError('Expected 2 or 3 pieces but got ' + str(len(pieces)) + ' with line: ' + line)
 
         if len(pieces) == 1:
