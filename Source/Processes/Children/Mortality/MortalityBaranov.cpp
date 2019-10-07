@@ -366,7 +366,7 @@ void MortalityBaranov::DoExecute() {
                         if ((*iter).get_number_tags() > 0) {
                           // fish has a tag record it
                           tag_recapture_info.age_.push_back((*iter).get_age());
-                          tag_recapture_info.length_.push_back((*iter).get_length());
+                          tag_recapture_info.length_ndx_.push_back((*iter).get_length_bin_index());
                           tag_recapture_info.time_at_liberty_.push_back((*iter).get_time_at_liberty(current_time_step_by_space_[row][col]));
                           tag_recapture_info.length_increment_.push_back((*iter).get_length_increment_since_tag());
                           tag_recapture_info.tag_row_.push_back((*iter).get_tag_row());
@@ -438,7 +438,7 @@ void MortalityBaranov::DoExecute() {
                         if ((*iter).get_number_tags() > 0) {
                           // fish has a tag record it
                           tag_recapture_info.age_.push_back((*iter).get_age());
-                          tag_recapture_info.length_.push_back((*iter).get_length());
+                          tag_recapture_info.length_ndx_.push_back((*iter).get_length_bin_index());
                           tag_recapture_info.time_at_liberty_.push_back((*iter).get_time_at_liberty(current_time_step_by_space_[row][col]));
                           tag_recapture_info.length_increment_.push_back((*iter).get_length_increment_since_tag());
                           tag_recapture_info.tag_row_.push_back((*iter).get_tag_row());
@@ -510,7 +510,7 @@ void MortalityBaranov::DoExecute() {
                         if ((*iter).get_number_tags() > 0) {
                           // fish has a tag record it
                           tag_recapture_info.age_.push_back((*iter).get_age());
-                          tag_recapture_info.length_.push_back((*iter).get_length());
+                          tag_recapture_info.length_ndx_.push_back((*iter).get_length_bin_index());
                           tag_recapture_info.time_at_liberty_.push_back((*iter).get_time_at_liberty(current_time_step_by_space_[row][col]));
                           tag_recapture_info.length_increment_.push_back((*iter).get_length_increment_since_tag());
                           tag_recapture_info.tag_row_.push_back((*iter).get_tag_row());
@@ -582,7 +582,7 @@ void MortalityBaranov::DoExecute() {
                         if ((*iter).get_number_tags() > 0) {
                           // fish has a tag record it
                           tag_recapture_info.age_.push_back((*iter).get_age());
-                          tag_recapture_info.length_.push_back((*iter).get_length());
+                          tag_recapture_info.length_ndx_.push_back((*iter).get_length_bin_index());
                           tag_recapture_info.time_at_liberty_.push_back((*iter).get_time_at_liberty(current_time_step_by_space_[row][col]));
                           tag_recapture_info.length_increment_.push_back((*iter).get_length_increment_since_tag());
                           tag_recapture_info.tag_row_.push_back((*iter).get_tag_row());
@@ -696,7 +696,7 @@ void  MortalityBaranov::FillReportCache(ostringstream& cache) {
           cache << tag_recapture.age_[ndx] << " ";
         cache << "\n";
         for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
-          cache << tag_recapture.length_[ndx] << " ";
+          cache << tag_recapture.length_ndx_[ndx] << " ";
         cache << "\n";
         for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
           cache << tag_recapture.time_at_liberty_[ndx] << " ";

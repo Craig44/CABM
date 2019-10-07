@@ -574,7 +574,7 @@ void MortalityEventBiomass::DoExecute() {
                                 //fish has a tag record it
                                 tag_recapture_info.age_.push_back((*this_agent).get_age());
                                 tag_recapture_info.sex_.push_back((*this_agent).get_sex());
-                                tag_recapture_info.length_.push_back((*this_agent).get_length());
+                                tag_recapture_info.length_ndx_.push_back((*this_agent).get_length_bin_index());
                                 tag_recapture_info.fishery_ndx_.push_back(fishery_ndx);
                                 tag_recapture_info.time_at_liberty_.push_back((*this_agent).get_time_at_liberty(time_step));
                                 tag_recapture_info.length_increment_.push_back((*this_agent).get_length_increment_since_tag());
@@ -856,7 +856,7 @@ void MortalityEventBiomass::DoExecute() {
                                 //fish has a tag record it
                                 tag_recapture_info.age_.push_back((*this_agent).get_age());
                                 tag_recapture_info.sex_.push_back((*this_agent).get_sex());
-                                tag_recapture_info.length_.push_back((*this_agent).get_length());
+                                tag_recapture_info.length_ndx_.push_back((*this_agent).get_length_bin_index());
                                 tag_recapture_info.fishery_ndx_.push_back(fishery_ndx);
                                 tag_recapture_info.time_at_liberty_.push_back((*this_agent).get_time_at_liberty(time_step));
                                 tag_recapture_info.length_increment_.push_back((*this_agent).get_length_increment_since_tag());
@@ -1101,7 +1101,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
           cache << "\n";
           cache << "length ";
           for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)
-            cache << tag_recapture.length_[ndx] << " ";
+            cache << model_->length_bin_mid_points()[tag_recapture.length_ndx_[ndx]] << " ";
           cache << "\n";
           cache << "at_liberty ";
           for (unsigned ndx = 0; ndx < tag_recapture.age_.size(); ++ndx)

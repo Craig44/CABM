@@ -56,6 +56,7 @@ protected:
   vector<unsigned>				  age_freq_;
   unsigned						  tag_release_year_;
   unsigned                        number_of_bootstraps_ = 0;
+  bool                            sexed_ = false; // TODO add this to the constructor
 
   Mortality*                      mortality_process_ = nullptr;
   string                          process_label_;

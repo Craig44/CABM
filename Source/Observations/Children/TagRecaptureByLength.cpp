@@ -76,8 +76,8 @@ void TagRecaptureByLength::DoBuild() {
   if (!mortality_process_)
     LOG_FATAL_P(PARAM_PROCESS_LABEL)<< "could not find the process " << process_label_ << ", please make sure it exists";
 
-  if (mortality_process_->type() == PARAM_MORTALITY_EVENT_BIOMASS) {
-    LOG_ERROR_P(PARAM_PROCESS_LABEL) << "We suggest that age observations for the mortality process of type " << PARAM_MORTALITY_EVENT_BIOMASS << " you use the observation type " << PARAM_MORTALITY_EVENT_BIOMASS_SCALED_AGE_FREQUENCY;
+  if (mortality_process_->type() != PARAM_MORTALITY_EVENT_BIOMASS) {
+    LOG_ERROR_P(PARAM_PROCESS_LABEL) << "We suggest that this observation only be applied for the process of type " << PARAM_MORTALITY_EVENT_BIOMASS;
   }
 
 
@@ -135,6 +135,8 @@ void TagRecaptureByLength::DoBuild() {
     for (auto val : col_map.second)
       LOG_FINE() << val;
   }
+
+  length_freq_.resize(model_->number_of_length_bins(), 0.0);
 }
 
 /**
@@ -163,13 +165,41 @@ void TagRecaptureByLength::Simulate() {
   vector<processes::tag_recapture>& tag_recapture_data = mortality_process_->get_tag_recapture_info();
   //vector<processes::composition_data>& length_frequency = mortality_process_->get_removals_by_length();
   LOG_FINE() << "length of census data = " << tag_recapture_data.size();
-  vector<unsigned> census_stratum_ndx;
 
   for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    fill(length_freq_.begin(), length_freq_.end(), 0.0);
     LOG_FINE() << "About to sort our info for year " << years_[year_ndx];
     for (unsigned stratum_ndx = 0; stratum_ndx < cells_.size(); ++stratum_ndx) {
-
-		
+      // Find out how many agents are available to be used for an ALK in this stratum
+      // -- loop over all cells that the fishery occured in (census data)
+      // -- if that area and fishery belongs to this stratum then summarise some numbers for use later.
+      //
+      // Calculate Length frequency for the strata
+      unsigned tag_recap_ndx = 0; // links back to the tag-recapture data
+      for (processes::tag_recapture &tag_recap : tag_recapture_data) {
+        // Find tag_recap elements that are in this year and stratum
+        if ((tag_recap.year_ == years_[year_ndx])
+            && (find(stratum_rows_[cells_[stratum_ndx]].begin(), stratum_rows_[cells_[stratum_ndx]].end(), tag_recap.row_)
+                != stratum_rows_[cells_[stratum_ndx]].end())
+            && (find(stratum_cols_[cells_[stratum_ndx]].begin(), stratum_cols_[cells_[stratum_ndx]].end(), tag_recap.col_)
+                != stratum_cols_[cells_[stratum_ndx]].end())) {
+          if (tag_recap.age_.size() > 0) {
+            for (unsigned length_ndx = 0; length_ndx < tag_recap.length_ndx_.size(); ++length_ndx) {
+              if (tag_release_year_ == tag_recap.tag_release_year_[length_ndx])
+                length_freq_[tag_recap.length_ndx_[length_ndx] - model_->min_age()]++;
+            }
+          }
+        }
+        ++tag_recap_ndx;
+      }
+      for (unsigned length_bin_ndx = 0; length_bin_ndx < length_freq_.size(); ++length_bin_ndx)
+        SaveComparison(0, model_->length_bin_mid_points()[length_bin_ndx], cells_[stratum_ndx], length_freq_[length_bin_ndx], 0.0, 0, years_[year_ndx]);
+    }
+  }
+  for (auto& iter : comparisons_) {
+    for (auto& second_iter : iter.second) {  // cell
+      for (auto& comparison : second_iter.second)
+        comparison.simulated_ += comparison.expected_;
     }
   }
 } // DoExecute

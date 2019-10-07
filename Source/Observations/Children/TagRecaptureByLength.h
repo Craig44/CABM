@@ -51,8 +51,8 @@ protected:
   layers::CategoricalLayer*       layer_ = nullptr;
   string                          layer_label_;
   bool                            sexed_;
-  unsigned						  tag_release_year_;
-
+  unsigned						            tag_release_year_;
+  vector<float>                   length_freq_;
   Mortality*                      mortality_process_ = nullptr;
   string                          process_label_;
 

@@ -70,7 +70,7 @@ struct tag_recapture {
   vector<unsigned> age_;
   vector<unsigned> sex_;
   vector<unsigned> fishery_ndx_;
-  vector<float> length_;
+  vector<unsigned> length_ndx_;
   vector<unsigned> time_at_liberty_;
   vector<unsigned> tag_row_;
   vector<unsigned> tag_col_;
