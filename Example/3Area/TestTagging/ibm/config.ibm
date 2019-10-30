@@ -1,12 +1,3 @@
-!include "population.ibm"
-!inlcude observation.ibm
-!include "../Estimation.ibm"
-
-
-
-
-
-
 ## Model description, a hypothetical life cycle
 # 3 stock model
 # 3 spatial cells
@@ -31,7 +22,7 @@ natural_mortality_process_label natural_mort
 maturity_ogive_label mature_ogive
 nrows 3
 ncols 1
-max_threads_to_use 1
+#max_threads_to_use 1
 # --------------
 # Init Phase
 # --------------
@@ -108,15 +99,43 @@ time_step_ratio 0.5 0.5
 # Fishing Mortality
 @process fishing
 type mortality_event_biomass
-years 1990:2013
-catch_layers  1990_catch 1991_catch 1992_catch 1993_catch 1994_catch 1995_catch 1996_catch 1997_catch 1998_catch 1999_catch 2000_catch 2001_catch 2002_catch 2003_catch 2004_catch 2005_catch 2006_catch 2007_catch 2008_catch 2009_catch 2010_catch 2011_catch 2012_catch 2013_catch
-selectivity Sel_LL
 print_extra_info true
-scanning_years 1990:1996
-scanning_proportion_of_catch 0.7*7
+table catch
+year Fishing_LL
+1990	1990_catch
+1991	1991_catch
+1992	1992_catch
+1993	1993_catch
+1994	1994_catch
+1995	1995_catch
+1996	1996_catch
+1997	1997_catch
+1998	1998_catch
+1999	1999_catch
+2000	2000_catch
+2001	2001_catch
+2002	2002_catch
+2003	2003_catch
+2004	2004_catch
+2005	2005_catch
+2006	2006_catch
+2007	2007_catch
+2008	2008_catch
+2009	2009_catch
+2010	2010_catch
+2011	2011_catch
+2012	2012_catch
+2013	2013_catch
+end_table
+
+table method_info
+method 	 	selectivity	 	minimum_legel_length  handling_mortality
+Fishing_LL     Sel_LL	0			0
+end_table
 
 # Movement
 @process Movement_home
+selectivity_label One
 type movement_box_transfer
 movement_type natal_homing
 origin_cell 1-1 2-1 3-1
@@ -124,6 +143,7 @@ probability_layers EN_home HG_home BP_home
 
 # Stage-one movement
 @process Jump_One
+selectivity_label One
 type movement_box_transfer
 #movement_type natal_homing # not sure this matters since they are all home at this point
 origin_cell 1-1 2-1 3-1
@@ -336,6 +356,7 @@ error_value 0.2 * 24
 selectivities Sel_LL
 cell_layer cells
 cells r1-c1 r2-c1 r3-c1 
+catchability 0.2
 
 # --------------
 # Include Layers

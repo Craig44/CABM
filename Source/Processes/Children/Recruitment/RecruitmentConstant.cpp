@@ -108,7 +108,7 @@ void RecruitmentConstant::DoBuild() {
       }
       LOG_FINEST() << "process_index = " << process_index;
       if (!mortailty_block) {
-        process_index++;
+        //process_index++;
         derived_quantity_index = process_index;
         process_index++;
       }
