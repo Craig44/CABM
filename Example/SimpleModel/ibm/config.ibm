@@ -27,7 +27,7 @@ years 40
 #lambda 1
 number_of_individuals 1000000 ## initial number of agents
 layer_label Base
-recruitment_layer_label recruitment_labels
+#recruitment_layer_label recruitment_labels
 # --------------
 # Annual Time Sequence
 # --------------
@@ -222,7 +222,7 @@ time_step Annual
 #!include "Layers/k_layer.ibm"
 !include "Layers/M_layer.ibm"
 !include "Layers/recruitment_areas.ibm"
-!include "Layers/recruitment_labels.ibm"
+#!include "Layers/recruitment_labels.ibm"
 ## Catch layers
 !include "Layers/CatchLayers/catch_1970.ibm"
 !include "Layers/CatchLayers/catch_1981.ibm"
