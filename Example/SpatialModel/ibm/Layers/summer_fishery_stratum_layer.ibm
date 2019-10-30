@@ -1,0 +1,14 @@
+@layer summery_fishery_catch_at_age_stratum
+type categorical
+table layer 
+Inshore Inshore Inshore Offshore Offshore Offshore Offshore Offshore Offshore Offshore
+Inshore Inshore Inshore Offshore Offshore Offshore Offshore Offshore Offshore Offshore
+Inshore Inshore Offshore Offshore Offshore Offshore Offshore Offshore Offshore Offshore
+Inshore Inshore Offshore Offshore Offshore Offshore Offshore Offshore Offshore Offshore
+Inshore Inshore Offshore Offshore Offshore Offshore Offshore Offshore Offshore Offshore
+Inshore Inshore Offshore Offshore Offshore Offshore Offshore Offshore Offshore Offshore
+Inshore Inshore Offshore Offshore Offshore Offshore Offshore Offshore Offshore Offshore
+Inshore Inshore Offshore Offshore Offshore Offshore Offshore Offshore Offshore Offshore
+Inshore Inshore Inshore Offshore Offshore Offshore Offshore Offshore Offshore Offshore
+Inshore Inshore Inshore Offshore Offshore Offshore Offshore Offshore Offshore Offshore
+end_table

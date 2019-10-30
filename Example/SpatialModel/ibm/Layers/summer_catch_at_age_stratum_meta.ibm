@@ -1,0 +1,5 @@
+@layer summer_fishery_stratum_meta
+type categorical_meta
+default_layer summery_fishery_catch_at_age_stratum
+years 1990:2018
+layer_labels summery_fishery_catch_at_age_stratum*29
