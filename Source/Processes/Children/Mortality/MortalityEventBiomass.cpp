@@ -910,7 +910,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
   // Fishery specific info
   // actual catches
   if (fishery_actual_catch_taken_[0].size() > 0) {
-    cache << "actual_catches " << REPORT_R_DATAFRAME << "\n";
+    cache << "actual_catches " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
     cache << "year ";
     for (auto& fishery : fishery_label_)
       cache << fishery << " ";
@@ -924,7 +924,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
   }
 
   if (fishery_catch_to_take_[0].size() > 0) {
-    cache << "catches " << REPORT_R_DATAFRAME << "\n";
+    cache << "catches " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
     cache << "year ";
     for (auto& fishery : fishery_label_)
       cache << fishery << " ";
@@ -940,7 +940,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
   if (age_comp_by_fishery_.size() > 0) {
     if (model_->get_sexed()) {
       for (auto& fishery : fishery_index_) {
-        cache << "age_freq-male-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
+        cache << "age_freq-male-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
         cache << "year ";
         for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
           cache << age << " ";
@@ -962,7 +962,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
       }
 
       for (auto& fishery : fishery_index_) {
-        cache << "age_freq-female-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
+        cache << "age_freq-female-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
         cache << "year ";
         for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
           cache << age << " ";
@@ -985,7 +985,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
 
     } else {
       for (auto& fishery : fishery_index_) {
-        cache << "age_freq-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
+        cache << "age_freq-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
         cache << "year ";
         for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
           cache << age << " ";
@@ -1009,7 +1009,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
   }
 
   if (removals_by_age_.size() > 0) {
-    cache << "age_frequency " << REPORT_R_DATAFRAME << "\n";
+    cache << "age_frequency " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
     cache << "year ";
     for (unsigned i = model_->min_age(); i <= model_->max_age(); ++i)
       cache << i << " ";
@@ -1027,7 +1027,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
     if (fishery_census_data_.size() > 0) {
       if (model_->get_sexed()) {
         for (auto& fishery : fishery_index_) {
-          cache << "age_freq-census-male-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
+          cache << "age_freq-census-male-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
           cache << "year ";
           for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
             cache << age << " ";
@@ -1049,7 +1049,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
           }
         }
         for (auto& fishery : fishery_index_) {
-          cache << "age_freq-census-female-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
+          cache << "age_freq-census-female-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
           cache << "year ";
           for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
             cache << age << " ";

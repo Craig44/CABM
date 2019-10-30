@@ -57,7 +57,7 @@ void Selectivity::Validate() {
  *
  */
 void Selectivity::Reset() {
-
+  RebuildCache();
 }
 
 /**
