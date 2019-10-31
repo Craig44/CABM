@@ -413,7 +413,7 @@ void Tagging::DoExecute() {
 // FillReportCache, called in the report class, it will print out additional information that is stored in
 // containers in this class.
 void  Tagging::FillReportCache(ostringstream& cache) {
-  cache << "global_tag_release_age_distribution " << REPORT_R_DATAFRAME << "\n";
+  cache << "global_tag_release_age_distribution " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
   cache << "year";
   for (unsigned age = 0; age < model_->age_spread(); ++age) {
     cache << " " << age + model_->min_age();
@@ -424,7 +424,7 @@ void  Tagging::FillReportCache(ostringstream& cache) {
       cache << " " << year_value.second[age_ndx];
   }
   cache << "\n";
-  cache << "global_tag_release_length_distribution " << REPORT_R_DATAFRAME << "\n";
+  cache << "global_tag_release_length_distribution " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
   cache << "year";
   for (unsigned length_ndx = 0; length_ndx < model_->length_bin_mid_points().size(); ++length_ndx) {
     cache << " " << model_->length_bin_mid_points()[length_ndx];

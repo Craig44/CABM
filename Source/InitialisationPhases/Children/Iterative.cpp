@@ -32,7 +32,7 @@ namespace initialisationphases {
 Iterative::Iterative(Model* model)
   : InitialisationPhase(model) {
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "The number of iterations (years) over which to execute this initialisation phase", "");
-  parameters_.Bind<unsigned>(PARAM_NUMBER_OF_INDIVIDUALS, &number_agents_, "The number of agents to initially seed in the partition", "");
+  parameters_.Bind<unsigned>(PARAM_INITIAL_NUMBER_OF_AGENTS, &number_agents_, "The number of agents to initially seed in the partition", "");
   parameters_.Bind<string>(PARAM_LAYER_LABEL, &intial_layer_label_, "The label of a layer that you want to seed a distribution by.", "", "");
   parameters_.Bind<string>(PARAM_RECRUITMENT_LAYER_LABEL, &recruitement_layer_label_, "The label of a layer has a recruitment process label in each cell to see how to set scalars", "", "");
 

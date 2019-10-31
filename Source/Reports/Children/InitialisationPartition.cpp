@@ -55,7 +55,7 @@ void InitialisationPartition::DoExecute() {
     cache_ << "*"<< type_ << "[" << label_ << "_2]" << "\n";
     cache_ << "year: " << model_->current_year() << "\n";
   }
-  cache_ << "values "<< REPORT_R_DATAFRAME<<"\n";
+  cache_ << "values "<< REPORT_R_DATAFRAME_ROW_LABELS <<"\n";
   cache_ << "row-col";
   for (unsigned i = model_->min_age(); i <=  model_->max_age(); ++i)
     cache_ << " " << i;

@@ -48,21 +48,25 @@ public:
 protected:
   // members
   vector<unsigned>                years_;
-  vector<string>                  cells_;
+  vector<string>                  recapture_stratum_;
+  string                          release_stratum_;
+
   layers::CategoricalLayer*       layer_ = nullptr;
   string                          layer_label_;
   AgeingError*                    ageing_error_ = nullptr;
   string                          ageing_error_label_;
-  vector<unsigned>				  age_freq_;
-  unsigned						  tag_release_year_;
+  vector<unsigned>        				age_freq_;
+  unsigned					              tag_release_year_;
   unsigned                        number_of_bootstraps_ = 0;
   bool                            sexed_ = false; // TODO add this to the constructor
 
   Mortality*                      mortality_process_ = nullptr;
   string                          process_label_;
   
-  map<string,vector<unsigned>>    stratum_rows_;
-  map<string,vector<unsigned>>    stratum_cols_;
+  vector<unsigned>                release_stratum_rows_;
+  vector<unsigned>                release_stratum_cols_;
+  map<string,vector<unsigned>>    recapture_stratum_rows_;
+  map<string,vector<unsigned>>    recapture_stratum_cols_;
   WorldView*                      world_ = nullptr;
   
 };
