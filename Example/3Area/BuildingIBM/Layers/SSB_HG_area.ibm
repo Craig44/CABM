@@ -1,0 +1,7 @@
+@layer SSB_HG
+type integer
+table layer
+0
+1
+0
+end_table

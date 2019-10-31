@@ -45,6 +45,7 @@ function (file, path = "",fileEncoding = "") {
         cat("loading a run from -i or -s format\n")
       }
     }
+    get_time = substring(get.lines(file, starts.with = "Total elapsed time:",fixed=F), first = 21)
     
     multi_year_reports = c("summarise_agents", "world_age_frequency","numeric_layer","age_frequency_by_cell")
     
@@ -107,7 +108,8 @@ function (file, path = "",fileEncoding = "") {
           }
           file = get.lines(file, clip.to = "*end")
         }
-    } 
+    }
+    result[["model_run_time"]] = get_time
     result<-set.class(result,"ibm_output")
     result
   } else {

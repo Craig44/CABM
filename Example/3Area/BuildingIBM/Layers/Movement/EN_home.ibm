@@ -1,0 +1,9 @@
+@layer EN_home
+proportions true
+type numeric
+## cells could be areas if we wanted densities
+table layer
+1
+0
+0
+end_table

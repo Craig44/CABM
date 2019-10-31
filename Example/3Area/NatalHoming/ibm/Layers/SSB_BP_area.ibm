@@ -1,7 +1,0 @@
-@layer SSB_BP
-type integer
-table layer
-0
-0
-1
-end_table

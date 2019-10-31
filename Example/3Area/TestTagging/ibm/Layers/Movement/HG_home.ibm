@@ -1,9 +1,0 @@
-@layer HG_home
-type numeric
-proportions true
-## cells could be areas if we wanted densities
-table layer
-0
-1
-0
-end_table

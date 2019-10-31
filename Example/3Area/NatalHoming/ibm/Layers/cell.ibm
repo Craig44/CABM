@@ -1,7 +1,0 @@
-@layer cells
-type categorical
-table layer
-r1-c1
-r2-c1
-r3-c1
-end_table

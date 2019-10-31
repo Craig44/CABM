@@ -1,0 +1,276 @@
+IBM
+Call: ibm -r -g 123 
+Seed: 123
+Date: Fri Nov 01 12:53:30 2019
+Version: 2019-10-07 02:58:21 UTC (rev. 2006f9b)
+Environment: machine:DESKTOP-D3MBM6L, user:Dell User, os:Windows_NT, pid:9736
+
+*initialisation_partition[init_1]
+equilibrium_shortcut: 1939
+values {d_r}
+row-col 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+1-1 51531 44680 39285 34636 30586 26602 23623 20273 18020 15746 13988 12211 10771 9289 8244 7099 6290 5565 4907 4303 31323
+2-1 56817 49708 43468 38496 33666 29382 25937 22880 19961 17769 15422 13690 11704 10573 9356 8101 7010 6323 5384 4951 34636
+3-1 14078 12289 10993 9499 8430 7395 6370 5709 5007 4368 3866 3353 2928 2554 2364 1977 1796 1549 1382 1251 8635
+*end
+
+*initialisation_partition[init_2]
+year: 1989
+values {d_r}
+row-col 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+1-1 1.90242e+007 1.67745e+007 1.47557e+007 1.29144e+007 1.13231e+007 9.98985e+006 8.85047e+006 7.79261e+006 6.79533e+006 6.03144e+006 5.36072e+006 4.68359e+006 4.09952e+006 3.66649e+006 3.21638e+006 2.86129e+006 2.46972e+006 2.19959e+006 1.95725e+006 1.74583e+006 1.34476e+007
+2-1 1.94555e+007 1.70738e+007 1.49668e+007 1.32062e+007 1.16434e+007 1.02537e+007 8.98703e+006 7.96775e+006 6.973e+006 6.15522e+006 5.43743e+006 4.71794e+006 4.21722e+006 3.74226e+006 3.23938e+006 2.92497e+006 2.60544e+006 2.21051e+006 1.99319e+006 1.77222e+006 1.3719e+007
+3-1 4.21774e+006 3.68765e+006 3.25881e+006 2.8518e+006 2.53253e+006 2.17941e+006 1.9171e+006 1.72049e+006 1.52194e+006 1.33293e+006 1.17174e+006 1.06124e+006 911084 802196 702173 629343 538809 468135 452523 382477 2.97867e+006
+*end
+
+*age_frequency_by_cell[Jan_Mar_age_freq]
+year: 1990
+time_step: Jan_Mar
+values {d}
+row-col 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+1-1 0 1.86383e+007 1.63883e+007 1.44195e+007 1.263e+007 1.11415e+007 9.75002e+006 8.6522e+006 7.61773e+006 6.64403e+006 5.88989e+006 5.23548e+006 4.56009e+006 4.00327e+006 3.59966e+006 3.15454e+006 2.80358e+006 2.39912e+006 2.12948e+006 1.918e+006 1.48462e+007
+2-1 0 1.92105e+007 1.69214e+007 1.48182e+007 1.30633e+007 1.14511e+007 1.01611e+007 8.88576e+006 7.885e+006 6.91812e+006 6.10096e+006 5.39098e+006 4.6936e+006 4.18336e+006 3.67786e+006 3.19285e+006 2.89183e+006 2.59554e+006 2.21061e+006 1.97145e+006 1.53387e+007
+3-1 0 4.84951e+006 4.22601e+006 3.74279e+006 3.27829e+006 2.90577e+006 2.51124e+006 2.21625e+006 1.97809e+006 1.7281e+006 1.5287e+006 1.34343e+006 1.20907e+006 1.04121e+006 933437 810554 720200 619331 538176 513534 3.85974e+006
+*end
+
+*age_frequency_by_cell[Apr_Dec_age_freq]
+year: 1990
+time_step: Apr_Dec
+values {d}
+row-col 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+1-1 6.52753e+007 1.67915e+007 1.47227e+007 1.29401e+007 1.13553e+007 1.00207e+007 8.75622e+006 7.79494e+006 6.84072e+006 5.97296e+006 5.27063e+006 4.68993e+006 4.09071e+006 3.59768e+006 3.23911e+006 2.83472e+006 2.52865e+006 2.17399e+006 1.92282e+006 1.75128e+006 1.34246e+007
+2-1 2.26965e+007 1.69719e+007 1.50383e+007 1.31617e+007 1.16095e+007 1.01823e+007 9.0179e+006 7.8957e+006 7.03279e+006 6.15098e+006 5.46562e+006 4.83005e+006 4.2086e+006 3.72755e+006 3.31045e+006 2.85193e+006 2.5728e+006 2.30932e+006 1.97732e+006 1.75755e+006 1.37666e+007
+3-1 4.17859e+006 3.72356e+006 3.21752e+006 2.83725e+006 2.49267e+006 2.23022e+006 1.92045e+006 1.68552e+006 1.51786e+006 1.34114e+006 1.18081e+006 1.02507e+006 940951 800424 709139 623781 554817 475590 411654 395945 2.97602e+006
+*end
+
+*age_frequency_by_cell[Jan_Mar_age_freq]
+year: 1991
+time_step: Jan_Mar
+values {d}
+row-col 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+1-1 0 6.871e+007 1.63729e+007 1.43763e+007 1.26459e+007 1.10884e+007 9.79325e+006 8.57345e+006 7.58819e+006 6.71465e+006 5.83382e+006 5.18198e+006 4.6106e+006 4.02723e+006 3.52134e+006 3.17808e+006 2.75607e+006 2.46332e+006 2.10894e+006 1.8769e+006 1.48394e+007
+2-1 0 1.88275e+007 1.68568e+007 1.4901e+007 1.30121e+007 1.14929e+007 1.0089e+007 8.92043e+006 7.84008e+006 6.92954e+006 6.10057e+006 5.39294e+006 4.7523e+006 4.13766e+006 3.68338e+006 3.25234e+006 2.83549e+006 2.54866e+006 2.29768e+006 1.96278e+006 1.53513e+007
+3-1 0 4.60162e+006 4.25689e+006 3.70041e+006 3.28026e+006 2.87555e+006 2.55034e+006 2.20015e+006 1.94787e+006 1.74715e+006 1.53067e+006 1.34211e+006 1.18213e+006 1.07537e+006 920951 828297 718885 644302 552304 472135 3.8801e+006
+*end
+
+*age_frequency_by_cell[Apr_Dec_age_freq]
+year: 1991
+time_step: Apr_Dec
+values {d}
+row-col 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+1-1 8.74743e+006 5.73224e+007 1.47249e+007 1.29774e+007 1.13491e+007 9.95684e+006 8.82459e+006 7.70241e+006 6.8739e+006 6.01794e+006 5.26737e+006 4.64087e+006 4.16953e+006 3.64805e+006 3.18623e+006 2.89286e+006 2.48781e+006 2.22287e+006 1.92497e+006 1.68424e+006 1.35077e+007
+2-1 6.07267e+006 1.99911e+007 1.49703e+007 1.31405e+007 1.15081e+007 1.02321e+007 8.92799e+006 7.97793e+006 6.92643e+006 6.17766e+006 5.45e+006 4.82896e+006 4.22682e+006 3.6741e+006 3.26893e+006 2.91741e+006 2.54722e+006 2.2632e+006 2.02578e+006 1.77682e+006 1.37392e+007
+3-1 2.80443e+006 3.65733e+006 3.25838e+006 2.8305e+006 2.52839e+006 2.20268e+006 1.95615e+006 1.70176e+006 1.50203e+006 1.34846e+006 1.18334e+006 1.02281e+006 926429 833043 705330 634130 531780 500795 423616 370423 2.99715e+006
+*end
+
+*process[M_report]
+cv: 0.150000006
+distribution: lognormal
+label: natural_mort
+m: 0.129999995
+m_multiplier_layer_label: M_layer
+selectivity_label: HalfOne HalfOne
+time_step_ratio: 1
+type: mortality_constant_rate
+update_mortality_parameters: 0
+year: 1990 1991 
+agents_removed: 138533 127308 
+*end
+
+*process[mature_report]
+label: Maturation
+type: maturation
+year: 1990 1991 
+agents_mature: 68569 68120 
+*end
+
+*process[Jump_One]
+label: Jump_One
+movement_type: markovian
+origin_cell: 1-1 2-1 3-1
+probability_layers: EN_jump_one HG_jump_one BP_jump_one
+selectivity_label: One One
+type: movement_box_transfer
+year-area-1990_1-1 {L}
+initial_numbers_in_cell: 548413
+destination_values {m}
+505770 
+40980 
+1663 
+end {L}
+year-area-1990_2-1 {L}
+initial_numbers_in_cell: 464563
+destination_values {m}
+39025 
+424542 
+996 
+end {L}
+year-area-1990_3-1 {L}
+initial_numbers_in_cell: 139453
+destination_values {m}
+7559 
+13219 
+118675 
+end {L}
+year-area-1991_1-1 {L}
+initial_numbers_in_cell: 505451
+destination_values {m}
+466137 
+37882 
+1432 
+end {L}
+year-area-1991_2-1 {L}
+initial_numbers_in_cell: 425331
+destination_values {m}
+35912 
+388587 
+832 
+end {L}
+year-area-1991_3-1 {L}
+initial_numbers_in_cell: 134095
+destination_values {m}
+7252 
+12630 
+114213 
+end {L}
+*end
+
+*process[Movement_home]
+label: Movement_home
+movement_type: natal_homing
+origin_cell: 1-1 2-1 3-1
+probability_layers: EN_home HG_home BP_home
+selectivity_label: One One
+type: movement_box_transfer
+year-area-1990_1-1 {L}
+initial_numbers_in_cell: 377977
+destination_values {m}
+336972 
+34389 
+6616 
+end {L}
+year-area-1990_2-1 {L}
+initial_numbers_in_cell: 413952
+destination_values {m}
+27400 
+374839 
+11713 
+end {L}
+year-area-1990_3-1 {L}
+initial_numbers_in_cell: 107015
+destination_values {m}
+1069 
+835 
+105111 
+end {L}
+year-area-1991_1-1 {L}
+initial_numbers_in_cell: 485627
+destination_values {m}
+444506 
+34443 
+6678 
+end {L}
+year-area-1991_2-1 {L}
+initial_numbers_in_cell: 421556
+destination_values {m}
+36034 
+373818 
+11704 
+end {L}
+year-area-1991_3-1 {L}
+initial_numbers_in_cell: 106713
+destination_values {m}
+1459 
+868 
+104386 
+end {L}
+*end
+
+*process[Rec_EN]
+b0: 113880
+label: Recruitment_EN
+proportion_male: 1 1
+recruitment_layer_label: recruitment_EN
+ssb: SSB_EN
+steepness: 0.75
+type: recruitment_beverton_holt
+ycs_values: 3.68975139 0.473009706
+initial_recruits: 49588
+years: 1990 1991 
+recruits: 182972 23452 
+ssb: 113917 113727 
+ssb_ratio: 1.00032 0.998659 
+SR: 1.00003 0.999888 
+true_ycs: 3.68985 0.472957 
+*end
+
+*process[Rec_HG]
+b0: 127644
+label: Recruitment_HG
+proportion_male: 1 1
+recruitment_layer_label: recruitment_HG
+ssb: SSB_HG
+steepness: 0.75
+type: recruitment_beverton_holt
+ycs_values: 0.980555475 0.291484803
+initial_recruits: 55581
+years: 1990 1991 
+recruits: 54500 16202 
+ssb: 127638 127739 
+ssb_ratio: 0.999956 1.00075 
+SR: 0.999996 1.00006 
+true_ycs: 0.980552 0.291503 
+*end
+
+*process[Rec_BP]
+b0: 38440.8008
+label: Recruitment_BP
+proportion_male: 1 1
+recruitment_layer_label: recruitment_BP
+ssb: SSB_BP
+steepness: 0.75
+type: recruitment_beverton_holt
+ycs_values: 0.955990314 0.676142871
+initial_recruits: 16738
+years: 1990 1991 
+recruits: 16013 11327 
+ssb: 38790.8 38847.8 
+ssb_ratio: 1.00911 1.01059 
+SR: 1.00075 1.00087 
+true_ycs: 0.95671 0.676734 
+*end
+
+*derived_quantity[derived_quants]
+SSB_HG {L} 
+type: mature_biomass 
+initialisation_phase[1]: 324.28 
+values {v}
+1990 127638
+1991 127739
+end {L}
+SSB_BP {L} 
+type: mature_biomass 
+initialisation_phase[1]: 117.651 
+values {v}
+1990 38790.8
+1991 38847.8
+end {L}
+SSB_EN {L} 
+type: mature_biomass 
+initialisation_phase[1]: 266.478 
+values {v}
+1990 113917
+1991 113727
+end {L}
+*end
+
+*model_attributes[model_attributes]
+Recruitment_BP: 328.554
+Recruitment_EN: 428.12
+Recruitment_HG: 393.963
+length_mid_points: 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 35 37 39 41 43 45 47 49 51 53 55 57 59 61 63 65 67 69 71 73 75 77 79 
+length_bins: 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44 46 48 50 52 54 56 58 60 62 64 66 68 70 72 74 76 78 80 
+*end
+
+Total elapsed time: 26 seconds
+Completed

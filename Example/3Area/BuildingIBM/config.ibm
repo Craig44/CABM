@@ -1,0 +1,28 @@
+!include "Population.ibm"
+!include "Reports.ibm"
+
+# --------------
+# Include Auxillary Layers
+# --------------
+!include "Layers/base_layer.ibm"
+!include "Layers/area_labels.ibm"
+
+!include "Layers/SSB_BP_area.ibm"
+!include "Layers/SSB_HG_area.ibm"
+!include "Layers/SSB_EN_area.ibm"
+!include "Layers/M_layer.ibm"
+!include "Layers/k_layer.ibm"
+!include "Layers/L_inf_layer.ibm"
+!include "Layers/initial_seed_layer.ibm"
+!include "Layers/recruitment_processes.ibm"
+
+!include "Layers/recruitment_HG_area.ibm"
+!include "Layers/recruitment_BP_area.ibm"
+!include "Layers/recruitment_EN_area.ibm"
+## Movement layers
+!include "Layers/Movement/BP_home.ibm"
+!include "Layers/Movement/HG_home.ibm"
+!include "Layers/Movement/EN_home.ibm"
+!include "Layers/Movement/BP_Jump_One.ibm"
+!include "Layers/Movement/HG_Jump_One.ibm"
+!include "Layers/Movement/EN_Jump_One.ibm"

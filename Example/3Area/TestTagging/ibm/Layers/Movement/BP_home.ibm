@@ -1,9 +1,0 @@
-@layer BP_home
-proportions true
-type numeric
-## cells could be areas if we wanted densities
-table layer
-0
-0
-1
-end_table

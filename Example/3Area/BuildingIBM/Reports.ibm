@@ -1,0 +1,53 @@
+# --------------
+# Define Reports
+# --------------
+# print process properties
+@report M_report
+type process
+process natural_mort
+
+@report mature_report
+type process
+process Maturation
+
+@report Jump_One
+type process
+process Jump_One
+
+@report Movement_home
+type process
+process Movement_home
+
+@report Rec_EN
+type process
+process Recruitment_EN
+
+@report Rec_HG
+type process
+process Recruitment_HG
+
+@report Rec_BP
+type process
+process Recruitment_BP
+
+# print initail state of agents
+@report init
+type initialisation_partition
+
+# print age frequency
+@report Apr_Dec_age_freq
+type age_frequency_by_cell
+time_step Apr_Dec
+
+@report Jan_Mar_age_freq
+type age_frequency_by_cell
+time_step Jan_Mar
+
+# print SSB's
+@report derived_quants
+type derived_quantity
+
+@report model_attributes
+type model_attributes
+
+
