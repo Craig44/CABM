@@ -6,7 +6,6 @@
 ################
 ## General model reports
 ################
-
 @report Summer_agents
 type summarise_agents
 number_of_individuals 200
@@ -98,7 +97,7 @@ ageing_error Age_misclassification
 type process
 process summer_fishery
 
-/*
+
 @report offshore_preference_movement
 type process
 process offshore_preference_movement
@@ -115,7 +114,6 @@ process Move_inshore
 type process
 process Move_offshore
 
-
 @report Rec
 type process
 process Recruitment
@@ -125,16 +123,11 @@ type process
 process M
 
 
-@report preferenceMovement
-type process
-process preferenceMovement
-*/
-
 ################
 ## Layers
 ################
-## Biomass
-/*
+## spatial explicit Biomass
+
 @report Summer_total_biomass_by_cell
 type numeric_layer
 layer_label biomass_by_cell
@@ -159,6 +152,7 @@ layer_label biomass_by_cell
 years 1990:2018
 time_step Spring
 ## Abundance
+/*
 @report Summer_total_abundance_by_cell
 type numeric_layer
 layer_label abundance_by_cell

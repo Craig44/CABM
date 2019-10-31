@@ -36,22 +36,28 @@
   ## get the report out
   this_report = get(report_label, model)
   ## check that the report label is of type derived_quantity
-  if (this_report$'1'$type != "derived_quantity") {
-    stop(Paste("The report label ", report_label, " in model is not a derived quantity plz Check you have specified the correct report_label."))     
+
+  if (any(names(this_report) %in% "type")) {
+    if (this_report$type != "derived_quantity") {
+      stop(Paste("The report label ", report_label, " in model is not a derived quantity plz Check you have specified the correct report_label."))     
+    }
+  } else {
+    print("multi iteration report found")
+    muliple_iterations_in_a_report = TRUE;
+    N_runs = length(this_report);
+    if (this_report$'1'$type != "derived_quantity") {
+      stop(Paste("The report label ", report_label, " in model is not a derived quantity plz Check you have specified the correct report_label."))     
+    }
   }
-  if (length(this_report) > 1) {
-      print("multi iteration report found")
-      muliple_iterations_in_a_report = TRUE;
-      N_runs = length(this_report);
-  }
+  
   if (!muliple_iterations_in_a_report) {
     ## only a single trajectory
-    derived_quantities = names(this_report$'1')[names(this_report$'1') != "type"]
+    derived_quantities = names(this_report)[names(this_report) != "type"]
     ## create a multi-plot panel
     if (plot.it)
       par(mfrow = c(1,length(derived_quantities)))
     for (i in 1:length(derived_quantities)) {
-      this_derived_q = get(derived_quantities[i], this_report$'1')
+      this_derived_q = get(derived_quantities[i], this_report)
       values = this_derived_q$values
       zero_ndx = values == 0;
       if (any(zero_ndx)) {
@@ -61,8 +67,7 @@
       years = as.numeric(names(values))
       ## does the user want it plotted as percent B0
       if (type == "percent") {
-        B0 = "hello"
-        values = values / this_derived_q$B0 * 100
+        values = values / values[1] * 100
       }  
       if(missing(ylim)) {
         ymax = max(values) + quantile(values, 0.05) 

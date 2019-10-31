@@ -514,8 +514,6 @@ void MortalityScaledAgeFrequency::Simulate() {
         comparison.simulated_ = comparison.expected_;
     }
   }
-
-
 } // DoExecute
 
 } /* namespace observations */

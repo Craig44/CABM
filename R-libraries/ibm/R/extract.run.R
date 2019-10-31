@@ -46,7 +46,7 @@ function (file, path = "",fileEncoding = "") {
       }
     }
     
-    multi_year_reports = c("partition", "PartitionBiomass", "PartitionMeanWeight")
+    multi_year_reports = c("summarise_agents", "world_age_frequency","numeric_layer","age_frequency_by_cell")
     
     result = list()
     for (i in 1:counter) {
