@@ -1,0 +1,71 @@
+# --------------
+# Define Reports
+# --------------
+@report mature_report
+type process
+process Maturation
+
+@report Fishing_Mortality
+type process
+process Fishing_Mortality
+
+@report Rec
+type process
+process Recruitment
+
+@report time_vary
+type time_varying
+
+##
+@report trwlFSel_m
+type selectivity
+selectivity trwlFSel_m
+
+@report trwlFSel_f
+type selectivity
+selectivity trwlFSel_f
+
+@report Trwl_age_length_method
+type observation
+observation Trwl_age_length_method
+
+@report Trwl_age_length_method_male
+type observation
+observation Trwl_age_length_method_male
+
+@report Trwl_age_length_method_female
+type observation
+observation Trwl_age_length_method_female
+
+@report survey_bio
+type observation
+observation survey_bio
+
+# print initail state of agents
+@report init
+type initialisation_partition
+
+# print age frequency
+@report age_freq_Sep_Nov
+type age_frequency_by_cell
+time_step Sep_Nov
+years 1969:2014
+
+# print age frequency
+@report age_freq_Dec_Aug
+type age_frequency_by_cell
+time_step Dec_Aug
+years 1969:2014
+
+# print SSB's
+@report derived_quants
+type derived_quantity
+
+@report model_attributes
+type model_attributes
+
+@report agents
+type summarise_agents
+number_of_individuals 100
+time_step Sep_Nov
+years 2000

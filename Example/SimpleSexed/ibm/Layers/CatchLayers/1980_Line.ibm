@@ -1,0 +1,5 @@
+@layer 1980_Line
+type numeric
+table layer
+360
+end_table

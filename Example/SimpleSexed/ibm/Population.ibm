@@ -1,0 +1,236 @@
+## simple model - for building up more complicated models.
+## no->very little variation among agents
+## Single sex, single area, 2 fisheries
+@model
+start_year 1968
+final_year 2014
+min_age 0
+max_age 35
+age_plus true # other acceptable inputs for bool are '1' and 'yes'
+initialisation_phase_labels Iterative #label to an @initialisation block
+time_steps Dec_Aug Sep_Nov
+length_bins 0   2   4   6   8  10  12  14  16  18  20  22  24  26  28  30  32  34  36  38  40  42  44  46  48  50  52  54  56  58  60  62  64  66  68  70  72  74  76  78  80  82  84  86  88  90 92  94  96  98 100 102 104 106 108 110 112 114 116 118 120 # assumed cm's
+length_plus true ## is the last bin a plus group
+base_layer_label Base #
+growth_process_label Growth
+natural_mortality_process_label Natural_Mortality
+sexed true
+maturity_ogive_label MaturationSel_male MaturationSel_female
+nrows 1
+ncols 1
+# --------------
+# Init Phase
+# --------------
+@initialisation_phase Iterative
+type iterative
+years 30
+number_of_individuals 2000000 ## initial number of agents
+layer_label initial_values
+recruitment_layer_label recruitment_layer # stock identification, important for when you are scaling SSB = B0 for an agent model to population model
+# --------------
+# Annual Sequence
+# --------------
+@time_step Dec_Aug 
+processes Maturation Natural_Mortality Fishing_Mortality
+
+@time_step Sep_Nov 
+processes Recruitment Natural_Mortality Growth 
+
+#Fishing_Mortality
+# --------------
+# Process definitions
+# --------------
+@process Nop 
+type nop
+
+# Growth
+@process Growth
+type growth_von_bertalanffy_with_basic_weight
+linf 113.9 156.4 # male female !! order is important
+k 0.127 0.083
+t0 0 0 #-0.70 #-0.74
+a 1.00e-9 1.14e-9 ## taken from LIN 3&4
+b 3.354 3.318
+update_growth_parameters false ## if an agent moves we don't update growth info
+distribution lognormal
+cv 0.05
+time_step_proportions 1
+
+# Maturity
+@process Maturation
+type maturation
+
+# Natural Mortality
+@process Natural_Mortality
+type mortality_constant_rate
+m_multiplier_layer_label M_layer
+m 0.146364
+update_mortality_parameters false
+distribution lognormal
+cv 0.0001
+selectivity_label One
+time_step_ratio 0.45 0.55
+
+# Fishing Mortality
+@process Fishing_Mortality
+type mortality_event_biomass
+print_extra_info true
+table catch
+year FishingTrwl FishingLine
+1972 1972_Trwl 1972_Line
+1973 1973_Trwl 1973_Line
+1974 1974_Trwl 1974_Line
+1975 1975_Trwl 1975_Line
+1976 1976_Trwl 1976_Line
+1977 1977_Trwl 1977_Line
+1978 1978_Trwl 1978_Line
+1979 1979_Trwl 1979_Line
+1980 1980_Trwl 1980_Line
+1981 1981_Trwl 1981_Line
+1982 1982_Trwl 1982_Line
+1983 1983_Trwl 1983_Line
+1984 1984_Trwl 1984_Line
+1985 1985_Trwl 1985_Line
+1986 1986_Trwl 1986_Line
+1987 1987_Trwl 1987_Line
+1988 1988_Trwl 1988_Line
+1989 1989_Trwl 1989_Line
+1990 1990_Trwl 1990_Line
+1991 1991_Trwl 1991_Line
+1992 1992_Trwl 1992_Line
+1993 1993_Trwl 1993_Line
+1994 1994_Trwl 1994_Line
+1995 1995_Trwl 1995_Line
+1996 1996_Trwl 1996_Line
+1997 1997_Trwl 1997_Line
+1998 1998_Trwl 1998_Line
+1999 1999_Trwl 1999_Line
+2000 2000_Trwl 2000_Line
+2001 2001_Trwl 2001_Line
+2002 2002_Trwl 2002_Line
+2003 2003_Trwl 2003_Line
+2004 2004_Trwl 2004_Line
+2005 2005_Trwl 2005_Line
+2006 2006_Trwl 2006_Line
+2007 2007_Trwl 2007_Line
+2008 2008_Trwl 2008_Line
+2009 2009_Trwl 2009_Line
+2010 2010_Trwl 2010_Line
+2011 2011_Trwl 2011_Line
+2012 2012_Trwl 2012_Line
+2013 2013_Trwl 2013_Line
+2014 2014_Trwl 2014_Line
+end_table
+
+table method_info
+method 	 	male_selectivity	female_selectivity 	minimum_legel_length  handling_mortality
+FishingTrwl     trwlFSel_m		trwlFSel_f		0			0
+FishingLine	Sel_Line		Sel_Line		0			0
+end_table
+
+#catch_layers  1990_catch 1991_catch 1992_catch 1993_catch 1994_catch 1995_catch 1996_catch 1997_catch 1998_catch 1999_catch 2000_catch 2001_catch 2002_catch 2003_catch 2004_catch 2005_catch 2006_catch 2007_catch 2008_catch 2009_catch 2010_catch 2011_catch 2012_catch 2013_catch
+#selectivity Sel_LL
+
+# Recruitment
+@process Recruitment
+type recruitment_beverton_holt
+recruitment_layer_label recruitment
+b0 187644
+proportion_male 0.5 0.64 0.59 0.45 0.45 0.64 0.54 0.58 0.47 0.63 0.42 0.56 0.42 0.25 0.37 0.51 0.59 0.32 0.37 0.68 0.46 0.55 0.45 0.47 0.51 0.50 0.48 0.45 0.20 0.69 0.68 0.39 0.48 0.64 0.60 0.63 0.39 0.76 0.39 0.58 0.51 0.46 0.46 0.40 0.66 0.51 0.53 
+ssb SSB
+steepness 0.84
+ycs_values 0.56644 0.797284 0.719969 0.828486 0.830266 0.734092 1.675342 0.50805 0.445206 0.496517 0.504679 0.425271 0.377082 0.445083 0.540207 0.611117 0.509599 0.514956 0.442706 0.464546 0.579921 0.773086 0.924752 0.650593 0.602481 0.575178 0.650517 0.537074 0.496574 0.479161 0.440742 0.481131 0.522766 0.435207 0.64029 0.474106 0.535288 0.686845 1 * 9
+
+
+# --------------
+# Define selectivities
+# --------------
+@selectivity natural_mortality_by_age
+type double_exponential
+x1 0
+x0 6
+x2 30
+y1 0.6
+y0 0.1
+y2 0.4
+
+@selectivity One
+type constant
+c 1
+
+@selectivity One_length
+type constant
+length_based true
+c 1
+
+@selectivity MaturationSel_male
+type all_values_bounded
+l 3
+h 10
+v 0 0 0.100 0.20 0.35 0.50 0.80 1.00
+
+@selectivity MaturationSel_female
+type all_values_bounded
+l 3
+h 10
+v 0 0 0.001 0.10 0.20 0.35 0.50 1.00
+
+## research selectivities
+@selectivity research_sel_m 
+type double_normal 
+mu 5.25885 
+sigma_l 1.71782 	
+sigma_r 45.2101 
+alpha 1.01499 
+
+@selectivity research_sel_f
+type double_normal 
+mu 5.05423 
+sigma_l 1.61542 	
+sigma_r 38.8097 
+
+@selectivity trwlFSel_m #Trawl fishery
+type double_normal
+mu 6.59149 	
+sigma_l 1.81217 
+sigma_r 42.2658 
+alpha 0.6931 
+
+@selectivity trwlFSel_f #Trawl fishery
+type double_normal
+mu 8.25834		
+sigma_l 2.79815
+sigma_r 15.398 
+
+@selectivity Sel_Line
+type logistic
+a50 10.5636	
+ato95 3.11395
+
+# --------------
+# Derived Quantities
+# --------------
+@derived_quantity SSB
+type mature_biomass
+biomass_layer_label SSB
+time_step Dec_Aug
+proportion_through_mortality_block 0.0
+
+# --------------
+# Time Varying Quantities
+# --------------
+/*
+@time_varying male_K
+type constant
+parameter process[Growth].k{1}
+years 2000:2013
+values 0.16
+
+@time_varying female_K
+type constant
+parameter process[Growth].k{2}
+years 2000:2013
+values 0.123
+*/
+
+
