@@ -22,7 +22,7 @@
 #' SSB = plot.derived_quantities(model = data, report_label = "biomass", plot.it = FALSE)
 #' plot(rownames(SSB),SSB, main = "My SSB", type = "l", ylim = c(0,90000))
 
-"plot.derived_quantities" = function(model, report_label="", type = "number", xlim, ylim, xlab, ylab, main, col,plot.it = T, ...) {
+"plot.derived_quantities" = function(model, report_label="", type = "number", xlim, ylim, xlab, ylab, col,plot.it = T, ...) {
   if (!type %in% c("number", "percent")) {
     stop ("the parameter type must be: 'number' or 'percent'")
   }
@@ -85,8 +85,7 @@
         xlab = "Years"
       if(missing(col)) 
         col = "black"      
-      if(missing(main)) 
-        main = derived_quantities[i]  
+      main = derived_quantities[i]  
       if (plot.it == TRUE) {
         plot(years, values, xlim = xlim, ylim = ylim, xlab = xlab, ylab = ylab, main = main, type = "o", ...)
       } else {
@@ -110,7 +109,7 @@
     if (plot.it)
       par(mfrow = c(1,length(derived_quantities)))
     for (k in 1:length(derived_quantities)) {
-    temp_df = c()
+      temp_df = c()
       first_run = TRUE;
       Legend_txt = c();
       for (i in 1:length(this_report)) {
@@ -125,9 +124,7 @@
         years = as.numeric(names(values))
         ## does the user want it plotted as percent B0
         if (type == "percent")
-          values = values / this_derived_quantity$B0 * 100
-
-        Legend_txt = c(Legend_txt,this_derived_quantity$B0)  
+          values = values / values[1] * 100
 
         if (first_run) {      
           if(plot.it == FALSE) {
@@ -147,13 +144,14 @@
           }
           if(missing(xlab)) 
             xlab = "Years"    
-          if(missing(main)) 
-            main = derived_quantities[k]      
-          if (plot.it == TRUE) {  
-            plot(years, values , xlim = xlim, ylim = ylim, xlab = xlab, ylab = ylab, main = main, type = "o", lwd = 3, col = Cols[i] ,...)        
+          main = derived_quantities[k]      
+          if (plot.it) {  
+            plot(years, values , xlim = xlim, ylim = ylim, xlab = xlab, ylab = ylab, main = main, type = "o", lwd = 3, col = Cols[i])        
+          } else {
+            temp_df = rbind(temp_df, values);
           }
         } else {
-          if (plot.it == TRUE) {
+          if (plot.it) {
             lines(years, values, type = "o", lwd = 3, col = Cols[i])          
           } else {
             temp_df = rbind(temp_df,values)
@@ -161,9 +159,7 @@
         }
         first_run = FALSE;
       }  
-      if (plot.it == TRUE) {
-        legend('bottomleft',legend = Legend_txt, col = Cols, lty = 2, lwd = 3)
-      } else {
+      if (!plot.it) {
         rownames(temp_df) = as.character(1:length(this_report))
         temp_DF[[derived_quantities[k]]] = temp_df
       }
