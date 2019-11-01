@@ -1,465 +1,260 @@
-## Read in Casal2 output
-detach("package:casal2", unload=TRUE)
-detach("package:ibm", unload=TRUE)
-detach("package:casal", unload=TRUE)
-setwd("C:/Work/Software/IBM/Example/3Area/NatalHoming")
-
-## this script is just comparing, steady state models just constant recruitment and M
+library(ibm)
 library(ggplot2)
 library(reshape2)
-library(cyrils)
-library(casal2)
-setwd("Casal2")
-cas2 = extract.mpd("output.log")
-cas2_dq = plot.derived_quantities(cas2, "derived_quants", plot.it = F)
-## Read in the IBM output
-setwd("../ibm")
-library(ibm)
 
-ibm = extract.run("no_variability.out", fileEncoding = "UTF-8")
-ibm_with_var = extract.run("variability.out", fileEncoding = "UTF-8")
-ibm_vec = extract.run("vector.out", fileEncoding = "UTF-8")
+## read in base model output
+ibm_20 = extract.run("../BuildingIBM/run_20.log")
+ibm_50 = extract.run("../BuildingIBM/run_50.log")
+ibm_100 = extract.run("../BuildingIBM/run_100.log")
+ibm_more_agents = extract.run("../BuildingIBM/run_more_agents.out")
 
-# find proportions of agents among the three regions to short cut it
-rowSums(ibm$init_2$`1`$values[,-1]) /  sum(rowSums(ibm$init_2$`1`$values[,-1]))
-rowSums(ibm_with_var$init_2$`1`$values[,-1]) /  sum(rowSums(ibm_with_var$init_2$`1`$values[,-1]))
+# look at time difference
+ibm_20$model_run_time
+ibm_50$model_run_time
+ibm_100$model_run_time
+ibm_more_agents$model_run_time # run with 50 initialisaiton years
+
+# if they generate the same initial age-structure we want the fastest lets see
+init_20 = melt(as.matrix(ibm_20$init_2$values))
+init_20$years = 20
+init_50 = melt(as.matrix(ibm_50$init_2$values))
+init_50$years = 50
+init_50_extra = melt(as.matrix(ibm_more_agents$init_2$values))
+init_50_extra$years = 50
+init_100 = melt(as.matrix(ibm_100$init_2$values))
+init_100$years = 100
+all_init = rbind(init_20, init_50, init_100)
+colnames(all_init) = c("area", "age", "numbers","years")
+all_init$years = as.factor(all_init$years)
+ggplot(data = all_init, aes(x = age, y = numbers, linetype = years, col = years)) +
+  geom_line(size = 1) + 
+  facet_wrap( ~ area, nrow = 1)
+## not much difference will settle with using 50 years.
+## 20 years seems to shorter a time.
+init_50$agents = "1 mil"
+init_50_extra$agents = "2 mil"
+all_agents = rbind(init_50, init_50_extra)
+colnames(all_agents) = c("area", "age", "numbers","years","agents")
+all_agents$years = as.factor(all_agents$years)
+ggplot(data = all_agents, aes(x = age, y = numbers, linetype = agents, col = agents)) +
+  geom_line(size = 1) + 
+  facet_wrap( ~ area, nrow = 1)
+
+## read in base model output
+ibm_base = extract.run("../base_ibm/run.log")
+# how long did the model take?
+ibm_base$model_run_time
+# are there any warnings
+ibm_base$warnings_encounted$warnings_found
+# you will want to look at these
+# number Agent = this many individuals
+ibm_base$model_attributes$Recruitment_EN
+ibm_base$model_attributes$Recruitment_HG
+ibm_base$model_attributes$Recruitment_BP
+# plot SSB's
+plot.derived_quantities(ibm_base, report_label = "derived_quants", lwd = 2, pch = 16, cex = 0.4)
+
+# View Agent attributes for each time-step
+jan_mar_1990 = ibm_base$Jan_Mar_agents$`1990`$values
+jan_mar_2000 = ibm_base$Jan_Mar_agents$`2000`$values
+jan_mar_2010 = ibm_base$Jan_Mar_agents$`2010`$values
+apr_dec_1990 = ibm_base$Apr_Dec_agents$`1990`$values
+apr_dec_2000 = ibm_base$Apr_Dec_agents$`2000`$values
+apr_dec_2010 = ibm_base$Apr_Dec_agents$`2010`$values
+# Attributes you can look at
+head(jan_mar_1990)
+# check distributions are as we expected
+dens_jan = density(c(jan_mar_1990$M, jan_mar_2000$M, jan_mar_2010$M))
+dens_dec = density(c(apr_dec_2010$M, apr_dec_2000$M, apr_dec_2010$M))
+
+# close enough
+plot(dens_jan$x,dens_jan$y, type = "l", lwd = 2, lty = 2, col = "red", 
+     xlab = "M", ylab = "frequency", ylim = c(0,25))
+log_sigma = sqrt(log(0.15*0.15 + 1.0));
+log_mean  = log(0.13) - (log_sigma * log_sigma) / 2.0;
+lines(dens_jan$x, dlnorm(dens_jan$x, log_mean, log_sigma), lty = 1, 
+      lwd = 2, col = "black")
+lines(dens_dec$x, dens_dec$y, type = "l", lwd = 2, col = "blue")
+legend('topright', legend = c("Jan_Mar", "Apr_Dec","True Dist"), 
+       lty = c(2,2,1), lwd = 2, col = c("red","blue","black"))
 
 
-## look at initial partition
-prop_init = ibm$init_2$`1`$values[,-c(1,2)] / rowSums(ibm$init_2$`1`$values[,-c(1,2)])
-prop_init_var = ibm_with_var$init_2$`1`$values[,-c(1,2)] / rowSums(ibm_with_var$init_2$`1`$values[,-c(1,2)])
-
-en_init = colSums(cas2$Init$`1`$values[1:3,-1])
-en_prop = en_init / sum(en_init)
-
-hg_init = colSums(cas2$Init$`1`$values[4:6,-1])
-hg_prop = hg_init / sum(hg_init)
-
-bp_init = colSums(cas2$Init$`1`$values[7:9,-1])
-bp_prop = bp_init / sum(bp_init)
-
-
-## plot
+# Plot age-length relationship
+EN_growth = jan_mar_2000[jan_mar_2000$`row-col` == "1-1",]
+HG_growth = jan_mar_2000[jan_mar_2000$`row-col` == "2-1",]
+BP_growth = jan_mar_2000[jan_mar_2000$`row-col` == "3-1",]
 par(mfrow = c(1,3))
-plot(1:20,prop_init[1,], type = "l", lwd = 2, xlab = "Ages", ylab = "Initial proportions",ylim = c(0,0.26))
-lines(1:20,prop_init_var[1,], col = "purple", lwd = 2, lty = 3)
-lines(1:20,en_prop, col = "red", lwd = 2)
-#lines(0:20,prop_40[1,], col = "blue", lwd = 2, lty = 2)
-#lines(0:20,prop_50[1,], col = "orange", lwd = 2, lty = 2)
+VB = function (age, K, L_inf, t0) { return(L_inf * (1 - exp(-K * (age - t0))))}
+plot(EN_growth$age, EN_growth$length, pch = 16, col = "red", main = "EN", 
+     xlab = "", ylab = "")
+lines(0:20, VB(0:20, 0.166321 ,46.496554 ,0), lwd = 2)
+plot(HG_growth$age, HG_growth$length, pch = 16, col = "red", main = "HG", 
+     xlab = "", ylab = "")
+lines(0:20, VB(0:20, 0.1285049 ,51.9492243 ,0), lwd = 2)
+plot(BP_growth$age, BP_growth$length, pch = 16, col = "red", main = "BP", 
+     xlab = "", ylab = "")
+lines(0:20, VB(0:20, 0.1424809  ,53.7596026 ,0), lwd = 2)
+mtext(adj = 0.5, side = 1, line = -2, outer=T, text = "Age", font = 2)
+mtext(adj = 0.5, side = 2, las = 3, line = -2, outer=T, text = "Length", font = 2)
 
-plot(1:20,prop_init[2,], type = "l", lwd = 2, xlab = "Ages", ylab = "Initial proportions",ylim = c(0,0.26))
-lines(1:20,hg_prop, col = "red", lwd = 2)
-lines(1:20,prop_init_var[2,], col = "purple", lwd = 2, lty = 3)
+plot(ibm_base$Rec_EN$year, ibm_base$Rec_EN$recruits, type = "l", lwd = 2, lty = 2,
+     xlab = "year", ylab = "Number of agents")
+lines(ibm_base$Rec_HG$year, ibm_base$Rec_HG$recruits, lwd = 2, col = "red")
+lines(ibm_base$Rec_BP$year, ibm_base$Rec_BP$recruits, lwd = 2, col = "blue")
+legend('topright', legend = c("EN", "HG","BP"), 
+       lty = c(1), lwd = 2, col = c("black","blue","red"))
 
-#lines(0:20,prop_40[2,], col = "blue", lwd = 2, lty = 2)
-#lines(0:20,prop_50[2,], col = "orange", lwd = 2, lty = 2)
+# difference between actual removed catches and what we wanted to take out,
+t(ibm_base$fishing$actual_catches) - t(ibm_base$fishing$catches)
+# every the subcommand print_extra_info true then you will have recorded every agent that was 
+# caught during this process.
 
-plot(1:20,prop_init[3,], type = "l", lwd = 2, xlab = "Ages", ylab = "Initial proportions",ylim = c(0,0.26))
-lines(1:20,bp_prop, col = "red", lwd = 2)
-lines(1:20,prop_init_var[3,], col = "purple", lwd = 2, lty = 3)
+# should check that we tagged the correct number of agents.
+tag_release_95 = ibm_base$Tagging$`tag_release_by_length-1995`
+tag_release_05 = ibm_base$Tagging$`tag_release_by_length-2005`
+rowSums(tag_release_95)
+rowSums(tag_release_05)
+# look at the length distribution of the tag-release
+par(mfrow = c(1,2))
+plot(colnames(tag_release_95), tag_release_95[1,], type = "l", lwd = 2, 
+     xlab = "length", ylab = "Numbers Tagged", main = "1995 releases",
+     ylim = c(0,max(tag_release_95,tag_release_05) + 20))
+lines(colnames(tag_release_95), tag_release_95[2,], col = "blue", lwd = 2)
+lines(colnames(tag_release_95), tag_release_95[3,], col = "red", lwd = 2)
+legend('topright', legend = c("EN", "HG","BP"), 
+       lty = c(1), lwd = 2, col = c("black","blue","red"))
 
-#lines(0:20,prop_40[3,], col = "blue", lwd = 2, lty = 2)
-#lines(0:20,prop_50[3,], col = "orange", lwd = 2, lty = 2)
+plot(colnames(tag_release_05), tag_release_05[1,], type = "l", lwd = 2, 
+     xlab = "length", ylab = "Numbers Tagged", main = "2005 releases",
+     ylim = c(0,max(tag_release_05,tag_release_05) + 20))
+lines(colnames(tag_release_05), tag_release_05[2,], col = "blue", lwd = 2)
+lines(colnames(tag_release_05), tag_release_05[3,], col = "red", lwd = 2)
 
-names(ibm)
-ibm$model_attributes$`1`
-
-ibm$Rec_BP$`1`$b0
-ibm$Rec_EN$`1`$b0
-ibm$agents$`1`$values$weight
-ibm$agents$`1`$values$length
-ibm$agents$`1`$values$age
-ibm$agents$`1`$values[1:10,]
-ibm$derived_quants$`1`$SSB_EN
-
-ibm_dq = plot.derived_quantities(ibm, report_label = "derived_quants", plot.it = F)
-ibm_dq_var = plot.derived_quantities(ibm_with_var, report_label = "derived_quants", plot.it = F)
-ibm_dq_vec = plot.derived_quantities(ibm_vec, report_label = "derived_quants", plot.it = F)
-
-## compare IBM's
-merged = melt(rbind(ibm_dq_vec[,c("SSB_HG",  "SSB_BP",  "SSB_EN")],ibm_dq[,c("SSB_HG",  "SSB_BP",  "SSB_EN")]))
-merged$model = rep(c(rep("ibm-vector", nrow(ibm_dq)),rep("ibm", nrow(ibm_dq))),3)
-## all dq's
-#merged = melt(rbind(ibm_dq_vec[,c("SSB_HG",  "SSB_BP",  "SSB_EN")],ibm_dq[,c("SSB_HG",  "SSB_BP",  "SSB_EN")],ibm_dq_var[,c("SSB_HG",  "SSB_BP",  "SSB_EN")], cas2_dq[,c("SSB_HG",  "SSB_BP",  "SSB_EN")]))
-#merged$model = rep(c(rep("ibm-vector", nrow(ibm_dq)),rep("ibm", nrow(ibm_dq)),rep("ibm with variation", nrow(ibm_dq_var)), rep("Casal2", nrow(cas2_dq))),3)
-colnames(merged) = c("year", "region", "SSB", "model")
-## melt down the matrices
-#jpeg("Threading_with_movement.jpg")
-ggplot(merged, aes(x=year, y=SSB, linetype = model, col = region)) + 
-  geom_line(size=1) +
-  xlab("years")+ylab("Biomass (t)") + 
-  ylim(c(0,200000)) +
-  scale_colour_discrete(name  ="Region",
-                          breaks=c("SSB_HG", "SSB_BP", "SSB_EN"),
-                          labels=c("HG", "BP","EN")) +
-  #scale_linetype_discrete(name  ="model",
-  #                      breaks=c("non-threaded", "threaded"),
-  #                      labels=c("no", "yes")) +
-  ggtitle("with movement")
-#dev.off()
-
-
-## Convert observations to Casal2 inputs so we can see if Casal2 will back estimate the population
-## plot catch at age for each fishery over time
-age_freq = ibm$fisher_age_freq$`1`$Values;
-fish_years = unique(age_freq$year)
-
-par(mfrow = c(4,3))
-for (year in 1990:1993) {
-  this_year = age_freq[age_freq$year == year,]
-  first_col = this_year[this_year$cell == "r1-c1",]
-  second_col = this_year[this_year$cell == "r2-c1",]
-  third_col = this_year[this_year$cell == "r3-c1",]
-  barplot(first_col$expected)
-  barplot(second_col$expected)
-  barplot(third_col$expected)
-}
-
-
-## lets look at the samples from a single fishery
-sum(ibm_with_var$fishing$`1`$`census_info-1990-0-0`$scalar)
-dim(ibm_with_var$fishing$`1`$`census_info-1990-0-0`)
-# 760918.1 individuals, expand the data set
-
-
-## look at movements
-ibm_with_var$Movement_home$`1`$`1990_1-1_destination`
-ibm_with_var$Movement_home$`1`$`1990_2-1_destination`
-ibm_with_var$Movement_home$`1`$`1990_3-1_destination`
-
-ibm_vec$Movement_home$`1`$`year-area-1990_1-1`
-ibm_vec$Movement_home$`1`$`year-area-1990_2-1`
-ibm_vec$Movement_home$`1`$`year-area-1990_3-1`
-
-
-ibm_vec$Jump_One$`1`$`year-area-1990_1-1`$destination_values / sum(ibm_vec$Jump_One$`1`$`year-area-1990_1-1`$destination_values)
-ibm_with_var$Jump_One$`1`$`1990_1-1_destination` / sum(ibm_with_var$Jump_One$`1`$`1990_1-1_destination`)
-
-
-#######################################
-## 
-#######################################
-n.times = round(ibm_with_var$fishing$`1`$`census_info-1990-0-0`$scalar);
-expand_df = ibm_with_var$fishing$`1`$`census_info-1990-0-0`[rep(seq_len(nrow(ibm_with_var$fishing$`1`$`census_info-1990-0-0`)), n.times),]
-dim(expand_df)
-expand_df[284:286,]
-
-available_otoliths = 2000;
-## Randomly select 2000 otoliths without replacement
-sample_ndx = sample(1:nrow(expand_df),size = available_otoliths, replace = F);
-Otoliths = expand_df[sample_ndx,]
-
-
-ibm$Movement_home$`1`$`1990_1-1_destination`
-ibm$Movement_home$`1`$`1990_2-1_destination`
-ibm$Movement_home$`1`$`1990_3-1_destination`
-
-ibm$Jump_One$`1`$`1990_1-1_destination`
-ibm$Jump_One$`1`$`1990_2-1_destination`
-ibm$Jump_One$`1`$`1990_3-1_destination`
-
-names(ibm)
-ibm$fishing$`1`$minimum_legel_length
-ibm$fishing$`1`$years
-ibm$fishing$`1`$biomass_removed
-ibm$fishing$`1`$catch_input_removed
+## check proportion moving is the same as what we specified in the config files
+round(ibm_base$Jump_One$`year-area-1990_1-1`$destination_values 
+      / ibm_base$Jump_One$`year-area-1990_1-1`$initial_numbers_in_cell,3)
+round(ibm_base$Jump_One$`year-area-1990_2-1`$destination_values 
+      / ibm_base$Jump_One$`year-area-1990_2-1`$initial_numbers_in_cell,3)
+round(ibm_base$Jump_One$`year-area-1990_3-1`$destination_values 
+      / ibm_base$Jump_One$`year-area-1990_3-1`$initial_numbers_in_cell,3)
 
 
 
-N1 = 10000
-N2 = N1 * 0.148
-N1 = N1 - N2
-N3 = N2 * 0.36
-N2 =N2 - N3
+EN_fish_sample = ibm_base$EN_age_sample$Values
+HG_fish_sample = ibm_base$HG_age_sample$Values
+BP_fish_sample = ibm_base$BP_age_sample$Values
+EN_fish_sample_alk = ibm_base$fishery_age_ALK_EN$Values
+HG_fish_sample_alk = ibm_base$fishery_age_ALK_HG$Values
+BP_fish_sample_alk = ibm_base$fishery_age_ALK_BP$Values
+fish_years = unique(EN_fish_sample$year)
+fish_age = unique(EN_fish_sample$age)
+# row 1 = age, row 2 = length_midpoint, row 3 = sex
+EN_1990 = tabulate(ibm_base$fishing$`census_info-Fishing_LL-1990-1-1`[1,], nbins = 20)
+HG_1990 = tabulate(ibm_base$fishing$`census_info-Fishing_LL-1990-2-1`[1,], nbins = 20)
+BP_1990 = tabulate(ibm_base$fishing$`census_info-Fishing_LL-1990-3-1`[1,], nbins = 20)
+EN_2000 = tabulate(ibm_base$fishing$`census_info-Fishing_LL-2000-1-1`[1,], nbins = 20)
+HG_2000 = tabulate(ibm_base$fishing$`census_info-Fishing_LL-2000-2-1`[1,], nbins = 20)
+BP_2000 = tabulate(ibm_base$fishing$`census_info-Fishing_LL-2000-3-1`[1,], nbins = 20)
 
-(c(N1,N2,N3))
+par(mfrow = c(2,3), mar = c(3,3,1,1),oma = c(3,3,2,0))
+plot(fish_age, EN_fish_sample[EN_fish_sample$year == 1990,"simulated"], type = "l", 
+     lwd = 2, xaxt = "n", xlab = "", ylab = "proportions", main = "EN", ylim = c(0,0.2), lty = 2)
+lines(1:20, EN_1990 / sum(EN_1990), lwd = 2, col = "red", lty = 1)
+lines(fish_age, EN_fish_sample_alk[EN_fish_sample_alk$year == 1990,"simulated"], lwd = 2, col = "blue", lty = 2)
 
-N0 = 10000
-N1a = N0 * 0.9220
-N2a = N0 * 0.09472
-N3a = N0 * 0.002964
-c(N1a,N2a,N3a)
-##########################################
-## create Inputs for teh IBM especially the catch ones which such
-##########################################
-list.files()
-setwd("Layers/CatchLayers")
-catch_mat = matrix(0,nrow = 3,ncol = 1)
-for (i in 1:length(cas2$instantaneous_mort$`1`$year)) {
-  year = cas2$instantaneous_mort$`1`$year[i]
-  catch_mat[1,] = cas2$instantaneous_mort$`1`$`actual_catch[EN_LL]`[i]
-  catch_mat[2,] = cas2$instantaneous_mort$`1`$`actual_catch[HG_LL]`[i]
-  catch_mat[3,] = cas2$instantaneous_mort$`1`$`actual_catch[BP_LL]`[i]
-  Filename = make.filename(file = paste0(year,"_catch.ibm"), path = getwd())
-  create_ibm_layer(label = paste0(year,"_catch"), type = "numeric", filename = Filename,catch_mat)
-}
-## now add teh include statements in the config.ibm
-setwd("../../")
+plot(fish_age, HG_fish_sample[HG_fish_sample$year == 1990,"simulated"], type = "l", 
+     lwd = 2, xaxt = "n", yaxt = "n", xlab = "", ylab = "", ylim = c(0,0.2), main = "HG", lty = 2)
+lines(1:20, HG_1990 / sum(HG_1990), lwd = 2, col = "red", lty = 1)
+lines(fish_age, HG_fish_sample_alk[HG_fish_sample_alk$year == 1990,"simulated"], lwd = 2, col = "blue", lty = 2)
 
-for (i in 1:length(cas2$instantaneous_mort$`1`$year)) {
-  year = cas2$instantaneous_mort$`1`$year[i]
-  Line = paste0('!include "Layers/CatchLayers/',year,'_catch.ibm"')
-  write(Line,file="config.ibm",append=TRUE)
-}
+plot(fish_age, BP_fish_sample[BP_fish_sample$year == 1990,"simulated"], type = "l", 
+     lwd = 2, xaxt = "n", yaxt = "n", xlab = "", ylab = "", ylim = c(0,0.2), main = "BP", lty = 2)
+lines(1:20, BP_1990 / sum(BP_1990), lwd = 2, col = "red", lty = 1)
+lines(fish_age, BP_fish_sample_alk[BP_fish_sample_alk$year == 1990,"simulated"], lwd = 2, col = "blue", lty = 2)
 
-##########################################
-# A little experiment on how to move individuals around box's (Box transfer)
-##########################################
-N = 1000000 ## in cell 1
-prob = c(0.333333,0.033333,0.6333333)
-area = c(1,2,3)
-## prob = probabiliity of moving to another cell
-area_freq = area_move2 = area_move = vector(length = 3, mode = "numeric");
-for (i in 1:N) {
-  ## Current implementation
-  possible_area = sample(area,1)
-  area_freq[possible_area] = area_freq[possible_area] + 1;
-  if( runif(1) <= prob[possible_area]) {
-    area_move[possible_area] = area_move[possible_area] + 1;
-  }
-  ## proposed implementation
-  ndx = which(as.numeric(rmultinom(1,size = 1, prob)) > 0)
-  area_move2[ndx] = area_move2[ndx] + 1;
-}
-area_move2 / sum(area_move2)
-area_move / sum(area_move)
-N - sum(area_move2)
-N - sum(area_move)
+plot(fish_age, EN_fish_sample[EN_fish_sample$year == 2000,"simulated"], type = "l", 
+     lwd = 2, xlab = "", ylab = "proportions", ylim = c(0,0.2), lty = 2)
+lines(1:20, EN_2000 / sum(EN_2000), lwd = 2, col = "red", lty = 1)
+lines(fish_age, EN_fish_sample_alk[EN_fish_sample_alk$year == 2000,"simulated"], lwd = 2, col = "blue", lty = 2)
 
-# standard approach for sampling from a multinomial like this is to compare a random standard 
-# uniform value to the cumulative sums of the probabilities and return the first index for which 
-# the cumulative sum is greater than the random uniform
+plot(fish_age, HG_fish_sample[HG_fish_sample$year == 2000,"simulated"], type = "l", 
+     lwd = 2, xlab = "", yaxt = "n", ylab = "", ylim = c(0,0.2), lty = 2)
+lines(1:20, HG_2000 / sum(HG_2000), lwd = 2, col = "red", lty = 1)
+lines(fish_age, HG_fish_sample_alk[HG_fish_sample_alk$year == 2000,"simulated"], lwd = 2, col = "blue", lty = 2)
+
+plot(fish_age, BP_fish_sample[BP_fish_sample$year == 2000,"simulated"], type = "l", 
+     lwd = 2, xlab = "", yaxt = "n", ylab = "", ylim = c(0,0.2), lty = 2)
+lines(fish_age, BP_fish_sample_alk[BP_fish_sample_alk$year == 2000,"simulated"], lwd = 2, col = "blue", lty = 2)
+lines(1:20, BP_2000 / sum(BP_2000), lwd = 2, col = "red", lty = 1)
+
+mtext(side = 2, las = 3, adj = 0.75, outer = T, line = 0, text = "1995", font = 2)
+mtext(side = 2, las = 3, adj = 0.25, outer = T, line = 0, text = "2005", font = 2)
+legend('topright', legend = c("Census","ALK","Cluster"), col = c("red","blue","black"), lty = c(1,2,2), lwd = 2)
 
 
 
-## compare SSB's
-years = as.numeric(rownames(ibm_dq))
-plot(years, ibm_dq[,"SSB_HG"], type = "l", lwd = 2, col = "red", xlab = "years", ylab = "SSB (t)", ylim = c(80000,156000))
-lines(years, ibm_thread_dq[,"SSB_HG"], lwd = 2, col = "blue")
-lines(years, ibm_thread1_dq[,"SSB_HG"], lwd = 2, col = "blue", lty = 2)
-lines(years, ibm_thread2_dq[,"SSB_HG"], lwd = 2, col = "green", lty = 2)
-lines(years, ibm_thread3_dq[,"SSB_HG"], lwd = 2, col = "yellow", lty = 2)
-
-legend('bottomleft', legend = c("threaded", "not threaded"), col = c("blue", "red"), lwd = 2)
-
-
-
-## look at age frequencies
-threaded_model = as.numeric(ibm_threaded$init_2$`1`$values[2:32] / sum(ibm_threaded$init_2$`1`$values[2:32]))
-nonthreaded_model = as.numeric(ibm$init_2$`1`$values[2:32] / sum(ibm$init_2$`1`$values[2:32]))
-## reformat for GGPLOT
-new_data = melt(data.frame(casal2_model,ibm_model), variable.name = "model")
-new_data$age = c(0:30,0:30)
-
-#jpeg("initial_age_distribution.jpg")
-ggplot(new_data,aes(x=age,y=value,fill=model))+
-  geom_bar(stat="identity",position="dodge")+
-  scale_fill_discrete(name="Model",
-  labels=c("Casal2", "IBM"))+ 
-  xlab("Age")+ylab("Proportion") + 
-  ggtitle("Initial age distribution")
-#dev.off()
-
-## Look at the fishing age structure
-rbind(
-ibm_threaded$fishing$`1`$values[5,2:41],
-ibm_threaded3$fishing$`1`$values[5,2:41],
-ibm$fishing$`1`$values[5,2:41])
-
-ibm_threaded$fishing$`1`$biomass_removed
-ibm_threaded3$fishing$`1`$biomass_removed
-ibm$fishing$`1`$biomass_removed
-
-## comparison of R0
-tot = ibm$Rec_BP$`1`$r0 + ibm$Rec_EN$`1`$r0 + ibm$Rec_HG$`1`$r0
-ibm$Rec_BP$`1`$r0 / tot
-ibm$Rec_EN$`1`$r0 / tot
-ibm$Rec_HG$`1`$r0 / tot
+sim_ibm = extract.run(file = "../base_ibm/simulated_obs.log")
+sim_ibm$warnings_encounted$`1`$warnings_found
+sim_ibm$model_run_time
+#plot.derived_quantities(sim_ibm, report_label = "derived_quants")
+# read in data
+sim_obs_location = "../base_ibm/sim_obs"
+sim_file_names = unique(sapply(strsplit(list.files(sim_obs_location), split = "\\."), "[", 1))
+sim_file_names
+extensions = unique(sapply(strsplit(list.files(sim_obs_location), split = "\\."), "[", 2))
+EN_1990_age = EN_2000_age = matrix(0, nrow = length(extensions), ncol = 21)
+EN_1990_age_alk = EN_2000_age_alk = matrix(0, nrow = length(extensions), ncol = 21)
+HG_1990_age = HG_2000_age = matrix(0, nrow = length(extensions), ncol = 21)
+HG_1990_age_alk = HG_2000_age_alk = matrix(0, nrow = length(extensions), ncol = 21)
+BP_1990_age = BP_2000_age =  matrix(0, nrow = length(extensions), ncol = 21)
+BP_1990_age_alk = BP_2000_age_alk = matrix(0, nrow = length(extensions), ncol = 21)
 
 
-cas2_tot = cas2$Rec_EN$`1`$r0 + cas2$Rec_BP$`1`$r0 + cas2$Rec_HG$`1`$r0
-cas2$Rec_EN$`1`$r0 / cas2_tot
-cas2$Rec_HG$`1`$r0 / cas2_tot
-cas2$Rec_BP$`1`$r0 / cas2_tot
-
-
-### Estimating growth
-setwd("C:/Work/Software/IBM/Example/3Area/NatalHoming/CASAL")
-growth_df = read.csv("growth.csv", header = T)
-## estimate a loose VB for each area based on this data
-fit_VB = function(pars, area = "EN") {
-  k = pars[1]
-  l_inf = pars[2]
-  t0 = 0
+for (i in 1:length(extensions)) {
+  en_age = extract.ibm.file(file = file.path(sim_obs_location, paste0("/EN_age_sample.",extensions[i])))
+  hg_age = extract.ibm.file(file = file.path(sim_obs_location, paste0("/HG_age_sample.",extensions[i])))
+  bp_age = extract.ibm.file(file = file.path(sim_obs_location, paste0("/BP_age_sample.",extensions[i])))
+  en_age_alk = extract.ibm.file(file = file.path(sim_obs_location, paste0("/fishery_age_ALK_EN.",extensions[i])))
+  hg_age_alk = extract.ibm.file(file = file.path(sim_obs_location, paste0("/fishery_age_ALK_HG.",extensions[i])))
+  bp_age_alk = extract.ibm.file(file = file.path(sim_obs_location, paste0("/fishery_age_ALK_BP.",extensions[i])))
   
-  data = growth_df[growth_df$stock == area, -c(1,2)]
-  length_hat = VB(1:20,k,l_inf,t0)
-  SSE = sweep(data, MARGIN = 2, length_hat, FUN = "-")
-  return(sum(SSE * SSE))
-}
-
-opt_EN = nlminb(c(0.2,80), objective = fit_VB, area = "EN")
-opt_EN$convergence
-opt_EN$par
-## look at fit
-EN_fit = VB(1:20, opt_EN$par[1],opt_EN$par[2],opt_EN$par[3])
-en_data = growth_df[growth_df$stock == "EN", -c(1,2)]
-plot(1:20, en_data[1,], xlab = "age", ylab = "length", ylim = c(0,60), pch = 19, col = "blue")
-for(i in 2:nrow(en_data))
-  points(1:20, en_data[i,], pch = 19, col = "blue")
-lines(1:20, EN_fit, col = "red", lwd = 2)
-
-opt_HG = nlminb(c(0.2,80), objective = fit_VB, area = "HG")
-opt_HG$convergence
-opt_HG$par
-
-
-opt_BP = nlminb(c(0.2,80), objective = fit_VB, area = "BP")
-opt_BP$convergence
-opt_BP$par
-
-
-## Some R code to simulate a baranov process F + M in annual time step
-N0 = 1000000
-M = 0.2
-age_freq = c(1)
-for(i in 2:8) {
-  age_freq[i] = age_freq[i - 1] * exp(-M)
-}
-mean_weight = c(0.2,0.4,0.6,0.8,1.2,1.6,2.3,3.0)
-
-
-N1 = round(N0 * age_freq)
-
-F_mort = 0.3#
-sel = d_norm(1:8, 3,1.1,8)
-F_a = F_mort * sel
-Z = F_a + M
-C_baranov = sum((F_a / Z) * (1 - exp(-Z)) * N1)
+  EN_1990_age[i,] = en_age$`observation[EN_age_sample_sim]`$Table$obs$`1990`
+  EN_2000_age[i,] = en_age$`observation[EN_age_sample_sim]`$Table$obs$`2000`
+  HG_1990_age[i,] = hg_age$`observation[HG_age_sample_sim]`$Table$obs$`1990`
+  HG_2000_age[i,] = hg_age$`observation[HG_age_sample_sim]`$Table$obs$`2000`
+  BP_1990_age[i,] = bp_age$`observation[BP_age_sample_sim]`$Table$obs$`1990`
+  BP_2000_age[i,] = bp_age$`observation[BP_age_sample_sim]`$Table$obs$`2000`
   
-N2 = N1 * exp(-Z)
-## now as a individual based model
-catch_by_age = vector();
-catch_by_age1 = vector();
-
-M_by_age = M_by_age1 = vector();
-N2a = vector();
-individual = 1;
-set.seed(127)
-for (a in 1:length(N1)) {
-  catch = 0;
-  catch1 = 0
-  M_this_age = M_this_age1 = 0;
-  N_age = 0;
-  M_or_F = c(M,F_a[a])
-  for (i in 1:(N1[a])) {
-    ## randomly check if it survives M or F
-    if (runif(1) < (1 - exp(-Z[a]))) {
-      if (runif(1) < F_a[a] / (F_a[a] + M)) {
-        catch1 = catch1 + 1;
-     } else {
-        M_this_age1 = M_this_age1 + 1;
-     }
-    }
-    
-    this_m_or_f = sample(c(1,2), 1)
-    if (runif(1) < (1 - exp(-M_or_F[this_m_or_f]))) {
-      if (this_m_or_f == 1) {
-        ## dies of M
-        M_this_age = M_this_age + 1;
-      } else {
-        catch = catch + 1;
-      }
-    } else if (runif(1) < (1 - exp(-(Z[a] - M_or_F[this_m_or_f])))) {
-      ## dies of M
-      if (this_m_or_f == 2) {
-        M_this_age = M_this_age + 1;
-      } else {
-        catch = catch + 1;
-      }
-    } else {
-      ## survives
-      N_age = N_age + 1;
-    }
-    individual = individual + 1;
+  EN_1990_age_alk[i,] = en_age_alk$`observation[fishery_age_ALK_EN_sim]`$Table$obs$`1990`
+  EN_2000_age_alk[i,] = en_age_alk$`observation[fishery_age_ALK_EN_sim]`$Table$obs$`2000`
+  HG_1990_age_alk[i,] = hg_age_alk$`observation[fishery_age_ALK_HG_sim]`$Table$obs$`1990`
+  HG_2000_age_alk[i,] = hg_age_alk$`observation[fishery_age_ALK_HG_sim]`$Table$obs$`2000`
+  BP_1990_age_alk[i,] = bp_age_alk$`observation[fishery_age_ALK_BP_sim]`$Table$obs$`1990`
+  BP_2000_age_alk[i,] = bp_age_alk$`observation[fishery_age_ALK_BP_sim]`$Table$obs$`2000`
+  
+  par(mfrow = c(1,2))
+  plot(1:20, EN_1990 / sum(EN_1990), type = "l", lwd = 2, xlab = "", ylab = "proportions", 
+       main = "Cluster method",xlim = c(0,20), ylim = c(0,0.2), lty = 2)
+  for(i in 1:nrow(EN_1990_age)) {
+    lines(fish_age, EN_1990_age[i,], lwd = 2, col = adjustcolor(col = "red", alpha.f = 0.2), 
+          lty = 1)
   }
-  N2a[a] = N_age;
-  M_by_age[a] = M_this_age
-  catch_by_age[a] = catch
-  M_by_age1[a] = M_this_age1
-  catch_by_age1[a] = catch1
-}
-
-c(sum(catch_by_age), sum(catch_by_age1))
-sum(catch_by_age) - C_baranov
-cbind(N2a, N2)
-
-cbind(M_by_age, M_by_age1)
-
-################################
-## Compareing Casal2 with CASAL
-#################################
-library(casal)
-setwd("CASAL")
-
-cas = extract.mpd("run_b0.log")
-cas_dq = cas$quantities$SSBs
-
-setwd("Casal2")
-library(casal2)
-
-cas2 = extract.mpd("run_original.log")
-
-cas2_dq = plot.derived_quantities(cas2, report_label = "derived_quants", plot.it = F)
-
-
-## compare CASAL with Casal2
-years = rownames(cas2_dq)
-par(mfrow = c(1,3))
-plot(years, cas2_dq[,"SSB_EN"], xlab = "years", ylab = "SSB (t)", main = "EN", type = "l", lwd = 2, ylim = c(0,200000))
-lines(years, cas_dq$EN, lwd = 2, col = "red",lty = 2)
-
-plot(years, cas2_dq[,"SSB_HG"], xlab = "years", ylab = "SSB (t)", main = "HG", type = "l", lwd = 2, ylim = c(0,150000))
-lines(years, cas_dq$HAGU, lwd = 2, col = "red",lty = 2)
-
-plot(years, cas2_dq[,"SSB_BP"], xlab = "years", ylab = "SSB (t)", main = "BP", type = "l", lwd = 2, ylim = c(0,60000))
-lines(years, cas_dq$BOP, lwd = 2, col = "red",lty = 2)
-
-## lets look at B0
-cas$quantities$B0
-c(cas2$Rec_EN$`1`$b0, cas2$Rec_HG$`1`$b0,cas2$Rec_BP$`1`$b0)
-
-## lets look at R0
-cas$quantities$R0
-c(cas2$Rec_EN$`1`$r0, cas2$Rec_HG$`1`$r0,cas2$Rec_BP$`1`$r0)
-
-## lets look at F
-rbind(cas$quantities$fishing_pressures$BP_LL,cas2$instantaneous_mort$`1`$`fishing_pressure[BP_LL]`)
-rbind(cas$quantities$actual_catches$BP_LL,cas2$instantaneous_mort$`1`$`actual_catch[BP_LL]`)
-
-rbind(cas$quantities$actual_catches$HG_LL,cas2$instantaneous_mort$`1`$`actual_catch[HG_LL]`)
-rbind(cas$quantities$fishing_pressures$HG_LL,cas2$instantaneous_mort$`1`$`fishing_pressure[HG_LL]`)
-
-rbind(cas$quantities$actual_catches$EN_LL,cas2$instantaneous_mort$`1`$`actual_catch[EN_LL]`)
-rbind(cas$quantities$fishing_pressures$EN_LL,cas2$instantaneous_mort$`1`$`fishing_pressure[EN_LL]`)
-
-
-cbind(cas$quantities$`Ogive parameter values`$`selectivity[Sel_LL].all`, cas2$Sel_LL$`1`$Values)
-
-cas2$mean_weight_1$`1`$EN.EN$mean_weights$values
-cas_en = 4.467e-008 * c(12.55  ,   16.43 ,    19.92   ,  23.07 ,    25.91  ,   28.46  ,   30.77 ,    32.85  ,   34.72 ,    36.41,     37.93,     39.31,     40.54,     41.66,     42.66,     43.57,     44.38,     45.12,     45.78,     46.38)^2.793 
-
-cas_hg = 4.467e-008 * c(11.76,     15.36,     18.7   ,   21.79   ,  24.67    , 27.34   ,  29.81    , 32.11     ,34.25   ,  36.23   ,  38.06   ,  39.77  ,   41.35  ,   42.82  ,   44.18  ,   45.45    , 46.62   ,  47.71   ,  48.73 ,    49.66 )^2.793 
-cas_bp = 4.467e-008 *  c(13.94  ,   17.68  ,   21.14  ,   24.35 ,    27.31  ,   30.06  ,   32.6 ,     34.96 ,    37.14  ,   39.16   ,  41.03 ,    42.77,     44.37,     45.85,     47.23 ,    48.5  ,    49.68  ,   50.77,     51.79,     52.72)^2.793
-cbind(cas2$mean_weight_1$`1`$EN.EN$mean_weights$values, cas_en)
-cbind(cas2$mean_weight_1$`1`$HG.HG$mean_weights$values, cas_hg)
-cbind(cas2$mean_weight_1$`1`$BP.BP$mean_weights$values, cas_bp)
+  lines(1:20, EN_1990 / sum(EN_1990), lwd = 2, col = "black", lty = 1)
+  lines(fish_age, apply(EN_1990_age, MARGIN = 2,FUN = function(x){mean(as.numeric(x))}), 
+        lwd = 2, col = "blue", lty = 2)
+  
+  plot(1:20, EN_1990 / sum(EN_1990), type = "l", lwd = 2, xlab = "", ylab = "", 
+       main = "Age Length Key method",xlim = c(0,20), ylim = c(0,0.2), lty = 2)
+  for(i in 1:nrow(EN_1990_age_alk)) {
+    lines(fish_age, EN_1990_age_alk[i,], lwd = 2, col = adjustcolor(col = "red", alpha.f = 0.2), 
+          lty = 1)
+  }
+  lines(1:20, EN_1990 / sum(EN_1990), lwd = 2, col = "black", lty = 1)
+  lines(fish_age, apply(EN_1990_age_alk, MARGIN = 2,FUN = function(x){mean(as.numeric(x))}), lwd = 2, 
+        col = "blue", lty = 2)
+  mtext(side = 1, adj = 0.52, outer = T, line = -2, text = "Age", font = 2)
+  legend('topright', legend = c("realisation","Mean","Census"), col = c("red","blue","black"), 
+         lty = c(1), lwd = 2, cex = 0.6)
 
 
 
-cbind(cas2$mean_weight_1$`1`$EN.EN$mean_weights$values,cas2$mean_weight_1$`1`$EN.HG$mean_weights$values,cas2$mean_weight_1$`1`$EN.BP$mean_weights$values)
-cbind(cas2$mean_weight_1$`1`$BP.EN$mean_weights$values,cas2$mean_weight_1$`1`$BP.HG$mean_weights$values,cas2$mean_weight_1$`1`$BP.BP$mean_weights$values)
-cbind(cas2$mean_weight_1$`1`$HG.EN$mean_weights$values,cas2$mean_weight_1$`1`$HG.HG$mean_weights$values,cas2$mean_weight_1$`1`$HG.BP$mean_weights$values)
-
-cas2 = extract.mpd("run.log")
-cas2_dq = plot.derived_quantities(cas2, report_label = "derived_quants", plot.it = F)
