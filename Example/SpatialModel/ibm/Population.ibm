@@ -31,7 +31,7 @@ ncols 10
 @initialisation_phase Iterative
 type iterative
 years 40
-number_of_individuals 1500000 ## initial number of agents
+initial_number_of_agents 1500000 ## initial number of agents
 #recruitment_layer_label  Recruitment_label not neede only a single stock in this model
 
 # --------------

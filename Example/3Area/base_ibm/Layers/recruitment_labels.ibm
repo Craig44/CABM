@@ -1,0 +1,5 @@
+@layer recruitment_labels
+type categorical
+table layer
+Recruitment_const
+end_table

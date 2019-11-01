@@ -1,0 +1,203 @@
+# --------------
+# Define Reports
+# --------------
+# print initial state of agents
+@report init
+type initialisation_partition
+
+# print age frequency
+@report Jan_Mar_age_freq
+type age_frequency_by_cell
+time_step Jan_Mar
+
+@report Apr_Dec_age_freq
+type age_frequency_by_cell
+time_step Apr_Dec
+
+@report Jan_Mar_agents
+type summarise_agents
+time_step Jan_Mar
+number_of_agents 1000
+
+@report Apr_Dec_agents
+type summarise_agents
+time_step Apr_Dec
+number_of_agents 1000
+
+@report model_attributes
+type model_attributes
+
+
+# print SSB's
+@report derived_quants
+type derived_quantity
+
+# print process properties
+@report M_report
+type process
+process natural_mort
+
+@report mature_report
+type process
+process Maturation
+
+@report fishing
+type process
+process fishing
+
+@report Jump_One
+type process
+process Jump_One
+
+@report Movement_home
+type process
+process Movement_home
+
+@report Rec_EN
+type process
+process Recruitment_EN
+
+@report Rec_HG
+type process
+process Recruitment_HG
+
+@report Rec_BP
+type process
+process Recruitment_BP
+
+@report Tagging
+type process
+process Tagging
+#----------------
+# Observations
+#----------------
+@report fisher_age_freq
+type observation
+observation combined_fishery_age
+
+@report CPUE
+type observation
+observation combined_CPUE
+
+@report HG_age_sample
+type observation
+observation HG_age_sample
+
+@report EN_age_sample
+type observation
+observation EN_age_sample
+
+@report BP_age_sample
+type observation
+observation BP_age_sample
+
+@report fishery_age_ALK_EN
+type observation
+observation fishery_age_ALK_EN
+
+@report fishery_age_ALK_HG
+type observation
+observation fishery_age_ALK_HG
+
+@report fishery_age_ALK_BP
+type observation
+observation fishery_age_ALK_BP
+
+@report tag_recapture_1995_EN
+type observation
+observation tag_recapture_1995_EN
+
+@report tag_recapture_1995_HG
+type observation
+observation tag_recapture_1995_HG
+
+@report tag_recapture_1995_BP
+type observation
+observation tag_recapture_1995_BP
+
+@report tag_recapture_2005_EN
+type observation
+observation tag_recapture_2005_EN
+
+@report tag_recapture_2005_HG
+type observation
+observation tag_recapture_2005_HG
+
+@report tag_recapture_2005_BP
+type observation
+observation tag_recapture_2005_BP
+
+@report tag_recapture_2005_EN_length
+type observation
+observation tag_recapture_2005_EN_length
+
+@report tag_recapture_2005_HG_length
+type observation
+observation tag_recapture_2005_HG_length
+
+@report tag_recapture_2005_BP_length
+type observation
+observation tag_recapture_2005_BP_length
+
+#-----------------------
+# Simulated Observations
+#-----------------------
+@report HG_age_sample_sim
+type simulated_observation
+observation HG_age_sample
+file_name sim_obs/HG_age_sample
+
+@report EN_age_sample_sim
+type simulated_observation
+observation EN_age_sample
+file_name sim_obs/EN_age_sample
+
+@report BP_age_sample_sim
+type simulated_observation
+observation BP_age_sample
+file_name sim_obs/BP_age_sample
+
+@report fishery_age_ALK_EN_sim
+type simulated_observation
+observation fishery_age_ALK_EN
+file_name sim_obs/fishery_age_ALK_EN
+
+@report fishery_age_ALK_HG_sim
+type simulated_observation
+observation fishery_age_ALK_HG
+file_name sim_obs/fishery_age_ALK_HG
+
+@report fishery_age_ALK_BP_sim
+type simulated_observation
+observation fishery_age_ALK_BP
+file_name sim_obs/fishery_age_ALK_BP
+
+@report tag_recapture_1995_EN_sim
+type simulated_observation
+observation tag_recapture_1995_EN
+file_name sim_obs/tag_recapture_1995_EN
+
+@report tag_recapture_1995_HG_sim
+type simulated_observation
+observation tag_recapture_1995_HG
+file_name sim_obs/tag_recapture_1995_HG
+
+@report tag_recapture_1995_BP_sim
+type simulated_observation
+observation tag_recapture_1995_BP
+file_name sim_obs/tag_recapture_1995_BP
+
+@report tag_recapture_2005_EN_sim
+type simulated_observation
+observation tag_recapture_2005_EN
+file_name sim_obs/tag_recapture_2005_EN
+
+@report tag_recapture_2005_HG_sim
+type simulated_observation
+observation tag_recapture_2005_HG
+file_name sim_obs/tag_recapture_2005_HG
+
+@report tag_recapture_2005_BP_sim
+type simulated_observation
+observation tag_recapture_2005_BP
+file_name sim_obs/tag_recapture_2005_BP

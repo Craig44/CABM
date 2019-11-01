@@ -1,0 +1,62 @@
+!include "Population.ibm"
+!include "Observations.ibm"
+!include "Reports.ibm"
+
+# --------------
+# Include Auxillary Layers
+# --------------
+!include "Layers/base_layer.ibm"
+!include "Layers/area_labels.ibm"
+
+!include "Layers/SSB_BP_area.ibm"
+!include "Layers/SSB_HG_area.ibm"
+!include "Layers/SSB_EN_area.ibm"
+!include "Layers/M_layer.ibm"
+!include "Layers/k_layer.ibm"
+!include "Layers/L_inf_layer.ibm"
+!include "Layers/initial_seed_layer.ibm"
+!include "Layers/recruitment_processes.ibm"
+
+!include "Layers/recruitment_HG_area.ibm"
+!include "Layers/recruitment_BP_area.ibm"
+!include "Layers/recruitment_EN_area.ibm"
+## Movement layers
+!include "Layers/Movement/BP_home.ibm"
+!include "Layers/Movement/HG_home.ibm"
+!include "Layers/Movement/EN_home.ibm"
+!include "Layers/Movement/BP_Jump_One.ibm"
+!include "Layers/Movement/HG_Jump_One.ibm"
+!include "Layers/Movement/EN_Jump_One.ibm"
+
+/*
+@layer HG_move
+type numeric_meta_layer
+years 1970:2020
+layer_labels HG_move_pre_2000 * 51
+default_layer HG_move_pre_2000
+*/
+## Catch layers
+!include "Layers/CatchLayers/1990_catch.ibm"
+!include "Layers/CatchLayers/1991_catch.ibm"
+!include "Layers/CatchLayers/1992_catch.ibm"
+!include "Layers/CatchLayers/1993_catch.ibm"
+!include "Layers/CatchLayers/1994_catch.ibm"
+!include "Layers/CatchLayers/1995_catch.ibm"
+!include "Layers/CatchLayers/1996_catch.ibm"
+!include "Layers/CatchLayers/1997_catch.ibm"
+!include "Layers/CatchLayers/1998_catch.ibm"
+!include "Layers/CatchLayers/1999_catch.ibm"
+!include "Layers/CatchLayers/2000_catch.ibm"
+!include "Layers/CatchLayers/2001_catch.ibm"
+!include "Layers/CatchLayers/2002_catch.ibm"
+!include "Layers/CatchLayers/2003_catch.ibm"
+!include "Layers/CatchLayers/2004_catch.ibm"
+!include "Layers/CatchLayers/2005_catch.ibm"
+!include "Layers/CatchLayers/2006_catch.ibm"
+!include "Layers/CatchLayers/2007_catch.ibm"
+!include "Layers/CatchLayers/2008_catch.ibm"
+!include "Layers/CatchLayers/2009_catch.ibm"
+!include "Layers/CatchLayers/2010_catch.ibm"
+!include "Layers/CatchLayers/2011_catch.ibm"
+!include "Layers/CatchLayers/2012_catch.ibm"
+!include "Layers/CatchLayers/2013_catch.ibm"

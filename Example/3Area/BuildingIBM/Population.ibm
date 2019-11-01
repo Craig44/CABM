@@ -25,10 +25,12 @@ ncols 1
 @initialisation_phase Iterative
 type iterative
 #years 20 # created run_20.log
-#years 50 # created run_50.log
-years 100 # created run_100.log
+years 50 # created run_50.log
+#years 100 # created run_100.log
 
-initial_number_of_agents 1000000 ## initial number of agents
+#initial_number_of_agents 1000000 ## initial number of agents
+initial_number_of_agents 2000000 ## run_more_agents.out
+
 layer_label initial_values
 recruitment_layer_label recruitment_layer # stock identification, important for when you are scaling SSB = B0 for an agent model to population model
 # --------------

@@ -25,7 +25,7 @@ type iterative
 years 40
 #convergence_years 20 40
 #lambda 1
-number_of_individuals 1000000 ## initial number of agents
+initial_number_of_agents 1000000 ## initial number of agents
 layer_label Base
 #recruitment_layer_label recruitment_labels
 # --------------
@@ -209,7 +209,7 @@ type model_attributes
 # summarises a random selection of agents at each time step of each year, useful when debugging new processes
 @report agents
 type summarise_agents
-number_of_individuals 1000
+number_of_agents 1000
 time_step Annual
 # --------------
 # Include Layers

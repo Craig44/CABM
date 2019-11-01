@@ -16,6 +16,7 @@ ageing_error Normal_error
 fishery_label FishingTrwl
 layer_of_stratum_definitions survey_area
 age_allocation_method proportional
+strata_to_include survey_area
 
 table samples
 year survey_area
@@ -119,7 +120,7 @@ ageing_error Normal_error
 fishery_label FishingTrwl
 layer_of_stratum_definitions survey_area
 age_allocation_method proportional
-strata_to_include
+strata_to_include survey_area
 
 table samples
 year survey_area
@@ -223,6 +224,7 @@ ageing_error Normal_error
 fishery_label FishingTrwl
 layer_of_stratum_definitions survey_area
 age_allocation_method proportional
+strata_to_include survey_area
 
 table samples
 year survey_area

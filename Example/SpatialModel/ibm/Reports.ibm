@@ -8,25 +8,25 @@
 ################
 @report Summer_agents
 type summarise_agents
-number_of_individuals 200
+number_of_agents 200
 time_step Summer
 years 1990
 
 @report Autumn_agents
 type summarise_agents
-number_of_individuals 200
+number_of_agents 200
 time_step Autumn
 years 1990
 
 @report Winter_agents
 type summarise_agents
-number_of_individuals 200
+number_of_agents 200
 time_step Winter
 years 1990
 
 @report Spring_agents
 type summarise_agents
-number_of_individuals 200
+number_of_agents 200
 time_step Spring
 years 1990
 
