@@ -432,6 +432,7 @@
 #define PARAM_NO_STANDARD_HEADER_REPORT           "no_standard_header_report"
 #define PARAM_NUISANCE                            "nuisance"
 #define PARAM_NUMBERS                             "numbers"
+#define PARAM_NUMBER_OF_AGENTS                    "number_of_agents"
 #define PARAM_NUMBER_OF_BOOTSTRAPS                "number_of_bootstraps"
 #define PARAM_NUMBER_OF_GROWTH_EPISODES           "number_of_growth_episodes"
 #define PARAM_NUMBER_OF_INDIVIDUALS					      "number_of_individuals"

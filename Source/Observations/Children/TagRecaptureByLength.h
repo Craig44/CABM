@@ -47,7 +47,6 @@ public:
 protected:
   // members
   vector<unsigned>                years_;
-  vector<string>                  cells_;
   layers::CategoricalLayer*       layer_ = nullptr;
   string                          layer_label_;
   bool                            sexed_;
@@ -56,12 +55,15 @@ protected:
   Mortality*                      mortality_process_ = nullptr;
   string                          process_label_;
 
-  map<string,vector<unsigned>>    stratum_rows_;
-  map<string,vector<unsigned>>    stratum_cols_;
-  map<string,float>               stratum_area_;
-  WorldView*                      world_ = nullptr;
+  vector<unsigned>                release_stratum_rows_;
+  vector<unsigned>                release_stratum_cols_;
+  map<string,vector<unsigned>>    recapture_stratum_rows_;
+  map<string,vector<unsigned>>    recapture_stratum_cols_;
 
-  map<unsigned, map<string, unsigned>>  samples_by_year_and_stratum_;
+  vector<string>                  recapture_stratum_;
+  string                          release_stratum_;
+
+  WorldView*                      world_ = nullptr;
 
 };
 

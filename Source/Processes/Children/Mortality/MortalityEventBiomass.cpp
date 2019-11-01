@@ -443,9 +443,9 @@ void MortalityEventBiomass::DoExecute() {
                   prob_of_untagged_fish = vulnerable_total_in_cell / (vulnerable_total_in_cell + tagged_fish_vulnerable);
                   prob_of_tagged_fish = 1 - prob_of_untagged_fish;
 
-                  LOG_MEDIUM() << "prob untagged = " << prob_of_untagged_fish << " prob_of_tagged_fish = " << prob_of_tagged_fish << " avg scalar = "
+                  LOG_FINE() << "prob untagged = " << prob_of_untagged_fish << " prob_of_tagged_fish = " << prob_of_tagged_fish << " avg scalar = "
                       << (vulnerable_total_in_cell / average_counter);
-                  LOG_MEDIUM() << "individuals_in_cell = " << vulnerable_total_in_cell << " tagged fish = " << tagged_fish << " prob of untagged fish = " << prob_of_untagged_fish
+                  LOG_FINE() << "individuals_in_cell = " << vulnerable_total_in_cell << " tagged fish = " << tagged_fish << " prob of untagged fish = " << prob_of_untagged_fish
                       << " tagged fish that are vulnerable = " << tagged_fish_vulnerable << " prob untagged = " << prob_of_untagged_fish << " prob tagged = "
                       << prob_of_tagged_fish;
 
@@ -1026,7 +1026,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
   if (removals_tag_recapture_.size() > 0) {
     for (auto& tag_recapture : removals_tag_recapture_) {
       if (tag_recapture.age_.size() > 0) {
-        cache << "tag_recapture_info-" << tag_recapture.year_ << "-" << tag_recapture.row_ << "-" << tag_recapture.col_ << " " << REPORT_R_LIST << "\n";
+        cache << "tag_recapture_info-" << tag_recapture.year_ << "-" << tag_recapture.row_  + 1 << "-" << tag_recapture.col_ + 1  << " " << REPORT_R_LIST << "\n";
         cache << "scanned_fish: " << tag_recapture.scanned_fish_ << "\n";
         cache << "expected_scanned_fish: " << tag_recapture.expected_scanned_ << "\n";
         cache << "prob_tagged_fish: " << tag_recapture.proportion_tagged_ << "\n";
@@ -1085,7 +1085,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
           for (unsigned cell_ndx = 0; cell_ndx < fishery_census_data_[fish_ndx][year_ndx].size(); ++cell_ndx) {
             if (fishery_census_data_[fish_ndx][year_ndx][cell_ndx].age_ndx_.size() > 0) {
               cache << "census_info-" << fishery_label_[fishery_index_[fish_ndx]] << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].year_ << "-"
-                  << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].row_ << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].col_ << " " << REPORT_R_MATRIX
+                  << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].row_ + 1 << "-" << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].col_ + 1 << " " << REPORT_R_MATRIX
                   << "\n";
               for (unsigned age_ndx = 0; age_ndx < fishery_census_data_[fish_ndx][year_ndx][cell_ndx].age_ndx_.size(); ++age_ndx)
                 cache << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].age_ndx_[age_ndx] + model_->min_age() << " ";
