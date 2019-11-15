@@ -27,6 +27,14 @@ number_of_agents 1000
 @report model_attributes
 type model_attributes
 
+## selectivities
+@report Sel_LL
+type selectivity
+selectivity Sel_LL
+
+@report mature_ogive
+type selectivity
+selectivity mature_ogive
 
 # print SSB's
 @report derived_quants

@@ -250,7 +250,7 @@ data {
   real<lower = 1, upper = 20> mat_ato95; // Maturity Parameters
   int<lower = 0, upper = 1> apply_prior;// 0 = don't apply prior, 1 = apply priors
   vector<lower = 0, upper = 1>[R] proportion_recruitment_by_region;
-  simplex[R] prob_move[R];  
+  simplex[R] prob_move[R];  // rows = from, cols = to
   
   simplex[Y] unity_YCS; // YCS
   real<lower = 13, upper = 20> ln_R0; // R0

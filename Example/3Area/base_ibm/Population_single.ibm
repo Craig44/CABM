@@ -46,10 +46,10 @@ layer_label initial_values
 # - 0.5M + F + 0.5M
 
 @time_step Jan_Mar  
-processes von_bert Maturation Movement_home
+processes von_bert Maturation #Movement_home
 
 @time_step Apr_Dec
-processes  Recruitment Jump_One Tagging  natural_mort fishing natural_mort
+processes  Recruitment Tagging Jump_One  natural_mort fishing natural_mort
 
 # --------------
 # Process definitions
@@ -84,8 +84,10 @@ end_table
 # Growth
 @process von_bert
 type growth_von_bertalanffy_with_basic_weight
-linf_layer_label L_inf_layer
-k_layer_label k_layer
+#linf_layer_label L_inf_layer
+#k_layer_label k_layer
+k 0.134
+linf 61.78748773
 a 4.467e-08
 b 2.793
 t0 -1.2
@@ -102,7 +104,7 @@ type maturation
 @process natural_mort
 type mortality_constant_rate
 m_multiplier_layer_label M_layer
-m 0.13
+m 0.2
 update_mortality_parameters false
 distribution lognormal
 cv 0.01
@@ -195,8 +197,8 @@ probability_layers EN_jump_one HG_jump_one BP_jump_one
 @process Recruitment
 type recruitment_beverton_holt
 recruitment_layer_label recruitment
-b0 277644
-ssb SSB_HG
+b0 427034.9
+ssb SSB
 steepness 0.75
 ycs_values 0.9805555 0.2914848 0.6481528 0.4034729 0.9808864 0.6098410 0.3110043 0.5339825 1.3775342 0.5589029 0.8531278 1.2828560 0.5769496 1.0968170 0.7381291 0.1832230 0.5703490 0.4430337 2.4570672 0.4980334 0.6098772 1.2694970 0.6366152 0.4220754
 
@@ -250,8 +252,8 @@ l 0
 h 20
 @selectivity Sel_LL
 type logistic
-a50 3.9
-ato95 4.2
+a50 2.4
+ato95 7
 
 # --------------
 # Derived Quantities
