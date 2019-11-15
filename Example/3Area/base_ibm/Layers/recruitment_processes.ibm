@@ -1,8 +1,0 @@
-@layer recruitment_layer
-type categorical
-## cells could be areas if we wanted densities
-table layer
-Recruitment_EN
-Recruitment_HG
-Recruitment_BP
-end_table

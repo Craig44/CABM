@@ -11,7 +11,10 @@ Other input files can, in some circumstances, be supplied depending on what is r
 To use \IBM, open a console (i.e. the command prompt) window (Microsoft Windows) or a terminal window (Linux). Navigate to a directory of your choice, where your \config s are located. Then enter \ibm\ with any arguments (see Section \ref{sec:command-line-arguments} for the the list of possible arguments) to start your \IBM\ job running. \IBM\ will print output to the screen and return you to the command prompt when the job has completed. Note that the \IBM\ executable (binary) and shared libraries (extension \texttt{.dll}) must be either in the same directory as the \config s or in your systems \texttt{PATH}. The \IBM\ installer (\textbf{doesn't exist yet}) should update your path on Windows in any case, but see your operating system documentation for help identifying or modifying your \texttt{PATH}.
 
 
-\subsection{The \config\label{sec:config-files}}\index{Input configuration file}
+\subsection{The \config\label{sec:config-files}}\index{Input configuration files}
+
+It is advised to view \config s, using Text Pad 8 (\url{https://www.textpad.com/download/}). We provide a syntax highlighter for this program which can be found in the Documentation/UserManual called \texttt{ibm.syn}, this makes viewing \config s a lot easier. 
+
 
 The \config\ is made up of three broad sections; the description of the population structure and parameters (the population section), the observations and their associated likelihoods (the observation section), and the outputs and reports that \IBM\ will return (the report section). The \config\ is made up of a number of commands (many with subcommands) which specify various options for each of these components.
 

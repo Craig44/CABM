@@ -76,6 +76,7 @@ protected:
   vector<vector<vector<composition_data>>>    age_comp_by_fishery_; // n_fishery * n_years * n_cells
   vector<vector<vector<composition_data>>>   length_comp_by_fishery_; // n_fishery * n_years * n_cells
   vector<vector<vector<census_data>>>   fishery_census_data_; // n_fishery * n_years * n_cells
+  vector<vector<vector<vector<float>>>> actual_catch_by_area_; // n_years * n_fishery * rows * cols
 
   vector<unsigned>                    cell_ndx_;
 

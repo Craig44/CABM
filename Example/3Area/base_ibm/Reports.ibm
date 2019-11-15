@@ -57,6 +57,7 @@ process Movement_home
 type process
 process Recruitment_EN
 
+/*
 @report Rec_HG
 type process
 process Recruitment_HG
@@ -64,7 +65,7 @@ process Recruitment_HG
 @report Rec_BP
 type process
 process Recruitment_BP
-
+*/
 @report Tagging
 type process
 process Tagging
@@ -78,6 +79,18 @@ observation combined_fishery_age
 @report CPUE
 type observation
 observation combined_CPUE
+
+@report CPUE_EN
+type observation
+observation CPUE_EN
+
+@report CPUE_HG
+type observation
+observation CPUE_HG
+
+@report CPUE_BP
+type observation
+observation CPUE_BP
 
 @report HG_age_sample
 type observation

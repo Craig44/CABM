@@ -1,7 +1,7 @@
 \section{\I{The population section}\label{sec:population-section}}
 
 \subsection{Introduction}
-The population section\index{Population section} specifies the dynamics that occur to agents in a population over time. They are labelled as as population level population level processes such as death, birth, migration and growth but all occur at an agent level. For each process we will define the algorithm and mathematical representation and an example of the syntax for how you would incorporate in your own model. This section also discusses how to define the temporal and spatial resolution, which are completely user defined albeit some are computationally limited.
+The population section\index{Population section} (Section\ref{sec:population-section}) specifies the dynamics that occur to agents in a population over time. They are labelled as population level processes such as death, birth, migration and growth but all occur at an agent level. For each process we will define the algorithm and mathematical representation and an example of the syntax for how you would incorporate in your own model. This section also discusses how to define the temporal and spatial resolution, which are completely user defined albeit some are computationally limited.
 
 The population section consists of several components, including:
 \begin{itemize}
@@ -308,7 +308,7 @@ initialisation_phases Iterative_initialisation
 
 @initialisation_phase Iterative_initialisation
 type iterative
-number_of_individuals 1500000
+initial_numbers_of_agents 1500000
 years 50
 layer_label initial_values_distribution
 recruitment_layer_label recruitment_layer
@@ -327,7 +327,8 @@ Processes are a set of classes that get access to agents parameters and either m
 	\caption{An example of a length based logistic vulnerability curve that describes the probability of capture when an interaction occurs.}
 \end{figure}
 
-So if we were to iterate over all the spatially available agents to this process we would calculate the probability of capture by taking the vulnerability curve and a specific agents length and compare that capture probability ($P_l$) to random number drawn from a $uniform(0,1)$ distribution ($U()$) and so many of the algorithms would run something like,
+
+So if we were to iterate over all the spatially available agents to this process we would calculate the probability of capture by taking the vulnerability curve and a specific agents length and compare that capture probability ($P_l$) to random number drawn from a $uniform(0,1)$ distribution denoted as$U()$, and so many of the algorithms include the term,
 
 $$ \text{if }U() <= P_l \text{ agent is captured and removed}$$
 $$ \text{else it survives the event}$$
@@ -344,13 +345,13 @@ This means every fish automatically ages by one at the end of the year, or you c
 The process of converting an agent from immature to mature, only should be used if you link it to a mature-biomass derived quantity (Section~\ref{para:mature_biomass}). This process only changes the internal state of an agent i.e. no material change happens to the agent. This could be useful down the track if we have dynamics that only occur to mature agents and so this internal flag can be checked against for use in a different algorithm. Maturity is applied using the ogive defined in the subcommand \subcommand{maturity\_ogive\_label} in the \command{model} block, and is applied for a single agent (assuming the agent is not already mature)
 
 \begin{equation}
-	\begin{cases}
-	\text{mature } = 1, & \text{if } U() \leq P_a\\
-	\text{mature } = 0, & \text{if } U() > P_a\\
+	\text{maturity }\begin{cases}
+	 = 1, & \text{if } U() \leq P_a\\
+	 = 0, & \text{if } U() > P_a\\
 	\end{cases}
 \end{equation}
 
-where, $P_a$ is the probability of an immature individual at age $a$ turning to a mature individual. Currently maturity can only be an age based process, although this is not difficult to make a length based probability statement if someone in the future wanted this. A note about creating a logistic based maturity schedule, we recommend users use the selectivity logistic producing (Section~\ref{sec:selectivities}) or a similar style of selectivity. The results will not be as expected if you use a normal logistic selectivity. This is because this is only applied to the non-mature agents and so the selectivity needs more thought than other situations where a selectivity is needed\\
+where, $P_a$ is the probability of an immature agent at age $a$ becoming a mature agent. Currently maturity can only be an age based process, although this is not difficult to make a length based probability statement if someone in the future wanted this. A note about creating a logistic based maturity schedule, we recommend users use the selectivity \subcommand{type = logistic\_producing} (Section~\ref{sec:selectivities}) or a similar style of selectivity. The results will not be as expected if you use a normal logistic selectivity. This is because this is only applied to the non-mature agents and so the selectivity needs more thought than other situations where a selectivity is needed\\
 
 \begin{figure}[htp]\label{fig:mature}
 	\centering
@@ -364,7 +365,7 @@ An alternative way and perhaps more efficient method for capturing a snap shot o
 {\small{\begin{verbatim}
 @model
 ...
-maturity_ogive_label mature_ogive # define maturity selectivity: male female (order is important)
+maturity_ogive_label mature_ogive # define maturity selectivity: male female (order is important!!)
 
 @time_step Annual
 processes  Maturation 
@@ -403,11 +404,11 @@ biomass_layer_label SSB_areas
 proportion_through_mortality_block 0.0
 \end{verbatim}}}
 
-So just to re-iterate the difference, you can have an explicit maturing process that is not associated with a derived quantity, or you could purely associate a derived quantity to the maturing process. This brings up a useful point in that, given there generality of the program there are more than one way to approximate dynamics and some will be more computationally quicker than others. So have a play around but try and keep the number of times we iterate over the state as small as possible, as you will get significant time saving.
+So just to re-iterate the difference, you can have an explicit maturing process that is not associated with a derived quantity, or you could purely associate a derived quantity to the maturing process. This brings up a useful point in that, given the generality of the program there are more than one way to approximate dynamics and some will be more computationally quicker than others. So have a play around but try and keep the number of times we iterate over the state as small as possible, as you will get significant time saving.
 
 
 \subsubsection{Recruitment}\index{Processes!Recruitment}
-Recruitment is the process where new agents are created in the system. It is also the process that defines stock structure in the model. Stocks are not an explicit attribute of \IBM\ so consideration on this process is important. How the stock is defined using the recruitment dynamic surrounds where we calculate Spawning Stock Biomass ($SSB$) and where the resulting recruits are first seeded. This means that for all recruitment types you will need to specify a $B_0$ parameter and an associated derived quantity that represents the $SSB$ for that event. This is how an $R_0$ value is calculated from the initialisation phase.
+Recruitment is the process where new agents are created in the system. It is also the process that defines stock structure in the model. Stocks are not an explicit attribute of \IBM\ so consideration on this process is important. How the stock is defined using the recruitment dynamic surrounds where we calculate Spawning Stock Biomass ($SSB$) and where the resulting recruits are first seeded. This means that for all recruitment types you will need to specify a $B_0$ or \(R_0\) parameter and an associated derived quantity that defines the spatial resolution of the stock ($SSB$) for that event. This is how an $R_0$ value is calculated from the initialisation phase.
 
 \begin{equation}
 	X = \sum_{a = 0}^{4A}exp^{-M a}
@@ -427,6 +428,41 @@ where, $R_{0,s}$ is the stock specific initial/equilibrium number of agents to s
 	R_{y,s} = R_{0,s}
 \end{equation}
 
+{\small{\begin{verbatim}
+# Constant
+@process Recruitment_const
+type recruitment_constant
+recruitment_layer_label recruit_layer
+b0 29924.6 
+ssb SSB
+
+@derived_quantity SSB
+type mature_biomass
+biomass_layer_label SSB_areas
+time_step Annual
+proportion_through_mortality_block 0.5
+
+# proportion of where recruits are spatially distributed
+@layer recruit_layer
+type numeric
+table layer
+0.2 0.2 0.2
+0.2 0.2 0
+0 0 0
+0 0 0	
+end_table
+
+# define areas where SSB calculations are made
+@layer SSB_areas
+type numeric
+table layer
+1 1 1
+1 1 0
+0 0 0
+0 0 0	
+end_table
+\end{verbatim}}}
+	
 \paragraph{Beverton-Holt recruitment}\label{subsubsec:bev-holt-recruitment}\index{Processes!Recruitment!Beverton-Holt recruitment}
 
 We have taken the parametrisation akin to \cite{mace_doonan_88} that is a population based formula. There is room to make this a more pure agent based model where we look at probability of finding a mate and etc, but for know this is all we have.
@@ -439,6 +475,17 @@ where $h$ is the compensation parameter known as the steepness parameter that re
 R_{y,s,c} = R_{y,s} \times p_c
 \end{equation}
 where $R_{y,s,c}$ is the resulting agents in cell $c$ with proportion $p_c$ there is no stochastic behaviour in this process unlike other processes.
+
+{\small{\begin{verbatim}
+# Recruitment Beverton Holt
+@process Recruitment
+type recruitment_beverton_holt
+recruitment_layer_label recruit_layer
+b0 100000
+steepness 0.85
+ycs_values 1*53
+ssb SSB
+\end{verbatim}}}
 
 \subsubsection{Mortality}\label{sec:mortality}\index{Processes!Mortality}
 Mortality processes remove agents from the model domain, and do not allow them to be available to processes or summaries. Mortality that are associated with fishing or anthropogenic removals are also responsible for tag-recaptures.\\
@@ -622,6 +669,20 @@ tolerance 0.03
 step_size 0.003
 
 \end{verbatim}}}
+\paragraph{Tag Recaptures}\label{subsubsec:tag_recaptures}\index{Processes!Mortality!Tag Recaptures}
+Because the underlying model entity is an agent than often represents many individuals and a tagged entity is an individual careful consideration is needed not to introduce bias quantities. The first thing to note that users must specify a tagging event Section~\ref{subsub:tag} so that tagged fish exist in the partition. Otherwise this will be a computational burden. The algorithm for observing tag recaptures during a removal process follows;
+
+\begin{enumerate} 
+	\item Calculate proportion of tagged \textbf{individuals} from the vulnerable population, denoted \(P_t\). Note vulnerable is a stochastic evaluation see the above mortality processes e.g. \(U() \leq P_a\)\\
+	\item When in a removal process and we are scanning catch for tags, randomly draw from a Bernoulli distribution.
+	\[\text{select tagged fish }= Binomial(1,P_a) \]
+	\item In most mortality processes users must specify the proportion of the catch scanned for tags (\(P_{scan}\)). So if a tagged fish is selected. \IBM\ then does a check to see if we observed that recapture i.e. \(U() \leq P_{scan}\).
+\end{enumerate}
+
+There is two ways to get \IBM\ to report information on tag-recaptures. You can either generate a \subcommand{tag\_recapture\_by\_length} or \subcommand{tag\_recapture\_by\_age} observation class (See sections~\ref{subsubsec:tag_recap_by_age} \& \ref{subsubsec:tag_recap_by_length}), or generate a report class from the mortality process that the recaptures occurred in.
+
+
+
 \subsubsection{Movement}\index{Processes!Movement}
 \paragraph{Box Transfer}\label{subsubsec:box_transfer}\index{Processes!Movement!Box Transfer}
 The box transfer movement process is a simple movement process that is commonly applied in stock assessments. It describes a proportion of individuals moving from a cell to all other cells. This is applied by drawing from a multinomial distribution where an individual will end up. There are two types of movement that users can select for this method; \subcommand{markovian} and \subcommand{natal\_homing}. The difference is with markovian movement the \subcommand{origin\_cell} refers to the cell an individual is currently in, where as if the movement type is natal homing the \subcommand{origin\_cell} refers to the cell that the individual was born in. These are subtle in application but a quite different movement assumptions. A practical note about the two methods natal homing is difficult to thread so may be quite a lot slower (disclaimer I haven't tested it, but I have turned off threading in this process). The probability is not age or length specific and so applies equally to all individuals in a cell. An example of syntax of how you would set this process up for a 3 area model is below.

@@ -89,7 +89,7 @@ class MainCode:
     
     print "--> Build main code base"
     if Globals.operating_system_ == "windows":
-      if os.system("mingw32-make -j5") != EX_OK:
+      if os.system("mingw32-make -j3") != EX_OK:
         return Globals.PrintError("Failed to build code base. Please see above for build error")
     else:
       if os.system("make -j5") != EX_OK:

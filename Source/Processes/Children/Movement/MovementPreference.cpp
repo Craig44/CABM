@@ -233,7 +233,7 @@ void MovementPreference::DoExecute() {
    */
   //Model and world information that we need to build and store before we run and execute in threaded mode
   // - cell pointers in matrix
-  // - heigth and width in matrix
+  // - height and width in matrix
   // - current_year/Initialisaiton in a matrix form (this is the only one that is dynamic godamit)
   // - Max-lat/lon in a matrix
 
@@ -290,6 +290,8 @@ void MovementPreference::DoExecute() {
                 ++total_jumps;
                 LOG_FINEST() << counter<< " " << (*iter).get_lat() << " distance = " << lat_distance << " lon = " << (*iter).get_lon() << " distance = " << lon_distance << " Z = " << lon_random_numbers_[cell_offset_[row][col] + counter] << " sigma = " << standard_deviation_;
                 // Check bounds and find cell destination
+                // this is crude and should be changed into the future, I am thinking some sort of buffer from the edge
+
                 if ((((*iter).get_lat() + lat_distance) <= model_->max_lat()) && (((*iter).get_lat() + lat_distance) >= model_->min_lat())) {
                   (*iter).set_lat((*iter).get_lat() + lat_distance);
                 } // else they stay as it would be jumping out of bounds
