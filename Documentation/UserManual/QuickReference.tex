@@ -18,7 +18,7 @@
 \defSub{type} {The type of initialisation}
 \par\textbf{\commandlabsubarg{initialisation\_phase}{type}{iterative}}\par
 \defSub{years} {The number of iterations (years) over which to execute this initialisation phase}
-\defSub{initial\_number\_of\_agents} {The number of agents to initially seed in the partition}
+\defSub{number\_of\_individuals} {The number of agents to initially seed in the partition}
 \defSub{layer\_label} {The label of a layer that you want to seed a distribution by.}
 \defSub{recruitment\_layer\_label} {The label of a layer has a recruitment process label in each cell to see how to set scalars}
 \defComLab{likelihood}{Define an object of type \emph{likelihood}}\par\par
@@ -177,16 +177,15 @@
 \defSub{tag\_release\_year} {The years that the tagged fish were released}
 \defSub{ageing\_error} {Label of ageing error to use}
 \defSub{process\_label} {Label of of removal process}
-\defSub{release\_stratum} {Stratum that individuals were released in}
-\defSub{recapture\_stratum} {Stratum to record recaptures, that were released in this year and in the release stratum}
+\defSub{layer\_of\_stratum\_definitions} {The layer that indicates what the stratum boundaries are.}
+\defSub{strata\_to\_include} {The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer}
 \par\textbf{\commandlabsubarg{observation}{type}{tag\_recapture\_by\_length}}\par
 \defSub{years} {The years of the observed values}
 \defSub{tag\_release\_year} {The years that the tagged fish were released}
 \defSub{sexed} {Seperate observation by sex}
 \defSub{process\_label} {Label of of removal process}
-\defSub{layer\_of\_strata\_definitions} {The layer that indicates what the stratum boundaries are.}
-\defSub{release\_stratum} {Stratum that individuals were released in}
-\defSub{recapture\_stratum} {Stratum to record recaptures, that were released in this year and in the release stratum}
+\defSub{layer\_of\_stratum\_definitions} {The layer that indicates what the stratum boundaries are.}
+\defSub{strata\_to\_include} {The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer}
 \defComLab{process}{Define an object of type \emph{process}}\par\par
 \defSub{label} {The label of the process}
 \defSub{type} {The type of process}
@@ -301,7 +300,7 @@
 \par\textbf{\commandlabsubarg{report}{type}{summarise\_agents}}\par
 \defSub{years} {Years}
 \defSub{time\_step} {Time Step label}
-\defSub{number\_of\_agents} {Number of agents to summarise}
+\defSub{number\_of\_individuals} {Number of agents to summarise}
 \par\textbf{\commandlabsubarg{report}{type}{time\_varying}}\par
 \par\textbf{\commandlabsubarg{report}{type}{world\_age\_frequency}}\par
 \defSub{years} {Years}
