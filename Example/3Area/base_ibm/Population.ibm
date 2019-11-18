@@ -8,7 +8,7 @@
 @model
 start_year 1990
 final_year 2013
-min_age 0
+min_age 1
 max_age 20
 age_plus true # other acceptable inputs for bool are '1' and 'yes'
 initialisation_phase_labels Iterative #label to an @initialisation block

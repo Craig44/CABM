@@ -8,7 +8,7 @@ simulation_likelihood multinomial
 process_label fishing
 years 1990:2013
 min_age 1
-max_age 20
+max_age 30
 ageing_error age_error
 table error_values
 1990 300
@@ -95,8 +95,6 @@ type mortality_event_biomass_age_clusters
 process_label fishing
 fishery_label Fishing_LL
 years 1990:2013
-min_age 1
-max_age 20
 average_cluster_weight 6
 cluster_cv 0.6
 cluster_sigma 1.1
@@ -138,8 +136,6 @@ type mortality_event_biomass_age_clusters
 process_label fishing
 fishery_label Fishing_LL
 years 1990:2013
-min_age 1
-max_age 20
 average_cluster_weight 6
 cluster_cv 0.6
 cluster_sigma 1.1
@@ -181,8 +177,6 @@ type mortality_event_biomass_age_clusters
 process_label fishing
 fishery_label Fishing_LL
 years 1990:2013
-min_age 1
-max_age 20
 ageing_error age_error
 average_cluster_weight 6
 cluster_cv 0.6
@@ -284,6 +278,8 @@ year EN
 2012	1
 2013	1
 end_table
+
+
 @observation fishery_age_ALK_HG
 type mortality_event_biomass_scaled_age_frequency
 years 1990:2013
@@ -417,33 +413,88 @@ end_table
 #############################
 ## Tag Recapture By Age obs
 #############################
-@observation tag_recapture_1995_EN
+@observation tag_recapture_1995_EN_EN
 type tag_recapture_by_age
 years 1995 1996 1997 1998
 tag_release_year 1995
 layer_of_strata_definitions area_definition
-recapture_stratum EN HG BP
+recapture_stratum EN
 release_stratum EN
 process_label fishing
 
-@observation tag_recapture_1995_HG
+@observation tag_recapture_1995_EN_HG
 type tag_recapture_by_age
 years 1995 1996 1997 1998
 tag_release_year 1995
 layer_of_strata_definitions area_definition
-recapture_stratum EN HG BP
+recapture_stratum HG
+release_stratum EN
+process_label fishing
+
+@observation tag_recapture_1995_EN_BP
+type tag_recapture_by_age
+years 1995 1996 1997 1998
+tag_release_year 1995
+layer_of_strata_definitions area_definition
+recapture_stratum BP
+release_stratum EN
+process_label fishing
+
+@observation tag_recapture_1995_HG_EN
+type tag_recapture_by_age
+years 1995 1996 1997 1998
+tag_release_year 1995
+layer_of_strata_definitions area_definition
+recapture_stratum EN
 release_stratum HG
 process_label fishing
 
-@observation tag_recapture_1995_BP
+@observation tag_recapture_1995_HG_HG
 type tag_recapture_by_age
 years 1995 1996 1997 1998
 tag_release_year 1995
 layer_of_strata_definitions area_definition
-recapture_stratum EN HG BP
+recapture_stratum HG
+release_stratum HG
+process_label fishing
+
+@observation tag_recapture_1995_HG_BP
+type tag_recapture_by_age
+years 1995 1996 1997 1998
+tag_release_year 1995
+layer_of_strata_definitions area_definition
+recapture_stratum BP
+release_stratum HG
+process_label fishing
+
+@observation tag_recapture_1995_BP_EN
+type tag_recapture_by_age
+years 1995 1996 1997 1998
+tag_release_year 1995
+layer_of_strata_definitions area_definition
+recapture_stratum EN
 release_stratum BP
 process_label fishing
 
+@observation tag_recapture_1995_BP_HG
+type tag_recapture_by_age
+years 1995 1996 1997 1998
+tag_release_year 1995
+layer_of_strata_definitions area_definition
+recapture_stratum HG
+release_stratum BP
+process_label fishing
+
+@observation tag_recapture_1995_BP_BP
+type tag_recapture_by_age
+years 1995 1996 1997 1998
+tag_release_year 1995
+layer_of_strata_definitions area_definition
+recapture_stratum BP
+release_stratum BP
+process_label fishing
+
+/*
 @observation tag_recapture_2005_EN
 type tag_recapture_by_age
 years 2005 2006 2007 2008
@@ -498,7 +549,7 @@ layer_of_strata_definitions area_definition
 recapture_stratum EN HG BP
 release_stratum BP
 process_label fishing
-
+*/
 ## Ageing error matrix
 @ageing_error age_error
 type none

@@ -46,9 +46,6 @@ MortalityEventBiomassAgeClusters::MortalityEventBiomassAgeClusters(Model* model)
   parameters_.Bind<string>(PARAM_PROCESS_LABEL, &process_label_, "Label of of removal process", "", "");
   parameters_.Bind<string>(PARAM_FISHERY_LABEL, &fishery_label_, "Label of of removal process", "");
 
-  parameters_.Bind<unsigned>(PARAM_MIN_AGE, &min_age_, "Minimum age", "");
-  parameters_.Bind<unsigned>(PARAM_MAX_AGE, &max_age_, "Maximum age", "");
-
   // Cluster Inputs
   parameters_.Bind<float>(PARAM_AVERAGE_CLUSTER_WEIGHT, &average_cluster_weight_, "Mean size in weight of the cluster size could be tow or trip intepretation", "")->set_lower_bound(1.0, false);
   parameters_.Bind<float>(PARAM_CLUSTER_CV, &cluster_cv_, "CV for randomly selecting clusters", "");
@@ -102,13 +99,6 @@ void MortalityEventBiomassAgeClusters::DoValidate() {
     if (sexed_flag_)
       LOG_WARNING() << "you asked for a sexed observation but the model isn't sexed so I am ignoring this and giving you unsexed results.";
   }
-
-  if(min_age_ < model_->min_age())
-    LOG_ERROR_P(PARAM_MIN_AGE) << "min age = " << min_age_ << " model min_age is " << model_->min_age() << " you cannot specify an age less than model min age";
-  if(max_age_ < model_->max_age())
-    LOG_ERROR_P(PARAM_MAX_AGE) << "max age = " << max_age_ << " model min_age is " << model_->max_age() << " you cannot specify an age less than model max age";
-
-  age_spread_ = (max_age_ - min_age_) + 1;
   n_age_bins_ = model_->age_spread();
   target_age_distribution_.resize(n_age_bins_);
 
@@ -255,12 +245,12 @@ void MortalityEventBiomassAgeClusters::DoBuild() {
     }
   }
 
-  stratum_af_.resize(age_spread_, 0);
+  stratum_af_.resize(n_age_bins_, 0);
   agent_ndx_for_age_subsample_within_cluster_.resize(age_samples_per_clusters_, 0);
 
-  age_bins_.resize(age_spread_ + 1,0.0);
-  for(unsigned i = 0; i < (age_spread_ + 1); ++i) {
-    age_bins_[i] = (float)(min_age_ + i) - 0.5;
+  age_bins_.resize(n_age_bins_ + 1,0.0);
+  for(unsigned i = 0; i < (n_age_bins_ + 1); ++i) {
+    age_bins_[i] = (float)(model_->min_age() + i) - 0.5;
     LOG_FINE() <<  age_bins_[i];
   }
   cluster_weight_.resize(years_.size());
@@ -281,7 +271,7 @@ void MortalityEventBiomassAgeClusters::DoBuild() {
       cluster_age_sample_weight_[i][j].resize(cluster_by_year_and_stratum_[years_[i]][cells_[j]],0.0);
       cluster_weight_[i][j].resize(cluster_by_year_and_stratum_[years_[i]][cells_[j]],0.0);
       cluster_mean_[i][j].resize(cluster_by_year_and_stratum_[years_[i]][cells_[j]],0.0);
-      age_target_[i][j].resize(model_->age_spread(), 0.0);
+      age_target_[i][j].resize(n_age_bins_, 0.0);
       for(unsigned k = 0; k < cluster_by_year_and_stratum_[years_[i]][cells_[j]]; ++k) {
         cluster_age_samples_[i][j][k].resize(age_samples_per_clusters_, 0);
       }
@@ -309,6 +299,7 @@ void MortalityEventBiomassAgeClusters::Execute() {
  *  Reset dynamic containers, in between simulations
  */
 void MortalityEventBiomassAgeClusters::ResetPreSimulation() {
+  LOG_FINE() << "ResetPreSimulation";
   for(unsigned i = 0; i < years_.size(); ++i) {
     for(unsigned j = 0; j < cells_.size(); ++j) {
       fill(cluster_weight_[i][j].begin(), cluster_weight_[i][j].end(),0.0);
@@ -320,7 +311,7 @@ void MortalityEventBiomassAgeClusters::ResetPreSimulation() {
     }
   }
   ClearComparison(); // Clear comparisons
-
+  LOG_FINE() << "Exit: ResetPreSimulation";
 }
 
 /**

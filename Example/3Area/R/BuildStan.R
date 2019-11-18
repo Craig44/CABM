@@ -17,11 +17,13 @@ list.files(stan_dir)
 
 ## Single stock Recruit function
 stan_sim_model = stan_model(file.path(stan_dir, "SpatialModelSim.stan"))
+## IBM
+ibm = extract.run(file = "../base_ibm/single.out")
 
 years = 1990:2013
 stan_data = list()
 stan_data$Y = length(years)
-stan_data$A = 20
+stan_data$A = 30
 stan_data$R = 3
 stan_data$T = 2*stan_data$R
 
@@ -84,7 +86,6 @@ init_pars$rho = 0.5
 init_pars$sigma = 1.3
 init_pars$adj_biomass_cv = 0.03
 ## use observations from IBM quicker
-ibm = extract.run(file = "../base_ibm/single.out")
 ibm$Jump_One$`year-area-1990_1-1`$initial_numbers_in_cell
 sum(ibm$Jump_One$`year-area-1990_1-1`$destination_values)
 
@@ -95,7 +96,7 @@ ibm$model_attributes$Recruitment * ibm$Rec$initial_recruits
 stan_sim$par$R0
 
 years = unique(ibm$EN_age_sample$Values$year)
-ages = 1:20
+ages = 1:30
 stan_data$Y_f = length(as.numeric(rownames(ibm$fishing$catches)))
 stan_data$fish_age_years = as.numeric(rownames(ibm$fishing$catches))
 fish_obs_A1 = matrix(ibm$EN_age_sample$Values$expected[ibm$EN_age_sample$Values$age != 0], ncol = length(years), nrow = length(ages))
@@ -114,7 +115,7 @@ stan_data$biomass_error[stan_data$biomass_error<=0.05] = 0.1
 process_error_sqrd = 0.04^2
 obs_cv = sqrt(stan_data$biomass_error^2 - process_error_sqrd)
 
-R0 = (ibm$Rec$initial_recruits) * ibm$model_attributes$Recruitment
+R0 = 40535890 #(ibm$Rec$initial_recruits) * ibm$model_attributes$Recruitment
 catches = NULL;
 for(i in 1:length(years)) {
   this_catch = eval(expr = parse(text = paste0("ibm$fishing$`actual_catches-", years[i],"`")))
@@ -134,12 +135,12 @@ stan_data$Q = 0.3832
 
 stan_data$fishery_obs_indicator = stan_data$biomass_indicator
 stan_data$tag_release_by_age = array(0,dim= c(stan_data$R,stan_data$A, stan_data$T))
-stan_data$tag_release_by_age[1,,1] = as.matrix(ibm$Tagging$`tag_release_by_age-1995`)[1,1:20]
-stan_data$tag_release_by_age[2,,2] = as.matrix(ibm$Tagging$`tag_release_by_age-1995`)[2,1:20]
-stan_data$tag_release_by_age[3,,3] = as.matrix(ibm$Tagging$`tag_release_by_age-1995`)[3,1:20]
-stan_data$tag_release_by_age[1,,4] = as.matrix(ibm$Tagging$`tag_release_by_age-2005`)[1,1:20]
-stan_data$tag_release_by_age[2,,5] = as.matrix(ibm$Tagging$`tag_release_by_age-2005`)[2,1:20]
-stan_data$tag_release_by_age[3,,6] = as.matrix(ibm$Tagging$`tag_release_by_age-2005`)[3,1:20]
+stan_data$tag_release_by_age[1,,1] = as.matrix(ibm$Tagging$`tag_release_by_age-1995`)[1,]
+stan_data$tag_release_by_age[2,,2] = as.matrix(ibm$Tagging$`tag_release_by_age-1995`)[2,]
+stan_data$tag_release_by_age[3,,3] = as.matrix(ibm$Tagging$`tag_release_by_age-1995`)[3,]
+stan_data$tag_release_by_age[1,,4] = as.matrix(ibm$Tagging$`tag_release_by_age-2005`)[1,]
+stan_data$tag_release_by_age[2,,5] = as.matrix(ibm$Tagging$`tag_release_by_age-2005`)[2,]
+stan_data$tag_release_by_age[3,,6] = as.matrix(ibm$Tagging$`tag_release_by_age-2005`)[3,]
 # check total number of tags
 sum(stan_data$tag_release_by_age)
 sum(ibm$Tagging$`tag_release_by_age-1995`) + sum(ibm$Tagging$`tag_release_by_age-2005`)
@@ -211,50 +212,144 @@ stan_sim = optimizing(stan_sim_model,data=stan_data,init=init_pars,
                       iter=1,algorithm="LBFGS",
                       verbose=F,as_vector = FALSE)
 
-plot(rownames(ibm_ssb),ibm_ssb[,"SSB"], type = "l", lwd = 2, lty = 2)
+par(mfrow = c(1,1))
+plot(rownames(ibm_ssb),ibm_ssb[,"SSB"], type = "l", lwd = 2, lty = 2, ylim = c(0,300000))
 lines(rownames(ibm_ssb),stan_sim$par$SSB, col = "red", lwd = 2)
-stan_sim$par$N[,1,,1]
-ibm$init_2$values
+legend('bottomleft', col = c("black","red"), legend = c("ABM","Stan"), lty = c(2,1), lwd = 2)
+box()
+stan_sim$par$B0
+ibm$Rec$b0
+
+stan_sim$par$standardised_ycs
+ibm$Rec$ycs_values
+# read in simulated data
+sim_obs_location= "../base_ibm/sim_obs"
+ibm_sim = extract.run("../base_ibm/simulated_obs.log")
+ibm_n_runs = length(ibm_sim$derived_quants)
+for(i in 1:ibm_n_runs)
+  lines(rownames(ibm_ssb),ibm_sim$derived_quants[[i]]$SSB$values, col = adjustcolor(col = "black", alpha.f = 0.3), lwd = 2)
+
+
+stan_data$N_sims = 1
+stan_en_tag_95 = stan_hg_tag_95 = stan_bp_tag_95 = array(NA, dim = c(3, ibm_n_runs, 4))
+stan_en_tag_00 = stan_hg_tag_00 = stan_bp_tag_00 = array(NA, dim = c(3, ibm_n_runs, 4))
+
+for(i in 1:ibm_n_runs) {
+  catches = NULL;
+  for(k in 1:length(years)) {
+    this_catch = eval(expr = parse(text = paste0("ibm_sim$fishing[[i]]$`actual_catches-", years[k],"`")))
+    catches = cbind(catches, as.numeric(this_catch[,1]))
+  }
+  print(sum(catches))
+  stan_data$catches = catches
+  stan_data$tag_release_by_age = array(0,dim= c(stan_data$R,stan_data$A, stan_data$T))
+  stan_data$tag_release_by_age[1,,1] = as.matrix(ibm_sim$Tagging[[i]]$`tag_release_by_age-1995`)[1,]
+  stan_data$tag_release_by_age[2,,2] = as.matrix(ibm_sim$Tagging[[i]]$`tag_release_by_age-1995`)[2,]
+  stan_data$tag_release_by_age[3,,3] = as.matrix(ibm_sim$Tagging[[i]]$`tag_release_by_age-1995`)[3,]
+  stan_data$tag_release_by_age[1,,4] = as.matrix(ibm_sim$Tagging[[i]]$`tag_release_by_age-2005`)[1,]
+  stan_data$tag_release_by_age[2,,5] = as.matrix(ibm_sim$Tagging[[i]]$`tag_release_by_age-2005`)[2,]
+  stan_data$tag_release_by_age[3,,6] = as.matrix(ibm_sim$Tagging[[i]]$`tag_release_by_age-2005`)[3,]
+  #(sum(stan_data$tag_release_by_age))
+  
+  stan_sim = optimizing(stan_sim_model,data=stan_data,init=init_pars,
+                      iter=1,algorithm="LBFGS",
+                      verbose=F,as_vector = FALSE)
+  stan_en_tag_95[1,i,1] = sum(stan_sim$par$recapture_expectations[1,1,,stan_data$years == 1995])
+  stan_en_tag_95[1,i,2] = sum(stan_sim$par$recapture_expectations[1,1,,stan_data$years == 1996])
+  stan_en_tag_95[1,i,3] = sum(stan_sim$par$recapture_expectations[1,1,,stan_data$years == 1997])
+  stan_en_tag_95[1,i,4] = sum(stan_sim$par$recapture_expectations[1,1,,stan_data$years == 1998])
+  
+  print(stan_en_tag_95[1,i,1])
+  
+  stan_en_tag_95[2,i,2] = sum(stan_sim$par$recapture_expectations[2,1,,stan_data$years == 1996])
+  stan_en_tag_95[2,i,3] = sum(stan_sim$par$recapture_expectations[2,1,,stan_data$years == 1997])
+  stan_en_tag_95[2,i,4] = sum(stan_sim$par$recapture_expectations[2,1,,stan_data$years == 1998])
+  
+  stan_en_tag_95[3,i,1] = sum(stan_sim$par$recapture_expectations[3,1,,stan_data$years == 1995])
+  stan_en_tag_95[3,i,2] = sum(stan_sim$par$recapture_expectations[3,1,,stan_data$years == 1996])
+  stan_en_tag_95[3,i,3] = sum(stan_sim$par$recapture_expectations[3,1,,stan_data$years == 1997])
+  stan_en_tag_95[3,i,4] = sum(stan_sim$par$recapture_expectations[3,1,,stan_data$years == 1998])
+}
+
+sim_file_names = unique(sapply(strsplit(list.files(sim_obs_location), split = "\\."), "[", 1))
+sim_file_names
+extensions = unique(sapply(strsplit(list.files(sim_obs_location), split = "\\."), "[", 2))
+
+en_tag_95 = hg_tag_95 = bp_tag_95 = array(NA, dim = c(3, length(extensions), 4))
+en_tag_00 = hg_tag_00 = bp_tag_00 = array(NA, dim = c(3, length(extensions), 4))
+
+for (i in 1:length(extensions)) {
+  temp_en_en_tag_95 = extract.ibm.file(file = file.path(sim_obs_location, paste0("/tag_recapture_1995_EN_EN.",extensions[i])))
+  temp_en_hg_tag_95 = extract.ibm.file(file = file.path(sim_obs_location, paste0("/tag_recapture_1995_EN_HG.",extensions[i])))
+  temp_en_bp_tag_95 = extract.ibm.file(file = file.path(sim_obs_location, paste0("/tag_recapture_1995_EN_BP.",extensions[i])))
+  
+  en_tag_95[1,i,1] = sum(as.numeric(temp_en_en_tag_95$`observation[tag_recapture_1995_EN_EN_sim]`$Table$obs$`1995`))
+  en_tag_95[1,i,2] = sum(as.numeric(temp_en_en_tag_95$`observation[tag_recapture_1995_EN_EN_sim]`$Table$obs$`1996`))
+  en_tag_95[1,i,3] = sum(as.numeric(temp_en_en_tag_95$`observation[tag_recapture_1995_EN_EN_sim]`$Table$obs$`1997`))
+  en_tag_95[1,i,4] = sum(as.numeric(temp_en_en_tag_95$`observation[tag_recapture_1995_EN_EN_sim]`$Table$obs$`1998`))
+  
+  en_tag_95[2,i,1] = sum(as.numeric(temp_en_hg_tag_95$`observation[tag_recapture_1995_EN_HG_sim]`$Table$obs$`1995`))
+  en_tag_95[2,i,2] = sum(as.numeric(temp_en_hg_tag_95$`observation[tag_recapture_1995_EN_HG_sim]`$Table$obs$`1996`))
+  en_tag_95[2,i,3] = sum(as.numeric(temp_en_hg_tag_95$`observation[tag_recapture_1995_EN_HG_sim]`$Table$obs$`1997`))
+  en_tag_95[2,i,4] = sum(as.numeric(temp_en_hg_tag_95$`observation[tag_recapture_1995_EN_HG_sim]`$Table$obs$`1998`))
+  
+  en_tag_95[3,i,1] = sum(as.numeric(temp_en_bp_tag_95$`observation[tag_recapture_1995_EN_BP_sim]`$Table$obs$`1995`))
+  en_tag_95[3,i,2] = sum(as.numeric(temp_en_bp_tag_95$`observation[tag_recapture_1995_EN_BP_sim]`$Table$obs$`1996`))
+  en_tag_95[3,i,3] = sum(as.numeric(temp_en_bp_tag_95$`observation[tag_recapture_1995_EN_BP_sim]`$Table$obs$`1997`))
+  en_tag_95[3,i,4] = sum(as.numeric(temp_en_bp_tag_95$`observation[tag_recapture_1995_EN_BP_sim]`$Table$obs$`1998`))
+}
+
 sum(ibm$tag_recapture_1995_EN$Values$expected[ibm$tag_recapture_1995_EN$Values$year == 1995 & ibm$tag_recapture_1995_EN$Values$cell == "EN"])
 sum(stan_sim$par$recapture_expectations[1,1,,stan_data$years == 1995])
 ## plot it
 ## Release at 1995 in "EN"
+jpeg(filename = "../Figures/tag_recaptures_EN_1995.jpeg", units = "in", res = 300, width = 6, height = 14)
 par(mfrow = c(4,3), mar = c(3,3,1,1), oma = c(2,2,2,0))
 ## 1995
-boxplot(stan_sim$par$sim_tag_recapture_poisson[1,1,stan_data$years == 1995,], main = "recapture EN")
+boxplot(cbind(stan_en_tag_95[1,,1],en_tag_95[1,,1]), main = "recapture EN", xaxt = "n")
 abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1995 & ibm$tag_recapture_1995_EN$Values$cell == "EN","expected"]), col = "red", lty = 2, lwd = 2)
 
-boxplot(stan_sim$par$sim_tag_recapture_poisson[1,2,stan_data$years == 1995,], main = "recapture HG")
+boxplot(cbind(stan_en_tag_95[2,,1],en_tag_95[2,,1]), main = "recapture HG", xaxt = "n")
 abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1995 & ibm$tag_recapture_1995_EN$Values$cell == "HG","expected"]), col = "red", lty = 2, lwd = 2)
 
-boxplot(stan_sim$par$sim_tag_recapture_poisson[1,3,stan_data$years == 1995,], main = "recapture BP")
+boxplot(cbind(stan_en_tag_95[3,,1],en_tag_95[3,,1]), main = "recapture BP", xaxt = "n")
 abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1995 & ibm$tag_recapture_1995_EN$Values$cell == "BP","expected"]), col = "red", lty = 2, lwd = 2)
 ## 1996
-boxplot(stan_sim$par$sim_tag_recapture_poisson[1,1,stan_data$years == 1996,], ylim = c(50,600), main = "")
+boxplot(cbind(stan_en_tag_95[1,,2],en_tag_95[1,,2]), main = "", xaxt = "n")
 abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1996 & ibm$tag_recapture_1995_EN$Values$cell == "EN","expected"]), col = "red", lty = 2, lwd = 2)
 
-boxplot(stan_sim$par$sim_tag_recapture_poisson[1,1,stan_data$years == 1996,], ylim = c(50,600), main = "")
+boxplot(cbind(stan_en_tag_95[2,,2],en_tag_95[2,,2]), main = "", xaxt = "n")
 abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1996 & ibm$tag_recapture_1995_EN$Values$cell == "HG","expected"]), col = "red", lty = 2, lwd = 2)
 
-boxplot(stan_sim$par$sim_tag_recapture_poisson[1,1,stan_data$years == 1996,], ylim = c(50,600), main = "")
+boxplot(cbind(stan_en_tag_95[3,,2],en_tag_95[3,,2]), main = "", xaxt = "n")
 abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1996 & ibm$tag_recapture_1995_EN$Values$cell == "BP","expected"]), col = "red", lty = 2, lwd = 2)
 
+## 1997
+boxplot(cbind(stan_en_tag_95[1,,3],en_tag_95[1,,3]), main = "")
+abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1997 & ibm$tag_recapture_1995_EN$Values$cell == "EN","expected"]), col = "red", lty = 2, lwd = 2)
 
+boxplot(cbind(stan_en_tag_95[2,,3],en_tag_95[2,,3]), main = "")
+abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1997 & ibm$tag_recapture_1995_EN$Values$cell == "HG","expected"]), col = "red", lty = 2, lwd = 2)
 
-boxplot(stan_sim$par$sim_tag_recapture_poisson[1,1,stan_data$years == 1995,], ylim = c(50,600), main = "EN")
-abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1995,"expected"]), col = "red", lty = 2, lwd = 2)
+boxplot(cbind(stan_en_tag_95[3,,3],en_tag_95[3,,3]), main = "")
+abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1997 & ibm$tag_recapture_1995_EN$Values$cell == "BP","expected"]), col = "red", lty = 2, lwd = 2)
+## 1998
+boxplot(cbind(stan_en_tag_95[1,,4],en_tag_95[1,,4]), main = "")
+abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1998 & ibm$tag_recapture_1995_EN$Values$cell == "EN","expected"]), col = "red", lty = 2, lwd = 2)
 
-boxplot(stan_sim$par$sim_tag_recapture_poisson[1,1,stan_data$years == 1995,], ylim = c(50,600), main = "EN")
-abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1995,"expected"]), col = "red", lty = 2, lwd = 2)
+boxplot(cbind(stan_en_tag_95[2,,4],en_tag_95[2,,4]), main = "")
+abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1998 & ibm$tag_recapture_1995_EN$Values$cell == "HG","expected"]), col = "red", lty = 2, lwd = 2)
 
+boxplot(cbind(stan_en_tag_95[3,,4],en_tag_95[3,,4]), main = "")
+abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1998 & ibm$tag_recapture_1995_EN$Values$cell == "BP","expected"]), col = "red", lty = 2, lwd = 2)
+mtext(outer = T, line = -0.2, font = 2, text = "1998", las = 3, adj = 0.125, side = 2)
+mtext(outer = T, line = -0.2, font = 2, text = "1997", las = 3, adj = 0.40, side = 2)
+mtext(outer = T, line = -0.2, font = 2, text = "1996", las = 3, adj = 0.67, side = 2)
+mtext(outer = T, line = -0.2, font = 2, text = "1995", las = 3, adj = 0.94, side = 2)
+dev.off()
 
+###
+sum(stan_sim$par$recapture_expectations[1,1,,6])
+sum(stan_sim$par$recapture_expectations[1,1,,7])
 
-ibm$tag_recapture_1995_BP$Values[ibm$tag_recapture_1995_BP$Values$year == 1995,]
-
-
-
-
-
-stan_data$r0
-
-
+stan_data$tag_release_by_age

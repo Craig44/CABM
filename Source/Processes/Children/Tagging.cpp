@@ -190,6 +190,9 @@ void Tagging::DoBuild() {
   length_distribution_of_tagged_fish_by_year_cell_.resize(years_.size());
   age_distribution_of_tagged_fish_by_year_cell_.resize(years_.size());
   for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    age_distribution_of_tagged_fish_by_year_[years_[year_ndx]].resize(model_->age_spread(),0);
+    length_distribution_of_tagged_fish_by_year_[years_[year_ndx]].resize(model_->length_bin_mid_points().size(),0);
+
     length_distribution_of_tagged_fish_by_year_cell_[year_ndx].resize(model_->get_height());
     age_distribution_of_tagged_fish_by_year_cell_[year_ndx].resize(model_->get_height());
     for (unsigned row = 0; row < model_->get_height(); ++row) {
@@ -203,6 +206,20 @@ void Tagging::DoBuild() {
   }
 }
 
+/*
+ * DoReset()
+ */
+void Tagging::DoReset() {
+  // Reset reporting containers
+  for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        fill(age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].begin(),age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].end(),0.0);
+        fill(length_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].begin(),length_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].end(),0.0);
+      }
+    }
+  }
+}
 
 void Tagging::DoExecute() {
   LOG_MEDIUM();
@@ -224,8 +241,9 @@ void Tagging::DoExecute() {
         }
       }
     }
-    age_distribution_of_tagged_fish_by_year_[model_->current_year()].resize(model_->age_spread(),0);
-    length_distribution_of_tagged_fish_by_year_[model_->current_year()].resize(model_->length_bin_mid_points().size(),0);
+    fill(age_distribution_of_tagged_fish_by_year_[model_->current_year()].begin(), age_distribution_of_tagged_fish_by_year_[model_->current_year()].end(), 0.0);
+    fill(length_distribution_of_tagged_fish_by_year_[model_->current_year()].begin(), length_distribution_of_tagged_fish_by_year_[model_->current_year()].end(), 0.0);
+
     LOG_FINE() << "allocate";
     // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
     random_numbers_.resize(n_agents_ + 1);

@@ -443,6 +443,7 @@ transformed parameters{
   * -- Ageing
   * -- Move
   * -- Recruit
+  * -- Tagging
   * -- Z 
   */ 
   for(y in 2:(Y + 1)) {
@@ -457,32 +458,8 @@ transformed parameters{
         N[reg, tag, 1, y] = 0.0; 
       }
     }
-    // Check if we are releasing tags this year
-    // Apply it using an exploitation so that we don't end up with negative partition during estimation
-    // of crappy parameter space.
-    for(tag_year in 1:T) {
-      if (tag_years[tag_year] == years[y - 1]) {
-        for (reg in 1:R) {
-          for (age in 1:A) {
-            if ((tag_release_by_age[reg, age, tag_year] / N[reg,1,age,y]) > u_max) {
-              N[reg, tag_year + 1, age, y] =  N[reg,1,age,y] * u_max;
-              N[reg,1,age,y] -= N[reg,1,age,y] * u_max;
-              ll_tag_penalty += ((N[reg,1,age,y] * u_max) - tag_release_by_age[reg, age, tag_year]) * ((N[reg,1,age,y] * u_max) - tag_release_by_age[reg, age, tag_year]);
-            } else {
-              N[reg, tag_year + 1, age, y] = tag_release_by_age[reg, age, tag_year];
-              N[reg,1,age,y] -= tag_release_by_age[reg, age, tag_year];
-            }
-
-          }
-        }
-
-      }
-    }
-    
     // Movement
     cache_N = rep_array(zero_vec,R,total_groups);
-    
-    
     for (from_reg in 1:R) {
       for (to_reg in 1:R) {
         for (tag in 1:total_groups) {
@@ -511,6 +488,26 @@ transformed parameters{
     // recruitment only occurs with untagged fish
     for (reg in 1:R) {
       N[reg, 1, 1,y] = recruits[y - 1] * proportion_recruitment_by_region[reg];
+    }
+    // Check if we are releasing tags this year
+    // Apply it using an exploitation so that we don't end up with negative partition during estimation
+    // of crappy parameter space.
+    for(tag_year in 1:T) {
+      if (tag_years[tag_year] == years[y - 1]) {
+        for (reg in 1:R) {
+          for (age in 1:A) {
+            if ((tag_release_by_age[reg, age, tag_year] / N[reg,1,age,y]) > u_max) {
+              N[reg, tag_year + 1, age, y] =  N[reg,1,age,y] * u_max;
+              N[reg,1,age,y] -= N[reg,1,age,y] * u_max;
+              ll_tag_penalty += ((N[reg,1,age,y] * u_max) - tag_release_by_age[reg, age, tag_year]) * ((N[reg,1,age,y] * u_max) - tag_release_by_age[reg, age, tag_year]);
+            } else {
+              N[reg, tag_year + 1, age, y] = tag_release_by_age[reg, age, tag_year];
+              N[reg,1,age,y] -= tag_release_by_age[reg, age, tag_year];
+            }
+
+          }
+        }
+      }
     }
     
     ///----------------

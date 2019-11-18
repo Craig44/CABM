@@ -9,7 +9,7 @@
 start_year 1990
 final_year 2013
 min_age 1
-max_age 20
+max_age 30
 age_plus true # other acceptable inputs for bool are '1' and 'yes'
 initialisation_phase_labels Iterative #label to an @initialisation block
 time_steps Jan_Mar Apr_Dec
@@ -49,7 +49,7 @@ layer_label initial_values
 processes von_bert Maturation #Movement_home
 
 @time_step Apr_Dec
-processes  Recruitment Tagging Jump_One  natural_mort fishing natural_mort
+processes  Jump_One Recruitment Tagging  natural_mort fishing natural_mort
 
 # --------------
 # Process definitions
@@ -114,7 +114,7 @@ time_step_ratio 1
 # Fishing Mortality
 @process fishing
 type mortality_event_biomass
-print_extra_info true
+print_extra_info false
 table catch
 year Fishing_LL
 1990	1990_catch
@@ -197,11 +197,10 @@ probability_layers EN_jump_one HG_jump_one BP_jump_one
 @process Recruitment
 type recruitment_beverton_holt
 recruitment_layer_label recruitment
-b0 427034.9
+b0 196034.2
 ssb SSB
 steepness 0.75
-ycs_values 0.9805555 0.2914848 0.6481528 0.4034729 0.9808864 0.6098410 0.3110043 0.5339825 1.3775342 0.5589029 0.8531278 1.2828560 0.5769496 1.0968170 0.7381291 0.1832230 0.5703490 0.4430337 2.4570672 0.4980334 0.6098772 1.2694970 0.6366152 0.4220754
-
+ycs_values 1.2836268 0.3815773 0.8484847 0.5281788 1.2840600 0.7983314 0.4071299 0.6990265 1.8033042 0.7316494 1.1168136 1.6793628 0.7552739 1.4358226 0.9662710 0.2398538 0.7466332 0.5799671 3.2165008 0.6519662 0.7983789 1.6618748 0.8333811 0.5525310
 /*
 @process Recruitment_EN
 type recruitment_beverton_holt
@@ -261,24 +260,24 @@ ato95 7
 @derived_quantity SSB_HG
 type mature_biomass
 biomass_layer_label SSB_HG
-time_step Jan_Mar
+time_step Apr_Dec
 proportion_through_mortality_block 0.0
 
 @derived_quantity SSB_BP
 type mature_biomass
 biomass_layer_label SSB_BP
-time_step Jan_Mar
+time_step Apr_Dec
 proportion_through_mortality_block 0.0
 
 @derived_quantity SSB_EN
 type mature_biomass
 biomass_layer_label SSB_EN
-time_step Jan_Mar
+time_step Apr_Dec
 proportion_through_mortality_block 0.0
 
 
 @derived_quantity SSB
 type mature_biomass
 biomass_layer_label SSB_areas
-time_step Jan_Mar
+time_step Apr_Dec
 proportion_through_mortality_block 0.0

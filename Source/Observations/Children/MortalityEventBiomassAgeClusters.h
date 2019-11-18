@@ -61,9 +61,6 @@ protected:
   AllocationType                  allocation_type_ = AllocationType::kRandom;
   string                          sexed_;
   unsigned                        sex_match_;
-  unsigned                        min_age_;
-  unsigned                        max_age_;
-  unsigned                        age_spread_;
 
   bool                            sexed_flag_;
   vector<float>                   length_bins_;

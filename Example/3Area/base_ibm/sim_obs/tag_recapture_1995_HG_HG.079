@@ -1,0 +1,21 @@
+@observation tag_recapture_1995_HG_HG_sim
+layer_of_strata_definitions area_definition 
+process_label fishing 
+recapture_stratum HG 
+release_stratum HG 
+tag_release_year 1995 
+type tag_recapture_by_age 
+years 1995 1996 1997 1998 
+table obs
+1995 55 119 59 123 53 161 98 86 90 82 60 60 50 40 24 24 23 14 5 10 5 5 3 5 5 7 2 2 4 7 
+1996 0 57 124 51 123 51 138 89 79 76 56 58 43 40 27 19 9 21 7 7 11 8 4 4 2 3 0 3 1 9 
+1997 0 0 66 121 48 94 33 111 54 67 47 28 30 24 22 20 15 13 12 7 7 4 3 7 3 4 3 3 4 3 
+1998 0 0 0 63 102 52 70 21 81 61 37 35 36 36 16 20 8 11 11 9 8 6 9 4 5 2 5 2 0 7 
+end_table
+table error_values
+1995 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+1996 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+1997 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+1998 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+end_table
+

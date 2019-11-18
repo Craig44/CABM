@@ -30,7 +30,7 @@ namespace reports {
  */
 Process::Process(Model* model) : Report(model) {
   model_state_ = State::kIterationComplete;
-  run_mode_    = (RunMode::Type)(RunMode::kBasic);
+  run_mode_    = (RunMode::Type)(RunMode::kBasic | RunMode::kSimulation);
 
   parameters_.Bind<string>(PARAM_PROCESS, &process_label_, "Process label that is reported", "", "");
 }

@@ -41,6 +41,7 @@ selectivity mature_ogive
 type derived_quantity
 
 # print process properties
+/*
 @report M_report
 type process
 process natural_mort
@@ -48,11 +49,6 @@ process natural_mort
 @report mature_report
 type process
 process Maturation
-
-@report fishing
-type process
-process fishing
-
 @report Jump_One
 type process
 process Jump_One
@@ -65,7 +61,7 @@ process Movement_home
 type process
 process Recruitment
 
-/*
+
 @report Rec_HG
 type process
 process Recruitment_HG
@@ -74,6 +70,11 @@ process Recruitment_HG
 type process
 process Recruitment_BP
 */
+
+@report fishing
+type process
+process fishing
+
 
 @report Tagging
 type process
@@ -125,10 +126,43 @@ observation fishery_age_ALK_HG
 type observation
 observation fishery_age_ALK_BP
 
-@report tag_recapture_1995_EN
+@report tag_recapture_1995_EN_EN
 type observation
-observation tag_recapture_1995_EN
+observation tag_recapture_1995_EN_EN
 
+@report tag_recapture_1995_EN_HG
+type observation
+observation tag_recapture_1995_EN_HG
+
+@report tag_recapture_1995_EN_BP
+type observation
+observation tag_recapture_1995_EN_BP
+
+@report tag_recapture_1995_HG_EN
+type observation
+observation tag_recapture_1995_HG_EN
+
+@report tag_recapture_1995_HG_HG
+type observation
+observation tag_recapture_1995_HG_HG
+
+@report tag_recapture_1995_HG_BP
+type observation
+observation tag_recapture_1995_HG_BP
+
+@report tag_recapture_1995_BP_EN
+type observation
+observation tag_recapture_1995_BP_EN
+
+@report tag_recapture_1995_BP_HG
+type observation
+observation tag_recapture_1995_BP_HG
+
+@report tag_recapture_1995_BP_BP
+type observation
+observation tag_recapture_1995_BP_BP
+
+/*
 @report tag_recapture_1995_HG
 type observation
 observation tag_recapture_1995_HG
@@ -160,7 +194,7 @@ observation tag_recapture_2005_HG_length
 @report tag_recapture_2005_BP_length
 type observation
 observation tag_recapture_2005_BP_length
-
+*/
 #-----------------------
 # Simulated Observations
 #-----------------------
@@ -194,11 +228,52 @@ type simulated_observation
 observation fishery_age_ALK_BP
 file_name sim_obs/fishery_age_ALK_BP
 
-@report tag_recapture_1995_EN_sim
+@report tag_recapture_1995_EN_EN_sim
 type simulated_observation
-observation tag_recapture_1995_EN
-file_name sim_obs/tag_recapture_1995_EN
+observation tag_recapture_1995_EN_EN
+file_name sim_obs/tag_recapture_1995_EN_EN
 
+@report tag_recapture_1995_EN_HG_sim
+type simulated_observation
+observation tag_recapture_1995_EN_HG
+file_name sim_obs/tag_recapture_1995_EN_HG
+
+@report tag_recapture_1995_EN_BP_sim
+type simulated_observation
+observation tag_recapture_1995_EN_BP
+file_name sim_obs/tag_recapture_1995_EN_BP
+
+@report tag_recapture_1995_HG_EN_sim
+type simulated_observation
+observation tag_recapture_1995_HG_EN
+file_name sim_obs/tag_recapture_1995_HG_EN
+
+@report tag_recapture_1995_HG_HG_sim
+type simulated_observation
+observation tag_recapture_1995_HG_HG
+file_name sim_obs/tag_recapture_1995_HG_HG
+
+@report tag_recapture_1995_HG_BP_sim
+type simulated_observation
+observation tag_recapture_1995_HG_BP
+file_name sim_obs/tag_recapture_1995_HG_BP
+
+@report tag_recapture_1995_BP_EN_sim
+type simulated_observation
+observation tag_recapture_1995_BP_EN
+file_name sim_obs/tag_recapture_1995_BP_EN
+
+@report tag_recapture_1995_BP_HG_sim
+type simulated_observation
+observation tag_recapture_1995_BP_HG
+file_name sim_obs/tag_recapture_1995_BP_HG
+
+@report tag_recapture_1995_BP_BP_sim
+type simulated_observation
+observation tag_recapture_1995_BP_BP
+file_name sim_obs/tag_recapture_1995_BP_BP
+
+/*
 @report tag_recapture_1995_HG_sim
 type simulated_observation
 observation tag_recapture_1995_HG
@@ -223,3 +298,4 @@ file_name sim_obs/tag_recapture_2005_HG
 type simulated_observation
 observation tag_recapture_2005_BP
 file_name sim_obs/tag_recapture_2005_BP
+*/
