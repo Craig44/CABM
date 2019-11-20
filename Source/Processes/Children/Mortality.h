@@ -65,8 +65,12 @@ struct tag_recapture {
   double   expected_scanned_ = 0;
   unsigned tag_draws_ = 0;
   vector<float> tagged_fish_available_;
+  vector<float> all_fish_available_;
   unsigned agents_sampled_ = 0;
-  float proportion_tagged_ = 0;
+  unsigned agents_caught_ = 0;
+  double individuals_caught_ = 0.0;
+  double proportion_inidividuals_tagged_ = 0;
+  double prob_sample_tagged_agents_ = 0;
   vector<unsigned> age_;
   vector<unsigned> sex_;
   vector<unsigned> fishery_ndx_;

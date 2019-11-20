@@ -183,6 +183,12 @@ for(bt in 1:boot){
   #####################
   ## Cyrils alternative
   #####################
+  # The Algorthm
+  # - probability of sampling an Agent, depends on how many individuals an Agent represents.
+  # - So it's a weighted resampling algorithm
+  # - This a little hard, in the ABM C++ mechanism, firstly because multiple agents will have 
+  # different amount of individuals, if there are different 'stocks', so what we do is calculate
+  # the average, 
   agent_mat$weight = agent_mat$number / sum(agent_mat$number)
   cat_untag<- catch
   agents_sampled = c();
@@ -377,9 +383,9 @@ bias
 estimated
 true
 
-write.table(bias, file = make.filename(file = "Tables\\Bias.txt", path = DIR$Base), quote = F)
-write.table(true, file = make.filename(file = "Tables\\true.txt", path = DIR$Base), quote = F)
-write.table(estimated, file = make.filename(file = "Tables\\estimated.txt", path = DIR$Base), quote = F)
+write.table(bias, file = "Bias.txt", quote = F)
+write.table(true, file = "true.txt", quote = F)
+write.table(estimated,file = "estimated.txt", quote = F)
 
 ## so makes a big difference if small tag population to overall population.
 weighted_Random_Sample <- function(
@@ -391,6 +397,7 @@ weighted_Random_Sample <- function(
     key <- runif(length(.data)) ^ (1 / .weights)
     return(.data[order(key, decreasing=TRUE)][1:.n])
 }
+
 
 ## repeat with new algorithm
 boots = 500;
@@ -476,8 +483,6 @@ summary(tag_counts[,catch_ndx, scalar_ndx, tag_ndx])
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 # 3.00    9.00   11.00   11.54   14.00   23.00 
 
-
-
 # 8.2 mins
 bias = estimated = cv = true = matrix(NA,nrow = length(scalars), ncol = length(tags_to_look_at))
 scalar_ndx = 1;
@@ -510,7 +515,6 @@ scalars = c(10,50,100)
 results = tag_counts = array(0, dim = c(boots,length(catches), length(scalars), length(tags_to_look_at)))
 n_tags = 1000
 ## should possible look at these two
-
 population = 100000
 scalar = 10
 catch = 2000
@@ -539,11 +543,14 @@ weights = c(weights, rep(1,n_tags))
 tags = c(tags, rep(1,n_tags))
 reshuffle_ndx = sample(1:n_new_agents)
 weights = weights[reshuffle_ndx]
+tags = tags[reshuffle_ndx]
 prob_untagged = sum(weights[tags == 0]) / sum(weights)
 prob_tagged = sum(weights[tags == 1]) / sum(weights)
+## account for sampling agents not inidviduals
+prob_untagged = prob_untagged / (scalar)
+prob_untagged = prob_untagged / (prob_untagged + prob_tagged)
+prob_tagged = 1 - prob_untagged
 #full_prob = c(prob_tagged, prob_untagged)
-prob = weights / sum(weights)
-tags = tags[reshuffle_ndx]
 pop_est = NULL
 for(bt in 1:boots) {
   temp_weights = weights

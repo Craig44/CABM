@@ -18,16 +18,18 @@ list.files(stan_dir)
 ## Single stock Recruit function
 stan_sim_model = stan_model(file.path(stan_dir, "SpatialModelSim.stan"))
 ## IBM
-ibm = extract.run(file = "../base_ibm/single.out")
+#ibm = extract.run(file = "../base_ibm/single.out")
+ibm = extract.run(file = "../base_ibm/run.log")
+ibm$model_attributes$Recruitment
 
 years = 1990:2013
 stan_data = list()
 stan_data$Y = length(years)
-stan_data$A = 30
+stan_data$A = 40
 stan_data$R = 3
 stan_data$T = 2*stan_data$R
 
-stan_data$proportion_mortality_spawning = 0.0
+stan_data$proportion_mortality_spawning = 1.0
 stan_data$proportion_mortality_biomass = 1.0
 stan_data$u_max = 0.8
 stan_data$catch_penalty = 1
@@ -96,7 +98,7 @@ ibm$model_attributes$Recruitment * ibm$Rec$initial_recruits
 stan_sim$par$R0
 
 years = unique(ibm$EN_age_sample$Values$year)
-ages = 1:30
+ages = 1:40
 stan_data$Y_f = length(as.numeric(rownames(ibm$fishing$catches)))
 stan_data$fish_age_years = as.numeric(rownames(ibm$fishing$catches))
 fish_obs_A1 = matrix(ibm$EN_age_sample$Values$expected[ibm$EN_age_sample$Values$age != 0], ncol = length(years), nrow = length(ages))
@@ -115,7 +117,7 @@ stan_data$biomass_error[stan_data$biomass_error<=0.05] = 0.1
 process_error_sqrd = 0.04^2
 obs_cv = sqrt(stan_data$biomass_error^2 - process_error_sqrd)
 
-R0 = 40535890 #(ibm$Rec$initial_recruits) * ibm$model_attributes$Recruitment
+R0 = 57535890 #(ibm$Rec$initial_recruits) * ibm$model_attributes$Recruitment
 catches = NULL;
 for(i in 1:length(years)) {
   this_catch = eval(expr = parse(text = paste0("ibm$fishing$`actual_catches-", years[i],"`")))
@@ -220,15 +222,169 @@ box()
 stan_sim$par$B0
 ibm$Rec$b0
 
+plot(rownames(ibm_ssb),ibm$Rec$ycs_values, type = "l", lwd = 3, lty = 2, ylim = c(0,3))
+lines(rownames(ibm_ssb),stan_sim$par$standardised_ycs, col = "red", lwd = 2)
+legend('bottomleft', col = c("black","red"), legend = c("ABM","Stan"), lty = c(2,1), lwd = 2)
+box()
+
+
+par(mfrow = c(1,3))
+plot(ages, ibm$init_2$values[1,], type = "l", lwd = 4, main = "EN")
+lines(ages, stan_sim$par$N[1,1,,1], lty = 3, col = "red", lwd = 2)
+plot(ages, ibm$init_2$values[2,], type = "l", lwd = 4, main = "HG")
+lines(ages, stan_sim$par$N[2,1,,1], lty = 3, col = "red", lwd = 2)
+plot(ages, ibm$init_2$values[3,], type = "l", lwd = 4, main = "BP")
+lines(ages, stan_sim$par$N[3,1,,1], lty = 3, col = "red", lwd = 2)
+
+par(mfrow = c(1,1))
+plot(ibm$Apr_Dec_agents$`1990`$values$age, ibm$Apr_Dec_agents$`1990`$values$length, pch = 16, col = "red")
+VB = function (age, K, L_inf, t0) {
+  return(L_inf * (1 - exp(-K * (age - t0))))
+}
+lines(ages, VB(ages, stan_data$k, stan_data$L_inf, stan_data$t0), lty = 2, lwd = 2)
+
+
+ibm$init_2$values - stan_sim$par$N[,1,,1]
+stan_sim$par$R0
+sum(ibm$Rec$initial_recruits) * ibm$model_attributes$Recruitment
+
+
+stan_sim$par$total_vulnerable[1,,stan_data$years == 1995]
+ibm$fishing$`tag_recapture_info-1995-1-1`$all_fish_available
+
+prop_tag_vulnerable = stan_sim$par$tagged_vulnerable / stan_sim$par$total_vulnerable
+dim(prop_tag_vulnerable)
+dimnames(prop_tag_vulnerable) = dimnames(stan_sim$par$tagged_vulnerable) = dimnames(stan_sim$par$total_vulnerable) = list(c("EN","HG","BP"),1:30,stan_data$years)
+
+ibm$fishing$`tag_recapture_info-1995-1-1`$prob_sample_tagged_agent * ibm$fishing$`tag_recapture_info-1995-1-1`$agents_caught
+sum(stan_sim$par$recapture_expectations[1,1,,stan_data$years == "1995"])
+
+sum(ibm$fishing$`tag_recapture_info-1995-1-1`$all_fish_available * stan_sim$par$weight_at_age)
+sum(ibm$fishing$`tag_recapture_info-1995-1-1`$all_fish_available) - sum(stan_sim$par$total_vulnerable[1,,stan_data$years == 1995])
+
+sum(stan_sim$par$tagged_vulnerable[1,,stan_data$years == 1995]) / sum(stan_sim$par$total_vulnerable[1,,stan_data$years == 1995])
+sum(stan_sim$par$tagged_vulnerable[1,,stan_data$years == 1995]) / sum(stan_sim$par$total_vulnerable[1,,stan_data$years == 1995])
+
+ibm$fishing$`tag_recapture_info-1995-1-1`$propotion_vulnerable_tagged
+
+stan_sim$par$total_vulnerable[1,,stan_data$years == 1995] - ibm$fishing$`tag_recapture_info-1995-1-1`$all_fish_available
+
+ibm$fishing$`tag_recapture_info-1995-1-1`$individuals_caught * sum(stan_sim$par$tagged_vulnerable[1,,stan_data$years == 1995]) / sum(stan_sim$par$total_vulnerable[1,,stan_data$years == 1995])
+ibm$fishing$`tag_recapture_info-1995-1-1`$individuals_caught * ibm$fishing$`tag_recapture_info-1995-1-1`$propotion_vulnerable_tagged
+
+
+
+stan_sim$par$vulnerable[1,stan_data$years == 1995]
+stan_sim$par$exploitation[1,stan_data$years == 1995]
+
+
+prop_tag_vulnerable[1,,"1995"]
+stan_sim$par$tagged_vulnerable[1,,"1995"]
+stan_sim$par$total_vulnerable[1,,"1995"]
+
+
+ibm$fishing$`tag_recapture_info-1995-1-1`$individuals_caught * ibm$fishing$`tag_recapture_info-1995-1-1`$prob_tagged_fish
+ibm$fishing$`tag_recapture_info-1995-1-1`$agents_caught * ibm$fishing$`tag_recapture_info-1995-1-1`$prob_tagged_fish
+
+test = vector()
+par(mfrow = c(1,2))
+plot(1:30,ibm1$fishing[[1]]$`tag_recapture_info-1995-1-1`$tagged_fish_available, type ="l", main = "comparison", ylim = c(0,1000))
+for(i in 1:length(ibm1$Tagging)) {
+  test[i] = (ibm1$fishing[[i]]$`tag_recapture_info-1995-1-1`$individuals_caught * ibm1$fishing[[i]]$`tag_recapture_info-1995-1-1`$propotion_vulnerable_tagged)
+  lines(1:30,ibm1$fishing[[i]]$`tag_recapture_info-1995-1-1`$tagged_fish_available)
+}
+#hist(test)
+#abline(v = sum(stan_sim$par$recapture_expectations[1,1,,stan_data$years == "1995"]), col = "red", lwd = 2)
+
+## stas expected values
+stan_vals =vector()
+all_vals = matrix(NA, ncol = 30, nrow = length(ibm1$Tagging))
+#plot(1:30,stan_sim$par$tagged_vulnerable[1,,stan_data$years == 1995], type ="l", main = "Stan", ylim = c(0,700))
+for(i in 1:length(ibm1$Tagging)) {
+  catches = NULL;
+  for(k in 1:length(years)) {
+    this_catch = eval(expr = parse(text = paste0("ibm1$fishing[[i]]$`actual_catches-", years[k],"`")))
+    catches = cbind(catches, as.numeric(this_catch[,1]))
+  }
+  #print(sum(catches))
+  stan_data$catches = catches
+  stan_data$tag_release_by_age = array(0,dim= c(stan_data$R,stan_data$A, stan_data$T))
+  stan_data$tag_release_by_age[1,,1] = as.matrix(ibm1$Tagging[[i]]$`tag_release_by_age-1995`)[1,]
+  stan_data$tag_release_by_age[2,,2] = as.matrix(ibm1$Tagging[[i]]$`tag_release_by_age-1995`)[2,]
+  stan_data$tag_release_by_age[3,,3] = as.matrix(ibm1$Tagging[[i]]$`tag_release_by_age-1995`)[3,]
+  stan_data$tag_release_by_age[1,,4] = as.matrix(ibm1$Tagging[[i]]$`tag_release_by_age-2005`)[1,]
+  stan_data$tag_release_by_age[2,,5] = as.matrix(ibm1$Tagging[[i]]$`tag_release_by_age-2005`)[2,]
+  stan_data$tag_release_by_age[3,,6] = as.matrix(ibm1$Tagging[[i]]$`tag_release_by_age-2005`)[3,]
+  #(sum(stan_data$tag_release_by_age))
+  stan_data$N_sims = 1
+  stan_sim = optimizing(stan_sim_model,data=stan_data,init=init_pars,
+                        iter=1,algorithm="LBFGS",
+                        verbose=F,as_vector = FALSE)
+  stan_vals[i] = sum(stan_sim$par$recapture_expectations[1,1,,stan_data$years == "1995"])
+  lines(1:30,stan_sim$par$tagged_vulnerable[1,,stan_data$years == 1995], col = "red")
+  all_vals[i,] = stan_sim$par$total_vulnerable[1,,stan_data$years == 1995]
+}
+
+test = vector()
+par(mfrow = c(1,2))
+plot(1:30,ibm1$fishing[[1]]$`tag_recapture_info-1995-1-1`$all_fish_available, type ="l", main = "comparison", ylim = c(0,8e+6))
+for(i in 1:length(ibm1$Tagging)) {
+  lines(1:30,ibm1$fishing[[i]]$`tag_recapture_info-1995-1-1`$all_fish_available)
+}
+for(i in 1:length(ibm1$Tagging)) {
+  lines(1:30,all_vals[i,], lwd =2, col = "red")
+}
+
+## they have the same untagged and tagged vulnerable numbers at age, why are the expectations different
+sum(all_vals[29,] * stan_sim$par$weight_at_age)
+stan_sim$par$vulnerable[1,stan_data$years == 1995]
+stan_data$catches[1,stan_data$years == 1995]
+stan_data$catches[1,stan_data$years == 1995] / stan_sim$par$vulnerable[1,stan_data$years == 1995]
+stan_sim$par$exploitation[1,stan_data$years == 1995]
+
+sum(ibm1$fishing[[29]]$`tag_recapture_info-1995-1-1`$all_fish_available * stan_sim$par$weight_at_age)
+
+
+ibm$fishing$`tag_recapture_info-1995-1-1`$prob_sample_tagged_agent * ibm$fishing$`tag_recapture_info-1995-1-1`$agents_sampled
+ibm$fishing$`tag_recapture_info-1995-1-1`$agents_sampled 
+ibm$fishing$`tag_recapture_info-1995-1-1`$binomial_samples 
+ibm$fishing$`tag_recapture_info-1995-1-1`$individuals_caught * ibm$fishing$`tag_recapture_info-1995-1-1`$propotion_vulnerable_tagged
+
+test = rbinom(n = 1000, size = ibm$fishing$`tag_recapture_info-1995-1-1`$individuals_caught, prob = ibm$fishing$`tag_recapture_info-1995-1-1`$propotion_vulnerable_tagged)
+
+
+ibm$fishing$`tag_recapture_info-1995-1-1`$tagged_fish_available
+ibm$fishing$`tag_recapture_info-1995-1-1`$all_fish_available
+
+ibm$fishing$`tag_recapture_info-1995-1-1`$agents_sampled * ibm$fishing$`tag_recapture_info-1995-1-1`$prob_tagged_fish
+
+sum(stan_sim$par$tagged_vulnerable[1,,"1995"] * stan_sim$par$exploitation[1,stan_data$years == 1995])
+sum(stan_sim$par$recapture_expectations[1,1,,stan_data$years == "1995"])
+
+## compare Stan tagged exploitable biomass compared to what the ABM is doing
+sum(sum(ibm$fishing$`tag_recapture_info-1995-1-1`$tagged_fish_available) / sum(ibm$fishing$`tag_recapture_info-1995-1-1`$all_fish_available))
+
+ibm$fishing$`tag_recapture_info-1995-1-1`$prob_tagged_fish
+round(sum(stan_sim$par$tagged_vulnerable[1,,"1995"] * stan_sim$par$weight_at_age) / sum(stan_sim$par$total_vulnerable[1,,"1995"] * stan_sim$par$weight_at_age),6)
+round(sum(stan_sim$par$tagged_vulnerable[1,,"1995"]) / sum(stan_sim$par$total_vulnerable[1,,"1995"]),6)
+
+ibm$fishing$`tag_recapture_info-1995-1-1`$agents_sampled
+ibm$fishing$`tag_recapture_info-1995-1-1`$binomial_samples
+ibm$fishing$`tag_recapture_info-1995-1-1`$agents_sampled * ibm$fishing$`tag_recapture_info-1995-1-1`$prob_tagged_fish
+
+
+
 stan_sim$par$standardised_ycs
 ibm$Rec$ycs_values
 # read in simulated data
 sim_obs_location= "../base_ibm/sim_obs"
 ibm_sim = extract.run("../base_ibm/simulated_obs.log")
+#ibm_sim = extract.run("../base_ibm/simulate.log")
+
+
 ibm_n_runs = length(ibm_sim$derived_quants)
 for(i in 1:ibm_n_runs)
   lines(rownames(ibm_ssb),ibm_sim$derived_quants[[i]]$SSB$values, col = adjustcolor(col = "black", alpha.f = 0.3), lwd = 2)
-
 
 stan_data$N_sims = 1
 stan_en_tag_95 = stan_hg_tag_95 = stan_bp_tag_95 = array(NA, dim = c(3, ibm_n_runs, 4))

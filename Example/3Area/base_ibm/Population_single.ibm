@@ -9,7 +9,7 @@
 start_year 1990
 final_year 2013
 min_age 1
-max_age 30
+max_age 40
 age_plus true # other acceptable inputs for bool are '1' and 'yes'
 initialisation_phase_labels Iterative #label to an @initialisation block
 time_steps Jan_Mar Apr_Dec
@@ -46,7 +46,7 @@ layer_label initial_values
 # - 0.5M + F + 0.5M
 
 @time_step Jan_Mar  
-processes von_bert Maturation #Movement_home
+processes von_bert #Movement_home
 
 @time_step Apr_Dec
 processes  Jump_One Recruitment Tagging  natural_mort fishing natural_mort
@@ -93,12 +93,12 @@ b 2.793
 t0 -1.2
 update_growth_parameters false ## this means that your growth is that of your birth area.
 distribution lognormal
-cv 0.01
+cv 0.00001
 time_step_proportions 1
 
 # Maturity
-@process Maturation
-type maturation
+#@process Maturation
+#type maturation
 
 # Natural Mortality
 @process natural_mort
@@ -107,7 +107,7 @@ m_multiplier_layer_label M_layer
 m 0.2
 update_mortality_parameters false
 distribution lognormal
-cv 0.01
+cv 0.00001
 selectivity_label HalfOne
 time_step_ratio 1
 
@@ -197,7 +197,7 @@ probability_layers EN_jump_one HG_jump_one BP_jump_one
 @process Recruitment
 type recruitment_beverton_holt
 recruitment_layer_label recruitment
-b0 196034.2
+b0 227861.1
 ssb SSB
 steepness 0.75
 ycs_values 1.2836268 0.3815773 0.8484847 0.5281788 1.2840600 0.7983314 0.4071299 0.6990265 1.8033042 0.7316494 1.1168136 1.6793628 0.7552739 1.4358226 0.9662710 0.2398538 0.7466332 0.5799671 3.2165008 0.6519662 0.7983789 1.6618748 0.8333811 0.5525310
@@ -243,12 +243,19 @@ type constant
 length_based true
 c 1
 
+/*
 @selectivity mature_ogive
 type logistic_producing
 a50 3.9
 ato95 4.2
 l 0
 h 20
+*/
+@selectivity mature_ogive
+type logistic
+a50 3.9
+ato95 4.2
+
 @selectivity Sel_LL
 type logistic
 a50 2.4
@@ -258,26 +265,30 @@ ato95 7
 # Derived Quantities
 # --------------
 @derived_quantity SSB_HG
-type mature_biomass
+type biomass
+selectivity mature_ogive
 biomass_layer_label SSB_HG
 time_step Apr_Dec
-proportion_through_mortality_block 0.0
+proportion_through_mortality_block 1.0
 
 @derived_quantity SSB_BP
-type mature_biomass
+type biomass
+selectivity mature_ogive
 biomass_layer_label SSB_BP
 time_step Apr_Dec
-proportion_through_mortality_block 0.0
+proportion_through_mortality_block 1.0
 
 @derived_quantity SSB_EN
-type mature_biomass
+type biomass
+selectivity mature_ogive
 biomass_layer_label SSB_EN
 time_step Apr_Dec
-proportion_through_mortality_block 0.0
+proportion_through_mortality_block 1.0
 
 
 @derived_quantity SSB
-type mature_biomass
+type biomass
+selectivity mature_ogive
 biomass_layer_label SSB_areas
 time_step Apr_Dec
-proportion_through_mortality_block 0.0
+proportion_through_mortality_block 1.0

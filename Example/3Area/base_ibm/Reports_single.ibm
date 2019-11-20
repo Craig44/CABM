@@ -46,9 +46,6 @@ type derived_quantity
 type process
 process natural_mort
 
-@report mature_report
-type process
-process Maturation
 @report Jump_One
 type process
 process Jump_One

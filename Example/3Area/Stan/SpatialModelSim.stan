@@ -321,6 +321,9 @@ transformed parameters{
   vector[Y] recruits;
   vector[Y] exploitation[R];
   vector[Y] vulnerable[R];
+  matrix[A,Y] tagged_vulnerable[R];
+  matrix[A,Y] total_vulnerable[R];
+
   vector[Y] actual_catches[R];
   
   vector[A] temp_partition;
@@ -380,6 +383,10 @@ transformed parameters{
   age_expectations =  rep_array(zero_matrix, R);
   fishery_age_expectations =  rep_array(zero_matrix, R);
   recapture_expectations =  rep_array(zero_matrix, R,T);
+  
+  tagged_vulnerable =  rep_array(zero_matrix, R);
+  total_vulnerable =  rep_array(zero_matrix, R);
+
   recapture_expected_props =  rep_array(SSB, R,T);
   for (t in 1:Y) 
     standardised_ycs[t] = unity_YCS[t] * Y;
@@ -401,7 +408,7 @@ transformed parameters{
   }
   
   // Apply movement, Rec, M, A times
-  for(init_years in 1:(A * 2)) {
+  for(init_years in 1:(A * 4)) {
     // Movement
     cache_N = rep_array(zero_vec,R,total_groups);
     for (from_reg in 1:R) {
@@ -524,9 +531,15 @@ transformed parameters{
 
     // Calculate F for each area
     for (reg in 1:R) {
-      for (tag in 1:total_groups)
+      for (tag in 1:total_groups) {
         vulnerable[reg,y-1] += sum(N[reg, tag, , y] * exp(-0.5 * M) .* fish_select_at_age .* weight_at_age);
-      
+        for (age in 1:A) {
+          if (tag > 1) 
+            tagged_vulnerable[reg, age, y-1] += N[reg, tag, age, y] * exp(-0.5 * M) * fish_select_at_age[age];
+          total_vulnerable[reg, age, y-1] += N[reg, tag, age, y] * exp(-0.5 * M) * fish_select_at_age[age];
+          
+        }
+      }
       u_obs[reg] = max(catches[reg,y-1] / vulnerable[reg,y-1] * fish_select_at_age);
       // Uobs is just for reporting and comparing with u_max
       if (u_obs[reg] > u_max) {
