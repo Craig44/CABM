@@ -463,41 +463,41 @@ jpeg(filename = "../Figures/tag_recaptures_EN_1995.jpeg", units = "in", res = 30
 par(mfrow = c(4,3), mar = c(3,3,1,1), oma = c(2,2,2,0))
 ## 1995
 boxplot(cbind(stan_en_tag_95[1,,1],en_tag_95[1,,1]), main = "recapture EN", xaxt = "n")
-abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1995 & ibm$tag_recapture_1995_EN$Values$cell == "EN","expected"]), col = "red", lty = 2, lwd = 2)
+#abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1995 & ibm$tag_recapture_1995_EN$Values$cell == "EN","expected"]), col = "red", lty = 2, lwd = 2)
 
 boxplot(cbind(stan_en_tag_95[2,,1],en_tag_95[2,,1]), main = "recapture HG", xaxt = "n")
-abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1995 & ibm$tag_recapture_1995_EN$Values$cell == "HG","expected"]), col = "red", lty = 2, lwd = 2)
+#abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1995 & ibm$tag_recapture_1995_EN$Values$cell == "HG","expected"]), col = "red", lty = 2, lwd = 2)
 
 boxplot(cbind(stan_en_tag_95[3,,1],en_tag_95[3,,1]), main = "recapture BP", xaxt = "n")
-abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1995 & ibm$tag_recapture_1995_EN$Values$cell == "BP","expected"]), col = "red", lty = 2, lwd = 2)
+#abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1995 & ibm$tag_recapture_1995_EN$Values$cell == "BP","expected"]), col = "red", lty = 2, lwd = 2)
 ## 1996
 boxplot(cbind(stan_en_tag_95[1,,2],en_tag_95[1,,2]), main = "", xaxt = "n")
-abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1996 & ibm$tag_recapture_1995_EN$Values$cell == "EN","expected"]), col = "red", lty = 2, lwd = 2)
+#abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1996 & ibm$tag_recapture_1995_EN$Values$cell == "EN","expected"]), col = "red", lty = 2, lwd = 2)
 
 boxplot(cbind(stan_en_tag_95[2,,2],en_tag_95[2,,2]), main = "", xaxt = "n")
-abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1996 & ibm$tag_recapture_1995_EN$Values$cell == "HG","expected"]), col = "red", lty = 2, lwd = 2)
+#abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1996 & ibm$tag_recapture_1995_EN$Values$cell == "HG","expected"]), col = "red", lty = 2, lwd = 2)
 
 boxplot(cbind(stan_en_tag_95[3,,2],en_tag_95[3,,2]), main = "", xaxt = "n")
-abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1996 & ibm$tag_recapture_1995_EN$Values$cell == "BP","expected"]), col = "red", lty = 2, lwd = 2)
+#abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1996 & ibm$tag_recapture_1995_EN$Values$cell == "BP","expected"]), col = "red", lty = 2, lwd = 2)
 
 ## 1997
 boxplot(cbind(stan_en_tag_95[1,,3],en_tag_95[1,,3]), main = "")
-abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1997 & ibm$tag_recapture_1995_EN$Values$cell == "EN","expected"]), col = "red", lty = 2, lwd = 2)
+#abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1997 & ibm$tag_recapture_1995_EN$Values$cell == "EN","expected"]), col = "red", lty = 2, lwd = 2)
 
 boxplot(cbind(stan_en_tag_95[2,,3],en_tag_95[2,,3]), main = "")
-abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1997 & ibm$tag_recapture_1995_EN$Values$cell == "HG","expected"]), col = "red", lty = 2, lwd = 2)
+#abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1997 & ibm$tag_recapture_1995_EN$Values$cell == "HG","expected"]), col = "red", lty = 2, lwd = 2)
 
 boxplot(cbind(stan_en_tag_95[3,,3],en_tag_95[3,,3]), main = "")
-abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1997 & ibm$tag_recapture_1995_EN$Values$cell == "BP","expected"]), col = "red", lty = 2, lwd = 2)
+#abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1997 & ibm$tag_recapture_1995_EN$Values$cell == "BP","expected"]), col = "red", lty = 2, lwd = 2)
 ## 1998
 boxplot(cbind(stan_en_tag_95[1,,4],en_tag_95[1,,4]), main = "")
-abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1998 & ibm$tag_recapture_1995_EN$Values$cell == "EN","expected"]), col = "red", lty = 2, lwd = 2)
+#abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1998 & ibm$tag_recapture_1995_EN$Values$cell == "EN","expected"]), col = "red", lty = 2, lwd = 2)
 
 boxplot(cbind(stan_en_tag_95[2,,4],en_tag_95[2,,4]), main = "")
-abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1998 & ibm$tag_recapture_1995_EN$Values$cell == "HG","expected"]), col = "red", lty = 2, lwd = 2)
+#abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1998 & ibm$tag_recapture_1995_EN$Values$cell == "HG","expected"]), col = "red", lty = 2, lwd = 2)
 
 boxplot(cbind(stan_en_tag_95[3,,4],en_tag_95[3,,4]), main = "")
-abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1998 & ibm$tag_recapture_1995_EN$Values$cell == "BP","expected"]), col = "red", lty = 2, lwd = 2)
+#abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1998 & ibm$tag_recapture_1995_EN$Values$cell == "BP","expected"]), col = "red", lty = 2, lwd = 2)
 mtext(outer = T, line = -0.2, font = 2, text = "1998", las = 3, adj = 0.125, side = 2)
 mtext(outer = T, line = -0.2, font = 2, text = "1997", las = 3, adj = 0.40, side = 2)
 mtext(outer = T, line = -0.2, font = 2, text = "1996", las = 3, adj = 0.67, side = 2)
