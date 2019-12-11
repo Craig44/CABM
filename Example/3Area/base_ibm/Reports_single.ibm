@@ -41,7 +41,7 @@ selectivity mature_ogive
 type derived_quantity
 
 # print process properties
-/*
+
 @report M_report
 type process
 process natural_mort
@@ -58,7 +58,7 @@ process Movement_home
 type process
 process Recruitment
 
-
+/*
 @report Rec_HG
 type process
 process Recruitment_HG
