@@ -286,6 +286,8 @@ stan_sim$par$total_vulnerable[1,,"1995"]
 ibm$fishing$`tag_recapture_info-1995-1-1`$individuals_caught * ibm$fishing$`tag_recapture_info-1995-1-1`$prob_tagged_fish
 ibm$fishing$`tag_recapture_info-1995-1-1`$agents_caught * ibm$fishing$`tag_recapture_info-1995-1-1`$prob_tagged_fish
 
+ibm1 = extract.run(file = "../base_ibm/run.log")
+
 test = vector()
 par(mfrow = c(1,2))
 plot(1:30,ibm1$fishing[[1]]$`tag_recapture_info-1995-1-1`$tagged_fish_available, type ="l", main = "comparison", ylim = c(0,1000))
@@ -509,3 +511,68 @@ sum(stan_sim$par$recapture_expectations[1,1,,6])
 sum(stan_sim$par$recapture_expectations[1,1,,7])
 
 stan_data$tag_release_by_age
+
+
+#########################
+## Debug estimation model
+#########################
+
+stan_dir = file.path(getwd(),"../Stan")
+list.files(stan_dir)
+
+## Single stock Recruit function
+stan_est_model = stan_model(file.path(stan_dir, "SpatialModelEst.stan"))
+
+expose_stan_functions(stan_est_model)
+
+ages = 1:15
+k = 0.24
+t0 = -0.3
+l_inf = 60
+cv = 0.2
+n_quants = 10
+a50 = 43
+ato95 = 12
+quants = (1:n_quants-0.5)/n_quants
+length_at_age = VB(ages, k, l_inf,t0)
+A = length(ages);
+
+
+age_based_select = vector()
+for(i in ages) {
+  lengths = length_at_age[i] + qnorm(p = quants) * (length_at_age[i] * cv)
+  age_based_select[i] = sum(logis(lengths, a50,ato95 )) / n_quants
+}
+
+stan_version = logis_length_based_sel(A, length_at_age, quants, cv, a50, ato95)
+stan_version
+age_based_select
+
+## now lets look at age-length transition matrix
+
+length_bins = seq(0,70, by = 2)
+age_length_mat = age_length_transition_matrix(A, length_at_age, length_bins, cv)
+dim(age_length_mat)
+rowSums(age_length_mat)
+
+test_age_length_mat = matrix(NA, length(ages), ncol = length(length_bins) - 1)
+for(i in ages) {
+  sigma = length_at_age[i] * cv
+  for(l in 1:(length(length_bins) - 1)) {
+    if (l == 1) {
+      prob_lower(length_bins[l + 1], length_at_age[i], sigma)
+      test_age_length_mat[i,l] = pnorm(length_bins[l + 1], length_at_age[i], sigma)
+    } else if (l == (length(length_bins) - 1)) {
+      test_age_length_mat[i,l] = 1 - pnorm(length_bins[l], length_at_age[i], sigma)
+    } else {
+      test_age_length_mat[i,l] = pnorm(length_bins[l + 1], length_at_age[i], sigma) - pnorm(length_bins[l], length_at_age[i], sigma)
+      
+    }
+  }
+}
+
+
+rowSums(test_age_length_mat)
+round(head(test_age_length_mat),2)
+
+round(head(age_length_mat),2)

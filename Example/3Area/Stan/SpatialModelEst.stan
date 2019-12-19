@@ -15,7 +15,71 @@ functions {
     for (i in 1:num_elements(x))
       tot *= x[i];
     return tot^(1.0/num_elements(x));
+  }  
+  
+  // logistic function
+  real logistic_fun(real x, real sel_50, real sel_95) {
+    return 1 / (1 + pow(19, (sel_50 - x) / sel_95));
+  }  
+  // Added these for testing purpose, should get compiled out
+  // the same as qnorm(p) in stan
+  real qnorm_stan(real x) {
+    return inv_Phi(x);
+  }  
+  
+  /* compute logistic age selectivity that is Length based
+   * @author c.marsh
+   * Args: 
+   *   length_at_age
+   *   cv
+   *   n_quants
+   * Returns: 
+   *   A vector of selectivity
+   */ 
+   vector logis_length_based_sel(int n_ages, vector mean_length_age_age, vector quants , real cv, real a50, real ato95) { 
+    int n_quants = num_elements(quants);
+    vector[n_ages] sel_by_age;
+    for(age in 1:n_ages) {
+     real total = 0.0;
+     real sigma = mean_length_age_age[age] * cv;
+     //print("sigma = ", sigma, " mean = " ,  mean_length_age_age[age], " age = ", age);
+     for(i in 1:n_quants) {
+       total += logistic_fun(mean_length_age_age[age] + inv_Phi(quants[i]) * sigma, a50, ato95);
+       //print("length = ", length , " total = ", total);
+     }
+     sel_by_age[age] = total / n_quants;
+    } 
+    return sel_by_age; 
   }
+  
+  real prob_lower(real upper_bound, real mu, real sigma) {
+    return   normal_cdf(upper_bound | mu, sigma);
+  } 
+  /* compute age-length transition matrix
+   * @author c.marsh
+   * Args: 
+   *   ar: AR1 autocorrelation 
+   *   nrows: number of rows of the covariance matrix 
+   * Returns: 
+   *   A nrows x nrows matrix 
+    */
+   matrix age_length_transition_matrix(int n_ages, vector mean_length_age_age, vector global_length_bins, real cv) { 
+     int n_length_bins = num_elements(global_length_bins) - 1;
+     matrix[n_ages, n_length_bins] age_length_mat; 
+     for(age_ndx in 1:n_ages) {
+       real sigma = mean_length_age_age[age_ndx] * cv;
+       for(len_ndx in 1:n_length_bins) {
+         if (len_ndx == 1) {
+           age_length_mat[age_ndx, len_ndx] = normal_cdf(global_length_bins[len_ndx + 1] | mean_length_age_age[age_ndx], sigma);
+         } else if (len_ndx == n_length_bins) {
+           age_length_mat[age_ndx, len_ndx] = 1.0 - normal_cdf(global_length_bins[len_ndx]| mean_length_age_age[age_ndx], sigma);
+         } else {
+           age_length_mat[age_ndx, len_ndx] = normal_cdf(global_length_bins[len_ndx + 1] | mean_length_age_age[age_ndx], sigma) - normal_cdf(global_length_bins[len_ndx] | mean_length_age_age[age_ndx], sigma);
+         }
+       }
+     }
+     return age_length_mat; 
+   }
 
   /* compute the cholesky factor of an AR1 correlation matrix
    * @author paul.buerkner@gmail.com
@@ -154,7 +218,7 @@ functions {
     return covariance_matrix;
   }
   
-  
+
   // logistic ogive function
   vector logistic_ogive(vector ages, real sel_50, real sel_95) {
     int n_ages = rows(ages);
@@ -219,6 +283,11 @@ data {
   // Tag release is expected to occur post ageing pre-movement, so first age shouldn't have tags.
   matrix[A,T] tag_release_by_age[R]; 
 
+
+  // Length based selectivity
+  int n_quants;
+  int<lower = 0, upper = 1> length_based_selectivity; // 0 = no, 1 = yes
+  real<lower = 0> length_cv;
   // Observational inputs
   // Indicators
   int<lower = 0, upper = 1> fishery_obs_indicator[Y];       // 0 = no, 1 = yes observation in this year and fishery
@@ -268,6 +337,8 @@ transformed data {
   vector[A] maturity_at_age;                // maturity schedule
   vector[A] length_at_age;                  // length at age
   vector[A] weight_at_age;                  // weight at age
+  vector[n_quants] quants_values;           // quantiles for length based selectivity
+
   int total_groups = T + 1;                 // need to increment it so that we have untagged group accounted for when interating over the partition
 
   for (age in 1:A) {
@@ -280,6 +351,10 @@ transformed data {
   weight_at_age = mean_weight_at_age(length_at_age, a, b);
   maturity_at_age = logistic_ogive(ages, mat_a50, mat_ato95);
   
+  for(i in 1:n_quants)
+    quants_values[i] = i - 0.5;
+  for(i in 1:n_quants)
+    quants_values[i] /= sum(quants_values);
 }
 
 /*
@@ -294,8 +369,8 @@ parameters {
   real<lower = 13, upper = 20> ln_R0; // R0
   real<lower = 0, upper = 1> Q; // survey_catchability
 
-  real<lower = 1, upper = 20> f_a50;
-  real<lower = 1, upper = 20> f_ato95;
+  real<lower = 1> f_a50;
+  real<lower = 1> f_ato95;
   
   // Movement
   simplex[R] prob_move[R];  
@@ -390,7 +465,11 @@ transformed parameters{
   recapture_expected_props =  rep_array(SSB, R,T);
   
   // Calculate selectivity
-  fish_select_at_age = logistic_ogive(ages, f_a50, f_ato95);
+  if (length_based_selectivity == 1) {
+      fish_select_at_age = logis_length_based_sel(A, length_at_age, quants_values, length_cv, f_a50, f_ato95);
+  } else {
+      fish_select_at_age = logistic_ogive(ages, f_a50, f_ato95);
+  }
   for (y in 1:Y) {
     standardised_ycs[y] = unity_YCS[y] * Y;
     // Calculate Total error
