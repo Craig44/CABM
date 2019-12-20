@@ -1,5 +1,6 @@
 #
 detach("package:ibm", unload=TRUE)
+detach("package:rstan", unload=TRUE)
 
 # Set up Stan
 library(rstan)
@@ -254,7 +255,7 @@ ibm$fishing$`tag_recapture_info-1995-1-1`$all_fish_available
 
 prop_tag_vulnerable = stan_sim$par$tagged_vulnerable / stan_sim$par$total_vulnerable
 dim(prop_tag_vulnerable)
-dimnames(prop_tag_vulnerable) = dimnames(stan_sim$par$tagged_vulnerable) = dimnames(stan_sim$par$total_vulnerable) = list(c("EN","HG","BP"),1:30,stan_data$years)
+dimnames(prop_tag_vulnerable) = dimnames(stan_sim$par$tagged_vulnerable) = dimnames(stan_sim$par$total_vulnerable) = list(c("EN","HG","BP"),ages,stan_data$years)
 
 ibm$fishing$`tag_recapture_info-1995-1-1`$prob_sample_tagged_agent * ibm$fishing$`tag_recapture_info-1995-1-1`$agents_caught
 sum(stan_sim$par$recapture_expectations[1,1,,stan_data$years == "1995"])
@@ -286,9 +287,11 @@ stan_sim$par$total_vulnerable[1,,"1995"]
 ibm$fishing$`tag_recapture_info-1995-1-1`$individuals_caught * ibm$fishing$`tag_recapture_info-1995-1-1`$prob_tagged_fish
 ibm$fishing$`tag_recapture_info-1995-1-1`$agents_caught * ibm$fishing$`tag_recapture_info-1995-1-1`$prob_tagged_fish
 
-ibm1 = extract.run(file = "../base_ibm/run.log")
+#ibm1 = extract.run(file = "../base_ibm/run.log")
 
 test = vector()
+ibm1 = extract.run(file = "../base_ibm/run1.log")
+
 par(mfrow = c(1,2))
 plot(1:30,ibm1$fishing[[1]]$`tag_recapture_info-1995-1-1`$tagged_fish_available, type ="l", main = "comparison", ylim = c(0,1000))
 for(i in 1:length(ibm1$Tagging)) {
@@ -385,8 +388,11 @@ ibm_sim = extract.run("../base_ibm/simulated_obs.log")
 
 
 ibm_n_runs = length(ibm_sim$derived_quants)
+par(mfrow = c(1,1))
+plot(names(ibm_sim$derived_quants$`1`$SSB$values), ibm_sim$derived_quants$`1`$SSB$values, lwd =2 , type = "l")
 for(i in 1:ibm_n_runs)
-  lines(rownames(ibm_ssb),ibm_sim$derived_quants[[i]]$SSB$values, col = adjustcolor(col = "black", alpha.f = 0.3), lwd = 2)
+  lines(rownames(ibm_ssb),ibm_sim$derived_quants[[i]]$SSB$values, col = adjustcolor(col = "red", alpha.f = 0.3), lwd = 2)
+lines(names(ibm_sim$derived_quants$`1`$SSB$values), ibm_sim$derived_quants$`1`$SSB$values, lwd = 2)
 
 stan_data$N_sims = 1
 stan_en_tag_95 = stan_hg_tag_95 = stan_bp_tag_95 = array(NA, dim = c(3, ibm_n_runs, 4))
@@ -483,22 +489,22 @@ boxplot(cbind(stan_en_tag_95[3,,2],en_tag_95[3,,2]), main = "", xaxt = "n")
 #abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1996 & ibm$tag_recapture_1995_EN$Values$cell == "BP","expected"]), col = "red", lty = 2, lwd = 2)
 
 ## 1997
-boxplot(cbind(stan_en_tag_95[1,,3],en_tag_95[1,,3]), main = "")
+boxplot(cbind(stan_en_tag_95[1,,3],en_tag_95[1,,3]), main = "", xaxt = "n")
 #abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1997 & ibm$tag_recapture_1995_EN$Values$cell == "EN","expected"]), col = "red", lty = 2, lwd = 2)
 
-boxplot(cbind(stan_en_tag_95[2,,3],en_tag_95[2,,3]), main = "")
+boxplot(cbind(stan_en_tag_95[2,,3],en_tag_95[2,,3]), main = "", xaxt = "n")
 #abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1997 & ibm$tag_recapture_1995_EN$Values$cell == "HG","expected"]), col = "red", lty = 2, lwd = 2)
 
-boxplot(cbind(stan_en_tag_95[3,,3],en_tag_95[3,,3]), main = "")
+boxplot(cbind(stan_en_tag_95[3,,3],en_tag_95[3,,3]), main = "", xaxt = "n")
 #abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1997 & ibm$tag_recapture_1995_EN$Values$cell == "BP","expected"]), col = "red", lty = 2, lwd = 2)
 ## 1998
-boxplot(cbind(stan_en_tag_95[1,,4],en_tag_95[1,,4]), main = "")
+boxplot(cbind(stan_en_tag_95[1,,4],en_tag_95[1,,4]), main = "", names = c("Stan", "IBM"))
 #abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1998 & ibm$tag_recapture_1995_EN$Values$cell == "EN","expected"]), col = "red", lty = 2, lwd = 2)
 
-boxplot(cbind(stan_en_tag_95[2,,4],en_tag_95[2,,4]), main = "")
+boxplot(cbind(stan_en_tag_95[2,,4],en_tag_95[2,,4]), main = "", names = c("Stan", "IBM"))
 #abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1998 & ibm$tag_recapture_1995_EN$Values$cell == "HG","expected"]), col = "red", lty = 2, lwd = 2)
 
-boxplot(cbind(stan_en_tag_95[3,,4],en_tag_95[3,,4]), main = "")
+boxplot(cbind(stan_en_tag_95[3,,4],en_tag_95[3,,4]), main = "", names = c("Stan", "IBM"))
 #abline(h = sum(ibm$tag_recapture_1995_EN$Values[ibm$tag_recapture_1995_EN$Values$year == 1998 & ibm$tag_recapture_1995_EN$Values$cell == "BP","expected"]), col = "red", lty = 2, lwd = 2)
 mtext(outer = T, line = -0.2, font = 2, text = "1998", las = 3, adj = 0.125, side = 2)
 mtext(outer = T, line = -0.2, font = 2, text = "1997", las = 3, adj = 0.40, side = 2)
@@ -576,3 +582,9 @@ rowSums(test_age_length_mat)
 round(head(test_age_length_mat),2)
 
 round(head(age_length_mat),2)
+
+## basically the same
+summary(as.vector(test_age_length_mat - age_length_mat))
+
+
+

@@ -88,6 +88,7 @@ void MortalityEventBiomassClusters::DoValidate() {
           << "). Please fix this.";
   }
 
+
   if (sexed_ == PARAM_IGNORE) {
     sexed_flag_ = false;
     sex_match_ = 0;
@@ -110,6 +111,7 @@ void MortalityEventBiomassClusters::DoValidate() {
 
   age_spread_ = (max_age_ - min_age_) + 1;
 
+  LOG_TRACE();
 
 }
 

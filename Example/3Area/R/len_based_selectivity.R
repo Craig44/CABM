@@ -53,5 +53,20 @@ legend('bottomright', legend = c("n_quant = 1","n_quant = 5", "n_quant = 10"), l
 dev.off()
 
 
+#TMB's multinomial
+prob = c(0.3,0.1,0.5,0.05,0.05)
+sum(prob)
+N = 230
+Y = rmultinom(n = 1, size = N, prob = prob)
 
+tmb_multi = function(Y, prob) {
+  yp1 = Y+(1);
+  logres = lgamma(sum(Y) + 1) - sum(lgamma(yp1)) + sum(Y*log(prob))
+  return(logres)
+}
 
+tmb_multi(Y = Y, prob = prob)
+
+Type logres = lgamma(x.sum() + Type(1)) - lgamma(xp1).sum() + (x*log(p)).sum();
+if(give_log) return logres;
+else return exp(logres);

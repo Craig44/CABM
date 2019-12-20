@@ -53,8 +53,13 @@ functions {
   }
   
   real prob_lower(real upper_bound, real mu, real sigma) {
-    return   normal_cdf(upper_bound | mu, sigma);
-  } 
+    return normal_cdf(upper_bound, mu, sigma);
+  }
+  
+  
+  //real prob_lower(real upper_bound, real mu, real sigma) {
+  //  return normal_cdf(upper_bound | mu, sigma);
+  //} 
   /* compute age-length transition matrix
    * @author c.marsh
    * Args: 
@@ -70,17 +75,16 @@ functions {
        real sigma = mean_length_age_age[age_ndx] * cv;
        for(len_ndx in 1:n_length_bins) {
          if (len_ndx == 1) {
-           age_length_mat[age_ndx, len_ndx] = normal_cdf(global_length_bins[len_ndx + 1] | mean_length_age_age[age_ndx], sigma);
+           age_length_mat[age_ndx, len_ndx] = normal_cdf(global_length_bins[len_ndx + 1] , mean_length_age_age[age_ndx], sigma);
          } else if (len_ndx == n_length_bins) {
-           age_length_mat[age_ndx, len_ndx] = 1.0 - normal_cdf(global_length_bins[len_ndx]| mean_length_age_age[age_ndx], sigma);
+           age_length_mat[age_ndx, len_ndx] = 1.0 - normal_cdf(global_length_bins[len_ndx], mean_length_age_age[age_ndx], sigma);
          } else {
-           age_length_mat[age_ndx, len_ndx] = normal_cdf(global_length_bins[len_ndx + 1] | mean_length_age_age[age_ndx], sigma) - normal_cdf(global_length_bins[len_ndx] | mean_length_age_age[age_ndx], sigma);
+           age_length_mat[age_ndx, len_ndx] = normal_cdf(global_length_bins[len_ndx + 1] , mean_length_age_age[age_ndx], sigma) - normal_cdf(global_length_bins[len_ndx] , mean_length_age_age[age_ndx], sigma);
          }
        }
      }
      return age_length_mat; 
    }
-
   /* compute the cholesky factor of an AR1 correlation matrix
    * @author paul.buerkner@gmail.com
    * Args: 
@@ -228,6 +232,7 @@ functions {
     }
     return logis;
   }
+
   
   // Weight at age
   vector mean_weight_at_age(vector L_a, real a, real b) {
@@ -271,6 +276,7 @@ data {
   // Model dimensions
   int<lower=1> Y; // number of years
   int<lower=1> A; // number of ages
+  int<lower=1> L; // number of length bins -> nl
   int<lower=1> R; // number of regions
   int<lower=1> T; // number of Tag release events - represent tagged partitions.
   int<lower=1> Y_f; // number of years of fishery obs data there should be an indicator = 1 that sums to Y_f
@@ -319,6 +325,7 @@ data {
   real<lower = 0> L_inf; // L-inf in the Von Bertallanffy equation
   real<lower = 0> k; // k in the Von Bertallanffy equation
   real<lower = -5> t0; // t0 in the Von Bertallanffy equation
+  vector[L + 1] global_length_limits; //  (b1, b2, ..., b_max)
   real<lower = 0> h; // steepness
   real<lower = 1, upper = 20> mat_a50; // Maturity Parameters
   real<lower = 1, upper = 20> mat_ato95; // Maturity Parameters
@@ -355,6 +362,8 @@ transformed data {
     quants_values[i] = i - 0.5;
   for(i in 1:n_quants)
     quants_values[i] /= sum(quants_values);
+    
+  matrix[A,L] age_length_probability_matrix = age_length_transition_matrix(A, length_at_age, global_length_limits, cv);
 }
 
 /*
@@ -383,9 +392,7 @@ parameters {
   real<lower = 0> overdispersion_tag_ll;
 
   //simplex[R] prob_move[R];
-  
 
-  
   //real<lower = 0.001, upper = 2> sigma_R;
   
 }
@@ -442,8 +449,8 @@ transformed parameters{
   real lognormal_sigmas;
   // Evaluate likelihood logistic likelihood
   matrix[A,A] covariance_matrix;
-  covariance_matrix = ar1_covar(sigma, rho, A);
   
+  covariance_matrix = ar1_covar(sigma, rho, A);
 
   // Initialise arrays and containers to be 0.0, have to do this because main function does a lot of incremental += stuff so need to set to 0
   ll_bio = rep_vector(0.0, R);
@@ -477,11 +484,11 @@ transformed parameters{
       biomass_error_total[reg,y] = sqrt(biomass_error[reg,y]^2 + adj_biomass_cv^2);
     }
   }
-  /* 
+  /*
   *  ======================
   *  Initialise Partition
   *  ======================
-  */   
+  */
   //
   // Approximate equilibrium age-structure without movement.
   for (reg in 1:R) {
@@ -643,7 +650,7 @@ transformed parameters{
       }   
     }
     
-    // Calculate Fishery observations
+    // Calculate Fishery observations 
     if (fishery_obs_indicator[y-1] == 1) {
       for(y_f in 1:Y_f) {
         if (fish_age_years[y_f] == years[y-1]) {
