@@ -93,7 +93,8 @@ protected:
   //
   vector<float>                   target_age_distribution_;
   unsigned                        n_age_bins_;
-
+  string                          obs_type_;
+  bool                            are_obs_props_ = true;
   string                          fishery_label_;
   MortalityEventBiomass*          mortality_process_ = nullptr;
   string                          process_label_;

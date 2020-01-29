@@ -45,10 +45,11 @@ MortalityEventBiomassAgeClusters::MortalityEventBiomassAgeClusters(Model* model)
   parameters_.Bind<string>(PARAM_AGEING_ERROR, &ageing_error_label_, "Label of ageing error to use", "", PARAM_NONE);
   parameters_.Bind<string>(PARAM_PROCESS_LABEL, &process_label_, "Label of of removal process", "", "");
   parameters_.Bind<string>(PARAM_FISHERY_LABEL, &fishery_label_, "Label of of removal process", "");
-
   // Cluster Inputs
   parameters_.Bind<float>(PARAM_AVERAGE_CLUSTER_WEIGHT, &average_cluster_weight_, "Mean size in weight of the cluster size could be tow or trip intepretation", "")->set_lower_bound(1.0, false);
   parameters_.Bind<float>(PARAM_CLUSTER_CV, &cluster_cv_, "CV for randomly selecting clusters", "");
+  parameters_.Bind<string>(PARAM_COMPOSITION_TYPE, &obs_type_, "", "Do you want  observation as proportions (normalised to sum to one), or as numbers?", PARAM_PROPORTIONS)->set_allowed_values({PARAM_PROPORTIONS,PARAM_NUMBERS});
+
   //parameters_.Bind<string>(PARAM_CLUSTER_DISTRIBUTION, &cluster_distribution_, "The distribution for generating random cluster sizes", "", PARAM_NORMAL)->set_allowed_values({PARAM_NORMAL, PARAM_LOGNORMAL});
   //parameters_.Bind<string>(PARAM_CLUSTER_ATTRIBUTE, &cluster_attribute_, "What attribute do you want to link clusters by, either age or length", "", PARAM_AGE)->set_allowed_values({PARAM_AGE, PARAM_LENGTH});
   parameters_.Bind<float>(PARAM_CLUSTER_SIGMA, &cluster_sigma_, "Standard deviation for the M-H proposal distribution", "")->set_lower_bound(0.0, false);
@@ -99,6 +100,11 @@ void MortalityEventBiomassAgeClusters::DoValidate() {
     if (sexed_flag_)
       LOG_WARNING() << "you asked for a sexed observation but the model isn't sexed so I am ignoring this and giving you unsexed results.";
   }
+
+  if (obs_type_ == PARAM_NUMBERS)
+    are_obs_props_ = false;
+  LOG_MEDIUM() << "comp type = " << obs_type_ << " bool = " << are_obs_props_ << " 0 = numbers, 1 = props";
+
   n_age_bins_ = model_->age_spread();
   target_age_distribution_.resize(n_age_bins_);
 
@@ -569,7 +575,7 @@ void MortalityEventBiomassAgeClusters::Simulate() {
             }
           } // age samples
           float scalar = cluster_weight_[year_ndx][stratum_ndx][total_cluster_ndx] / cluster_age_sample_weight_[year_ndx][stratum_ndx][total_cluster_ndx];
-          LOG_FINE() << "scalar = " << scalar << " total weight = " << cluster_weight_[year_ndx][stratum_ndx][total_cluster_ndx] << " sampled weight = " << cluster_age_sample_weight_[year_ndx][stratum_ndx][total_cluster_ndx];
+          LOG_MEDIUM() << "scalar = " << scalar << " total weight = " << cluster_weight_[year_ndx][stratum_ndx][total_cluster_ndx] << " sampled weight = " << cluster_age_sample_weight_[year_ndx][stratum_ndx][total_cluster_ndx];
           unsigned age_ndx = 0;
           for (unsigned j = 1; j < age_samples_per_clusters_; ++j) {
             age_ndx = cluster_age_samples_[year_ndx][stratum_ndx][total_cluster_ndx][j];
@@ -590,7 +596,7 @@ void MortalityEventBiomassAgeClusters::Simulate() {
       } // cells
       // Save AF
       for (unsigned age_bin_ndx = 0; age_bin_ndx < model_->age_spread(); ++age_bin_ndx) {
-        LOG_FINE() << "numbers at age before = " << stratum_af_[age_bin_ndx];
+        LOG_MEDIUM() << "numbers at age while saveing = " << stratum_af_[age_bin_ndx];
         SaveComparison(age_bin_ndx + model_->min_age(), 0, cells_[stratum_ndx], stratum_af_[age_bin_ndx], 0.0, 0, years_[year_ndx]);
       }
     } // Stratum loop
@@ -598,13 +604,16 @@ void MortalityEventBiomassAgeClusters::Simulate() {
   for (auto& iter : comparisons_) {
     for (auto& second_iter : iter.second) {  // cell
       float total = 0.0;
-      for (auto& comparison : second_iter.second)
-        total += comparison.expected_;
-      for (auto& comparison : second_iter.second)
-        comparison.expected_ /= total;
+      if (are_obs_props_) {
+        for (auto& comparison : second_iter.second)
+          total += comparison.expected_;
+        for (auto& comparison : second_iter.second)
+          comparison.expected_ /= total;
+      }
       // No simulation in this, simulated = expected
-      for (auto& comparison : second_iter.second)
+      for (auto& comparison : second_iter.second) {
         comparison.simulated_ = comparison.expected_;
+      }
     }
   }
 } // Simulate

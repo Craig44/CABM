@@ -444,6 +444,7 @@
 #define PARAM_OBJECTIVE                           "objective"
 #define PARAM_OBJECTIVE_FUNCTION                  "objective_function"
 #define PARAM_OBS                                 "obs"
+#define PARAM_COMPOSITION_TYPE                    "composition_type"
 #define PARAM_OBSERVATION                         "observation"
 #define PARAM_OFF_BY_ONE                          "off_by_one"
 #define PARAM_OUTPUT_PARAMETERS                   "output_parameters"

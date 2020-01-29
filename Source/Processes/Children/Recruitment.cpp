@@ -32,6 +32,7 @@ Recruitment::Recruitment(Model* model) : Process(model) {
   parameters_.Bind<float>(PARAM_PROPORTION_MALE, &prop_male_, "Proportion of recruits male", "", 1.0);
 
   RegisterAsAddressable(PARAM_B0, &b0_, addressable::kAll, addressable::kyes);
+  RegisterAsAddressable(PARAM_PROPORTION_MALE, &prop_male_, addressable::kAll, addressable::kno);
 
 }
 
