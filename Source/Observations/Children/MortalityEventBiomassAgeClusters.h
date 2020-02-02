@@ -59,8 +59,6 @@ protected:
   string                          ageing_error_label_;
   string                          ageing_allocation_ = PARAM_RANDOM;
   AllocationType                  allocation_type_ = AllocationType::kRandom;
-  string                          sexed_;
-  unsigned                        sex_match_;
 
   bool                            sexed_flag_;
   vector<float>                   length_bins_;
@@ -122,6 +120,8 @@ protected:
   vector<vector<vector<float>>>               cluster_weight_; // n_years x n_stratum x n_clusters (weight of cluster)
   vector<vector<vector<float>>>               cluster_age_sample_weight_;
   vector<vector<vector<vector<unsigned>>>>    cluster_age_samples_; // n_years x n_stratum x n_clusters x n_samples
+  vector<vector<vector<vector<unsigned>>>>    cluster_age_samples_sex_; // n_years x n_stratum x n_clusters x n_samples
+
   vector<vector<vector<float>>>               age_target_; // n_years x n_stratum x age_bins
 
 

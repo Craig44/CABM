@@ -235,6 +235,67 @@ This will be a great class for investigating catch at age inputs, I will have to
 	\item different methods for weighting, to generate scaled length frequency you would want to add the options to weight stratum by biomass, area, numbers or proportion
 	\item Bootstrap estimates, we could boot strap ALK and Scaled length frequencies to get CV for each age bin in the frequency, and calculate an effective sample size.
 \end{itemize}
+where, $u$ is a random number generated from uniform random variable on $[0,1]$. This algorithm is shown to generate unbiased estimates of the target distribution (Figure~\ref{fig:ResidsConsistent}).
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.5]{Figures/MH_samples.jpeg}
+	\caption{Boxplots of simulated age frequency using the algorithm described in the methods, with $n_a = 30$ (number of otoliths per cluster), $n_c = 100$ (number of clusters) and $\sigma_c = 2.5$, showing that on average they generate unbiased proportions at age.}
+	\label{fig:simulated_MH_data}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering
+	\subfloat[]{
+	\includegraphics[scale=0.6]{Figures/cluster_residuals_post_dataweighting.png}}
+	\qquad
+	\subfloat[]{
+	\includegraphics[scale=0.6]{Figures/chatTANage_resid_corr.jpg}}
+	\caption{Top panel (a) are, Pearson residuals from a stock assessment assuming a multinomial distribution, with data simulated from the IBM with this cluster algorithm. The bottom panel (b)are Pearson residuals, from the HAK 3\&4 stock assessment from the Chatham Rise Age composition data set.}
+	\label{fig:ResidsConsistent}
+\end{figure}
+
+\pagebreak
+\subsubsection{Age frequency from Mortality Event Biomass process with clustering}\label{subsubsec:MortalityEventBiomasssubsamlecluster}\index{Observations!Age frequency from Mortality Event Biomass With Clustering}
+
+In this observation, you specify the number of clusters which can be thought of as hauls you want to sample from a fishing event (specific fishery and time), as well as some attributes of clusters i.e.  \subcommand{average\_cluster\_weight} in tonnes average weight of haul to sample, the cv \subcommand{cluster\_cv} which describes the variance around the mean weight of hauls to sample from (distribution assumed is log normal). Within each cluster you can specify, how many otoliths will be sampled from each haul, and how correlated the ages will be within a haul, this is defined by the \subcommand{cluster\_sigma}. As this parameter goes to zero the hauls are highly homogeneous, compared to a large value, where the ages become uncorrelated. You can ask for the observation to be normalised as proportions (\subcommand{composition\_type proportions} ) or as numbers. 
+
+
+
+The other neat thing regarding this observation class, is you can weight each haul, 
+
+
+
+
+The algorithm
+
+\begin{itemize}
+	\item Iterate over each stratum, calculating weight in each stratum, and associated cells with their weights
+	\item for each stratum
+	\subitem iterate over all cells within each strata 
+	\subitem with in each cell
+	\subsubitem randomly select a cluster/haul, number of hauls per cell are weighted by how much biomass was in the cell compared to all cells within strata
+	\subsubitem Randomly select a cluster size (weight based quantity)
+	\subsubitem Calculate that to abundance using a simple mean weight per agent in the cell.
+	\subsubitem Randomly select on agent in available in the current cell, this is the starting agent, and all other agents in the cluster are conditional on this first agent (thus creating a school effect)
+	\subsubitem We implement a Metropolis Hastings algorithm (steps~\ref{list:MH_algorithm}) to select the number agents that the user desires for this cluster.
+	\subsubitem Can apply ageing error at this point
+	\subsubitem weight each aged fish's contribution by the weight of the cluster e.g. an aged fish from a cluster of 100 tonnes will have more 'weight' than an aged fish from a cluster of 1 tonne.
+\end{itemize}
+%
+
+\begin{enumerate}\label{list:MH_algorithm}
+	\item Randomly select an individual $x_0$ from the population (all individuals have equal probability of capture)
+	
+	\item generate a proposal individual from  $x'_i \sim \mathcal{N}(x_{i-1}, \sigma_c^2)$
+	
+	\item calculate the acceptance ratio $\alpha = \frac{\pi(x'_i)}{\pi(x_{i-1})}$
+	
+	\item accept if $u \leq \alpha$ $x_i = x'_i$ or reject if $u > \alpha$ $x_i = x_{i-1}$
+	
+	\item repeat steps 2-4 until an adequate sample size is reached denoted by \(n_a\).
+	
+	\item repeat steps 1-5 to generate multiple clusters \(n_c\)
+\end{enumerate}
 
 
 \subsubsection{Tag-recaptures by length}\label{subsubsec:tag_recap_by_length}\index{Observations!Tag-recaptures by length}

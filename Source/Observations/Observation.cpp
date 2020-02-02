@@ -76,6 +76,7 @@ void Observation::Reset() {
 void Observation::SaveComparison(unsigned age, float length, string row_col, float expected, float simulated, float error_value, unsigned year){
   observations::Comparison new_comparison;
   new_comparison.age_ = age;
+  new_comparison.sex_ = 0;
   new_comparison.length_ = length;
   new_comparison.expected_ = expected;
   new_comparison.simulated_ = simulated;

@@ -63,7 +63,7 @@ MortalityEventBiomassAgeClusters::MortalityEventBiomassAgeClusters(Model* model)
   // TODO add these in at some point ...
   //parameters_.Bind<unsigned>(PARAM_NUMBER_OF_BOOTSTRAPS, &number_of_bootstraps_, "Number of bootstraps to conduct for each stratum to calculate Pooled CV's for each stratum and total age frequency", "", 50);
   parameters_.Bind<string>(PARAM_STRATUM_WEIGHT_METHOD, &stratum_weight_method_, "Method to weight stratum estimates by", "", PARAM_BIOMASS)->set_allowed_values({PARAM_BIOMASS, PARAM_AREA, PARAM_NONE});
-  parameters_.Bind<string>(PARAM_SEX, &sexed_, "You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female", "", PARAM_IGNORE)->set_allowed_values({PARAM_MALE,PARAM_FEMALE,PARAM_IGNORE});
+  parameters_.Bind<bool>(PARAM_SEXED, &sexed_flag_, "You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female", "", false);
 
   parameters_.Bind<string>(PARAM_LAYER_OF_STRATUM_DEFINITIONS, &layer_label_, "The layer that indicates what the stratum boundaries are.", "");
   parameters_.Bind<string>(PARAM_STRATUMS_TO_INCLUDE, &cells_, "The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer", "", true);
@@ -86,19 +86,11 @@ void MortalityEventBiomassAgeClusters::DoValidate() {
           << "). Please fix this.";
   }
 
-  if (sexed_ == PARAM_IGNORE) {
-    sexed_flag_ = false;
-    sex_match_ = 0;
-  } else if (sexed_ == PARAM_MALE) {
-    sexed_flag_ = true;
-    sex_match_ = 0;
-  } else if (sexed_ == PARAM_FEMALE) {
-    sexed_flag_ = true;
-    sex_match_ = 1;
-  }
   if(!model_->get_sexed()) {
-    if (sexed_flag_)
+    if (sexed_flag_) {
       LOG_WARNING() << "you asked for a sexed observation but the model isn't sexed so I am ignoring this and giving you unsexed results.";
+      sexed_flag_ = false;
+    }
   }
 
   if (obs_type_ == PARAM_NUMBERS)
@@ -251,7 +243,11 @@ void MortalityEventBiomassAgeClusters::DoBuild() {
     }
   }
 
-  stratum_af_.resize(n_age_bins_, 0);
+  if(sexed_flag_) {
+    stratum_af_.resize(n_age_bins_ * 2 , 0);
+  } else {
+    stratum_af_.resize(n_age_bins_ , 0);
+  }
   agent_ndx_for_age_subsample_within_cluster_.resize(age_samples_per_clusters_, 0);
 
   age_bins_.resize(n_age_bins_ + 1,0.0);
@@ -263,23 +259,27 @@ void MortalityEventBiomassAgeClusters::DoBuild() {
   cluster_age_sample_weight_.resize(years_.size());
   cluster_mean_.resize(years_.size());
   cluster_age_samples_.resize(years_.size());
+  cluster_age_samples_sex_.resize(years_.size());
   agent_ndx_cluster_.resize(age_samples_per_clusters_, 0);
   age_target_.resize(years_.size());
 
   for(unsigned i = 0; i < years_.size(); ++i) {
     cluster_age_samples_[i].resize(cells_.size());
+    cluster_age_samples_sex_[i].resize(cells_.size());
     cluster_age_sample_weight_[i].resize(cells_.size());
     cluster_weight_[i].resize(cells_.size());
     cluster_mean_[i].resize(cells_.size());
     age_target_[i].resize(cells_.size());
     for(unsigned j = 0; j < cells_.size(); ++j) {
       cluster_age_samples_[i][j].resize(cluster_by_year_and_stratum_[years_[i]][cells_[j]]);
+      cluster_age_samples_sex_[i][j].resize(cluster_by_year_and_stratum_[years_[i]][cells_[j]]);
       cluster_age_sample_weight_[i][j].resize(cluster_by_year_and_stratum_[years_[i]][cells_[j]],0.0);
       cluster_weight_[i][j].resize(cluster_by_year_and_stratum_[years_[i]][cells_[j]],0.0);
       cluster_mean_[i][j].resize(cluster_by_year_and_stratum_[years_[i]][cells_[j]],0.0);
       age_target_[i][j].resize(n_age_bins_, 0.0);
       for(unsigned k = 0; k < cluster_by_year_and_stratum_[years_[i]][cells_[j]]; ++k) {
         cluster_age_samples_[i][j][k].resize(age_samples_per_clusters_, 0);
+        cluster_age_samples_sex_[i][j][k].resize(age_samples_per_clusters_, 0);
       }
     }
   }
@@ -313,6 +313,7 @@ void MortalityEventBiomassAgeClusters::ResetPreSimulation() {
       fill(age_target_[i][j].begin(), age_target_[i][j].end(),0.0);
       for(unsigned k = 0; k < cluster_by_year_and_stratum_[years_[i]][cells_[j]]; ++k) {
         fill(cluster_age_samples_[i][j][k].begin(), cluster_age_samples_[i][j][k].end(),0);
+        fill(cluster_age_samples_sex_[i][j][k].begin(), cluster_age_samples_sex_[i][j][k].end(),0);
       }
     }
   }
@@ -327,7 +328,6 @@ void MortalityEventBiomassAgeClusters::Simulate() {
   unsigned i = 0;
   LOG_MEDIUM() << "Simulating data for observation = " << label_;
   ResetPreSimulation();
-  LOG_MEDIUM() << "size clusters " << comparisons_.size();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   vector<vector<processes::census_data>> fishery_age_data = mortality_process_->get_fishery_census_data(fishery_label_);
 
@@ -388,7 +388,7 @@ void MortalityEventBiomassAgeClusters::Simulate() {
             census_stratum_ndx.push_back(census_ndx);
             // Calculate the agents available in the first sampling unit
             LOG_FINE() << "agents in this cell = " << census.age_ndx_.size();
-            if (sexed_flag_) {
+            /*if (sexed_flag_) {
               if (sex_match_ == 0) {
                 total_stratum_biomass += census.biomass_;
                 biomass_by_cell.push_back(census.biomass_);
@@ -405,13 +405,19 @@ void MortalityEventBiomassAgeClusters::Simulate() {
                 }
               }
             } else {
-              total_stratum_biomass += census.biomass_;
-              biomass_by_cell.push_back(census.biomass_);
+              */
+
+              /*
+               * Target distribution for the both sexed and unsexed models is unsexed!! this is not ideal, start with this though
+               */
+
+              total_stratum_biomass += census.biomass_ + census.female_biomass_;
+              biomass_by_cell.push_back(census.biomass_ + census.female_biomass_);
               // Stratum length target distribution
               for(i = 0; i < census.age_ndx_.size(); ++i) {
                 target_age_distribution_[census.age_ndx_[i]]++;
               }
-            }
+            //}
           }
         }
         ++census_ndx;
@@ -447,7 +453,7 @@ void MortalityEventBiomassAgeClusters::Simulate() {
       vector<unsigned> expected_cluster_numbers;
       vector<float> prob_cluster_numbers;
       unsigned agents_available = 1000;
-      unsigned agent_ndx = 0, age_ndx = 0;
+      unsigned agent_ndx = 0, age_ndx = 0, agent_counter = 0, temp_agent_ndx = 0;
       float ratio = 0;
       float mean_weight_of_agents = 0.0;
       unsigned total_cluster_ndx = 0;
@@ -472,107 +478,114 @@ void MortalityEventBiomassAgeClusters::Simulate() {
           cluster_size_numbers = (unsigned)(cluster_size / mean_weight_of_agents); // turn to numbers
           LOG_FINE() << "cluster ndx = " << total_cluster_ndx << " cluster size = " << cluster_size << " average cluster weight " << average_cluster_weight_ << " numbers = " << cluster_size_numbers << " mean weight of agents = " << mean_weight_of_agents;
 
-          // Randomly draw the starting value for the cluster
+          // Randomly draw the starting value for the cluster and M-H algorithm
           agent_ndx = agents_available * rng.chance();
           agent_ndx_cluster_[0] = agent_ndx;
 
           census_ndx_cluster_[total_cluster_ndx].push_back(census_stratum_ndx[cell_ndx]);
 
           cluster_age_samples_[year_ndx][stratum_ndx][total_cluster_ndx][0] = census.age_ndx_[agent_ndx];
+          cluster_age_samples_sex_[year_ndx][stratum_ndx][total_cluster_ndx][0] = census.sex_[agent_ndx];
 
           unsigned y = census.age_ndx_[agent_ndx];
           unsigned y_proposed = 0;
           LOG_FINE() << "y = " << y;
 
-          // only collect a representative length sample
+          // Start the M-H sampling algorithm
           for (unsigned j = 1; j < age_samples_per_clusters_; ++j) {
+
+            // randomly draw the age that we want to sample
             float val = rng.normal(y, cluster_sigma_);
             y_proposed = (unsigned)roundf(val);
-
             if ((y_proposed < 0) | (y_proposed >= n_age_bins_))
               y_proposed = y;
-
-
-            LOG_FINEST() << "proposed = " << y_proposed << " target " <<  target_age_distribution_[y_proposed] << " val = " << val << " y = " << y << " target = " << target_age_distribution_[y];
+            // calculate the acceptance ratio
             ratio = target_age_distribution_[y_proposed] / target_age_distribution_[y];
-            LOG_FINEST() << "ratio = " << ratio;
-
+            LOG_MEDIUM() << "proposed = " << y_proposed << " target " <<  target_age_distribution_[y_proposed] << " val = " << val << " y = " << y << " target = " << target_age_distribution_[y] << " ratio = " << ratio;
+            // accept or reject this jump
             if (rng.chance() <= ratio) {
-              // Find an agent in the partition that fits this length distribution
-              if (sexed_flag_) {
-                if (sex_match_ == 0) {
-                  for (i = 0; i < census.age_ndx_.size(); ++i) {
-                    if (census.sex_[i] != 0)
-                      continue;
-                    // Check we haven't already sampled this agent.
-                    if (census.age_ndx_[i] == y_proposed) {
-                      if (find(agent_ndx_cluster_.begin(), agent_ndx_cluster_.end(), i) != agent_ndx_cluster_.end())
-                        continue;
-                      age_ndx = census.age_ndx_[i];
-                      agent_ndx_cluster_[j] = i;
-                      cluster_age_samples_[year_ndx][stratum_ndx][total_cluster_ndx][j] = age_ndx;
-                      cluster_age_sample_weight_[year_ndx][stratum_ndx][total_cluster_ndx] += census.scalar_[i];
-
-                      y = y_proposed;
-                      break;
-                    }
-                  }
-                } else {
-                  for (i = 0; i < census.age_ndx_.size(); ++i) {
-                    if (census.sex_[i] != 1)
-                      continue;
-                    if (census.age_ndx_[i] == y_proposed) {
-                      if (find(agent_ndx_cluster_.begin(), agent_ndx_cluster_.end(), i) != agent_ndx_cluster_.end())
-                        continue;
-                      age_ndx = census.age_ndx_[i];
-                      agent_ndx_cluster_[j] = i;
-                      cluster_age_samples_[year_ndx][stratum_ndx][total_cluster_ndx][j] = age_ndx;
-                      cluster_age_sample_weight_[year_ndx][stratum_ndx][total_cluster_ndx] += census.scalar_[i];
-
-                      y = y_proposed;
-                      break;
-                    }
-                  }
+              // accept this jump so find a random element with this age to save attributes
+              agent_counter = 10000;
+              while(agent_counter > 0) {
+                LOG_MEDIUM() << "attemtp = " << agent_counter;
+                --agent_counter;
+                temp_agent_ndx = agents_available * rng.chance();
+                if (census.age_ndx_[temp_agent_ndx] == y_proposed) {
+                  // have we sampled this agent before
+                  if (find(agent_ndx_cluster_.begin(), agent_ndx_cluster_.end(), temp_agent_ndx) != agent_ndx_cluster_.end())
+                    continue;
+                  agent_ndx_cluster_[j] = temp_agent_ndx;
+                  cluster_age_samples_[year_ndx][stratum_ndx][total_cluster_ndx][j] = census.age_ndx_[temp_agent_ndx];
+                  cluster_age_sample_weight_[year_ndx][stratum_ndx][total_cluster_ndx] += census.scalar_[temp_agent_ndx];
+                  cluster_age_samples_sex_[year_ndx][stratum_ndx][total_cluster_ndx][j] = census.sex_[temp_agent_ndx];
+                  break; // while loop
                 }
-              } else {
+              }
+              /*
+               * If we can't attribute using the random selection systematically sample to find this attribute
+               */
+              if (agent_counter == 0) {
+                LOG_MEDIUM() << "need to systematically sample";
                 for (i = 0; i < census.age_ndx_.size(); ++i) {
                   if (i == (census.age_ndx_.size() - 1))
                     agent_ndx_cluster_.clear();
+
                   // Check we haven't already sampled this agent.
                   if (census.age_ndx_[i] == y_proposed) {
-                    //LOG_FINE() << "check wihtout replacement";
                     if (find(agent_ndx_cluster_.begin(), agent_ndx_cluster_.end(), i) != agent_ndx_cluster_.end())
                       continue;
-                    LOG_FINEST() << "accepting jump resampling a similar agent as the last " << y_proposed << " choosing agent at index = " << i;
                     age_ndx = census.age_ndx_[i];
+                    LOG_FINEST() << "rejecting jump resampling a similar agent as the last " << y << " choosing agent at index = " << i;
                     agent_ndx_cluster_[j] = i;
                     cluster_age_samples_[year_ndx][stratum_ndx][total_cluster_ndx][j] = age_ndx;
                     cluster_age_sample_weight_[year_ndx][stratum_ndx][total_cluster_ndx] += census.scalar_[i];
-
-                    y = y_proposed;
+                    cluster_age_samples_sex_[year_ndx][stratum_ndx][total_cluster_ndx][j] = census.sex_[i];
                     break;
                   }
                 }
               }
             } else {
-              // Find an agent in the partition that fits this length distribution
-              for (i = 0; i < census.age_ndx_.size(); ++i) {
-                if (i == (census.age_ndx_.size() - 1))
-                  agent_ndx_cluster_.clear();
-
-                // Check we haven't already sampled this agent.
-                if (census.age_ndx_[i] == y) {
-                  if (find(agent_ndx_cluster_.begin(), agent_ndx_cluster_.end(), i) != agent_ndx_cluster_.end())
+              // Failed jump so find an agent with the previous attribute
+              agent_counter = 10000;
+              while(agent_counter > 0) {
+                --agent_counter;
+                temp_agent_ndx = agents_available * rng.chance();
+                if (census.age_ndx_[temp_agent_ndx] == y_proposed) {
+                  // have we sampled this agent before
+                  if (find(agent_ndx_cluster_.begin(), agent_ndx_cluster_.end(), temp_agent_ndx) != agent_ndx_cluster_.end())
                     continue;
-                  age_ndx = census.age_ndx_[i];
-                  LOG_FINEST() << "rejecting jump resampling a similar agent as the last " << y << " choosing agent at index = " << i;
-                  agent_ndx_cluster_[j] = i;
-                  cluster_age_samples_[year_ndx][stratum_ndx][total_cluster_ndx][j] = age_ndx;
-                  cluster_age_sample_weight_[year_ndx][stratum_ndx][total_cluster_ndx] += census.scalar_[i];
-                  break;
+                  agent_ndx_cluster_[j] = temp_agent_ndx;
+                  cluster_age_samples_[year_ndx][stratum_ndx][total_cluster_ndx][j] = census.age_ndx_[temp_agent_ndx];
+                  cluster_age_sample_weight_[year_ndx][stratum_ndx][total_cluster_ndx] += census.scalar_[temp_agent_ndx];
+                  cluster_age_samples_sex_[year_ndx][stratum_ndx][total_cluster_ndx][j] = census.sex_[temp_agent_ndx];
+                  break; // while loop
+                }
+              }
+              /*
+               * If we can't attribute using the random selection systematically sample to find this attribute
+               */
+              if (agent_counter == 0) {
+                LOG_MEDIUM() << "need to systematically sample";
+                for (i = 0; i < census.age_ndx_.size(); ++i) {
+                  if (i == (census.age_ndx_.size() - 1))
+                    agent_ndx_cluster_.clear();
+
+                  // Check we haven't already sampled this agent.
+                  if (census.age_ndx_[i] == y) {
+                    if (find(agent_ndx_cluster_.begin(), agent_ndx_cluster_.end(), i) != agent_ndx_cluster_.end())
+                      continue;
+                    age_ndx = census.age_ndx_[i];
+                    LOG_FINEST() << "rejecting jump resampling a similar agent as the last " << y << " choosing agent at index = " << i;
+                    agent_ndx_cluster_[j] = i;
+                    cluster_age_samples_[year_ndx][stratum_ndx][total_cluster_ndx][j] = age_ndx;
+                    cluster_age_sample_weight_[year_ndx][stratum_ndx][total_cluster_ndx] += census.scalar_[i];
+                    cluster_age_samples_sex_[year_ndx][stratum_ndx][total_cluster_ndx][j] = census.sex_[i];
+                    break;
+                  }
                 }
               }
             }
+            LOG_MEDIUM() << "counter = " << agent_counter;
           } // age samples
           float scalar = cluster_weight_[year_ndx][stratum_ndx][total_cluster_ndx] / cluster_age_sample_weight_[year_ndx][stratum_ndx][total_cluster_ndx];
           LOG_MEDIUM() << "scalar = " << scalar << " total weight = " << cluster_weight_[year_ndx][stratum_ndx][total_cluster_ndx] << " sampled weight = " << cluster_age_sample_weight_[year_ndx][stratum_ndx][total_cluster_ndx];
@@ -590,14 +603,29 @@ void MortalityEventBiomassAgeClusters::Simulate() {
                 }
               }
             }
-            stratum_af_[age_ndx] += scalar;
+            if (sexed_flag_) {
+              // 1 = male
+              stratum_af_[age_ndx + (cluster_age_samples_sex_[year_ndx][stratum_ndx][total_cluster_ndx][j] * n_age_bins_)] += scalar;
+            } else
+              stratum_af_[age_ndx] += scalar;
           }
         } // Cluster_ndx
       } // cells
       // Save AF
-      for (unsigned age_bin_ndx = 0; age_bin_ndx < model_->age_spread(); ++age_bin_ndx) {
-        LOG_MEDIUM() << "numbers at age while saveing = " << stratum_af_[age_bin_ndx];
-        SaveComparison(age_bin_ndx + model_->min_age(), 0, cells_[stratum_ndx], stratum_af_[age_bin_ndx], 0.0, 0, years_[year_ndx]);
+      if (sexed_flag_) {
+        LOG_MEDIUM() << "size of AG = " << stratum_af_.size() ;
+        for(unsigned sex_ndx = 0; sex_ndx <= 1; sex_ndx++) {
+          for (unsigned age_bin_ndx = 0; age_bin_ndx < model_->age_spread(); ++age_bin_ndx) {
+            LOG_MEDIUM() <<"age " << age_bin_ndx + model_->min_age() <<  " numbers at age = " << stratum_af_[age_bin_ndx] << " sex ndx = " << sex_ndx << " vector ndx = " << age_bin_ndx + (sex_ndx * n_age_bins_);
+
+            SaveComparison(age_bin_ndx + model_->min_age(), sex_ndx, 0.0, cells_[stratum_ndx], stratum_af_[age_bin_ndx + (sex_ndx * n_age_bins_)], 0.0, 0, years_[year_ndx]);
+          }
+        }
+      } else {
+        for (unsigned age_bin_ndx = 0; age_bin_ndx < model_->age_spread(); ++age_bin_ndx) {
+          LOG_MEDIUM() << "numbers at age while saveing = " << stratum_af_[age_bin_ndx];
+          SaveComparison(age_bin_ndx + model_->min_age(), 0, cells_[stratum_ndx], stratum_af_[age_bin_ndx], 0.0, 0, years_[year_ndx]);
+        }
       }
     } // Stratum loop
   } // year loop
@@ -621,6 +649,7 @@ void MortalityEventBiomassAgeClusters::Simulate() {
 
 
 void MortalityEventBiomassAgeClusters::FillReportCache(ostringstream& cache) {
+  LOG_MEDIUM() << "we are here";
   // Print the age length key for curiosity
   /*
   cache << "length_freq_by_year_stratum "  <<REPORT_R_DATAFRAME <<"\n";
@@ -661,6 +690,7 @@ void MortalityEventBiomassAgeClusters::FillReportCache(ostringstream& cache) {
       cache << "\n";
     }
   }
+  /*
   // Cluster mean
   for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     cache << "cluster_mean-" << years_[year_ndx] << " " << REPORT_R_MATRIX <<"\n";
@@ -670,7 +700,7 @@ void MortalityEventBiomassAgeClusters::FillReportCache(ostringstream& cache) {
       cache << "\n";
     }
   }
-
+  */
   // Cluster age sample
   for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     for(unsigned stratum_ndx = 0; stratum_ndx < cells_.size(); ++stratum_ndx) {
@@ -683,10 +713,20 @@ void MortalityEventBiomassAgeClusters::FillReportCache(ostringstream& cache) {
       }
     }
   }
+  /*
+  // Cluster sex
+  for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    cache << "cluster_sex-" << years_[year_ndx] << " " << REPORT_R_MATRIX <<"\n";
+    for(unsigned stratum_ndx = 0; stratum_ndx < cells_.size(); ++stratum_ndx) {
+      for(unsigned cluster_ndx = 0; cluster_ndx < cluster_age_samples_sex_[year_ndx][stratum_ndx].size(); ++cluster_ndx)
+        cache << cluster_age_samples_sex_[year_ndx][stratum_ndx][cluster_ndx] << " ";
+      cache << "\n";
+    }
+  }
 
+*/
 
-
-  // Target length distribution
+  // Target age distribution
   for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     cache << "target_age-" << years_[year_ndx] << " " << REPORT_R_DATAFRAME << "\n";
     for (unsigned age = model_->min_age(); age <=  model_->max_age(); ++age)
