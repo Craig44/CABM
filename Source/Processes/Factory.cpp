@@ -21,6 +21,7 @@
 #include "Children/Recruitment/RecruitmentBevertonHolt.h"
 #include "Children/Recruitment/RecruitmentConstant.h"
 #include "Children/Growth/GrowthVonBertalanffyWithBasic.h"
+#include "Children/Growth/GrowthSchnuteWithBasic.h"
 #include "Children/Mortality/MortalityBaranov.h"
 #include "Children/Mortality/MortalityConstantRate.h"
 #include "Children/Mortality/MortalityEventBiomass.h"
@@ -74,6 +75,8 @@ Process* Factory::Create(Model* model, const string& object_type, const string& 
       result = new RecruitmentConstant(model);
     else if (sub == PARAM_GROWTH_VON_BERTALANFFY_WITH_BASIC)
       result = new GrowthVonBertalanffyWithBasic(model);
+    else if (sub == PARAM_GROWTH_SCHNUTE_WITH_BASIC)
+      result = new GrowthSchnuteWithBasic(model);
     else if (sub == PARAM_MORTALITY_BARANOV)
       result = new MortalityBaranov(model);
     else if (sub == PARAM_MORTALITY_CONSTANT_RATE)

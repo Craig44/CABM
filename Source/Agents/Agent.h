@@ -45,11 +45,11 @@ public:
   virtual const float&         get_weight() const {return weight_;};
   virtual const float&         get_length() const {return length_;};
   virtual const float&         get_m() const {return M_;};
-  virtual const float&         get_first_age_length_par() const {return first_age_length_par_;}; // L_inf
-  virtual const float&         get_second_age_length_par() const {return second_age_length_par_;}; // K
-  virtual const float&         get_third_age_length_par() const {return third_age_length_par_;}; // t0
-  virtual const float&         get_first_length_weight_par() const {return first_length_weight_par_;}; // a
-  virtual const float&         get_second_length_weight_par() const {return second_length_weight_par_;}; // b
+  virtual const float&         get_first_age_length_par() const {return first_age_length_par_;}; // L_inf // alpha
+  virtual const float&         get_second_age_length_par() const {return second_age_length_par_;}; // K // beta
+  virtual const float&         get_third_age_length_par() const {return third_age_length_par_;}; // t0 // t0
+  virtual const float&         get_first_length_weight_par() const {return first_length_weight_par_;}; // a // a
+  virtual const float&         get_second_length_weight_par() const {return second_length_weight_par_;}; // b //n
   virtual const unsigned&      get_home_row() const {return home_row_ ;};
   virtual const unsigned&      get_home_col() const {return home_col_ ;};
   virtual const float&         get_lat() const {return lat_;};
