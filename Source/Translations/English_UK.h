@@ -454,6 +454,7 @@
 #define PARAM_OUTPUT_PARAMETERS                   "output_parameters"
 #define PARAM_ONE                                 "1 (one)"
 #define PARAM_ONE_THOUSAND                        "1000"
+#define PARAM_ONLY_MATURE_PARTITION               "only_mature_partition"
 #define PARAM_ORIGIN_CELL                         "origin_cell"
 #define PARAM_ORTHOGONAL                          "orthogonal"
 #define PARAM_OVERWRITE                           "overwrite"
