@@ -52,7 +52,7 @@ public:
   virtual void                DoReset() = 0;
   virtual void                Simulate() = 0;
   virtual bool                HasYear(unsigned year) const = 0;
-  virtual void                FillReportCache(ostringstream& cache) { };  // If we want to store and report more information within a process use this method
+  virtual void                FillReportCache(ostringstream& cache) { };  // If we want to store and report additional information within a observation use this method
 
   // accessors
   string&                       likelihood() { return simulation_likelihood_label_; }

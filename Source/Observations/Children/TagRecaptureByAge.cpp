@@ -100,7 +100,7 @@ void TagRecaptureByAge::DoBuild() {
     // Build and validate layers
   layer_ = model_->managers().layer()->GetCategoricalLayer(layer_label_);
   if (!layer_)
-    LOG_FATAL_P(PARAM_LAYER_OF_STRATUM_DEFINITIONS)<< "could not find layer " << layer_label_ << " does it exist?, if it exists is of type categorical?";
+    LOG_FATAL_P(PARAM_LAYER_OF_STRATA_DEFINITIONS)<< "could not find layer " << layer_label_ << " does it exist?, if it exists is of type categorical?";
 
   LOG_FINE() << "Check stratum are consistent";
   if (parameters_.Get(PARAM_RECAPTURE_STRATUM)->has_been_defined()) {
@@ -258,6 +258,9 @@ void TagRecaptureByAge::Simulate() {
 
 } // DoExecute
 
+void TagRecaptureByAge::FillReportCache(ostringstream& cache) {
+  cache << "release_stratum: " << release_stratum_ << "\n";
+}
 } /* namespace observations */
 } /* namespace niwa */
 

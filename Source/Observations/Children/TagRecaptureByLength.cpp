@@ -219,6 +219,10 @@ void TagRecaptureByLength::Simulate() {
   }
 } // DoExecute
 
+void TagRecaptureByLength::FillReportCache(ostringstream& cache) {
+  cache << "release_stratum: " << release_stratum_ << "\n";
+}
+
 } /* namespace observations */
 } /* namespace niwa */
 
