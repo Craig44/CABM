@@ -57,7 +57,7 @@ void AgeFrequencyByCell::DoExecute() {
   cache_ << "year: " << model_->current_year() << "\n";
   cache_ << "time_step: " << time_step_ << "\n";
   if (model_->get_sexed()) {
-    cache_ << "male-values "<< REPORT_R_DATAFRAME<<"\n";
+    cache_ << "male-values "<< REPORT_R_DATAFRAME_ROW_LABELS<<"\n";
     cache_ << "row-col";
     for (unsigned i = model_->min_age(); i <=  model_->max_age(); ++i)
       cache_ << " " << i;
@@ -76,7 +76,7 @@ void AgeFrequencyByCell::DoExecute() {
         }
       }
     }
-    cache_ << "female-values "<< REPORT_R_DATAFRAME<<"\n";
+    cache_ << "female-values "<< REPORT_R_DATAFRAME_ROW_LABELS<<"\n";
     cache_ << "row-col";
     for (unsigned i = model_->min_age(); i <=  model_->max_age(); ++i)
       cache_ << " " << i;
@@ -96,7 +96,7 @@ void AgeFrequencyByCell::DoExecute() {
       }
     }
   } else {
-    cache_ << "values "<< REPORT_R_DATAFRAME<<"\n";
+    cache_ << "values "<< REPORT_R_DATAFRAME_ROW_LABELS<<"\n";
     cache_ << "row-col";
     for (unsigned i = model_->min_age(); i <=  model_->max_age(); ++i)
       cache_ << " " << i;
