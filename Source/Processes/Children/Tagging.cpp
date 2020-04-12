@@ -142,16 +142,22 @@ void Tagging::DoBuild() {
       LOG_FINEST() << "row = " << split_cells[0] << " col = " << split_cells[1];
       if (!utilities::To<unsigned>(split_cells[0], cell_ndx))
         LOG_ERROR_P(PARAM_PROPORTIONS) << " value (" << split_cells[0] << ") could not be converted to a unsigned";
-       table_rows_.push_back(cell_ndx);
-      if (cell_ndx >= model_->get_height())
-        LOG_ERROR_P(PARAM_PROPORTIONS) << "The cell row " << cell_ndx << " at row " << row_counter << " is larget than the world = '"<< model_->get_height() << "'";
+      if (cell_ndx > model_->get_height())
+        LOG_ERROR_P(PARAM_PROPORTIONS) << "The cell row " << cell_ndx << " at row " << row_counter << " is large than the world = '"<< model_->get_height() << "'";
+      if (cell_ndx <= 0)
+        LOG_ERROR_P(PARAM_PROPORTIONS) << "The cell row " << cell_ndx << " at row " << row_counter << " is less than equal to 0, must be greater than 0";
+      table_rows_.push_back(cell_ndx);
 
       if (!utilities::To<unsigned>(split_cells[1], cell_ndx))
         LOG_ERROR_P(PARAM_PROPORTIONS) << " value (" << split_cells[1] << ") could not be converted to a unsigned";
        table_cols_.push_back(cell_ndx);
 
-      if (cell_ndx >= model_->get_width())
-        LOG_ERROR_P(PARAM_PROPORTIONS) << "The cell col " << cell_ndx << " at row " << row_counter << " is larget than the world = '"<< model_->get_width() << "'";
+      if (cell_ndx > model_->get_width())
+        LOG_ERROR_P(PARAM_PROPORTIONS) << "The cell col " << cell_ndx << " at row " << row_counter << " is large than the world = '"<< model_->get_width() << "'";
+
+      if (cell_ndx <= 0)
+        LOG_ERROR_P(PARAM_PROPORTIONS) << "The cell col " << cell_ndx << " at row " << row_counter << " is less than equal to 0, must be greater than 0";
+
 
       vector<float> proportions;
       float total_proportion = 0.0;
@@ -172,6 +178,7 @@ void Tagging::DoBuild() {
 
 
   // Build cell specific containers in the hope that we can thread
+  // Allocate memory so we are doing this during execute
   cell_offset_for_selectivity_.resize(model_->get_height());
   cell_offset_.resize(model_->get_height());
   model_length_bins_.resize(model_->get_height());
@@ -188,19 +195,26 @@ void Tagging::DoBuild() {
   }
 
   length_distribution_of_tagged_fish_by_year_cell_.resize(years_.size());
+  length_observed_tag_of_tagged_fish_by_year_cell_.resize(years_.size());
   age_distribution_of_tagged_fish_by_year_cell_.resize(years_.size());
   for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     age_distribution_of_tagged_fish_by_year_[years_[year_ndx]].resize(model_->age_spread(),0);
     length_distribution_of_tagged_fish_by_year_[years_[year_ndx]].resize(model_->length_bin_mid_points().size(),0);
-
     length_distribution_of_tagged_fish_by_year_cell_[year_ndx].resize(model_->get_height());
+    length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx].resize(model_->get_height());
+
     age_distribution_of_tagged_fish_by_year_cell_[year_ndx].resize(model_->get_height());
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       length_distribution_of_tagged_fish_by_year_cell_[year_ndx][row].resize(model_->get_width());
+      length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row].resize(model_->get_width());
+
       age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row].resize(model_->get_width());
       for (unsigned col = 0; col < model_->get_width(); ++col) {
+    	length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row][col].resize(model_->number_of_length_bins(),0.0);
         length_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].resize(model_->number_of_length_bins(),0.0);
         age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].resize(model_->age_spread(),0.0);
+
+
       }
     }
   }
@@ -216,6 +230,9 @@ void Tagging::DoReset() {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         fill(age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].begin(),age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].end(),0.0);
         fill(length_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].begin(),length_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].end(),0.0);
+        fill(length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row][col].begin(),length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row][col].end(),0.0);
+
+
       }
     }
   }
@@ -337,7 +354,7 @@ void Tagging::DoExecute() {
         }
       }
     } else if (selectivity_length_based_ & not apply_using_proportions_) {
-      LOG_WARNING() << "length based tagging not yet implemented";
+      LOG_WARNING() << "in process" << label_ << " length based tagging not yet implemented";
 
 
 
@@ -350,15 +367,16 @@ void Tagging::DoExecute() {
           // find row index
           unsigned row_ndx = 0;
           for ( ; row_ndx < table_years_.size(); ++row_ndx) {
-            if ((table_years_[row_ndx] == model_->current_year()) & (table_rows_[row_ndx] == row) & (table_cols_[row_ndx] == col))
+            if ((table_years_[row_ndx] == model_->current_year()) & (table_rows_[row_ndx] == (row + 1)) & (table_cols_[row_ndx] == (col + 1)))
               break;
           }
-          LOG_FINE() << "Year = " << model_->current_year() << " row = " << row << " col = " << col << " table ndx = " << row_ndx;
+          LOG_MEDIUM() << "Year = " << model_->current_year() << " row = " << row + 1<< " col = " << col + 1 << " table ndx = " << row_ndx;
           cell = world_->get_base_square(row, col); // Shared resource...
           tags_to_release = tag_layer_[year_ndx]->get_value(row, col);
           vector<unsigned> tags_by_length_bin(proportions_data_[row_ndx].size(), 0);
           for(unsigned i = 0; i < tags_by_length_bin.size(); ++i) {
             tags_by_length_bin[i] = (unsigned)(proportions_data_[row_ndx][i] * tags_to_release);
+            length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row][col][i] = tags_by_length_bin[i];
           }
           if (cell->is_enabled()) {
             unsigned tag_slot = 0;
@@ -369,19 +387,25 @@ void Tagging::DoExecute() {
                 vector<unsigned> agent_ndx_available_to_sample_;
                 unsigned agent_counter = 0;
                 for (auto& agent : cell->agents_) {
-                  ++agent_counter;
                   if (agent.is_alive() & (agent.get_length_bin_index() == i))
                     agent_ndx_available_to_sample_.push_back(agent_counter);
+                  ++agent_counter;
                 }
                 LOG_MEDIUM() << "length bin = " << i + 1 << " tags " << tags_by_length_bin[i] << " agents alive that are in this length bin = " << agent_ndx_available_to_sample_.size();
                 if(agent_ndx_available_to_sample_.size() <= tags_by_length_bin[i]) {
                   // jump out of this length bin
-                  tags_by_length_bin[i + 1] += tags_by_length_bin[i];
+                  // push tags into next length bin if we aren't in the last bin
+                  if ((i + 1) < tags_by_length_bin.size()) {
+                    tags_by_length_bin[i + 1] += tags_by_length_bin[i];
+                  }
                   continue;
                 }
+                LOG_MEDIUM() << "length bin = " << i + 1 << " tags " << tags_by_length_bin[i] << " agents alive that are in this length bin = " << agent_ndx_available_to_sample_.size();
+
                 agent_counter = tags_by_length_bin[i];
                 unsigned agent_ndx = 0;
                 while(agent_counter > 0) {
+                  //LOG_MEDIUM() << "agent counter = " << agent_counter;
                   agent_ndx = agent_ndx_available_to_sample_[agent_ndx_available_to_sample_.size() * rng.chance()];
                   agent_counter--;
                   Agent tagged_agent(cell->agents_[agent_ndx]);
@@ -412,6 +436,9 @@ void Tagging::DoExecute() {
                   if (tag_slot >= cell->tagged_agents_.size()) {
                     cell->tagged_agents_.push_back(tagged_agent);
                   }
+                }
+                if (agent_counter < 0) {
+                	LOG_WARNING() << "in Process " << label_ << " couldn't apply all tags in year " << model_->current_year() << " tags that didn't get released = " << tags_to_release;
                 }
               }
             }
@@ -454,6 +481,23 @@ void  Tagging::FillReportCache(ostringstream& cache) {
   }
   cache << "\n";
   for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    cache << "tag_release_by_length_observed-" << years_[year_ndx] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
+    cache << "cell";
+    for (unsigned length_ndx = 0; length_ndx < model_->length_bin_mid_points().size(); ++length_ndx) {
+      cache << " " << model_->length_bin_mid_points()[length_ndx];
+    }
+    cache << "\n";
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        cache << row + 1 << "-" << col + 1 << " ";
+        for (unsigned len_ndx = 0; len_ndx < model_->number_of_length_bins(); ++len_ndx) {
+          cache << length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row][col][len_ndx] << " ";
+        }
+        cache << "\n";
+      }
+    }
+  }
+  for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     cache << "tag_release_by_length-" << years_[year_ndx] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
     cache << "cell";
     for (unsigned length_ndx = 0; length_ndx < model_->length_bin_mid_points().size(); ++length_ndx) {
@@ -470,6 +514,8 @@ void  Tagging::FillReportCache(ostringstream& cache) {
       }
     }
   }
+
+
   for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     cache << "tag_release_by_age-" << years_[year_ndx] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
     cache << "cell";
