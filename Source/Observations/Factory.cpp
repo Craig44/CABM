@@ -25,6 +25,7 @@
 #include "Observations/Children/MortalityEventBiomassScaledAgeFrequency.h"
 #include "Observations/Children/MortalityEventBiomassClusters.h"
 #include "Observations/Children/MortalityEventBiomassAgeClusters.h"
+#include "Observations/Children/MortalityEventBiomassLengthClusters.h"
 #include "Observations/Children/TagRecaptureByLength.h"
 #include "Observations/Children/TagRecaptureByAge.h"
 
@@ -56,6 +57,8 @@ Observation* Factory::Create(Model* model, const string& object_type, const stri
       result = new MortalityEventBiomassClusters(model);
     if (sub_type == PARAM_MORTALITY_EVENT_BIOMASS_AGE_CLUSTERS)
       result = new MortalityEventBiomassAgeClusters(model);
+    if (sub_type == PARAM_MORTALITY_EVENT_BIOMASS_LENGTH_CLUSTERS)
+      result = new MortalityEventBiomassLengthClusters(model);
     if (sub_type == PARAM_PROPORTIONS_AT_AGE)
       result = new ProportionsAtAge(model);
     else if (sub_type == PARAM_PROCESS_REMOVALS_BY_LENGTH)
