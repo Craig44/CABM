@@ -83,7 +83,7 @@ void AddressableValuesLoader::LoadValues(const string& file_name) {
 
       Double numeric = 0.0;
       if (!utilities::To<Double>(values[i], numeric))
-        LOG_FATAL() << "In addressable_value file could not convert the value " << values[i] << " to a double";
+        LOG_FATAL() << "at line number " << line_number << " the addressable_value file (" << file_name<< " ) could not convert the value '" << values[i] << "' to a double, it is probably either a null, empty or a string, needs to be a numeric";
       addressables.AddValue(parameters[i], numeric);
     }
   }
