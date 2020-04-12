@@ -61,7 +61,8 @@ struct tag_recapture {
   unsigned row_;
   unsigned col_;
   unsigned time_step_;
-  unsigned scanned_fish_ = 0;
+  unsigned scanned_fish_ = 0;  // individuals
+  unsigned scanned_agents_ = 0;// agents
   double   expected_scanned_ = 0;
   unsigned tag_draws_ = 0;
   vector<float> tagged_fish_available_;

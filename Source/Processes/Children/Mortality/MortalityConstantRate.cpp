@@ -99,6 +99,7 @@ void MortalityConstantRate::DoBuild() {
       active_time_steps.push_back(i);
   }
 
+  LOG_FINE() << "active time-steps = " << active_time_steps.size() << " number of ratios = " << ratios_.size();
   if (ratios_.size() == 0) {
     for (unsigned i : active_time_steps)
       time_step_ratios_[i] = 1.0;
@@ -112,11 +113,13 @@ void MortalityConstantRate::DoBuild() {
         LOG_ERROR_P(PARAM_TIME_STEP_RATIO) << " value (" << value << ") must be between 0.0 (exclusive) and 1.0 (inclusive)";
     }
 
-    for (unsigned i = 0; i < ratios_.size(); ++i)
+    for (unsigned i = 0; i < ratios_.size(); ++i) {
+      LOG_FINE() << "timestep = " << i << " value = " << ratios_[i] << " timestep ndx = " << active_time_steps[i];
       time_step_ratios_[active_time_steps[i]] = ratios_[i];
+    }
   }
 
-
+  LOG_FINE() << "setting value of m in the model = " << m_;
   model_->set_m(m_);
 
   cell_offset_.resize(model_->get_height());
@@ -145,6 +148,7 @@ void MortalityConstantRate::ApplyStochasticMortality(vector<Agent>& agents) {
   unsigned time_step = model_->managers().time_step()->current_time_step();
   float ratio = time_step_ratios_[time_step];
 
+  LOG_FINE() << "year = " << model_->current_year() << " time step = " << time_step << " ratio = " << ratio;
   if (selectivity_length_based_) {
     for(auto& agent : agents) {
       if (agent.is_alive()) {

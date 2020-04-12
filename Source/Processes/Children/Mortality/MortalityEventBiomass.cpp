@@ -34,8 +34,11 @@ MortalityEventBiomass::MortalityEventBiomass(Model* model) :
   parameters_.BindTable(PARAM_SCANNING, scanning_table_, "Table of scanning proportions by year for each fishery", "", true, true);
   method_table_ = new parameters::Table(PARAM_METHOD_INFO);
   parameters_.BindTable(PARAM_METHOD_INFO, method_table_, "Table of information for each fishery.", "", true, false);
-  parameters_.Bind<bool>(PARAM_PRINT_EXTRA_INFO, &print_extra_info_, "if you have process report for this process you can control the amount of information printed to the file.",
+  parameters_.Bind<bool>(PARAM_PRINT_CENSUS_INFO, &print_census_info_, "if you have process report for this process you can control the amount of information printed to the file.",
       "", true);
+  parameters_.Bind<bool>(PARAM_PRINT_TAG_RECAP_INFO, &print_tag_recap_info_, "if you have process report for this process you can control the amount of information printed to the file.",
+      "", true);
+
 }
 
 MortalityEventBiomass::~MortalityEventBiomass() {
@@ -306,6 +309,9 @@ void MortalityEventBiomass::DoReset() {
   removals_tag_recapture_.clear();
   for(unsigned year_ndx = 0; year_ndx < catch_year_.size(); ++year_ndx) {
     for(unsigned fishery_ndx = 0; fishery_ndx < fishery_label_.size(); ++fishery_ndx) {
+      fishery_census_data_[fishery_ndx][year_ndx].clear();
+      age_comp_by_fishery_[fishery_ndx][year_ndx].clear();
+      length_comp_by_fishery_[fishery_ndx][year_ndx].clear();
       for (unsigned row = 0; row < model_->get_height(); ++row)
         fill(actual_catch_by_area_[year_ndx][fishery_ndx][row].begin(), actual_catch_by_area_[year_ndx][fishery_ndx][row].end(), 0.0);
     }
@@ -316,7 +322,6 @@ void MortalityEventBiomass::DoReset() {
  * DoExecute
  */
 void MortalityEventBiomass::DoExecute() {
-  LOG_MEDIUM();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance(); // shared resource
   vector<unsigned> global_age_freq(model_->age_spread(), 0);
   unsigned time_step = model_->get_time_step_counter();
@@ -380,6 +385,7 @@ void MortalityEventBiomass::DoExecute() {
                   fisheries_to_sample_from.push_back(i);
 
                 cell_ndx_[i] = age_comp_by_fishery_[i][catch_ndx].size() - 1;
+                LOG_MEDIUM() << "ndx = " << cell_ndx_[i] << " for fishery = " << fishery_label_[i];
               }
 
               vector<float> prop_catch_by_fishery(fisheries_to_sample_from.size(), 0.0);
@@ -390,10 +396,9 @@ void MortalityEventBiomass::DoExecute() {
 
               world_catch_to_take += catch_taken;
               LOG_FINE() << "need to remove " << catch_taken << " weight of fish across all fisheries";
-              unsigned counter = 0;
               //unsigned agent_counter = 0;
               if (catch_taken > 0) {
-                LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << catch_taken;
+                LOG_MEDIUM() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << catch_taken;
                 census_data census_fishery(model_->current_year(), row, col);
                 tag_recapture tag_recapture_info(model_->current_year(), row, col, time_step);
 
@@ -411,6 +416,8 @@ void MortalityEventBiomass::DoExecute() {
                 double average_counter = 0.0;
                 double prob_of_untagged_fish = 0.0;
                 double prob_of_tagged_fish = 0.0;
+                double vulnerable_agent_in_cell = 0.0;
+                double tagged_agent_vulnerable = 0.0;
 
                 // vulnerable biomass an approximation
                 // we want to find the proportion of vulnerable tagged fish (can argue they are all vulnerable) to vulnerable untagged fish
@@ -418,8 +425,8 @@ void MortalityEventBiomass::DoExecute() {
                 if (account_for_tag_population_) {
                   tag_recapture_info.tagged_fish_available_.resize(model_->age_spread(), 0);
                   tag_recapture_info.all_fish_available_.resize(model_->age_spread(), 0);
-
-                  for (auto& agent : cell->agents_) {
+                  LOG_MEDIUM() << "number of elements in nontagged partition = " << cell->agents_.size();
+                  for (auto &agent : cell->agents_) {
                     if (agent.is_alive()) {
                       temp_sum = 0.0;
                       random_fish = rng.chance();
@@ -431,14 +438,16 @@ void MortalityEventBiomass::DoExecute() {
                         }
                       }
                       if (rng.chance() <= fishery_selectivity_[fishery_ndx][agent.get_sex()]->GetResult(agent.get_age_index())) {
-                        vulnerable_total_in_cell += agent.get_scalar();// * agent.get_weight();
-                        tag_recapture_info.all_fish_available_[agent.get_age_index()] += agent.get_scalar();// * agent.get_weight();
+                        vulnerable_total_in_cell += agent.get_scalar();                // * agent.get_weight();
+                        tag_recapture_info.all_fish_available_[agent.get_age_index()] += agent.get_scalar();                // * agent.get_weight();
                         average_counter++;
+                        vulnerable_agent_in_cell++;
                       }
                     }
                   }
                   // Tagged partition
-                  for (auto& agent : cell->tagged_agents_) {
+                  LOG_MEDIUM() << "number of elements in tagged partition = " << cell->tagged_agents_.size();
+                  for (auto &agent : cell->tagged_agents_) {
                     if (agent.is_alive()) {
                       tagged_fish += agent.get_scalar(); // if all tagged fish are vulnerable to fishing
                       temp_sum = 0.0;
@@ -452,26 +461,29 @@ void MortalityEventBiomass::DoExecute() {
                       }
                       // Assuming law of large numbers allows this to go for
                       if (rng.chance() <= fishery_selectivity_[fishery_ndx][agent.get_sex()]->GetResult(agent.get_age_index())) {
-                        tagged_fish_vulnerable += agent.get_scalar();// * agent.get_weight();
-                        tag_recapture_info.tagged_fish_available_[agent.get_age_index()] += agent.get_scalar();// * agent.get_weight();
-                        tag_recapture_info.all_fish_available_[agent.get_age_index()] += agent.get_scalar();// * agent.get_weight();
+                        tagged_fish_vulnerable += agent.get_scalar(); // * agent.get_weight();
+                        tag_recapture_info.tagged_fish_available_[agent.get_age_index()] += agent.get_scalar(); // * agent.get_weight();
+                        tag_recapture_info.all_fish_available_[agent.get_age_index()] += agent.get_scalar(); // * agent.get_weight();
+                        tagged_agent_vulnerable++;
                       }
                     }
                   }
 
                   tag_recapture_info.expected_scanned_ = vulnerable_total_in_cell + tagged_fish_vulnerable;
+                  tag_recapture_info.scanned_agents_ = vulnerable_agent_in_cell + tagged_agent_vulnerable;
+
                   prob_of_untagged_fish = vulnerable_total_in_cell / (vulnerable_total_in_cell + tagged_fish_vulnerable);
                   prob_of_tagged_fish = 1 - prob_of_untagged_fish;
 
                   LOG_FINE() << "prob untagged = " << prob_of_untagged_fish << " prob_of_tagged_fish = " << prob_of_tagged_fish << " avg scalar = "
                       << (vulnerable_total_in_cell / average_counter);
-                  LOG_FINE() << "individuals_in_cell = " << vulnerable_total_in_cell << " tagged fish = " << tagged_fish << " prob of untagged fish = " << prob_of_untagged_fish
-                      << " tagged fish that are vulnerable = " << tagged_fish_vulnerable << " prob untagged = " << prob_of_untagged_fish << " prob tagged = "
-                      << prob_of_tagged_fish;
+                  LOG_FINE() << "individuals_in_cell = " << vulnerable_total_in_cell << " tagged fish = " << tagged_fish << " prob of untagged fish = "
+                      << prob_of_untagged_fish << " tagged fish that are vulnerable = " << tagged_fish_vulnerable << " prob untagged = "
+                      << prob_of_untagged_fish << " prob tagged = " << prob_of_tagged_fish;
                   // Proportion of individuals tagged
                   tag_recapture_info.proportion_inidividuals_tagged_ = prob_of_tagged_fish;
-                  // Account for sampling of entire agents NOT individuals
-                  // see line 551: ValidationCode/Agent based tag simulatio.R for confirmation
+                  // Account for sampling of agents NOT individuals
+                  // see line 551: ValidationCode/Agent based tag simulation.R for confirmation
                   prob_of_untagged_fish /= (vulnerable_total_in_cell / average_counter);
                   prob_of_untagged_fish = prob_of_untagged_fish / (prob_of_untagged_fish + prob_of_tagged_fish);
                   prob_of_tagged_fish = 1 - prob_of_untagged_fish;
@@ -488,13 +500,30 @@ void MortalityEventBiomass::DoExecute() {
 
                 /*
                  *  Main loop
+                 *  1) randomly sample fishery
+                 *  2)
                  */
+                LOG_MEDIUM() << "begin main loop, catch to take = " << catch_taken << " max attempts allowed = " << catch_max ;
                 while (catch_taken > 0) {
+                  /*
+                  if (catch_attempts % 1000 == 0) {
+                    cerr << catch_attempts << " ";
+                  }
+                  */
                   agent_counter = 0;
-                  LOG_FINEST() << "catch taken = " << catch_taken << " attempts = " << catch_attempts;
+                  //LOG_MEDIUM() << "catch taken = " << catch_taken << " attempts = " << catch_attempts;
                   ++catch_attempts;
+                  // Make sure we don't end up fishing for infinity if there isn't enough to catch
+                  if (catch_attempts >= catch_max) {
+                    LOG_WARNING() << "Too many attempts to catch an agent in the process " << label_ << " in year " << model_->current_year() << " in row " << row + 1
+                        << " and column " << col + 1 << ", remaining catch to take = " << catch_taken << " this most likely means you have"
+                        << " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation. attempts = "
+                        << catch_attempts << " max attempts allowed = " << catch_max;
+                    // Kick out of this cell
+                    break;
+                  }
                   already_checked_selec = false;
-                  // calculate fishery based on proportion of catch
+                  // randomly select a fishery based on proportion of catch to take
                   temp_sum = 0.0;
                   random_fish = rng.chance();
                   for (unsigned i = 0; i < fisheries_to_sample_from.size(); ++i) {
@@ -505,11 +534,9 @@ void MortalityEventBiomass::DoExecute() {
                     }
                   }
                   if (catch_to_take_by_fishery_[fishery_ndx] > 0) {
-                    if (scanning_this_year_[fishery_ndx])
-                      LOG_FINE() << "about to calculate agent";
                     // randomly find agent
                     this_agent = &cell->agents_[rng.chance() * cell->agents_.size()];
-
+                    // if scanning for tag-recoveries check that
                     if (scanning_this_year_[fishery_ndx]) {
                       agent_has_tag = (unsigned) rng.binomial(prob_of_tagged_fish, 1);
                       LOG_FINEST() << "find value " << agent_counter << " " << cell->agents_.size() << " fishery ndx = " << fishery_ndx << " agents has tag = " << agent_has_tag;
@@ -544,6 +571,7 @@ void MortalityEventBiomass::DoExecute() {
                         }
                       }
                     }
+                    // Do the Moratlity check and remove from partition aka die
                     if ((*this_agent).is_alive()) {
                       if ((rng.chance() <= fishery_selectivity_[fishery_ndx][(*this_agent).get_sex()]->GetResult((*this_agent).get_age_index())) | already_checked_selec) {
 
@@ -612,16 +640,6 @@ void MortalityEventBiomass::DoExecute() {
                         (*this_agent).dies();
                       }
                     }
-                    // Make sure we don't end up fishing for infinity
-                    if (catch_attempts >= catch_max) {
-                      LOG_WARNING() << "Too many attempts to catch an agent in the process " << label_ << " in year " << model_->current_year() << " in row " << row + 1
-                          << " and column " << col + 1 << ", remaining catch to take = " << catch_taken << " this most likely means you have"
-                          << " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation. attempts = "
-                          << catch_attempts << " max attempts allowed = " << catch_max;
-                      // Kick out of this cell
-                      break;
-                    }
-                    ++counter;
                   }
                 } // while (catch_taken > 0
 
@@ -680,7 +698,6 @@ void MortalityEventBiomass::DoExecute() {
 
               world_catch_to_take += catch_taken;
               LOG_FINE() << "need to remove " << catch_taken << " weight of fish across all fisheries";
-              unsigned counter = 0;
               if (catch_taken > 0) {
                 LOG_FINE() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << catch_taken;
                 census_data census_fishery(model_->current_year(), row, col);
@@ -697,6 +714,8 @@ void MortalityEventBiomass::DoExecute() {
                 double vulnerable_total_in_cell = 0.0; // an approximation. assumes catches proportion for entire population, it's also stochastic with selectivity
                 double tagged_fish = 0;
                 double tagged_fish_vulnerable = 0;
+                double vulnerable_agent_in_cell = 0;
+                double tagged_agent_vulnerable = 0;
                 double average_counter = 0.0;
                 double prob_of_untagged_fish = 0.0;
                 double prob_of_tagged_fish = 0.0;
@@ -707,7 +726,8 @@ void MortalityEventBiomass::DoExecute() {
                 if (account_for_tag_population_) {
                   tag_recapture_info.tagged_fish_available_.resize(model_->age_spread(), 0);
                   tag_recapture_info.all_fish_available_.resize(model_->age_spread(), 0);
-                  for (auto& agent : cell->agents_) {
+                  LOG_MEDIUM() << "number of elements in nontagged partition = " << cell->agents_.size();
+                  for (auto &agent : cell->agents_) {
                     if (agent.is_alive()) {
                       temp_sum = 0.0;
                       random_fish = rng.chance();
@@ -718,15 +738,17 @@ void MortalityEventBiomass::DoExecute() {
                           break;
                         }
                       }
-                      if (rng.chance() <= fishery_selectivity_[fishery_ndx][agent.get_sex()]->GetResult(agent.get_age_index())) {
-                        vulnerable_total_in_cell += agent.get_scalar();// * agent.get_weight();
-                        tag_recapture_info.all_fish_available_[agent.get_age_index()] += agent.get_scalar();// * agent.get_weight();
+                      if (rng.chance() <= fishery_selectivity_[fishery_ndx][agent.get_sex()]->GetResult(agent.get_length_bin_index())) {
+                        vulnerable_total_in_cell += agent.get_scalar();                // * agent.get_weight();
+                        tag_recapture_info.all_fish_available_[agent.get_age_index()] += agent.get_scalar();                // * agent.get_weight();
                         average_counter++;
+                        vulnerable_agent_in_cell++;
                       }
                     }
                   }
                   // Tagged partition
-                  for (auto& agent : cell->tagged_agents_) {
+                  LOG_MEDIUM() << "number of elements in tagged partition = " << cell->tagged_agents_.size();
+                  for (auto &agent : cell->tagged_agents_) {
                     if (agent.is_alive()) {
                       tagged_fish += agent.get_scalar(); // if all tagged fish are vulnerable to fishing
                       temp_sum = 0.0;
@@ -740,23 +762,26 @@ void MortalityEventBiomass::DoExecute() {
                       }
                       // Assuming law of large numbers allows this to go for
                       if (rng.chance() <= fishery_selectivity_[fishery_ndx][agent.get_sex()]->GetResult(agent.get_length_bin_index())) {
-                        tagged_fish_vulnerable += agent.get_scalar() * agent.get_weight();
-                        tag_recapture_info.tagged_fish_available_[agent.get_age_index()] += agent.get_scalar();// * agent.get_weight();
-                        tag_recapture_info.all_fish_available_[agent.get_age_index()] += agent.get_scalar();// * agent.get_weight();
+                        tagged_fish_vulnerable += agent.get_scalar(); // * agent.get_weight();
+                        tag_recapture_info.tagged_fish_available_[agent.get_age_index()] += agent.get_scalar(); // * agent.get_weight();
+                        tag_recapture_info.all_fish_available_[agent.get_age_index()] += agent.get_scalar(); // * agent.get_weight();
+                        tagged_agent_vulnerable++;
                       }
                     }
                   }
 
                   tag_recapture_info.expected_scanned_ = vulnerable_total_in_cell + tagged_fish_vulnerable;
+                  tag_recapture_info.scanned_agents_ = vulnerable_agent_in_cell + tagged_agent_vulnerable;
+
                   prob_of_untagged_fish = vulnerable_total_in_cell / (vulnerable_total_in_cell + tagged_fish_vulnerable);
                   prob_of_tagged_fish = 1 - prob_of_untagged_fish;
 
-                  LOG_MEDIUM() << "prob untagged = " << prob_of_untagged_fish << " prob_of_tagged_fish = " << prob_of_tagged_fish << " avg scalar = "
+                  LOG_FINE() << "prob untagged = " << prob_of_untagged_fish << " prob_of_tagged_fish = " << prob_of_tagged_fish << " avg scalar = "
                       << (vulnerable_total_in_cell / average_counter);
-                  LOG_MEDIUM() << "individuals_in_cell = " << vulnerable_total_in_cell << " tagged fish = " << tagged_fish << " prob of untagged fish = " << prob_of_untagged_fish
-                      << " tagged fish that are vulnerable = " << tagged_fish_vulnerable << " prob untagged = " << prob_of_untagged_fish << " prob tagged = "
-                      << prob_of_tagged_fish;
-
+                  LOG_FINE() << "individuals_in_cell = " << vulnerable_total_in_cell << " tagged fish = " << tagged_fish << " prob of untagged fish = "
+                      << prob_of_untagged_fish << " tagged fish that are vulnerable = " << tagged_fish_vulnerable << " prob untagged = "
+                      << prob_of_untagged_fish << " prob tagged = " << prob_of_tagged_fish;
+                  // Proportion of individuals tagged
                   tag_recapture_info.proportion_inidividuals_tagged_ = prob_of_tagged_fish;
                   // Account for sampling of entire agents NOT individuals
                   // see line 551: ValidationCode/Agent based tag simulatio.R for confirmation
@@ -764,7 +789,6 @@ void MortalityEventBiomass::DoExecute() {
                   prob_of_untagged_fish = prob_of_untagged_fish / (prob_of_untagged_fish + prob_of_tagged_fish);
                   prob_of_tagged_fish = 1 - prob_of_untagged_fish;
                   tag_recapture_info.prob_sample_tagged_agents_ = prob_of_tagged_fish;
-
                 }
 
                 unsigned agent_has_tag = 0;
@@ -910,7 +934,6 @@ void MortalityEventBiomass::DoExecute() {
                       // Kick out of this cell
                       break;
                     }
-                    ++counter;
                   }
                 } // while (catch_taken > 0
 
@@ -943,19 +966,20 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
   if (age_comp_by_fishery_.size() > 0) {
     if (model_->get_sexed()) {
       for (auto& fishery : fishery_index_) {
-        cache << "age_freq-male-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
-        cache << "year ";
+        cache << "age_freq-male-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
+        cache << "year cell ";
         for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
           cache << age << " ";
         cache << "\n";
         for (unsigned year_ndx = 0; year_ndx < age_comp_by_fishery_[fishery].size(); ++year_ndx) {
           vector<unsigned> temp_age_freq(model_->age_spread(), 0.0);
-          cache << catch_year_[year_ndx] << " ";
-          // Accumulate over all cells
+          // Print by cell
           for (unsigned cell_ndx = 0; cell_ndx < age_comp_by_fishery_[fishery][year_ndx].size(); ++cell_ndx) {
+            cache << catch_year_[year_ndx] << " " << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].row_ + 1 << "-" << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].col_ + 1 << " ";
             if (age_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
               for (unsigned age_ndx = 0; age_ndx < age_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_.size(); ++age_ndx)
-                temp_age_freq[age_ndx] += age_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_[age_ndx];
+                cache <<  age_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_[age_ndx] << " ";
+              cache << "\n";
             }
           }
           for (auto& age_freq : temp_age_freq)
@@ -965,19 +989,21 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
       }
 
       for (auto& fishery : fishery_index_) {
-        cache << "age_freq-female-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
-        cache << "year ";
+        cache << "age_freq-female-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
+        cache << "year cell ";
         for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
           cache << age << " ";
         cache << "\n";
         for (unsigned year_ndx = 0; year_ndx < age_comp_by_fishery_[fishery].size(); ++year_ndx) {
           vector<unsigned> temp_age_freq(model_->age_spread(), 0.0);
-          cache << catch_year_[year_ndx] << " ";
-          // Accumulate over all cells
+          // By cell
           for (unsigned cell_ndx = 0; cell_ndx < age_comp_by_fishery_[fishery][year_ndx].size(); ++cell_ndx) {
             if (age_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
+              cache << catch_year_[year_ndx] << " " <<  age_comp_by_fishery_[fishery][year_ndx][cell_ndx].row_ + 1 << "-" << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].col_ + 1 << " ";
+
               for (unsigned age_ndx = 0; age_ndx < age_comp_by_fishery_[fishery][year_ndx][cell_ndx].female_frequency_.size(); ++age_ndx)
-                temp_age_freq[age_ndx] += age_comp_by_fishery_[fishery][year_ndx][cell_ndx].female_frequency_[age_ndx];
+                cache <<  age_comp_by_fishery_[fishery][year_ndx][cell_ndx].female_frequency_[age_ndx] << " ";
+              cache << "\n";
             }
           }
           for (auto& age_freq : temp_age_freq)
@@ -987,24 +1013,22 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
       }
     } else {
       for (auto& fishery : fishery_index_) {
-        cache << "age_freq-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
-        cache << "year ";
+        cache << "age_freq-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
+        cache << "year cell ";
         for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
           cache << age << " ";
         cache << "\n";
         for (unsigned year_ndx = 0; year_ndx < age_comp_by_fishery_[fishery].size(); ++year_ndx) {
           vector<unsigned> temp_age_freq(model_->age_spread(), 0.0);
-          cache << catch_year_[year_ndx] << " ";
-          // Accumulate over all cells
+          // By cell
           for (unsigned cell_ndx = 0; cell_ndx < age_comp_by_fishery_[fishery][year_ndx].size(); ++cell_ndx) {
             if (age_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
+              cache << catch_year_[year_ndx] << " "  << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].row_ + 1 << "-" << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].col_ + 1 << " ";
               for (unsigned age_ndx = 0; age_ndx < age_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_.size(); ++age_ndx)
-                temp_age_freq[age_ndx] += age_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_[age_ndx];
+                cache << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_[age_ndx] << " ";
+              cache << "\n";
             }
           }
-          for (auto& age_freq : temp_age_freq)
-            cache << age_freq << " ";
-          cache << "\n";
         }
       }
     }
@@ -1032,10 +1056,11 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
       if (tag_recapture.age_.size() > 0) {
         cache << "tag_recapture_info-" << tag_recapture.year_ << "-" << tag_recapture.row_  + 1 << "-" << tag_recapture.col_ + 1  << " " << REPORT_R_LIST << "\n";
         cache << "scanned_fish_weight: " << tag_recapture.scanned_fish_ << "\n";
-        cache << "expected_scanned_fish_weight: " << tag_recapture.expected_scanned_ << "\n";
+        cache << "total_fish_vulnerable: " << tag_recapture.expected_scanned_ << "\n";  // this is approximate
+        cache << "expected_scanned_agents: " << tag_recapture.scanned_agents_ << "\n";
         cache << "prob_sample_tagged_agent: " << tag_recapture.prob_sample_tagged_agents_ << "\n";
         cache << "propotion_vulnerable_tagged: " << tag_recapture.proportion_inidividuals_tagged_ << "\n";
-        cache << "agents_sampled: " << tag_recapture.agents_sampled_ << "\n";
+        cache << "agents_expected: " << tag_recapture.agents_sampled_ << "\n";
         cache << "binomial_samples: " << tag_recapture.tag_draws_ << "\n";
         cache << "agents_caught: " << tag_recapture.agents_caught_ << "\n";
         cache << "individuals_caught: " << tag_recapture.individuals_caught_ << "\n";
@@ -1047,7 +1072,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
         for(auto& tag_age :  tag_recapture.all_fish_available_ )
          cache << tag_age<< " ";
         cache << "\n";
-        if (print_extra_info_) {
+        if (print_tag_recap_info_) {
           cache << "values " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
           LOG_MEDIUM() << "ages = " << tag_recapture.age_.size();
           cache << "rowlabs ";
@@ -1085,7 +1110,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream& cache) {
       }
     }
   }
-  if (print_extra_info_) {
+  if (print_census_info_) {
     if (removals_by_age_.size() > 0) {
       cache << "age_frequency " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
       cache << "year ";
@@ -1153,12 +1178,14 @@ bool MortalityEventBiomass::check_fishery_exists(string fishery_label) {
 }
 
 // find and return age comp data for this fishery.
+// TODO: change this, make void and pass a pointer of class vector<vector<census_data>> and fishery label,
+// and assign the address of the pointer to this fisher label, that way no copies are being made.
 vector<vector<census_data>> MortalityEventBiomass::get_fishery_census_data(string fishery_label) {
   LOG_FINE();
   vector < vector < census_data >> fish_comp;
   for (unsigned i = 0; i < fishery_label_.size(); ++i) {
     if (fishery_label_[i] == fishery_label)
-      fish_comp = fishery_census_data_[fishery_index_[i]];
+      return fishery_census_data_[fishery_index_[i]];
   }
   return fish_comp;
 }

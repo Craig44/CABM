@@ -72,7 +72,10 @@ protected:
   // For reporting
   map<unsigned, float>                actual_removals_by_year_;
   map<unsigned, float>                removals_by_year_;
-  bool                                print_extra_info_ = false;
+  bool                                print_census_info_ = false;
+  bool                                print_tag_recap_info_ = false;
+
+  // need to be reset for any multi run format in DoReset
   vector<vector<vector<composition_data>>>    age_comp_by_fishery_; // n_fishery * n_years * n_cells
   vector<vector<vector<composition_data>>>   length_comp_by_fishery_; // n_fishery * n_years * n_cells
   vector<vector<vector<census_data>>>   fishery_census_data_; // n_fishery * n_years * n_cells
