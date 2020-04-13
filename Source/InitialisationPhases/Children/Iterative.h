@@ -58,7 +58,7 @@ protected:
   WorldView*                  world_ = nullptr;
   string					            growth_process_label_;
   string					            natural_mortality_label_;
-
+  float                       shortcut_m_;
 
 };
 

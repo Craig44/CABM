@@ -587,3 +587,91 @@ summary(tag_counts[,catch_ndx, scalar_ndx, tag_ndx])
 #Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 #8.00   17.00   20.00   20.31   23.00   36.00 
 
+
+
+## check with multiple fisheries? and multiple scalars like in the SNA1 case
+## First multiple scalars
+boots = 50000;
+set.seed(125)
+results = tag_counts = array(0, dim = c(boots,length(catches), length(scalars), length(tags_to_look_at)))
+n_tags = 1000
+## should possible look at these two
+population = 100000 ## inidividuals
+scalar = c(10, 20)
+prop = c(0.3,0.7) ## proportion of scalars in population
+catch = 2000
+startTime<-Sys.time()
+scalar_ndx = 1;
+print(paste0("tag = ", n_tags))
+pop_ndx = c(rep(1,n_agents[1]), rep(2, n_agents[2]))[sample(1:sum(n_agents), size = sum(n_agents), replace = F)]
+n_agents = as.integer((population * prop) / scalar)
+population = sum(n_agents * scalar)
+tags = rep(0,sum(n_agents))
+weights = scalar[pop_ndx]
+# apply tagging, all agents have equal prob of being tagged
+tag_agent_ndx = sample(x = sum(n_agents), size = n_tags, replace = F)
+## pull out tagged individuals take away the scalar
+weights[tag_agent_ndx] = weights[tag_agent_ndx] - 1
+## initially append taged agents at end and then reshuffle
+n_new_agents = sum(n_agents) + n_tags
+weights = c(weights, rep(1,n_tags))
+tags = c(tags, rep(1,n_tags))
+reshuffle_ndx = sample(1:n_new_agents)
+weights = weights[reshuffle_ndx]
+tags = tags[reshuffle_ndx]
+prob_untagged = sum(weights[tags == 0]) / sum(weights)
+prob_tagged = sum(weights[tags == 1]) / sum(weights)
+## account for sampling agents not inidviduals
+prob_untagged = prob_untagged / mean(weights[tags == 0])
+prob_untagged = prob_untagged / (prob_untagged + prob_tagged)
+prob_tagged = 1 - prob_untagged
+#full_prob = c(prob_tagged, prob_untagged)
+pop_est = NULL
+agents_samps = NULL;
+individuals_samps = NULL;
+for(bt in 1:boots) {
+  temp_weights = weights
+  temp_catch = catch
+  ## now do recapture event first treating this is as equal probability
+  tag_count = 0
+  agents_sampled = 0
+  inidviduals_sampled = 0;
+  while(temp_catch > 0) {
+    agent_tag = rbinom(n = c(1), size = 1, prob = prob_tagged)
+    ## now find agent and sample
+    for(i in 1:length(tags)) { ## could be issues if this vector isn't random.
+      if (tags[i] == agent_tag & temp_weights[i] != 0) {
+        temp_catch = temp_catch - temp_weights[i]
+        agents_sampled = agents_sampled + 1;
+        inidviduals_sampled = inidviduals_sampled + temp_weights[i]
+        temp_weights[i] = 0
+        if (tags[i] == 1)
+          tag_count = tag_count + 1;
+        break;
+      }
+    }
+  }
+  individuals_samps[bt] = inidviduals_sampled
+  agents_samps[bt] = agents_sampled
+  pop_est = ((n_tags+1)*(catch+1)/(tag_count+1))-1
+  results[bt,catch_ndx, scalar_ndx, tag_ndx] = pop_est
+  tag_counts[bt,catch_ndx, scalar_ndx, tag_ndx] = tag_count
+}
+
+summary(tag_counts[,catch_ndx, scalar_ndx, tag_ndx])
+#Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#4.00   17.00   20.00   20.64   24.00   42.00 
+summary(rbinom(n = boots, size = catch, prob = n_tags / population))
+## close enough
+
+
+## check multiple fisheries, multiple stocks, and different selectivities to see the robustness of the algorithm
+## 
+catch = c(1000, 500)
+
+
+## There will be a lot more randomensee than above because we have selectivities that differ among fisheries and 
+## scalars very by age. and dealing with weight not abundance.
+
+
+

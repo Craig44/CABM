@@ -140,7 +140,7 @@ void MortalityEventBiomass::DoBuild() {
   length_comp_by_fishery_.resize(fishery_label_.size());
   fishery_census_data_.resize(fishery_label_.size());
   cell_ndx_.resize(fishery_label_.size());
-
+  only_mature_partition_.resize(fishery_label_.size());
   auto model_years = model_->years();
   // load objects
   vector < vector < string >> &catch_values_data = catch_table_->data();
@@ -180,14 +180,30 @@ void MortalityEventBiomass::DoBuild() {
   auto meth_data = method_table_->data();
   auto meth_cols = method_table_->columns();
 
+
+
   // special case with selectivity in this so do it first
   if (!model_->get_sexed()) {
     // find the column header selectivity
     unsigned selec_index = std::find(meth_cols.begin(), meth_cols.end(), PARAM_SELECTIVITY) - meth_cols.begin();
+
     for (auto meth_row : meth_data) {
 
       unsigned meth_index = std::find(fishery_label_.begin(), fishery_label_.end(), meth_row[0]) - fishery_label_.begin();
 
+      if (std::find(meth_cols.begin(), meth_cols.end(), PARAM_ONLY_MATURE_PARTITION) == meth_cols.end()) {
+        only_mature_partition_[meth_index] = false;
+      } else {
+        unsigned mature_ndx = std::find(meth_cols.begin(), meth_cols.end(), PARAM_ONLY_MATURE_PARTITION) - meth_cols.begin();
+        bool mature_result;
+
+        if (!utilities::To<string, bool>(meth_row[mature_ndx], mature_result))
+          LOG_ERROR_P(PARAM_METHOD_INFO) << "couldn't convert column " << PARAM_ONLY_MATURE_PARTITION << " for fishery = " << meth_row[0] << " from string to boolean, check spelling";
+        only_mature_partition_[meth_index] = mature_result;
+        LOG_MEDIUM() << "mature_ndx = " << mature_ndx << " fishing method = " <<  meth_row[0] << " result = " << mature_result;
+
+
+      }
       fishery_selectivity_label_[fishery_index_[meth_index]].push_back(meth_row[selec_index]);
       fishery_selectivity_label_[fishery_index_[meth_index]].push_back(meth_row[selec_index]);
       Selectivity* temp_selectivity = model_->managers().selectivity()->GetSelectivity(meth_row[selec_index]);
@@ -212,6 +228,17 @@ void MortalityEventBiomass::DoBuild() {
       if (!male_temp_selectivity)
         LOG_FATAL_P(PARAM_METHOD_INFO)<< ": male_selectivity " << meth_row[male_selec_index] << " does not exist. Have you defined it?";
 
+      if (std::find(meth_cols.begin(), meth_cols.end(), PARAM_ONLY_MATURE_PARTITION) == meth_cols.end()) {
+        only_mature_partition_[meth_index] = false;
+      } else {
+        unsigned mature_ndx = std::find(meth_cols.begin(), meth_cols.end(), PARAM_ONLY_MATURE_PARTITION) - meth_cols.begin();
+        bool mature_result;
+        if (!utilities::To<string, bool>(meth_row[mature_ndx], mature_result))
+          LOG_ERROR_P(PARAM_METHOD_INFO) << "couldn't convert column " << PARAM_ONLY_MATURE_PARTITION << " for fishery = " << meth_row[0] << " from string to boolean, check spelling";
+        only_mature_partition_[meth_index] = mature_result;
+        LOG_MEDIUM() << "mature_ndx = " << mature_ndx << " fishing method = " <<  meth_row[0] << " result = " << mature_result;
+
+      }
       Selectivity* female_temp_selectivity = model_->managers().selectivity()->GetSelectivity(meth_row[female_selec_index]);
       if (!female_temp_selectivity)
         LOG_FATAL_P(PARAM_METHOD_INFO)<< ": female_selectivity " << meth_row[female_selec_index] << " does not exist. Have you defined it?";
@@ -328,7 +355,7 @@ void MortalityEventBiomass::DoExecute() {
   account_for_tag_population_ = false;
   auto iter = catch_year_.begin();
   if (model_->state() != State::kInitialise) {
-    if (find(iter, catch_year_.end(), model_->current_year()) != catch_year_.end()) {
+    if (std::find(iter, catch_year_.end(), model_->current_year()) != catch_year_.end()) {
       iter = find(catch_year_.begin(), catch_year_.end(), model_->current_year());
       unsigned catch_ndx = distance(catch_year_.begin(), iter);
 
@@ -500,8 +527,12 @@ void MortalityEventBiomass::DoExecute() {
 
                 /*
                  *  Main loop
-                 *  1) randomly sample fishery
-                 *  2)
+                 *  - Randomly select Fishery, weighted by catch (multinomial)
+                 *  - Randomly select an agent
+                 *  - if scanning for tags, do a binomial try
+                 *  -- check if we are only fishing mature fish
+                 *  -- check tagging info
+                 *  -- chance() kill entier agent, and record information
                  */
                 LOG_MEDIUM() << "begin main loop, catch to take = " << catch_taken << " max attempts allowed = " << catch_max ;
                 while (catch_taken > 0) {
@@ -574,7 +605,11 @@ void MortalityEventBiomass::DoExecute() {
                     // Do the Moratlity check and remove from partition aka die
                     if ((*this_agent).is_alive()) {
                       if ((rng.chance() <= fishery_selectivity_[fishery_ndx][(*this_agent).get_sex()]->GetResult((*this_agent).get_age_index())) | already_checked_selec) {
-
+                        if (only_mature_partition_[fishery_ndx]) { // for most models this will be false
+                          if (not (*this_agent).get_maturity()) {
+                            continue;
+                          }
+                        }
                         if (scanning_this_year_[fishery_ndx]) {
                           LOG_FINE() << "agent age = " << (*this_agent).get_age() << " tag = " << agent_has_tag << " (" << (*this_agent).get_number_tags() << ") contributing "
                               << (*this_agent).get_scalar();

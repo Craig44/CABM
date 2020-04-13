@@ -68,7 +68,7 @@ protected:
   bool                                scanning_ = false;
   bool                                account_for_tag_population_ = false;
   vector<bool>                        scanning_this_year_; // n_fishery
-
+  vector<bool>                        only_mature_partition_;
   // For reporting
   map<unsigned, float>                actual_removals_by_year_;
   map<unsigned, float>                removals_by_year_;

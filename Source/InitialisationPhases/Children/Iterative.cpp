@@ -35,7 +35,7 @@ Iterative::Iterative(Model* model)
   parameters_.Bind<unsigned>(PARAM_INITIAL_NUMBER_OF_AGENTS, &number_agents_, "The number of agents to initially seed in the partition", "");
   parameters_.Bind<string>(PARAM_LAYER_LABEL, &intial_layer_label_, "The label of a layer that you want to seed a distribution by.", "", "");
   parameters_.Bind<string>(PARAM_RECRUITMENT_LAYER_LABEL, &recruitement_layer_label_, "The label of a layer has a recruitment process label in each cell to see how to set scalars", "", "");
-
+  parameters_.Bind<float>(PARAM_INIT_MORTALITY_RATE, &shortcut_m_, "The instaneous mortality rate to use to approximate a crude initial age-structure", "", 0.2);
 }
 
 /**
@@ -109,14 +109,20 @@ void Iterative::Execute() {
   // Check the recruitment labels in the recruitment layer make sense
 
   // Check we get a sensible estimate of M
-  if (model_->get_m() <= 0.0)
-    LOG_FATAL() << "Could not get a sensible M value from the mortality process defined this is unusual you want to check everything is okay in the mortality process or contact a developer";
-
+  if (!parameters_.Get(PARAM_INIT_MORTALITY_RATE)->has_been_defined()) {
+    if (model_->get_m() <= 0.0)
+      LOG_FATAL() << "Could not get a sensible M value from the mortality process defined this is unusual you want to check everything is okay in the mortality process or contact a developer";
+  }
   // Calculate the R0 values for the recruitment processes this is a bit crude but will do for now
   unsigned large_age = model_->max_age() * 4;
   //unsigned large_age = 200;
   float number = 0;
-  float m = model_->get_m();
+  float m = 0.2;
+  if (!parameters_.Get(PARAM_INIT_MORTALITY_RATE)->has_been_defined())
+    m = model_->get_m(); //TODO put this at line 122 and give it a cell row and col call and return M if spatially variable  This is important to set, otherwise age distribution will get all weird
+  else
+    m = shortcut_m_;
+
   for (unsigned age = 0; age < large_age; ++age)
     number += exp(- m * age);
 
@@ -158,18 +164,17 @@ void Iterative::Execute() {
       }
     }
   }
-  float seed_z = model_->get_m(); //TODO put this at line 122 and give it a cell row and col call and return M if spatially variable
-  // This is important to set, otherwise age distribution will get all weird
+  // float seed_z = model_->get_m();
   unsigned init_year = model_->start_year() - years_ - 1;
   model_->set_current_year_in_initialisation(init_year);
 
-  LOG_FINE() << "check seed = " << seed_z;
+  LOG_FINE() << "check seed = " << m;
   // Seed some individuals in the world
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
-        cell->seed_agents(agents_per_cell[row][col], seed_z);
+        cell->seed_agents(agents_per_cell[row][col], m);
         LOG_FINE() << "row " << row + 1 << " col = " << col + 1 << " seeded " << cell->agents_.size();
       }
     }
@@ -182,6 +187,7 @@ void Iterative::Execute() {
   timesteps::Manager& time_step_manager = *model_->managers().time_step();
   model_->set_current_year_in_initialisation(model_->start_year() - years_);
 
+  // This iterates the annual cycle
   time_step_manager.ExecuteInitialisation(label_, years_);
   // I removed the convergence check because we seed agents by birth_year so we really need to have an incremental inital years to have a sensible age distribution
   // if we cut at 50 years when we thought we might be running for 100 years then this would cause an improper age distribution, So I leave it for the user to define
