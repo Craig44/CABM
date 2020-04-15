@@ -72,6 +72,9 @@ struct tag_recapture {
   double individuals_caught_ = 0.0;
   double proportion_inidividuals_tagged_ = 0;
   double prob_sample_tagged_agents_ = 0;
+  vector<float> scanned_length_comp_;
+  vector<float> scanned_age_comp_;
+  // attributes of tagged fish
   vector<unsigned> age_;
   vector<unsigned> sex_;
   vector<unsigned> fishery_ndx_;

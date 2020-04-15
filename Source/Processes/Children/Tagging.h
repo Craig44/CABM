@@ -41,7 +41,7 @@ protected:
   vector<unsigned>                    years_;
   vector<string>                      selectivity_labels_;
   vector<Selectivity*>                selectivities_;
-  bool                                selectivity_length_based_;
+  bool                                selectivity_length_based_ = false;
   bool                                apply_using_proportions_ = false;
   // objects for thread safety of rng
   vector<float>                       random_numbers_;

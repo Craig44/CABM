@@ -32,7 +32,7 @@ public:
   // methods
   explicit TagShedding(Model* model);
   virtual                     ~TagShedding() = default;
-  virtual void                        DoValidate() override final { };
+  virtual void                        DoValidate() override final;
   virtual void                        DoBuild() override final;
   virtual void                        DoReset() override final;
   virtual void                        DoExecute() override final;
@@ -42,16 +42,25 @@ public:
 protected:
   vector<string>                      selectivity_label_;
   vector<Selectivity*>                selectivity_;
+  vector<string>                      release_region_;
   vector<float>                       shedding_rate_;
   vector<unsigned>                    tag_release_year_;
   vector<float>                       time_step_proportions_;
   vector<float>                       ratios_;
 
+  map<unsigned,vector<vector<float>>> shedding_rate_by_year_cell_; // year (map key), cell, row x col vector index
+
+  vector<unsigned>                    release_row_;
+  vector<unsigned>                    release_col_;
+
   map<unsigned, float>                time_step_ratios_;
   unsigned                            agents_removed_ = 0;
-  bool 								  selectivity_length_based_;
+  bool 								                selectivity_length_based_;
   // For reporting
-  map<unsigned, unsigned>             tags_loss_by_year_;
+  vector<unsigned>                    years_;
+  vector<unsigned>                    tag_shedded_per_release_event_;
+
+
 };
 
 } /* namespace processes */

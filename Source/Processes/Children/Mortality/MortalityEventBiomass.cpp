@@ -428,7 +428,8 @@ void MortalityEventBiomass::DoExecute() {
                 LOG_MEDIUM() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << catch_taken;
                 census_data census_fishery(model_->current_year(), row, col);
                 tag_recapture tag_recapture_info(model_->current_year(), row, col, time_step);
-
+                tag_recapture_info.scanned_age_comp_.resize(model_->age_spread(), 0.0);
+                tag_recapture_info.scanned_length_comp_.resize(model_->number_of_length_bins(), 0.0);
                 composition_data age_freq(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
                 composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->number_of_length_bins());
 
@@ -655,6 +656,8 @@ void MortalityEventBiomass::DoExecute() {
                             // Probability of scanning agent
                             if (rng.chance() <= scanning_proportion_by_fishery_[fishery_ndx][catch_ndx]) {
                               // We scanned this agent
+                              tag_recapture_info.scanned_age_comp_[(*this_agent).get_age_index()] += (*this_agent).get_scalar();
+                              tag_recapture_info.scanned_length_comp_[(*this_agent).get_length_bin_index()] += (*this_agent).get_scalar();
                               tag_recapture_info.scanned_fish_ += (*this_agent).get_scalar() * (*this_agent).get_weight();
                               tag_recapture_info.agents_sampled_++;
                               if ((*this_agent).get_number_tags() > 0) {
@@ -737,6 +740,8 @@ void MortalityEventBiomass::DoExecute() {
                 LOG_FINE() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << catch_taken;
                 census_data census_fishery(model_->current_year(), row, col);
                 tag_recapture tag_recapture_info(model_->current_year(), row, col, time_step);
+                tag_recapture_info.scanned_age_comp_.resize(model_->age_spread(), 0.0);
+                tag_recapture_info.scanned_length_comp_.resize(model_->number_of_length_bins(), 0.0);
                 composition_data age_freq(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
                 composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->number_of_length_bins());
 
@@ -940,6 +945,8 @@ void MortalityEventBiomass::DoExecute() {
                             // Probability of scanning agent
                             if (rng.chance() <= scanning_proportion_by_fishery_[fishery_ndx][catch_ndx]) {
                               // We scanned this agent
+                              tag_recapture_info.scanned_age_comp_[(*this_agent).get_age_index()] += (*this_agent).get_scalar();
+                              tag_recapture_info.scanned_length_comp_[(*this_agent).get_length_bin_index()] += (*this_agent).get_scalar();
                               tag_recapture_info.scanned_fish_ += (*this_agent).get_scalar() * (*this_agent).get_weight();
                               tag_recapture_info.agents_sampled_++;
                               if ((*this_agent).get_number_tags() > 0) {
@@ -1224,6 +1231,35 @@ vector<vector<census_data>> MortalityEventBiomass::get_fishery_census_data(strin
   }
   return fish_comp;
 }
+
+// Return Fishery specific Length composition
+vector<vector<composition_data>>* MortalityEventBiomass::get_fishery_length_comp(string& fishery_label) {
+  LOG_FINE();
+  vector < vector < composition_data >>* fish_comp = nullptr;
+  for (unsigned i = 0; i < fishery_label_.size(); ++i) {
+    if (fishery_label_[i] == fishery_label)
+      return &length_comp_by_fishery_[fishery_index_[i]];
+  }
+  LOG_FATAL() << "This should not reach this point";
+  return fish_comp;
+}
+
+// Return Fishery specific Age composition
+vector<vector<composition_data>>* MortalityEventBiomass::get_fishery_age_comp(string& fishery_label) {
+  LOG_FINE();
+  vector < vector < composition_data >>* fish_comp = nullptr;
+  for (unsigned i = 0; i < fishery_label_.size(); ++i) {
+    if (fishery_label_[i] == fishery_label)
+      return &age_comp_by_fishery_[fishery_index_[i]];
+  }
+  LOG_FATAL() << "This should not reach this point";
+  return fish_comp;
+}
+
+
+
+
+
 
 } /* namespace processes */
 } /* namespace niwa */

@@ -218,6 +218,8 @@ void Tagging::DoBuild() {
       }
     }
   }
+
+  LOG_MEDIUM() << "length based = " << selectivity_length_based_ << " using proportions = " << apply_using_proportions_;
 }
 
 /*
@@ -271,7 +273,7 @@ void Tagging::DoExecute() {
       selectivity_random_numbers_[i] = rng.chance();
       handling_mortality_random_numbers_[i] = rng.chance();
     }
-    LOG_FINE() << "about to apply tagging";
+    LOG_MEDIUM() << "about to apply tagging";
     if (not selectivity_length_based_ & not apply_using_proportions_) {
       // Thread out each loop
       //#pragma omp parallel for collapse(2)

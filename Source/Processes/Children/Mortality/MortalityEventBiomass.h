@@ -43,6 +43,8 @@ public:
   bool                                check_fishery_exists(string fishery_label);
   vector<unsigned>&                   get_fishery_years() {return catch_year_;};
   vector<vector<census_data>>         get_fishery_census_data(string fishery_label);
+  vector<vector<composition_data>>*   get_fishery_length_comp(string& fishery_label);
+  vector<vector<composition_data>>*   get_fishery_age_comp(string& fishery_label);
 
 
 protected:
