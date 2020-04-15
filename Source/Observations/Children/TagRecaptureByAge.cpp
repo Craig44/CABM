@@ -164,7 +164,7 @@ void TagRecaptureByAge::DoBuild() {
   }
 
   age_freq_.resize(model_->age_spread());
-
+  scanned_age_freq_.resize(model_->age_spread());
 }
 
 /**
@@ -203,6 +203,8 @@ void TagRecaptureByAge::Simulate() {
       // Calculate Age frequency for the strata
       // reset age-freq for each year
       fill(age_freq_.begin(), age_freq_.end(), 0);
+      fill(scanned_age_freq_.begin(), scanned_age_freq_.end(), 0.0);
+
       unsigned tag_recap_ndx = 0; // links back to the tag-recapture data
       for (processes::tag_recapture &tag_recap : tag_recapture_data) {
         // Find tag_recap elements that are in this year and stratum
@@ -240,11 +242,14 @@ void TagRecaptureByAge::Simulate() {
               }
             }
           }
+          for(unsigned j = 0; j < tag_recap.scanned_age_comp_.size(); ++j)
+            scanned_age_freq_[j] += tag_recap.scanned_age_comp_[j];
+
         }
         ++tag_recap_ndx;
       }
       for (unsigned age_bin_ndx = 0; age_bin_ndx < model_->age_spread(); ++age_bin_ndx)
-        SaveComparison(age_bin_ndx + model_->min_age(), 0, recapture_stratum_[recapture_area_ndx], age_freq_[age_bin_ndx], 0.0, 0, years_[year_ndx]);
+        SaveComparison(age_bin_ndx + model_->min_age(), 0, recapture_stratum_[recapture_area_ndx], age_freq_[age_bin_ndx], 0.0, scanned_age_freq_[age_bin_ndx], years_[year_ndx]);
     }
   }
 

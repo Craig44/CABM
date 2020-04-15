@@ -151,6 +151,7 @@ void TagRecaptureByLength::DoBuild() {
   }
 
   length_freq_.resize(model_->number_of_length_bins(), 0.0);
+  scanned_length_freq_.resize(model_->number_of_length_bins(), 0.0);
 }
 
 /**
@@ -188,6 +189,8 @@ void TagRecaptureByLength::Simulate() {
       // -- if that area and fishery belongs to this stratum then summarise some numbers for use later.
       //
       fill(length_freq_.begin(), length_freq_.end(), 0.0);
+      fill(scanned_length_freq_.begin(), scanned_length_freq_.end(), 0.0);
+
       // Calculate Length frequency for the strata
       unsigned tag_recap_ndx = 0; // links back to the tag-recapture data
       for (processes::tag_recapture &tag_recap : tag_recapture_data) {
@@ -204,11 +207,13 @@ void TagRecaptureByLength::Simulate() {
               }
             }
           }
+          for(unsigned j = 0; j < tag_recap.scanned_length_comp_.size(); ++j)
+            scanned_length_freq_[j] += tag_recap.scanned_length_comp_[j];
         }
         ++tag_recap_ndx;
       }
       for (unsigned length_bin_ndx = 0; length_bin_ndx < length_freq_.size(); ++length_bin_ndx)
-        SaveComparison(0, model_->length_bin_mid_points()[length_bin_ndx], recapture_stratum_[recapture_area_ndx], length_freq_[length_bin_ndx], 0.0, 0, years_[year_ndx]);
+        SaveComparison(0, model_->length_bin_mid_points()[length_bin_ndx], recapture_stratum_[recapture_area_ndx], length_freq_[length_bin_ndx], 0.0, scanned_length_freq_[length_bin_ndx], years_[year_ndx]);
     }
   }
   for (auto& iter : comparisons_) {

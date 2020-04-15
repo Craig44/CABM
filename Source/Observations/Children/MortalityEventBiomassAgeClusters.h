@@ -95,8 +95,6 @@ protected:
   bool                            are_obs_props_ = true;
   string                          fishery_label_;
   MortalityEventBiomass*          mortality_process_ = nullptr;
-  vector<vector<processes::census_data>>* fishery_census_data_ = nullptr;
-
   string                          process_label_;
   string                          stratum_weight_method_ = PARAM_NONE;
   // TODO change from string -> unsigned int for a little speed up
@@ -121,7 +119,7 @@ protected:
   vector<vector<vector<float>>>               cluster_mean_; // n_years x n_stratum x n_clusters (contains ages or lengths mean for cluster)
   vector<vector<vector<float>>>               cluster_weight_; // n_years x n_stratum x n_clusters (weight of cluster)
   vector<vector<vector<float>>>               cluster_age_sample_weight_;
-    vector<vector<vector<vector<unsigned>>>>    cluster_age_samples_; // n_years x n_stratum x n_clusters x n_samples
+  vector<vector<vector<vector<unsigned>>>>    cluster_age_samples_; // n_years x n_stratum x n_clusters x n_samples
   vector<vector<vector<vector<unsigned>>>>    cluster_age_samples_sex_; // n_years x n_stratum x n_clusters x n_samples
 
   vector<vector<vector<float>>>               age_target_; // n_years x n_stratum x age_bins

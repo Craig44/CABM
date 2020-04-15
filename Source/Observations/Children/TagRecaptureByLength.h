@@ -53,6 +53,8 @@ protected:
   bool                            sexed_;
   unsigned						            tag_release_year_;
   vector<float>                   length_freq_;
+  vector<float>                   scanned_length_freq_;
+
   Mortality*                      mortality_process_ = nullptr;
   string                          process_label_;
 

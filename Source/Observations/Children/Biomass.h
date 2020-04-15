@@ -39,6 +39,7 @@ public:
   void                        Execute() override final;
   void                        Simulate() override final;
   bool                        HasYear(unsigned year) const override final { return std::find(years_.begin(), years_.end(), year) != years_.end(); }
+  virtual void                FillReportCache(ostringstream& cache);
 
 protected:
   // members
@@ -59,7 +60,7 @@ protected:
   WorldView*                       world_ = nullptr;
   bool                             selectivity_length_based_ = false;
   float                           time_step_proportion_;
-
+  bool                            obs_abundance_;
 
 
 };

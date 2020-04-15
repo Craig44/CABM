@@ -388,25 +388,6 @@ void MortalityEventBiomassAgeClusters::Simulate() {
             census_stratum_ndx.push_back(census_ndx);
             // Calculate the agents available in the first sampling unit
             LOG_FINE() << "agents in this cell = " << census.age_ndx_.size();
-            /*if (sexed_flag_) {
-              if (sex_match_ == 0) {
-                total_stratum_biomass += census.biomass_;
-                biomass_by_cell.push_back(census.biomass_);
-                for(i = 0; i < census.age_ndx_.size(); ++i) {
-                  if (census.sex_[i] == 0)
-                    target_age_distribution_[census.age_ndx_[i]]++;
-                }
-              } else {
-                total_stratum_biomass += census.female_biomass_;
-                biomass_by_cell.push_back(census.female_biomass_);
-                for(i = 0; i < census.age_ndx_.size(); ++i) {
-                  if (census.sex_[i] == 1)
-                    target_age_distribution_[census.age_ndx_[i]]++;
-                }
-              }
-            } else {
-              */
-
               /*
                * Target distribution for the both sexed and unsexed models is unsexed!! this is not ideal, start with this though
                */
@@ -417,7 +398,7 @@ void MortalityEventBiomassAgeClusters::Simulate() {
               for(i = 0; i < census.age_ndx_.size(); ++i) {
                 target_age_distribution_[census.age_ndx_[i]]++;
               }
-            //}
+
           }
         }
         ++census_ndx;

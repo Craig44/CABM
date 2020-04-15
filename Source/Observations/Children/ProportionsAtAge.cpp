@@ -494,7 +494,8 @@ void ProportionsAtAge::Simulate() {
       for (auto& comparison : second_iter.second)
         comparison.simulated_ /= total;
     }
-  }}
+  }
+}
 
 
 } /* namespace observations */

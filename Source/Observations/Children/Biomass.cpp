@@ -47,7 +47,7 @@ Biomass::Biomass(Model* model) : Observation(model) {
   parameters_.Bind<string>(PARAM_LAYER_OF_CELLS, &layer_label_, "The layer that indicates what area to summarise observations over.", "");
   parameters_.Bind<string>(PARAM_CELLS, &cells_, "The cells we want to generate observations for from the layer of cells supplied", "");
   parameters_.Bind<string>(PARAM_SIMULATION_LIKELIHOOD, &simulation_likelihood_label_, "Simulation likelihood to use", "");
-
+  parameters_.Bind<bool>(PARAM_ABUNDANCE, &obs_abundance_, "Is the index biomass (abundance = false) or abundance (abundance = true)", "", false);
   RegisterAsAddressable(PARAM_CATCHABILITY, &catchability_value_);
 
   allowed_likelihood_types_.push_back(PARAM_NORMAL);
@@ -199,11 +199,22 @@ void Biomass::PreExecute() {
               LOG_FINEST() << "about to convert " << cell->agents_.size() << " through the maturity process";
               //unsigned counter = 1;
               float probability;
-              for (Agent& agent : cell->agents_) {
-                if (agent.is_alive()) {
-                  probability = selectivities_[agent.get_sex()]->GetResult(agent.get_length_bin_index());
-                  if (rng.chance() <= probability) {
-                    pre_obs_values_by_year_[year][cell_label] += agent.get_weight() * agent.get_scalar();
+              if (obs_abundance_) {
+                for (Agent& agent : cell->agents_) {
+                  if (agent.is_alive()) {
+                    probability = selectivities_[agent.get_sex()]->GetResult(agent.get_length_bin_index());
+                    if (rng.chance() <= probability) {
+                      pre_obs_values_by_year_[year][cell_label] += agent.get_scalar();
+                    }
+                  }
+                }
+              } else {
+                for (Agent& agent : cell->agents_) {
+                  if (agent.is_alive()) {
+                    probability = selectivities_[agent.get_sex()]->GetResult(agent.get_length_bin_index());
+                    if (rng.chance() <= probability) {
+                      pre_obs_values_by_year_[year][cell_label] += agent.get_weight() * agent.get_scalar();
+                    }
                   }
                 }
               }
@@ -221,11 +232,22 @@ void Biomass::PreExecute() {
               LOG_FINEST() << "about to convert " << cell->agents_.size() << " through the maturity process";
               //unsigned counter = 1;
               float probability;
-              for (Agent& agent : cell->agents_) {
-                if (agent.is_alive()) {
-                  probability = selectivities_[agent.get_sex()]->GetResult(agent.get_age_index());
-                  if (rng.chance() <= probability) {
-                    pre_obs_values_by_year_[year][cell_label] += agent.get_weight() * agent.get_scalar();
+              if (obs_abundance_) {
+                for (Agent& agent : cell->agents_) {
+                  if (agent.is_alive()) {
+                    probability = selectivities_[agent.get_sex()]->GetResult(agent.get_age_index());
+                    if (rng.chance() <= probability) {
+                      pre_obs_values_by_year_[year][cell_label] += agent.get_scalar();
+                    }
+                  }
+                }
+              } else {
+                for (Agent& agent : cell->agents_) {
+                  if (agent.is_alive()) {
+                    probability = selectivities_[agent.get_sex()]->GetResult(agent.get_age_index());
+                    if (rng.chance() <= probability) {
+                      pre_obs_values_by_year_[year][cell_label] += agent.get_weight() * agent.get_scalar();
+                    }
                   }
                 }
               }
@@ -256,11 +278,22 @@ void Biomass::Execute() {
             LOG_FINEST() << "about to convert " << cell->agents_.size() << " through the maturity process";
             //unsigned counter = 1;
             float probability;
-            for (Agent& agent : cell->agents_) {
-              if (agent.is_alive()) {
-                probability = selectivities_[agent.get_sex()]->GetResult(agent.get_length_bin_index());
-                if (rng.chance() <= probability) {
-                  obs_values_by_year_[year][cell_label] += agent.get_weight() * agent.get_scalar();
+            if (obs_abundance_) {
+              for (Agent& agent : cell->agents_) {
+                if (agent.is_alive()) {
+                  probability = selectivities_[agent.get_sex()]->GetResult(agent.get_length_bin_index());
+                  if (rng.chance() <= probability) {
+                    obs_values_by_year_[year][cell_label] += agent.get_scalar();
+                  }
+                }
+              }
+            } else {
+              for (Agent& agent : cell->agents_) {
+                if (agent.is_alive()) {
+                  probability = selectivities_[agent.get_sex()]->GetResult(agent.get_length_bin_index());
+                  if (rng.chance() <= probability) {
+                    obs_values_by_year_[year][cell_label] += agent.get_weight() * agent.get_scalar();
+                  }
                 }
               }
             }
@@ -278,11 +311,22 @@ void Biomass::Execute() {
             LOG_FINEST() << "about to convert " << cell->agents_.size() << " through the maturity process";
             //unsigned counter = 1;
             float probability;
-            for (Agent& agent : cell->agents_) {
-              if (agent.is_alive()) {
-                probability = selectivities_[agent.get_sex()]->GetResult(agent.get_age_index());
-                if (rng.chance() <= probability) {
-                  obs_values_by_year_[year][cell_label] += agent.get_weight() * agent.get_scalar();
+            if (obs_abundance_) {
+              for (Agent& agent : cell->agents_) {
+                if (agent.is_alive()) {
+                  probability = selectivities_[agent.get_sex()]->GetResult(agent.get_age_index());
+                  if (rng.chance() <= probability) {
+                    obs_values_by_year_[year][cell_label] += agent.get_scalar();
+                  }
+                }
+              }
+            } else {
+              for (Agent& agent : cell->agents_) {
+                if (agent.is_alive()) {
+                  probability = selectivities_[agent.get_sex()]->GetResult(agent.get_age_index());
+                  if (rng.chance() <= probability) {
+                    obs_values_by_year_[year][cell_label] += agent.get_weight() * agent.get_scalar();
+                  }
                 }
               }
             }
@@ -320,6 +364,12 @@ void Biomass::Simulate() {
   likelihood_->SimulateObserved(comparisons_);
 }
 
+/**
+ * Extra Reporting
+ */
+void Biomass::FillReportCache(ostringstream& cache) {
+  cache << "catchability: " << catchability_value_ << "\n";
+}
 
 } /* namespace observations */
 } /* namespace niwa */

@@ -57,6 +57,7 @@ protected:
   AgeingError*                    ageing_error_ = nullptr;
   string                          ageing_error_label_;
   vector<unsigned>        				age_freq_;
+  vector<float>                   scanned_age_freq_;
   unsigned					              tag_release_year_;
   unsigned                        number_of_bootstraps_ = 0;
   bool                            sexed_ = false; // TODO add this to the constructor
