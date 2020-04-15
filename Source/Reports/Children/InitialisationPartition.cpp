@@ -28,6 +28,7 @@ namespace reports {
  * @param model Pointer to the current model context
  */
 InitialisationPartition::InitialisationPartition(Model* model) : Report(model) {
+  parameters_.Bind<bool>(PARAM_DO_LENGTH_FREQUENCY, &do_length_frequency_, "Print the report as length frequency not age.", "", false);
   model_state_ = State::kInitialise;
   run_mode_    = (RunMode::Type)(RunMode::kBasic);
 }
@@ -48,6 +49,12 @@ void InitialisationPartition::DoBuild() {
  */
 void InitialisationPartition::DoExecute() {
   LOG_FINE() <<" printing report " << label_;
+  if (not do_length_frequency_)
+    do_age_ = true;
+  else
+    do_age_ = false;
+
+  LOG_MEDIUM() << "do length =  " << do_length_frequency_ << " do age = " << do_age_;
   if (call_number_) {
     cache_ << "*"<< type_ << "[" << label_ << "_1]" << "\n";
     cache_ << "equilibrium_shortcut: " << model_->current_year() << "\n";
@@ -57,8 +64,13 @@ void InitialisationPartition::DoExecute() {
   }
   cache_ << "values "<< REPORT_R_DATAFRAME_ROW_LABELS <<"\n";
   cache_ << "row-col";
-  for (unsigned i = model_->min_age(); i <=  model_->max_age(); ++i)
-    cache_ << " " << i;
+  if (do_length_frequency_) {
+    for (unsigned i = 0; i <  model_->length_bin_mid_points().size(); ++i)
+      cache_ << " " << model_->length_bin_mid_points()[i];
+  } else {
+    for (unsigned i = model_->min_age(); i <=  model_->max_age(); ++i)
+      cache_ << " " << i;
+  }
   cache_ << "\n";
 
   vector<float> age_freq;
@@ -67,7 +79,7 @@ void InitialisationPartition::DoExecute() {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
         cache_ << row + 1 << "-" << col + 1;
-        cell->get_age_frequency(age_freq);
+        cell->get_age_frequency(age_freq, do_age_);
         for(auto& age : age_freq)
           cache_ << " " << age;
         cache_ << "\n";

@@ -344,13 +344,14 @@ void WorldView::get_cell_element(unsigned& row, unsigned& col, const float lat, 
 */
 void WorldView::get_world_age_frequency(vector<float>& world_age_freq) {
   LOG_TRACE();
+  bool do_age;
   world_age_freq.clear();
   world_age_freq.resize(model_->age_spread());
   vector<float> temp;
   for (unsigned i = 0; i < height_; ++i) {
     for (unsigned j = 0; j < width_; ++j) {
       if (base_grid_[i][j].is_enabled()) {
-        base_grid_[i][j].get_age_frequency(temp);
+        base_grid_[i][j].get_age_frequency(temp, do_age);
         for(unsigned i = 0; i < temp.size(); ++i)
           world_age_freq[i] += temp[i];
       }

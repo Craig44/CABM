@@ -35,6 +35,8 @@ public:
 
 
 private:
+  bool                        do_length_frequency_;
+  bool                        do_age_ = true;
   bool                        first_run_ = true;
   WorldView*                  world_;
   bool                        call_number_ = true; // initialisation phase reports are called twice once in the middle of initialisation DoExecute and one once it is complete in RunBasic Model.cpp

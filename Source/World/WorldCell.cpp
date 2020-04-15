@@ -521,19 +521,34 @@ float  WorldCell::get_mature_biomass() {
 /*
  * Returns the age frequency of agents in this cell
 */
-void  WorldCell::get_age_frequency(vector<float>& age_freq) {
+void  WorldCell::get_age_frequency(vector<float>& age_freq, bool& is_age) {
   age_freq.clear();
-  age_freq.resize(model_->age_spread(),0);
-  for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
-    if ((*iter).is_alive()) {
-      age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
+  if (is_age) {
+    age_freq.resize(model_->age_spread(),0);
+    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
+      if ((*iter).is_alive()) {
+        age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
+      }
+    }
+    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
+      if ((*iter).is_alive()) {
+        age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
+      }
+    }
+  } else {
+    age_freq.resize(model_->number_of_length_bins(),0);
+    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
+      if ((*iter).is_alive()) {
+        age_freq[(*iter).get_length_bin_index()] += (*iter).get_scalar();
+      }
+    }
+    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
+      if ((*iter).is_alive()) {
+        age_freq[(*iter).get_length_bin_index()] += (*iter).get_scalar();
+      }
     }
   }
-  for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
-    if ((*iter).is_alive()) {
-      age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
-    }
-  }
+
 }
 
 
@@ -541,38 +556,66 @@ void  WorldCell::get_age_frequency(vector<float>& age_freq) {
 /*
  * Return male age frequency
 */
-void  WorldCell::get_male_frequency(vector<float>& age_freq) {
+void  WorldCell::get_male_frequency(vector<float>& age_freq, bool& is_age) {
   age_freq.clear();
-  age_freq.resize(model_->age_spread(),0);
-  for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
-    if ((*iter).is_alive() and (*iter).get_sex() == 0) {
-      age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
+  if (is_age) {
+    age_freq.resize(model_->age_spread(),0);
+    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
+      if ((*iter).is_alive() and (*iter).get_sex() == 0) {
+        age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
+      }
     }
-  }
-  for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
-    if ((*iter).is_alive() and (*iter).get_sex() == 0) {
-      age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
+    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
+      if ((*iter).is_alive() and (*iter).get_sex() == 0) {
+        age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
+      }
     }
-  }
+   } else {
+     age_freq.resize(model_->number_of_length_bins(),0);
+     for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
+       if ((*iter).is_alive() and (*iter).get_sex() == 0) {
+         age_freq[(*iter).get_length_bin_index()] += (*iter).get_scalar();
+       }
+     }
+     for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
+       if ((*iter).is_alive() and (*iter).get_sex() == 0) {
+         age_freq[(*iter).get_length_bin_index()] += (*iter).get_scalar();
+       }
+     }
+   }
 }
 
 
 /*
  * Returns total female age frequency
 */
-void  WorldCell::get_female_frequency(vector<float>& age_freq) {
+void  WorldCell::get_female_frequency(vector<float>& age_freq, bool& is_age) {
   age_freq.clear();
-  age_freq.resize(model_->age_spread(),0);
-  for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
-    if ((*iter).is_alive() and (*iter).get_sex() == 1) {
-      age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
+  if (is_age) {
+    age_freq.resize(model_->age_spread(),0);
+    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
+      if ((*iter).is_alive() and (*iter).get_sex() == 1) {
+        age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
+      }
     }
-  }
-  for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
-    if ((*iter).is_alive() and (*iter).get_sex() == 1) {
-      age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
+    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
+      if ((*iter).is_alive() and (*iter).get_sex() == 1) {
+        age_freq[(*iter).get_age_index()] += (*iter).get_scalar();
+      }
     }
-  }
+   } else {
+     age_freq.resize(model_->number_of_length_bins(),0);
+     for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
+       if ((*iter).is_alive() and (*iter).get_sex() == 1) {
+         age_freq[(*iter).get_length_bin_index()] += (*iter).get_scalar();
+       }
+     }
+     for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
+       if ((*iter).is_alive() and (*iter).get_sex() == 1) {
+         age_freq[(*iter).get_length_bin_index()] += (*iter).get_scalar();
+       }
+     }
+   }
 }
 
 /*
