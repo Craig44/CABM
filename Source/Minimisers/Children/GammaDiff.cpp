@@ -25,8 +25,16 @@ GammaDiff::GammaDiff(Model* model) : Minimiser(model) {
   parameters_.Bind<int>(PARAM_MAX_EVALUATIONS, &max_evaluations_, "Maximum number of evaluations", "", 4000);
   parameters_.Bind<double>(PARAM_TOLERANCE, &gradient_tolerance_, "Tolerance of the gradient for convergence", "", 0.002);
   parameters_.Bind<double>(PARAM_STEP_SIZE, &step_size_, "Minimum Step-size before minimisation fails", "", 0.001);
-}
 
+}
+/**
+ * Execute the minimiser to solve the model
+ */
+void GammaDiff::DoValidate() {
+  // Variables
+  init_max_iterations_ = max_iterations_;
+  init_max_evaluations_ = max_evaluations_;
+}
 /**
  * Execute the minimiser to solve the model
  */
@@ -54,7 +62,10 @@ void GammaDiff::Execute() {
  * Execute the minimiser to solve the Baranov equation
  */
 void GammaDiff::SolveBaranov() {
-  LOG_FINE() << "Solve Baranov called";
+  // These need to get reset. They are passed to the minimiser by reference and get adapted.... line 509 Engine.cpp
+  max_iterations_ = init_max_iterations_;
+  max_evaluations_ = init_max_evaluations_;
+  LOG_MEDIUM() << "Solve Baranov called maxiters = " << max_iterations_ << " max grad = " << max_evaluations_ << " step size = " << step_size_;
   gammadiff::CallbackBaranov  call_back_baranov(mortality_process_);
   LOG_FINE() << "check callback";
   vector<double> lower_bound = {0.0000001};

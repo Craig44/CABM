@@ -36,6 +36,7 @@ void Manager::Validate() {
   for (auto minimiser : objects_)
     minimiser->Validate();
 
+  /*
   if (objects_.size() > 1) {
     LOG_FATAL() << "Found more than one @minimiser block currently this is not allowed, please sort out";
   }
@@ -44,6 +45,7 @@ void Manager::Validate() {
     active_minimiser_ = objects_[0];
 
   }
+   */
 }
 
 Minimiser* Manager::get_minimiser(string label) {

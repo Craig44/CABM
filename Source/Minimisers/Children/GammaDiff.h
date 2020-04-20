@@ -32,7 +32,7 @@ public:
   // Methods
   GammaDiff(Model* model);
   virtual                     ~GammaDiff() = default;
-  void                        DoValidate() override final { };
+  void                        DoValidate() override final;
   void                        DoBuild() override final { };
   void                        DoReset() override final { };
   void                        Execute() override final;
@@ -44,6 +44,8 @@ private:
   // Members
   int                         max_iterations_;
   int                         max_evaluations_;
+  int                         init_max_iterations_;
+  int                         init_max_evaluations_;
   double                      gradient_tolerance_;
   double                      step_size_;
   vector<double>              start_value_ = {0.003};
