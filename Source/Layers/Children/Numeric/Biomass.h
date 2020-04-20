@@ -14,6 +14,7 @@
 #include "../NumericLayer.h"
 
 namespace niwa {
+class Selectivity;
 class WorldView;
 namespace layers {
 
@@ -34,8 +35,12 @@ protected:
   virtual void                DoValidate() override final;
   virtual void                DoBuild() override final;
   // Variables
-  bool                        mature_;
+  bool                        mature_ = false;
   WorldView*                  world_ = nullptr;
+  vector<string>              selectivity_label_;
+  vector<Selectivity*>        selectivity_;
+  bool                        length_based_selectivity_ = false;
+  bool                        apply_selectivity_;
 };
 } /* namespace layers */
 } /* namespace niwa */
