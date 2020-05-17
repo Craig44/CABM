@@ -29,6 +29,8 @@ public:
   virtual                       ~Agent() = default;
   Agent(float lat, float lon, float first_age_length_par, float second_age_length_par, float third_age_length_par, float M, unsigned birth_year, float first_length_weight_par,
       float second_length_weigth_par, Model* model, bool mature, unsigned sex, float scalar, unsigned home_row, unsigned home_col, unsigned tag);
+  Agent(float lat, float lon, float first_age_length_par, float second_age_length_par, float third_age_length_par, float fourth_age_length_par, float fifth_age_length_par, float sixth_age_length_par,float M, unsigned birth_year, float first_length_weight_par,
+      float second_length_weigth_par, Model* model, bool mature, unsigned sex, float scalar, unsigned home_row, unsigned home_col, unsigned tag);
   // Overload the constructor with another agent, used in tagging to mirror an existing agent.
   //Agent(Agent& agent_to_copy);
 
@@ -48,8 +50,11 @@ public:
   virtual const float&         get_first_age_length_par() const {return first_age_length_par_;}; // L_inf // alpha
   virtual const float&         get_second_age_length_par() const {return second_age_length_par_;}; // K // beta
   virtual const float&         get_third_age_length_par() const {return third_age_length_par_;}; // t0 // t0
+  virtual const float&         get_fourth_age_length_par() const {return fourth_age_length_par_;}; // nul // y1
+  virtual const float&         get_fith_age_length_par() const {return fith_age_length_par_;}; // nul // y2
+  virtual const float&         get_sixth_age_length_par() const {return sixth_age_length_par_;}; // nul // tau2
   virtual const float&         get_first_length_weight_par() const {return first_length_weight_par_;}; // a // a
-  virtual const float&         get_second_length_weight_par() const {return second_length_weight_par_;}; // b //n
+  virtual const float&         get_second_length_weight_par() const {return second_length_weight_par_;}; // b //b
   virtual const unsigned&      get_home_row() const {return home_row_ ;};
   virtual const unsigned&      get_home_col() const {return home_col_ ;};
   virtual const float&         get_lat() const {return lat_;};
@@ -71,6 +76,9 @@ public:
   void                         set_first_age_length_par(float value) {first_age_length_par_ = value;}
   void                         set_second_age_length_par(float value) {second_age_length_par_ = value;}
   void                         set_third_age_length_par(float value) {third_age_length_par_ = value;}
+  void                         set_fourth_age_length_par(float value) {fourth_age_length_par_ = value;}
+  void                         set_fith_age_length_par(float value) {fith_age_length_par_ = value;}
+  void                         set_sixth_age_length_par(float value) {sixth_age_length_par_ = value;}
   void                         set_first_length_weight_par(float value) {first_length_weight_par_ = value;}
   void                         set_second_length_weight_par(float value) {second_length_weight_par_ = value;}
   void                         set_m(float value) {M_ = value;}
@@ -87,6 +95,10 @@ protected:
   float                       first_age_length_par_;  // L_inf for von bert
   float                       second_age_length_par_; // k for von bert
   float                       third_age_length_par_;  // t0 for von bert
+  float                       fourth_age_length_par_;
+  float                       fith_age_length_par_;
+  float                       sixth_age_length_par_;
+
   float                       M_; // natural mortality
   unsigned                    birth_year_;
   float                       length_ = 0.0;

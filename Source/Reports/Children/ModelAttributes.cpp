@@ -60,6 +60,21 @@ void ModelAttributes::DoExecute() {
   for (unsigned length_ndx = 0; length_ndx < length_bins.size(); ++length_ndx)
     cache_ << length_bins[length_ndx] << " ";
   cache_ << "\n";
+  cache_ << "growth_model: ";
+  switch(model_->get_growth_model()) {
+
+  case Growth::Type::kVonbert:
+    cache_ << "VonBertalanffy";
+    break;
+  case Growth::Type::kSchnute:
+    cache_ << "Schnute";
+    break;
+  case Growth::Type::kInvalid:
+    cache_ << "Invalid";
+    break;
+  }
+
+  cache_ << "\n";
   ready_for_writing_ = true;
 
 }

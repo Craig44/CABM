@@ -75,7 +75,7 @@ void SummariseAgents::DoExecute() {
     // Randomly select a cell
     unsigned row_index = rng.chance() * rows_.size();
     unsigned col_index = rng.chance() * cols_.size();
-    LOG_FINEST() << "col index = " << col_index << " row index " << row_index;
+    //LOG_FINEST() << "col index = " << col_index << " row index " << row_index;
     WorldCell* cell = world_->get_base_square(rows_[row_index], cols_[col_index]);
     if (cell->is_enabled()) {
       unsigned agent_ndx = rng.chance() * cell->agents_.size();

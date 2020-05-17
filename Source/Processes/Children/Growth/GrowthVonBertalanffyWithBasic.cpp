@@ -43,6 +43,7 @@ GrowthVonBertalanffyWithBasic::GrowthVonBertalanffyWithBasic(Model* model) : Gro
 
   RegisterAsAddressable(PARAM_LINF, &l_inf_, addressable::kAll, addressable::kyes);
   RegisterAsAddressable(PARAM_K, &k_, addressable::kAll, addressable::kyes);
+  model_->set_growth_model(niwa::Growth::kVonbert);
 }
 
 // check users have defined spatial or non_spatial
@@ -68,6 +69,7 @@ void GrowthVonBertalanffyWithBasic::DoValidate() {
     LOG_ERROR_P(PARAM_LABEL) << "You have not specified a value or a layer label for the 'b' parameter, you must pick one of these options";
   if(!parameters_.Get(PARAM_T0)->has_been_defined() & !parameters_.Get(PARAM_T0_LAYER_LABEL)->has_been_defined())
     t0_.push_back(0.0); // Default value of t0 = 0
+
 
 }
 
@@ -179,7 +181,6 @@ void GrowthVonBertalanffyWithBasic::DoBuild() {
     if (t0_.size() == 0)
       t0_.assign(2, 0.0);
   }
-
 
 	// Check that the layers are all positive
 }

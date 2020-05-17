@@ -157,10 +157,10 @@ void Iterative::Execute() {
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       agents_per_cell[row].resize(model_->get_width(),0.0);
       for (unsigned col = 0; col < model_->get_width(); ++col) {
-        LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " number of agents = " << (int)number_agents_;
-        LOG_FINEST() << "initial_layer value = " << initial_layer_->get_value(row,col) << " value = " << (int)(number_agents_ * initial_layer_->get_value(row,col));;
+        LOG_FINE() << "row = " << row + 1 << " col = " << col + 1 << " number of agents = " << (int)number_agents_;
+        LOG_FINE() << "initial_layer value = " << initial_layer_->get_value(row,col) << " value = " << (int)(number_agents_ * initial_layer_->get_value(row,col));;
         agents_per_cell[row][col] = (int)(number_agents_ * initial_layer_->get_value(row,col));
-        LOG_FINEST() << "number of possible agents per cell = " << agents_per_cell[row][col];
+        LOG_FINE() << "number of possible agents per cell = " << agents_per_cell[row][col];
       }
     }
   }

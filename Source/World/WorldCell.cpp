@@ -113,33 +113,57 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
     LOG_CODE_ERROR() << "number_agents_to_seed != growth_pars.size(), this must be a code error as these should always be true";
   }
   LOG_FINE() << "start seeding";
-  for (unsigned agent = 0; agent < number_agents_to_seed; ++agent) {
-    sex = 0;
-    mature = false;
-    age = std::max(std::min((unsigned)rng.exponential(seed_z), model_->max_age()), model_->min_age()); // truncate age to between min_age and max_age
-    // Need to add Maturity and sex into this
-    if (sexed) {
-      if (rng.chance() >= male_prop)
-        sex = 1;
-    }
-    probability_mature_at_age = selectivity_[sex]->GetResult(age);
-    if (rng.chance() <= probability_mature_at_age)
-      mature = true;
+  if (model_->get_growth_model() == Growth::kVonbert) {
+    for (unsigned agent = 0; agent < number_agents_to_seed; ++agent) {
+      sex = 0;
+      mature = false;
+      age = std::max(std::min((unsigned)rng.exponential(seed_z), model_->max_age()), model_->min_age()); // truncate age to between min_age and max_age
+      // Need to add Maturity and sex into this
+      if (sexed) {
+        if (rng.chance() >= male_prop)
+          sex = 1;
+      }
+      probability_mature_at_age = selectivity_[sex]->GetResult(age);
+      if (rng.chance() <= probability_mature_at_age)
+        mature = true;
 
-    if (sex == 0) {
-      Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], growth_pars[agent][2], mort_par[agent], (model_->current_year() - age),
-          growth_pars[agent][3], growth_pars[agent][4], model_, mature, sex, 1.0, row_, col_, 0);
-      agents_.push_back(new_agent);
-    } else {
-      Agent new_agent(lat_, lon_, female_growth_pars[agent][0], female_growth_pars[agent][1], female_growth_pars[agent][2], mort_par[agent], (model_->current_year() - age),
-          female_growth_pars[agent][3], female_growth_pars[agent][4], model_, mature, sex, 1.0, row_, col_, 0);
-      agents_.push_back(new_agent);
+      if (sex == 0) {
+        Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], growth_pars[agent][2], mort_par[agent], (model_->current_year() - age),
+            growth_pars[agent][3], growth_pars[agent][4], model_, mature, sex, 1.0, row_, col_, 0);
+        agents_.push_back(new_agent);
+      } else {
+        Agent new_agent(lat_, lon_, female_growth_pars[agent][0], female_growth_pars[agent][1], female_growth_pars[agent][2], mort_par[agent], (model_->current_year() - age),
+            female_growth_pars[agent][3], female_growth_pars[agent][4], model_, mature, sex, 1.0, row_, col_, 0);
+        agents_.push_back(new_agent);
+      }
+    }
+  } else if (model_->get_growth_model() == Growth::kSchnute) {
+    for (unsigned agent = 0; agent < number_agents_to_seed; ++agent) {
+      sex = 0;
+      mature = false;
+      age = std::max(std::min((unsigned)rng.exponential(seed_z), model_->max_age()), model_->min_age()); // truncate age to between min_age and max_age
+      // Need to add Maturity and sex into this
+      if (sexed) {
+        if (rng.chance() >= male_prop)
+          sex = 1;
+      }
+      probability_mature_at_age = selectivity_[sex]->GetResult(age);
+      if (rng.chance() <= probability_mature_at_age)
+        mature = true;
+      if (sex == 0) {
+        Agent new_agent(lat_, lon_,  growth_pars[agent][0], growth_pars[agent][1],growth_pars[agent][2],growth_pars[agent][3], growth_pars[agent][4],growth_pars[agent][5], mort_par[agent], (model_->current_year() - age),
+            growth_pars[agent][6], growth_pars[agent][7], model_, false, sex, 1.0, row_, col_, 0);
+        agents_.push_back(new_agent);
+      } else {
+        Agent new_agent(lat_, lon_, female_growth_pars[agent][0], female_growth_pars[agent][1], female_growth_pars[agent][2],growth_pars[agent][3], growth_pars[agent][4],growth_pars[agent][5], mort_par[agent], (model_->current_year() - age),
+            female_growth_pars[agent][6], female_growth_pars[agent][7], model_, mature, sex, 1.0, row_, col_, 0);
+        agents_.push_back(new_agent);
+      }
+      if (agent == 0)
+         LOG_MEDIUM() << "number of bytes of an agent class " << sizeof(agents_.back());
     }
 
-/*
-   if (agent == 0) {
-      LOG_MEDIUM() << "number of bytes of an agent class " << sizeof(new_agent);
-    }*/
+
   }
 }
 
@@ -173,45 +197,89 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
 
   unsigned sex;
   unsigned agent_bin = 0;
-  for (unsigned agent = 0; agent < birth_agents; ++agent) {
-    total_individuals_alive_ += scalar;
-    sex = 0;
-    if (sexed) {
-      if (rng.chance() >= male_prop)
-        sex = 1;
+
+  if (model_->get_growth_model() == Growth::kVonbert) {
+    for (unsigned agent = 0; agent < birth_agents; ++agent) {
+      total_individuals_alive_ += scalar;
+      sex = 0;
+      if (sexed) {
+        if (rng.chance() >= male_prop)
+          sex = 1;
+      }
+      if (sex == 0) {
+        Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1],growth_pars[agent][2], mort_par[agent], model_->current_year() - model_->min_age(),
+            growth_pars[agent][3], growth_pars[agent][4], model_, false, sex, scalar, row_, col_, 0);
+        // Check to see if
+        while (agent_bin < agents_.size()) {
+          if (not agents_[agent_bin].is_alive()) {
+            agents_[agent_bin] = new_agent;
+            break;
+          } else {
+            agent_bin++;
+          }
+        }
+        if (agent_bin == agents_.size()) {
+          agents_.push_back(new_agent);
+        }
+      } else {
+        Agent new_agent(lat_, lon_, female_growth_pars[agent][0], female_growth_pars[agent][1],female_growth_pars[agent][2], mort_par[agent], model_->current_year() - model_->min_age(),
+            female_growth_pars[agent][3], female_growth_pars[agent][4], model_, false, sex, scalar, row_, col_, 0);
+        // Check to see if
+        while (agent_bin < agents_.size()) {
+          if (not agents_[agent_bin].is_alive()) {
+            agents_[agent_bin] = new_agent;
+            break;
+          } else {
+            agent_bin++;
+          }
+        }
+        if (agent_bin == agents_.size()) {
+          agents_.push_back(new_agent);
+        }
+      }
     }
-    if (sex == 0) {
-      Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1],growth_pars[agent][2], mort_par[agent], model_->current_year() - model_->min_age(),
-          growth_pars[agent][3], growth_pars[agent][4], model_, false, sex, scalar, row_, col_, 0);
-      // Check to see if
-      while (agent_bin < agents_.size()) {
-        if (not agents_[agent_bin].is_alive()) {
-          agents_[agent_bin] = new_agent;
-          break;
-        } else {
-          agent_bin++;
+  } else if (model_->get_growth_model() == Growth::kSchnute) {
+    for (unsigned agent = 0; agent < birth_agents; ++agent) {
+      total_individuals_alive_ += scalar;
+      sex = 0;
+      if (sexed) {
+        if (rng.chance() >= male_prop)
+          sex = 1;
+      }
+      if (sex == 0) {
+        Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1],growth_pars[agent][2],growth_pars[agent][3], growth_pars[agent][4],growth_pars[agent][5], mort_par[agent], model_->current_year() - model_->min_age(),
+            growth_pars[agent][6], growth_pars[agent][7], model_, false, sex, scalar, row_, col_, 0);
+        // Check to see if
+        while (agent_bin < agents_.size()) {
+          if (not agents_[agent_bin].is_alive()) {
+            agents_[agent_bin] = new_agent;
+            break;
+          } else {
+            agent_bin++;
+          }
         }
-      }
-      if (agent_bin == agents_.size()) {
-        agents_.push_back(new_agent);
-      }
-    } else {
-      Agent new_agent(lat_, lon_, female_growth_pars[agent][0], female_growth_pars[agent][1],female_growth_pars[agent][2], mort_par[agent], model_->current_year() - model_->min_age(),
-          female_growth_pars[agent][3], female_growth_pars[agent][4], model_, false, sex, scalar, row_, col_, 0);
-      // Check to see if
-      while (agent_bin < agents_.size()) {
-        if (not agents_[agent_bin].is_alive()) {
-          agents_[agent_bin] = new_agent;
-          break;
-        } else {
-          agent_bin++;
+        if (agent_bin == agents_.size()) {
+          agents_.push_back(new_agent);
         }
-      }
-      if (agent_bin == agents_.size()) {
-        agents_.push_back(new_agent);
+      } else {
+        Agent new_agent(lat_, lon_, female_growth_pars[agent][0], female_growth_pars[agent][1],female_growth_pars[agent][2],female_growth_pars[agent][3], female_growth_pars[agent][4],female_growth_pars[agent][5], mort_par[agent], model_->current_year() - model_->min_age(),
+            female_growth_pars[agent][6], female_growth_pars[agent][7], model_, false, sex, scalar, row_, col_, 0);
+        // Check to see if
+        while (agent_bin < agents_.size()) {
+          if (not agents_[agent_bin].is_alive()) {
+            agents_[agent_bin] = new_agent;
+            break;
+          } else {
+            agent_bin++;
+          }
+        }
+        if (agent_bin == agents_.size()) {
+          agents_.push_back(new_agent);
+        }
       }
     }
   }
+
   LOG_FINE() << "cell: " << row_ << "-" << col_ <<  "added values = " << total_individuals_alive_ - temp << " temp = " << temp << " total_individuals_alive_ " << total_individuals_alive_;
 }
 
@@ -247,38 +315,86 @@ void  WorldCell::apply_growth_time_varying() {
   if (model_->get_sexed()) {
     growth_->draw_growth_param(row_, col_, agents_.size() + tagged_agents_.size(), female_growth_pars, 1);
   }
-
-  for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
-    if ( (*iter).is_alive()) {
-      if ((*iter).get_sex() == 0) {
-        (*iter).set_first_age_length_par(growth_pars[counter][0]);
-        (*iter).set_second_age_length_par(growth_pars[counter][1]);
-        (*iter).set_third_age_length_par(growth_pars[counter][2]);
-        (*iter).set_first_length_weight_par(growth_pars[counter][3]);
-        (*iter).set_second_length_weight_par(growth_pars[counter][4]);
-      } else {
-        (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
-        (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
-        (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
-        (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
-        (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+  if (model_->get_growth_model() == Growth::kVonbert) {
+    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+      if ( (*iter).is_alive()) {
+        if ((*iter).get_sex() == 0) {
+          (*iter).set_first_age_length_par(growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(growth_pars[counter][2]);
+          (*iter).set_first_length_weight_par(growth_pars[counter][3]);
+          (*iter).set_second_length_weight_par(growth_pars[counter][4]);
+        } else {
+          (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+          (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
+          (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+        }
       }
     }
-  }
-  for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
-    if ( (*iter).is_alive()) {
-      if ((*iter).get_sex() == 0) {
-        (*iter).set_first_age_length_par(growth_pars[counter][0]);
-        (*iter).set_second_age_length_par(growth_pars[counter][1]);
-        (*iter).set_third_age_length_par(growth_pars[counter][2]);
-        (*iter).set_first_length_weight_par(growth_pars[counter][3]);
-        (*iter).set_second_length_weight_par(growth_pars[counter][4]);
-      } else {
-        (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
-        (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
-        (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
-        (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
-        (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
+      if ( (*iter).is_alive()) {
+        if ((*iter).get_sex() == 0) {
+          (*iter).set_first_age_length_par(growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(growth_pars[counter][2]);
+          (*iter).set_first_length_weight_par(growth_pars[counter][3]);
+          (*iter).set_second_length_weight_par(growth_pars[counter][4]);
+        } else {
+          (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+          (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
+          (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+        }
+      }
+    }
+  } else if (model_->get_growth_model() == Growth::kSchnute) {
+    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+      if ( (*iter).is_alive()) {
+        if ((*iter).get_sex() == 0) {
+          (*iter).set_first_age_length_par(growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(growth_pars[counter][2]);
+          (*iter).set_fourth_age_length_par(growth_pars[counter][3]);
+          (*iter).set_fith_age_length_par(growth_pars[counter][4]);
+          (*iter).set_sixth_age_length_par(growth_pars[counter][5]);
+          (*iter).set_first_length_weight_par(growth_pars[counter][6]);
+          (*iter).set_second_length_weight_par(growth_pars[counter][7]);
+        } else {
+          (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+          (*iter).set_fourth_age_length_par(female_growth_pars[counter][3]);
+          (*iter).set_fith_age_length_par(female_growth_pars[counter][4]);
+          (*iter).set_sixth_age_length_par(female_growth_pars[counter][5]);
+          (*iter).set_first_length_weight_par(female_growth_pars[counter][6]);
+          (*iter).set_second_length_weight_par(female_growth_pars[counter][7]);
+        }
+      }
+    }
+    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
+      if ( (*iter).is_alive()) {
+        if ((*iter).get_sex() == 0) {
+          (*iter).set_first_age_length_par(growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(growth_pars[counter][2]);
+          (*iter).set_fourth_age_length_par(growth_pars[counter][3]);
+          (*iter).set_fith_age_length_par(growth_pars[counter][4]);
+          (*iter).set_sixth_age_length_par(growth_pars[counter][5]);
+          (*iter).set_first_length_weight_par(growth_pars[counter][6]);
+          (*iter).set_second_length_weight_par(growth_pars[counter][7]);
+        } else {
+          (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+          (*iter).set_fourth_age_length_par(female_growth_pars[counter][3]);
+          (*iter).set_fith_age_length_par(female_growth_pars[counter][4]);
+          (*iter).set_sixth_age_length_par(female_growth_pars[counter][5]);
+          (*iter).set_first_length_weight_par(female_growth_pars[counter][6]);
+          (*iter).set_second_length_weight_par(female_growth_pars[counter][7]);
+        }
       }
     }
   }
@@ -299,41 +415,91 @@ void  WorldCell::update_agent_parameters() {
     if (model_->get_sexed()) {
       growth_->draw_growth_param(row_, col_, agents_.size() + tagged_agents_.size(), female_growth_pars, 1);
     }
-
-    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
-      if ( (*iter).is_alive()) {
-        if ((*iter).get_sex() == 0) {
-          (*iter).set_first_age_length_par(growth_pars[counter][0]);
-          (*iter).set_second_age_length_par(growth_pars[counter][1]);
-          (*iter).set_third_age_length_par(growth_pars[counter][2]);
-          (*iter).set_first_length_weight_par(growth_pars[counter][3]);
-          (*iter).set_second_length_weight_par(growth_pars[counter][4]);
-        } else {
-          (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
-          (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
-          (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
-          (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
-          (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+    if (model_->get_growth_model() == Growth::kVonbert) {
+      for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+        if ((*iter).is_alive()) {
+          (*iter).set_m(mort_par[counter]);
+          if ((*iter).get_sex() == 0) {
+            (*iter).set_first_age_length_par(growth_pars[counter][0]);
+            (*iter).set_second_age_length_par(growth_pars[counter][1]);
+            (*iter).set_third_age_length_par(growth_pars[counter][2]);
+            (*iter).set_first_length_weight_par(growth_pars[counter][3]);
+            (*iter).set_second_length_weight_par(growth_pars[counter][4]);
+          } else {
+            (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+            (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+            (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+            (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
+            (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+          }
         }
-        (*iter).set_m(mort_par[counter]);
       }
-    }
-    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
-      if ( (*iter).is_alive()) {
-        if ((*iter).get_sex() == 0) {
-          (*iter).set_first_age_length_par(growth_pars[counter][0]);
-          (*iter).set_second_age_length_par(growth_pars[counter][1]);
-          (*iter).set_third_age_length_par(growth_pars[counter][2]);
-          (*iter).set_first_length_weight_par(growth_pars[counter][3]);
-          (*iter).set_second_length_weight_par(growth_pars[counter][4]);
-        } else {
-          (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
-          (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
-          (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
-          (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
-          (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+      for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
+        if ((*iter).is_alive()) {
+          (*iter).set_m(mort_par[counter]);
+          if ((*iter).get_sex() == 0) {
+            (*iter).set_first_age_length_par(growth_pars[counter][0]);
+            (*iter).set_second_age_length_par(growth_pars[counter][1]);
+            (*iter).set_third_age_length_par(growth_pars[counter][2]);
+            (*iter).set_first_length_weight_par(growth_pars[counter][3]);
+            (*iter).set_second_length_weight_par(growth_pars[counter][4]);
+          } else {
+            (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+            (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+            (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+            (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
+            (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+          }
         }
-        (*iter).set_m(mort_par[counter]);
+      }
+    } else if (model_->get_growth_model() == Growth::kSchnute) {
+      for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+        if ((*iter).is_alive()) {
+          (*iter).set_m(mort_par[counter]);
+          if ((*iter).get_sex() == 0) {
+            (*iter).set_first_age_length_par(growth_pars[counter][0]);
+            (*iter).set_second_age_length_par(growth_pars[counter][1]);
+            (*iter).set_third_age_length_par(growth_pars[counter][2]);
+            (*iter).set_fourth_age_length_par(growth_pars[counter][3]);
+            (*iter).set_fith_age_length_par(growth_pars[counter][4]);
+            (*iter).set_sixth_age_length_par(growth_pars[counter][5]);
+            (*iter).set_first_length_weight_par(growth_pars[counter][6]);
+            (*iter).set_second_length_weight_par(growth_pars[counter][7]);
+          } else {
+            (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+            (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+            (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+            (*iter).set_fourth_age_length_par(female_growth_pars[counter][3]);
+            (*iter).set_fith_age_length_par(female_growth_pars[counter][4]);
+            (*iter).set_sixth_age_length_par(female_growth_pars[counter][5]);
+            (*iter).set_first_length_weight_par(female_growth_pars[counter][6]);
+            (*iter).set_second_length_weight_par(female_growth_pars[counter][7]);
+          }
+        }
+      }
+      for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
+        if ((*iter).is_alive()) {
+          (*iter).set_m(mort_par[counter]);
+          if ((*iter).get_sex() == 0) {
+            (*iter).set_first_age_length_par(growth_pars[counter][0]);
+            (*iter).set_second_age_length_par(growth_pars[counter][1]);
+            (*iter).set_third_age_length_par(growth_pars[counter][2]);
+            (*iter).set_fourth_age_length_par(growth_pars[counter][3]);
+            (*iter).set_fith_age_length_par(growth_pars[counter][4]);
+            (*iter).set_sixth_age_length_par(growth_pars[counter][5]);
+            (*iter).set_first_length_weight_par(growth_pars[counter][6]);
+            (*iter).set_second_length_weight_par(growth_pars[counter][7]);
+          } else {
+            (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+            (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+            (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+            (*iter).set_fourth_age_length_par(female_growth_pars[counter][3]);
+            (*iter).set_fith_age_length_par(female_growth_pars[counter][4]);
+            (*iter).set_sixth_age_length_par(female_growth_pars[counter][5]);
+            (*iter).set_first_length_weight_par(female_growth_pars[counter][6]);
+            (*iter).set_second_length_weight_par(female_growth_pars[counter][7]);
+          }
+        }
       }
     }
   } else if (!growth_->update_growth() && mortality_->update_mortality()) {
@@ -356,37 +522,86 @@ void  WorldCell::update_agent_parameters() {
     if (model_->get_sexed()) {
       growth_->draw_growth_param(row_, col_, agents_.size() + tagged_agents_.size(), female_growth_pars, 1);
     }
-    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
-      if ( (*iter).is_alive()) {
-        if ((*iter).get_sex() == 0) {
-          (*iter).set_first_age_length_par(growth_pars[counter][0]);
-          (*iter).set_second_age_length_par(growth_pars[counter][1]);
-          (*iter).set_third_age_length_par(growth_pars[counter][2]);
-          (*iter).set_first_length_weight_par(growth_pars[counter][3]);
-          (*iter).set_second_length_weight_par(growth_pars[counter][4]);
-        } else {
-          (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
-          (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
-          (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
-          (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
-          (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+    if (model_->get_growth_model() == Growth::kVonbert) {
+      for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+        if ( (*iter).is_alive()) {
+          if ((*iter).get_sex() == 0) {
+            (*iter).set_first_age_length_par(growth_pars[counter][0]);
+            (*iter).set_second_age_length_par(growth_pars[counter][1]);
+            (*iter).set_third_age_length_par(growth_pars[counter][2]);
+            (*iter).set_first_length_weight_par(growth_pars[counter][3]);
+            (*iter).set_second_length_weight_par(growth_pars[counter][4]);
+          } else {
+            (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+            (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+            (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+            (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
+            (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+          }
         }
       }
-    }
-    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
-      if ( (*iter).is_alive()) {
-        if ((*iter).get_sex() == 0) {
-          (*iter).set_first_age_length_par(growth_pars[counter][0]);
-          (*iter).set_second_age_length_par(growth_pars[counter][1]);
-          (*iter).set_third_age_length_par(growth_pars[counter][2]);
-          (*iter).set_first_length_weight_par(growth_pars[counter][3]);
-          (*iter).set_second_length_weight_par(growth_pars[counter][4]);
-        } else {
-          (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
-          (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
-          (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
-          (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
-          (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+      for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
+        if ( (*iter).is_alive()) {
+          if ((*iter).get_sex() == 0) {
+            (*iter).set_first_age_length_par(growth_pars[counter][0]);
+            (*iter).set_second_age_length_par(growth_pars[counter][1]);
+            (*iter).set_third_age_length_par(growth_pars[counter][2]);
+            (*iter).set_first_length_weight_par(growth_pars[counter][3]);
+            (*iter).set_second_length_weight_par(growth_pars[counter][4]);
+          } else {
+            (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+            (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+            (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+            (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
+            (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+          }
+        }
+      }
+    } else if (model_->get_growth_model() == Growth::kSchnute) {
+      for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+        if ( (*iter).is_alive()) {
+          if ((*iter).get_sex() == 0) {
+            (*iter).set_first_age_length_par(growth_pars[counter][0]);
+            (*iter).set_second_age_length_par(growth_pars[counter][1]);
+            (*iter).set_third_age_length_par(growth_pars[counter][2]);
+            (*iter).set_fourth_age_length_par(growth_pars[counter][3]);
+            (*iter).set_fith_age_length_par(growth_pars[counter][4]);
+            (*iter).set_sixth_age_length_par(growth_pars[counter][5]);
+            (*iter).set_first_length_weight_par(growth_pars[counter][6]);
+            (*iter).set_second_length_weight_par(growth_pars[counter][7]);
+          } else {
+            (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+            (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+            (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+            (*iter).set_fourth_age_length_par(female_growth_pars[counter][3]);
+            (*iter).set_fith_age_length_par(female_growth_pars[counter][4]);
+            (*iter).set_sixth_age_length_par(female_growth_pars[counter][5]);
+            (*iter).set_first_length_weight_par(female_growth_pars[counter][6]);
+            (*iter).set_second_length_weight_par(female_growth_pars[counter][7]);
+          }
+        }
+      }
+      for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
+        if ( (*iter).is_alive()) {
+          if ((*iter).get_sex() == 0) {
+            (*iter).set_first_age_length_par(growth_pars[counter][0]);
+            (*iter).set_second_age_length_par(growth_pars[counter][1]);
+            (*iter).set_third_age_length_par(growth_pars[counter][2]);
+            (*iter).set_fourth_age_length_par(growth_pars[counter][3]);
+            (*iter).set_fith_age_length_par(growth_pars[counter][4]);
+            (*iter).set_sixth_age_length_par(growth_pars[counter][5]);
+            (*iter).set_first_length_weight_par(growth_pars[counter][6]);
+            (*iter).set_second_length_weight_par(growth_pars[counter][7]);
+          } else {
+            (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+            (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+            (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+            (*iter).set_fourth_age_length_par(female_growth_pars[counter][3]);
+            (*iter).set_fith_age_length_par(female_growth_pars[counter][4]);
+            (*iter).set_sixth_age_length_par(female_growth_pars[counter][5]);
+            (*iter).set_first_length_weight_par(female_growth_pars[counter][6]);
+            (*iter).set_second_length_weight_par(female_growth_pars[counter][7]);
+          }
         }
       }
     }
@@ -425,37 +640,86 @@ void  WorldCell::update_growth_params() {
     growth_->draw_growth_param(row_, col_, agents_.size() + tagged_agents_.size(), female_growth_pars, 1);
   }
   unsigned counter = 0;
-  for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
-    if ( (*iter).is_alive()) {
-      if ((*iter).get_sex() == 0) {
-        (*iter).set_first_age_length_par(growth_pars[counter][0]);
-        (*iter).set_second_age_length_par(growth_pars[counter][1]);
-        (*iter).set_third_age_length_par(growth_pars[counter][2]);
-        (*iter).set_first_length_weight_par(growth_pars[counter][3]);
-        (*iter).set_second_length_weight_par(growth_pars[counter][4]);
-      } else {
-        (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
-        (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
-        (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
-        (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
-        (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+  if (model_->get_growth_model() == Growth::kVonbert) {
+    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+      if ( (*iter).is_alive()) {
+        if ((*iter).get_sex() == 0) {
+          (*iter).set_first_age_length_par(growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(growth_pars[counter][2]);
+          (*iter).set_first_length_weight_par(growth_pars[counter][3]);
+          (*iter).set_second_length_weight_par(growth_pars[counter][4]);
+        } else {
+          (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+          (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
+          (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+        }
       }
     }
-  }
-  for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
-    if ( (*iter).is_alive()) {
-      if ((*iter).get_sex() == 0) {
-        (*iter).set_first_age_length_par(growth_pars[counter][0]);
-        (*iter).set_second_age_length_par(growth_pars[counter][1]);
-        (*iter).set_third_age_length_par(growth_pars[counter][2]);
-        (*iter).set_first_length_weight_par(growth_pars[counter][3]);
-        (*iter).set_second_length_weight_par(growth_pars[counter][4]);
-      } else {
-        (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
-        (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
-        (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
-        (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
-        (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
+      if ( (*iter).is_alive()) {
+        if ((*iter).get_sex() == 0) {
+          (*iter).set_first_age_length_par(growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(growth_pars[counter][2]);
+          (*iter).set_first_length_weight_par(growth_pars[counter][3]);
+          (*iter).set_second_length_weight_par(growth_pars[counter][4]);
+        } else {
+          (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+          (*iter).set_first_length_weight_par(female_growth_pars[counter][3]);
+          (*iter).set_second_length_weight_par(female_growth_pars[counter][4]);
+        }
+      }
+    }
+  } else if (model_->get_growth_model() == Growth::kSchnute) {
+    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter, ++counter) {
+      if ( (*iter).is_alive()) {
+        if ((*iter).get_sex() == 0) {
+          (*iter).set_first_age_length_par(growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(growth_pars[counter][2]);
+          (*iter).set_fourth_age_length_par(growth_pars[counter][3]);
+          (*iter).set_fith_age_length_par(growth_pars[counter][4]);
+          (*iter).set_sixth_age_length_par(growth_pars[counter][5]);
+          (*iter).set_first_length_weight_par(growth_pars[counter][6]);
+          (*iter).set_second_length_weight_par(growth_pars[counter][7]);
+        } else {
+          (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+          (*iter).set_fourth_age_length_par(female_growth_pars[counter][3]);
+          (*iter).set_fith_age_length_par(female_growth_pars[counter][4]);
+          (*iter).set_sixth_age_length_par(female_growth_pars[counter][5]);
+          (*iter).set_first_length_weight_par(female_growth_pars[counter][6]);
+          (*iter).set_second_length_weight_par(female_growth_pars[counter][7]);
+        }
+      }
+    }
+    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter, ++counter) {
+      if ( (*iter).is_alive()) {
+        if ((*iter).get_sex() == 0) {
+          (*iter).set_first_age_length_par(growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(growth_pars[counter][2]);
+          (*iter).set_fourth_age_length_par(growth_pars[counter][3]);
+          (*iter).set_fith_age_length_par(growth_pars[counter][4]);
+          (*iter).set_sixth_age_length_par(growth_pars[counter][5]);
+          (*iter).set_first_length_weight_par(growth_pars[counter][6]);
+          (*iter).set_second_length_weight_par(growth_pars[counter][7]);
+        } else {
+          (*iter).set_first_age_length_par(female_growth_pars[counter][0]);
+          (*iter).set_second_age_length_par(female_growth_pars[counter][1]);
+          (*iter).set_third_age_length_par(female_growth_pars[counter][2]);
+          (*iter).set_fourth_age_length_par(female_growth_pars[counter][3]);
+          (*iter).set_fith_age_length_par(female_growth_pars[counter][4]);
+          (*iter).set_sixth_age_length_par(female_growth_pars[counter][5]);
+          (*iter).set_first_length_weight_par(female_growth_pars[counter][6]);
+          (*iter).set_second_length_weight_par(female_growth_pars[counter][7]);
+        }
       }
     }
   }

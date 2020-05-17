@@ -43,6 +43,34 @@ Agent::Agent(float lat, float lon, float first_age_length_par, float second_age_
   growth_init(); // if age = 0 will calculate length_ and weight_ based on uniform(0.000,0.4)
 }
 
+
+Agent::Agent(float lat, float lon, float first_age_length_par, float second_age_length_par, float third_age_length_par, float fourth_age_length_par, float fifth_age_length_par, float sixth_age_length_par,
+    float M, unsigned birth_year, float first_length_weight_par, float second_length_weigth_par,
+    Model* model, bool mature, unsigned sex, float scalar, unsigned home_row, unsigned home_col, unsigned tag) :
+    lat_(lat),
+    lon_(lon),
+    first_age_length_par_(first_age_length_par),
+    second_age_length_par_(second_age_length_par),
+    third_age_length_par_(third_age_length_par),
+    fourth_age_length_par_(fourth_age_length_par),
+    fith_age_length_par_(fifth_age_length_par),
+    sixth_age_length_par_(sixth_age_length_par),
+    M_(M),
+    birth_year_(birth_year),
+    first_length_weight_par_(first_length_weight_par),
+    second_length_weight_par_(second_length_weigth_par),
+    model_(model),
+    mature_(mature),
+    sex_(sex),
+    scalar_(scalar),
+    home_row_(home_row),
+    home_col_(home_col),
+    tag_(tag)
+
+{
+  growth_init(); // if age = 0 will calculate length_ and weight_
+}
+
 /*// An overloaded constructor for cloning an agent
 Agent::Agent(Agent& agent_to_copy) {
   lat_ = agent_to_copy.get_lat();
@@ -91,16 +119,23 @@ void Agent::apply_tagging_event(unsigned tags, unsigned row, unsigned col) {
 */
 void Agent::growth_init() {
   //utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-  if (get_age() == 0) {
-    // Add a jitter for the length of zero year olds
-    //length_ = first_age_length_par_ * (1-std::exp(-second_age_length_par_ * (rng.uniform(0.001,0.4) - third_age_length_par_)));
-    length_ = first_age_length_par_ * (1-std::exp(-second_age_length_par_ * (0.001 - third_age_length_par_)));
+  if (model_->get_growth_model() == Growth::kVonbert) {
+    if (get_age() == 0) {
+      // Add a jitter for the length of zero year olds
+      //length_ = first_age_length_par_ * (1-std::exp(-second_age_length_par_ * (rng.uniform(0.001,0.4) - third_age_length_par_)));
+      length_ = first_age_length_par_ * (1-std::exp(-second_age_length_par_ * (0.001 - third_age_length_par_)));
+    } else {
+      length_ = first_age_length_par_ * (1-std::exp(-second_age_length_par_ * ((float)get_age() - third_age_length_par_)));
+    }
+  } else if(model_->get_growth_model() == Growth::kSchnute)  {
 
-  } else {
-    length_ = first_age_length_par_ * (1-std::exp(-second_age_length_par_ * ((float)get_age() - third_age_length_par_)));
+    length_ = pow(pow(fourth_age_length_par_, second_age_length_par_) + (pow(fith_age_length_par_, second_age_length_par_) - pow(fourth_age_length_par_, second_age_length_par_)) * ((1.0 - std::exp(-first_age_length_par_ * ((float)get_age() -  (float)model_->min_age()))) / (1.0 - std::exp(-first_age_length_par_ *(sixth_age_length_par_ - (float)model_->min_age())))), 1 / second_age_length_par_);
   }
+
   weight_ = first_length_weight_par_ * pow(length_, second_length_weight_par_); // Just update weight when ever we update length to save executions
-  //LOG_FINEST() << "initialise agent, age = " << get_age() << " length = " << length_ << " weight = " << weight_;
+
+  //LOG_FINEST() << "initialise agent, age = " << get_age() << " length = " << length_ << " weight = " << weight_ << " 1 " << first_age_length_par_ << " 2 = " << second_age_length_par_ << " 3 = " << third_age_length_par_ <<
+  //    " 4 = " << fourth_age_length_par_ << " 5 = " << fith_age_length_par_ << " 6 = " << sixth_age_length_par_;
 }
 
 } /* namespace niwa */

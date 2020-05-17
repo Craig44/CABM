@@ -36,20 +36,20 @@ GrowthSchnuteWithBasic::GrowthSchnuteWithBasic(Model* model) : Growth(model) {
   parameters_.Bind<string>(PARAM_B_LAYER_LABEL, &b_layer_label_, "Label for the numeric layer that describes mean b in the weight calcualtion through space", "", true);
 
   parameters_.Bind<float>(PARAM_T0, &t0_, "The value for t0 default = 0", "", true);
-  parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "Value of mean L inf multiplied by the layer value if supplied", "", true);
-  parameters_.Bind<float>(PARAM_BETA, &beta_, "Value of mean k multiplied by the layer value if supplied", "", true);
+  parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "alpha value for schnute growth curve", "", true);
+  parameters_.Bind<float>(PARAM_BETA, &beta_, "beta value for schnute growth curve", "", true);
   parameters_.Bind<float>(PARAM_A, &a_, "alpha value for weight at length function", "", true);
   parameters_.Bind<float>(PARAM_B, &b_, "beta value for weight at length function", "", true);
-  parameters_.Bind<float>(PARAM_TAU1, &tau1_, "alpha value for weight at length function", "");
-  parameters_.Bind<float>(PARAM_TAU2, &tau2_, "beta value for weight at length function", "");
-  parameters_.Bind<float>(PARAM_Y1, &y1_, "alpha value for weight at length function", "");
-  parameters_.Bind<float>(PARAM_Y2, &y2_, "beta value for weight at length function", "");
+  parameters_.Bind<float>(PARAM_TAU1, &tau1_, "reference age for y1", "");
+  parameters_.Bind<float>(PARAM_TAU2, &tau2_, "reference age for y2", "");
+  parameters_.Bind<float>(PARAM_Y1, &y1_, "mean size at reference ages tau1", "");
+  parameters_.Bind<float>(PARAM_Y2, &y2_, "mean size at reference ages tau2", "");
 
   RegisterAsAddressable(PARAM_ALPHA, &alpha_, addressable::kAll, addressable::kyes);
   RegisterAsAddressable(PARAM_BETA, &beta_, addressable::kAll, addressable::kyes);
   RegisterAsAddressable(PARAM_TAU1, &tau1_, addressable::kAll, addressable::kyes);
   RegisterAsAddressable(PARAM_TAU2, &tau2_, addressable::kAll, addressable::kyes);
-
+  model_->set_growth_model(niwa::Growth::kSchnute);
 }
 
 // check users have defined spatial or non_spatial
@@ -76,6 +76,12 @@ void GrowthSchnuteWithBasic::DoValidate() {
     LOG_ERROR_P(PARAM_LABEL) << "You have not specified a value or a layer label for the " << PARAM_ALPHA << " parameter, you must pick one or the other";
   if (!parameters_.Get(PARAM_BETA_LAYER_LABEL)->has_been_defined() & !parameters_.Get(PARAM_BETA)->has_been_defined())
     LOG_ERROR_P(PARAM_LABEL) << "You have not specified a value or a layer label for the " << PARAM_BETA << " parameter, you must pick one or the other";
+
+  for(auto& tau1 : tau1_) {
+    if(tau1 != model_->min_age())
+      LOG_ERROR_P(PARAM_TAU1) << "tau1 should be the same as min_age on the model.";
+  }
+
 }
 
 
@@ -197,7 +203,6 @@ void GrowthSchnuteWithBasic::DoBuild() {
       t0_.assign(2, 0.0);
   }
 
-
 	// Check that the layers are all positive
 }
 
@@ -240,7 +245,7 @@ void GrowthSchnuteWithBasic::DoExecute() {
 }
 
 /*
- * This method is called at when ever an agent is created/seeded or moves. Agents will get a new/updated growth parameters
+ * This method is called at when ever an agent is created/seeded or moves (WorldCell.cpp) . Agents will get a new/updated growth parameters
  * based on the spatial cells of the process. This is called in initialisation/Recruitment and movement processes if needed.
 */
 void  GrowthSchnuteWithBasic::draw_growth_param(unsigned row, unsigned col, unsigned number_of_draws, vector<vector<float>>& vec, unsigned sex) {
@@ -281,6 +286,9 @@ void  GrowthSchnuteWithBasic::draw_growth_param(unsigned row, unsigned col, unsi
       vec[i].push_back(rng.normal(mean_alpha, cv_ * mean_alpha));
       vec[i].push_back(rng.normal(mean_beta, cv_ * mean_beta));
       vec[i].push_back(t0);
+      vec[i].push_back(y1_[sex]);
+      vec[i].push_back(y2_[sex]);
+      vec[i].push_back(tau2_[sex]);
       vec[i].push_back(a);
       vec[i].push_back(b);
     }
@@ -289,6 +297,9 @@ void  GrowthSchnuteWithBasic::draw_growth_param(unsigned row, unsigned col, unsi
       vec[i].push_back(rng.lognormal(mean_alpha, cv_));
       vec[i].push_back(rng.lognormal(mean_beta, cv_));
       vec[i].push_back(t0);
+      vec[i].push_back(y1_[sex]);
+      vec[i].push_back(y2_[sex]);
+      vec[i].push_back(tau2_[sex]);
       vec[i].push_back(a);
       vec[i].push_back(b);
     }

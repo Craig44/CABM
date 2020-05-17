@@ -58,6 +58,16 @@ enum Type {
 };
 } /* namespace Units */
 
+
+namespace Growth {
+enum Type {
+  kVonbert = 0,
+  kSchnute = 1,
+  kInvalid = 2
+};
+
+} /* namespace Units */
+
 /**
  * Class definition
  */
@@ -74,6 +84,9 @@ public:
   // Accessors
   RunMode::Type               run_mode() const { return run_mode_; }
   State::Type                 state() const { return state_; }
+  Growth::Type                get_growth_model() const { return growth_model_; }
+  void                        set_growth_model(Growth::Type growth_model) {growth_model_ = growth_model;}
+
   virtual unsigned            start_year() const { return start_year_; }
   virtual unsigned            final_year() const { return final_year_; }
   unsigned                    projection_final_year() const { return projection_final_year_;}
@@ -154,6 +167,8 @@ protected:
   // Members
   RunMode::Type               run_mode_ = RunMode::kInvalid;
   State::Type                 state_    = State::kStartUp;
+  Growth::Type                growth_model_ = Growth::kInvalid;
+
   unsigned                    start_year_ = 0;
   unsigned                    final_year_ = 0;
   unsigned                    projection_final_year_ = 0;
