@@ -39,9 +39,9 @@ namespace processes {
 MovementPreference::MovementPreference(Model* model) : Movement(model) {
   process_type_ = ProcessType::kTransition;
   //parameters_.Bind<string>(PARAM_SELECTIVITY, &selectivity_label_, "Selectivity label", "");
-  parameters_.Bind<float>(PARAM_D_MAX, &d_max_, "The maxiumu diffusion value", "")->set_lower_bound(0.0, false);
-  parameters_.Bind<float>(PARAM_TIME_INTERVAL, &time_interval_, "The time interval that this movement process occurs over (k) in the documentation formula's", "", 1.0)->set_lower_bound(0.0, false);
-  parameters_.Bind<float>(PARAM_ZETA, &zeta_, "An arbiituary parameter that controls curvature between preference and diffusion", "", 1.0)->set_lower_bound(0.0, false);
+  parameters_.Bind<double>(PARAM_D_MAX, &d_max_, "The maxiumu diffusion value", "")->set_lower_bound(0.0, false);
+  parameters_.Bind<double>(PARAM_TIME_INTERVAL, &time_interval_, "The time interval that this movement process occurs over (k) in the documentation formula's", "", 1.0)->set_lower_bound(0.0, false);
+  parameters_.Bind<double>(PARAM_ZETA, &zeta_, "An arbiituary parameter that controls curvature between preference and diffusion", "", 1.0)->set_lower_bound(0.0, false);
   parameters_.Bind<bool>(PARAM_BROWNIAN_MOTION, &brownian_motion_, "Just apply random movement, undirected movement", "", false);
   parameters_.Bind<string>(PARAM_PREFERENCE_FUNCTIONS, &preference_function_labels_, "The preference functions to apply", "", true);
   parameters_.Bind<string>(PARAM_PREFERENCE_LAYERS, &preference_layer_labels_, "The preference functions to apply", "", true);
@@ -61,7 +61,7 @@ void MovementPreference::DoValidate() {
  *  Build relationships with other classes
  */
 void MovementPreference::DoBuild() {
-  LOG_FINE();
+  LOG_MEDIUM();
   // Get the preference functions
   for (auto& label : preference_function_labels_) {
     PreferenceFunction* temp_func = nullptr;
@@ -84,7 +84,7 @@ void MovementPreference::DoBuild() {
       non_static_layer_ndx_.push_back(layer_ndx);
       calculate_on_the_fly_ = true;
     }
-    LOG_FINE() << "brownian motion = " << brownian_motion_ << " calculate on the fly? " << calculate_on_the_fly_;
+    LOG_MEDIUM() << "brownian motion = " << brownian_motion_ << " calculate on the fly? " << calculate_on_the_fly_;
 
     preference_layers_.push_back(temp_layer);
     ++layer_ndx;
@@ -103,7 +103,7 @@ void MovementPreference::DoBuild() {
   }
 
 
-  LOG_FINEST() << "selectivities supplied = " << selectivity_label_.size();
+  LOG_MEDIUM() << "selectivities supplied = " << selectivity_label_.size();
   // Build selectivity links
   if (selectivity_label_.size() == 1)
     selectivity_label_.assign(2, selectivity_label_[0]);
@@ -111,7 +111,7 @@ void MovementPreference::DoBuild() {
   if (selectivity_label_.size() > 2) {
     LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << "You suppled " << selectivity_label_.size()  << " Selectiviites, you can only have one for each sex max = 2";
   }
-  LOG_FINEST() << "selectivities supplied = " << selectivity_label_.size();
+  LOG_MEDIUM() << "selectivities supplied = " << selectivity_label_.size();
 
   bool first = true;
   for (string label : selectivity_label_) {
@@ -136,7 +136,7 @@ void MovementPreference::DoBuild() {
  *  Execute process
  */
 void MovementPreference::DoExecute() {
-  LOG_FINE();
+  LOG_MEDIUM();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   // Pre-calculate agents in the world to set aside our random numbers needed for the operation
   n_agents_ = 0;
@@ -241,7 +241,7 @@ void MovementPreference::DoExecute() {
   //#pragma omp parallel for collapse(2)
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
-      LOG_FINEST() << "row = " << row << " col = " << col  << " thread id = " << omp_get_thread_num();
+      LOG_FINE() << "row = " << row << " col = " << col  << " thread id = " << omp_get_thread_num();
       WorldCell* origin_cell = world_->get_base_square(row, col);
       WorldCell* destination_cell;
       if (origin_cell->is_enabled()) {
@@ -333,7 +333,7 @@ void MovementPreference::DoExecute() {
                 total_v += lat_distance;
                 total_u += lon_distance;
                 ++total_jumps;
-                LOG_FINEST() << counter<< " " << (*iter).get_lat() << " distance = " << lat_distance << " lon = " << (*iter).get_lon() << " distance = " << lon_distance << " Z = " << lon_random_numbers_[cell_offset_[row][col] + counter] << " sigma = " << standard_deviation_;
+                LOG_FINEST() << " age = " <<(*iter).get_age() << " counter = " << counter<< " " << (*iter).get_lat() << " distance = " << lat_distance << " lon = " << (*iter).get_lon() << " distance = " << lon_distance << " Z = " << lon_random_numbers_[cell_offset_[row][col] + counter] << " sigma = " << standard_deviation_;
                 // Check bounds and find cell destination
                 if ((((*iter).get_lat() + lat_distance) <= model_->max_lat()) && (((*iter).get_lat() + lat_distance) >= model_->min_lat())) {
                   (*iter).set_lat((*iter).get_lat() + lat_distance);
@@ -387,33 +387,33 @@ void MovementPreference::DoExecute() {
     } // col
   } // row
   // merge destination agents into the actual grid
-  LOG_FINE() << "Mergind cached world";
+  LOG_MEDIUM() << "Mergind cached world";
   world_->MergeCachedGrid();
-  LOG_TRACE();
+  LOG_MEDIUM();
 }
 
 /*
  * Calculate gradient using the difference method, for each year and initialisation
 */
 void  MovementPreference::calculate_gradients() {
+  LOG_MEDIUM() << "calculate_gradients()";
   if (brownian_motion_)
     return void();
   LOG_FINE();
-
   // Start with setting the initialisation sets
   initialisation_meridonal_gradient_.resize(model_->get_height());
   initialisation_zonal_gradient_.resize(model_->get_height());
-  vector<vector<float>> preference(model_->get_height());
+  vector<vector<double>> preference(model_->get_height());
   initialisation_preference_value_.resize(model_->get_height());
-  vector<vector<float>> average_zonal(model_->get_height());
-  vector<vector<float>> average_meridonal(model_->get_height());
+  vector<vector<double>> average_zonal(model_->get_height());
+  vector<vector<double>> average_meridonal(model_->get_height());
   for (unsigned row = 0; row < model_->get_height(); ++row) {
-    initialisation_meridonal_gradient_[row].resize(model_->get_height());
-    initialisation_zonal_gradient_[row].resize(model_->get_height(), 1.0);
-    preference[row].resize(model_->get_height(), 1.0);
-    initialisation_preference_value_[row].resize(model_->get_height(), 1.0);
-    average_meridonal[row].resize(model_->get_height(), 0.0);
-    average_zonal[row].resize(model_->get_height(),0.0);
+    initialisation_meridonal_gradient_[row].resize(model_->get_width());
+    initialisation_zonal_gradient_[row].resize(model_->get_width(), 1.0);
+    preference[row].resize(model_->get_width(), 1.0);
+    initialisation_preference_value_[row].resize(model_->get_width(), 1.0);
+    average_meridonal[row].resize(model_->get_width(), 0.0);
+    average_zonal[row].resize(model_->get_width(),0.0);
   }
 
   for (auto year : model_->years()) {
@@ -428,7 +428,7 @@ void  MovementPreference::calculate_gradients() {
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         preference[row][col] *= preference_functions_[layer_iter]->get_result(preference_layers_[layer_iter]->get_value(row, col, 0));  // the 0 in the layers call will return the default layer
-        LOG_FINEST() << "preference layer value = " <<  preference_layers_[layer_iter]->get_value(row, col, 0) << " preference function value = " << preference_functions_[layer_iter]->get_result(preference_layers_[layer_iter]->get_value(row, col, 0));
+        LOG_FINE() << "preference layer value = " <<  preference_layers_[layer_iter]->get_value(row, col, 0) << " preference function value = " << preference_functions_[layer_iter]->get_result(preference_layers_[layer_iter]->get_value(row, col, 0));
       }
     }
   }
@@ -474,13 +474,13 @@ void  MovementPreference::calculate_gradients() {
     for (auto year : model_->years()) {
       LOG_FINE() << "year = " << year;
       // initialise temporary containers
-      vector<vector<float>> zonal_gradient(model_->get_height());
-      vector<vector<float>> meredional_gradient(model_->get_height());
-      vector<vector<float>> preference(model_->get_height());
+      vector<vector<double>> zonal_gradient(model_->get_height());
+      vector<vector<double>> meredional_gradient(model_->get_height());
+      vector<vector<double>> preference(model_->get_height());
       for (unsigned row = 0; row < model_->get_height(); ++row) {
-        zonal_gradient[row].resize(model_->get_height(), 1.0);
-        meredional_gradient[row].resize(model_->get_height(), 1.0);
-        preference[row].resize(model_->get_height(),1.0);
+        zonal_gradient[row].resize(model_->get_width(), 1.0);
+        meredional_gradient[row].resize(model_->get_width(), 1.0);
+        preference[row].resize(model_->get_width(),1.0);
       }
 
       for (unsigned layer_iter = 0; layer_iter < preference_layer_labels_.size(); ++layer_iter) {
@@ -490,7 +490,6 @@ void  MovementPreference::calculate_gradients() {
         for (unsigned row = 0; row < model_->get_height(); ++row) {
           for (unsigned col = 0; col < model_->get_width(); ++col) {
             preference[row][col] *= preference_functions_[layer_iter]->get_result(preference_layers_[layer_iter]->get_value(row, col, year));  // the 0 in the layers call will return the default layer
-            LOG_FINEST() << "preference layer value = " <<  preference_layers_[layer_iter]->get_value(row, col, year) << " preference function value = " << preference_functions_[layer_iter]->get_result(preference_layers_[layer_iter]->get_value(row, col, year));
 
           }
         }
@@ -505,35 +504,33 @@ void  MovementPreference::calculate_gradients() {
   } else {
     // We can calculate gradients now as nothing is unknown to us at this point
     for (auto year : model_->years()) {
-      LOG_FINE() << "year = " << year;
+      LOG_FINE() << "year = " << year << " number of layer labels = " << preference_layer_labels_.size();
 
       // initialise temporary containers
 
-      vector<vector<float>> zonal_gradient(model_->get_height());
-      vector<vector<float>> meredional_gradient(model_->get_height());
-      vector<vector<float>> preference(model_->get_height());
+      vector<vector<double>> zonal_gradient(model_->get_height());
+      vector<vector<double>> meredional_gradient(model_->get_height());
+      vector<vector<double>> preference(model_->get_height());
       for (unsigned row = 0; row < model_->get_height(); ++row) {
-        zonal_gradient[row].resize(model_->get_height(), 1.0);
-        meredional_gradient[row].resize(model_->get_height(), 1.0);
-        preference[row].resize(model_->get_height(),1.0);
+        zonal_gradient[row].resize(model_->get_width(), 1.0);
+        meredional_gradient[row].resize(model_->get_width(), 1.0);
+        preference[row].resize(model_->get_width(), 1.0);
 
       }
       for (unsigned layer_iter = 0; layer_iter < preference_layer_labels_.size(); ++layer_iter) {
         for (unsigned row = 0; row < model_->get_height(); ++row) {
           for (unsigned col = 0; col < model_->get_width(); ++col) {
             preference[row][col] *= preference_functions_[layer_iter]->get_result(preference_layers_[layer_iter]->get_value(row, col, year));  // the 0 in the layers call will return the default layer
-            LOG_FINEST() << "preference layer value = " <<  preference_layers_[layer_iter]->get_value(row, col, year) << " preference function value = " << preference_functions_[layer_iter]->get_result(preference_layers_[layer_iter]->get_value(row, col, year));
 
           }
         }
       }
       // take the preference to the power
-      LOG_FINE() << "power = " << float(1.0 / preference_function_labels_.size());
+      LOG_MEDIUM() << "power = " << float(1.0 / preference_function_labels_.size());
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
-          float val = pow(preference[row][col], float(1.0 / preference_function_labels_.size()));
+          double val = pow(preference[row][col], float(1.0 / preference_function_labels_.size()));
           preference[row][col] = val;
-          LOG_FINEST() << "preference layer value = " << preference[row][col];
         }
       }
       preference_by_year_[year] = preference;
@@ -568,7 +565,7 @@ void  MovementPreference::calculate_gradients() {
 /*
  * This function just recalculates the random component of the random walk around the preference space, which depends on habitat quality
 */
-void  MovementPreference::calculate_diffusion_parameter(float& preference_value, float& standard_deviation) {
+void  MovementPreference::calculate_diffusion_parameter(double& preference_value, double& standard_deviation) {
   diffusion_parameter_ = d_max_ * (1 - (preference_value / (zeta_ + preference_value)));
   if (brownian_motion_)
     diffusion_parameter_ = d_max_;

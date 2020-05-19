@@ -37,7 +37,7 @@ MortalityEffortBased::MortalityEffortBased(Model* model) : Mortality(model) {
   parameters_.Bind<string>(PARAM_MINIMIZER, &minimiser_label_, "Label of the minimser to solve the problem", "");
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "years to apply the process", "");
   parameters_.Bind<float>(PARAM_CATCHES, &catches_, "Total catch by year","");
-  parameters_.Bind<float>(PARAM_EFFORT_VALUES, &effort_input_, "A vector of effort values, one for each enabled cell of the model","",true);
+  parameters_.Bind<float>(PARAM_EFFORT_VALUES, &effort_input_, "A vector of effort values, one for each enabled cell of the model, these should represent the variability of effort of the fishery mimicking","",true);
   parameters_.Bind<string>(PARAM_EFFORT_LAYER_LABEL, &effort_layer_label_, "A layer label that is a numeric layer label that contains effort values for each year.","","");
   parameters_.Bind<double>(PARAM_STARTING_VALUE_FOR_LAMBDA, &start_value_for_lambda_, "Total catch by year","", true);
 
@@ -66,13 +66,12 @@ void MortalityEffortBased::DoBuild() {
   if (!parameters_.Get(PARAM_EFFORT_VALUES)->has_been_defined() & !parameters_.Get(PARAM_EFFORT_LAYER_LABEL)->has_been_defined())
     LOG_FATAL_P(PARAM_LABEL) << "You need to supply either " << PARAM_EFFORT_VALUES << " or " << PARAM_EFFORT_LAYER_LABEL << " inputs, you have not supplied either.";
 
-  vulnerable_biomass_vector_format_.resize(model_->get_height() * model_->get_width(), 0.0);
-  effort_organised_vector_format_.resize(model_->get_height() * model_->get_width(), 0.0);
+  LOG_MEDIUM() << "enabled cells = " << world_->get_enabled_cells();
 
   if (parameters_.Get(PARAM_EFFORT_VALUES)->has_been_defined()) {
     effort_layer_based_ = false;
-    // Order the effort vector so it
-    sort (effort_input_.begin(), effort_input_.end());  // low -> high
+    // Order the effort vector so it what?
+    sort(effort_input_.begin(), effort_input_.end());  // low -> high
 
   } else if (parameters_.Get(PARAM_EFFORT_LAYER_LABEL)->has_been_defined()) {
     effort_layer_based_ = true;
@@ -150,6 +149,7 @@ void MortalityEffortBased::DoBuild() {
     minimiser_->PassStartValueBaranov(start_value_for_lambda_);
   }
 
+  age_freq_census_.resize(model_->age_spread());
 }
 
 /**
@@ -167,12 +167,17 @@ void MortalityEffortBased::DoReset() {
  * DoExecute
  */
 void MortalityEffortBased::DoExecute() {
-  LOG_FINE() << "DoExecute";
+  LOG_MEDIUM() << "DoExecute";
   if (first_execute_) {
     // Bit of an annoying hack, but cannot check at build because of Building mortality classes before World, blah TODO move this process into the PreWorldProcessBuild in Process Manager.
-    if (world_->get_enabled_cells() != effort_input_.size()) {
-      LOG_FATAL_P(PARAM_EFFORT_VALUES) << "You must specify an effort value for each enabled (Base layer > 0) cell, there are " << world_->get_enabled_cells() << " Base cells, but you have supplied " << effort_input_.size() << ". Can you please sort this descrepency out";
+    if (!effort_layer_based_) {
+      if (world_->get_enabled_cells() != effort_input_.size()) {
+        LOG_FATAL_P(PARAM_EFFORT_VALUES) << "You must specify an effort value for each enabled (Base layer > 0) cell, there are " << world_->get_enabled_cells() << " Base cells, but you have supplied " << effort_input_.size() << ". Can you please sort this descrepency out";
+      }
     }
+    vulnerable_biomass_vector_format_.resize(world_->get_enabled_cells(), 0.0);
+    effort_organised_vector_format_.resize(world_->get_enabled_cells(), 0.0);
+
     first_execute_ = false;
   }
   auto iter = years_.begin();
@@ -180,9 +185,11 @@ void MortalityEffortBased::DoExecute() {
     if (find(iter, years_.end(), model_->current_year()) != years_.end()) {
       iter = find(years_.begin(), years_.end(), model_->current_year());
       unsigned catch_ndx = distance(years_.begin(), iter);
-      LOG_FINE() << "applying F in year " << model_->current_year() << " catch index = " << catch_ndx;
+      LOG_MEDIUM() << "applying F in year " << model_->current_year() << " catch index = " << catch_ndx;
       // Pre-calculate agents in the world to set aside our random numbers needed for the operation
       n_agents_ = 0;
+      unsigned cell_counter = 0;
+
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
           WorldCell* cell = world_->get_base_square(row, col);
@@ -194,12 +201,15 @@ void MortalityEffortBased::DoExecute() {
             cell_offset_[row][col] = n_agents_;
             n_agents_ += cell->agents_.size();
             if (effort_layer_based_)
-              effort_input_[row * model_->get_width() + col] = effort_layer_->get_value(row, col, model_->current_year());
+              effort_input_[cell_counter] = effort_layer_->get_value(row, col, model_->current_year());
+            cell_counter++;
           }
         }
       }
       if (effort_layer_based_)
         sort(effort_input_.begin(),effort_input_.end());
+
+      fill(age_freq_census_.begin(), age_freq_census_.end(), 0.0);
 
       vulnerable_biomass_by_year_[model_->current_year()] = 0;
       // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
@@ -212,47 +222,78 @@ void MortalityEffortBased::DoExecute() {
         discard_random_numbers_[i] = rng.chance();
         selectivity_random_numbers_[i] = rng.chance();
       }
+      cell_counter = 0;
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
 
           WorldCell* cell = world_->get_base_square(row, col);
+
           if (cell->is_enabled()) {
-            LOG_FINE() << "checking cell in row " << row + 1 << " col = " << col + 1;
+            LOG_MEDIUM() << "checking cell in row " << row + 1 << " col = " << col + 1;
             // iterate through and calcualte vulnerable biomass in each cell exactly, nothing random here
             unsigned counter = 0;
             if (selectivity_length_based_) {
               for (auto agent_iter = cell->agents_.begin(); agent_iter != cell->agents_.end(); ++counter,++agent_iter) {
                 //LOG_FINE() << "counter = " << counter;
-                if ((*agent_iter).is_alive())
-                  vulnerable_by_cell_[row][col] += (*agent_iter).get_weight() * (*agent_iter).get_scalar() * selectivity_[(*agent_iter).get_sex()]->GetResult((*agent_iter).get_length_bin_index());
+                if ((*agent_iter).is_alive()) {
+                  if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[(*agent_iter).get_sex()]->GetResult((*agent_iter).get_length_bin_index()))
+                    vulnerable_by_cell_[row][col] += (*agent_iter).get_weight() * (*agent_iter).get_scalar();
+                }
+              }
+              for (auto agent_iter = cell->tagged_agents_.begin(); agent_iter != cell->tagged_agents_.end(); ++counter,++agent_iter) {
+                if ((*agent_iter).is_alive()) {
+                  if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[(*agent_iter).get_sex()]->GetResult((*agent_iter).get_length_bin_index()))
+                    vulnerable_by_cell_[row][col] += (*agent_iter).get_weight() * (*agent_iter).get_scalar();
+                }
               }
             } else {
               for (auto agent_iter = cell->agents_.begin(); agent_iter != cell->agents_.end(); ++counter,++agent_iter) {
                 //LOG_FINE() << "counter = " << counter;
-                if ((*agent_iter).is_alive())
-                  vulnerable_by_cell_[row][col] += (*agent_iter).get_weight() * (*agent_iter).get_scalar() * selectivity_[(*agent_iter).get_sex()]->GetResult((*agent_iter).get_age_index());
+                if ((*agent_iter).is_alive()) {
+                  if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[(*agent_iter).get_sex()]->GetResult((*agent_iter).get_age_index()))
+                    vulnerable_by_cell_[row][col] += (*agent_iter).get_weight() * (*agent_iter).get_scalar();
+                }
+              }
+              for (auto agent_iter = cell->tagged_agents_.begin(); agent_iter != cell->tagged_agents_.end(); ++counter,++agent_iter) {
+                //LOG_FINE() << "counter = " << counter;
+                if ((*agent_iter).is_alive()) {
+                  if (random_numbers_[cell_offset_[row][col] + counter] <= selectivity_[(*agent_iter).get_sex()]->GetResult((*agent_iter).get_age_index()))
+                    vulnerable_by_cell_[row][col] += (*agent_iter).get_weight() * (*agent_iter).get_scalar();
+                }
               }
             }
+            LOG_MEDIUM() << "Biomass = " << vulnerable_by_cell_[row][col] << " cell counter = " << cell_counter << " size = " << vulnerable_biomass_vector_format_.size();
 
             vulnerable_biomass_by_year_[model_->current_year()] += vulnerable_by_cell_[row][col];
-            vulnerable_biomass_vector_format_[row * model_->get_width() + col] = vulnerable_by_cell_[row][col];
+
+            vulnerable_biomass_vector_format_[cell_counter] = vulnerable_by_cell_[row][col];
+            ++cell_counter;
+
             //effort_by_cell_[row][col] = vulnerable_by_cell_[row][col];// * catchability_;
           }
         }
       }
       //
-      // Final attribute effort based on an ideal free distribution
-      biomass_index_ = math::sort_indexes(vulnerable_biomass_vector_format_);
-      for(unsigned i = 0; i < vulnerable_biomass_vector_format_.size(); ++i)
-        effort_organised_vector_format_[biomass_index_[i]] = effort_input_[i];
 
+      // Final attribute effort based on an ideal free distribution The highest vulnerable biomass gets the most effort.
+      biomass_index_ = math::sort_indexes(vulnerable_biomass_vector_format_);
+      for(unsigned i = 0; i < vulnerable_biomass_vector_format_.size(); ++i) {
+        LOG_MEDIUM() << "i  = " << i << " biomass ndx = " << biomass_index_[i]<< " effort value = " << effort_input_[i] << " biomass = " << vulnerable_biomass_vector_format_[biomass_index_[i]];
+        effort_organised_vector_format_[biomass_index_[i]] = effort_input_[i];
+      }
+
+      cell_counter = 0;
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
-          effort_by_cell_[row][col] = effort_organised_vector_format_[row * model_->get_width() + col];
+          WorldCell* cell = world_->get_base_square(row, col);
+          if (cell->is_enabled()) {
+            effort_by_cell_[row][col] = effort_organised_vector_format_[cell_counter];
+            cell_counter++;
+          }
         }
       }
 
-      LOG_FINE() << "about to check baranov";
+      LOG_MEDIUM() << "about to check baranov";
       time(&start_time_);
       minimiser_->SolveBaranov();
       time_by_year_[model_->current_year()] = (time(NULL) - start_time_); // seconds
@@ -281,19 +322,20 @@ void MortalityEffortBased::DoExecute() {
               for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter, ++iter) {
                 //LOG_MEDIUM() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " is alove = " << (*iter).is_alive() << " counter = " << counter;
                 if ((*iter).is_alive()) {
-                  if (random_numbers_[cell_offset_[row][col] + counter]
-                      <= (1.0 - std::exp(-F_this_cell * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())))) {
+                  if (random_numbers_[cell_offset_[row][col] + counter] <= (1.0 - std::exp(-F_this_cell * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())))) {
                     actual_catch_ += (*iter).get_weight() * (*iter).get_scalar();
                     removals_by_cell_[row][col] += (*iter).get_weight() * (*iter).get_scalar();
                     age_freq.frequency_[(*iter).get_age_index()] += (*iter).get_scalar(); // This catch actually represents many individuals.
+                    age_freq.biomass_ += (*iter).get_weight() * (*iter).get_scalar();
                     length_freq.frequency_[(*iter).get_length_bin_index()] += (*iter).get_scalar();
+                    length_freq.biomass_ += (*iter).get_weight() * (*iter).get_scalar();
                     census_fishery.age_ndx_.push_back((*iter).get_age_index());
                     census_fishery.length_ndx_.push_back((*iter).get_length_bin_index());
                     census_fishery.scalar_.push_back((*iter).get_scalar());
                     census_fishery.biomass_+= (*iter).get_weight() * (*iter).get_scalar();
                     census_fishery.weight_.push_back((*iter).get_weight());
                     census_fishery.sex_.push_back((*iter).get_sex());
-
+                    age_freq_census_[(*iter).get_age_index()] += (*iter).get_scalar();
                     cell->remove_agent_alive((*iter).get_scalar());
                     (*iter).dies();
                   }
@@ -308,14 +350,16 @@ void MortalityEffortBased::DoExecute() {
                     actual_catch_ += (*iter).get_weight() * (*iter).get_scalar();
                     removals_by_cell_[row][col] += (*iter).get_weight() * (*iter).get_scalar();
                     age_freq.frequency_[(*iter).get_age_index()] += (*iter).get_scalar(); // This catch actually represents many individuals.
+                    age_freq.biomass_ += (*iter).get_weight() * (*iter).get_scalar();
                     length_freq.frequency_[(*iter).get_length_bin_index()] += (*iter).get_scalar();
+                    length_freq.biomass_ += (*iter).get_weight() * (*iter).get_scalar();
                     census_fishery.age_ndx_.push_back((*iter).get_age_index());
                     census_fishery.length_ndx_.push_back((*iter).get_length_bin_index());
                     census_fishery.scalar_.push_back((*iter).get_scalar());
                     census_fishery.biomass_+= (*iter).get_weight() * (*iter).get_scalar();
                     census_fishery.weight_.push_back((*iter).get_weight());
                     census_fishery.sex_.push_back((*iter).get_sex());
-
+                    age_freq_census_[(*iter).get_age_index()] += (*iter).get_scalar();
                     cell->remove_agent_alive((*iter).get_scalar());
                     (*iter).dies();
                   }
@@ -334,6 +378,7 @@ void MortalityEffortBased::DoExecute() {
       F_by_year_and_cell_[model_->current_year()] = F_by_cell_;
       vulnerable_by_year_and_cell_[model_->current_year()] = vulnerable_by_cell_;
       effort_by_year_and_cell_[model_->current_year()] = effort_by_cell_;
+      age_freq_census_by_year_[model_->current_year()] = age_freq_census_;
 
     } // year
   } // initialisation
@@ -341,6 +386,9 @@ void MortalityEffortBased::DoExecute() {
 
 /**
  * Evaluate SSE for catch using the baranov catch equation
+ * There is stochastic fishing in the sense we generate random numbers once to evaluate the vulnerability of agents to fishing to generate vulnerable biomass
+ * After that, we solve for (observed_catch - est_catch)^2  where est_catch =
+ *
  */
 double MortalityEffortBased::SolveBaranov() {
   LOG_FINE();
@@ -355,8 +403,7 @@ double MortalityEffortBased::SolveBaranov() {
           for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter, ++counter) {
             //LOG_FINEST() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " survivorship = " << (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()])) << " M = " << (*iter).get_m();
             if ((*iter).is_alive()) {
-              if (random_numbers_[cell_offset_[row][col] + counter]
-                  <= (1.0 - std::exp(-F_this_cell * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())))) {
+              if (random_numbers_[cell_offset_[row][col] + counter] <= (1.0 - std::exp(-F_this_cell * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())))) {
                 catch_based_on_baranov_ += (*iter).get_weight() * (*iter).get_scalar();
               }
             }
@@ -365,8 +412,7 @@ double MortalityEffortBased::SolveBaranov() {
           for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter, ++counter) {
             //LOG_FINEST() << "rand number = " << random_numbers_[cell_offset_[row][col] + counter] << " selectivity = " << cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()] << " survivorship = " << (1 - std::exp(-(*iter).get_m() *  cell_offset_for_selectivity_[row][col][(*iter).get_sex() * model_->age_spread() + (*iter).get_age_index()])) << " M = " << (*iter).get_m();
             if ((*iter).is_alive()) {
-              if (random_numbers_[cell_offset_[row][col] + counter]
-                  <= (1.0 - std::exp(-F_this_cell * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index())))) {
+              if (random_numbers_[cell_offset_[row][col] + counter] <= (1.0 - std::exp(-F_this_cell * selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index())))) {
                 catch_based_on_baranov_ += (*iter).get_weight() * (*iter).get_scalar();
               }
             }
@@ -376,7 +422,7 @@ double MortalityEffortBased::SolveBaranov() {
     }
   }
   //
-  LOG_FINE() << "estimated catch = " << catch_based_on_baranov_ << " SSE = " << pow(catches_by_year_[model_->current_year()] - catch_based_on_baranov_,2);
+  LOG_MEDIUM() << "proposed catch = " << catch_based_on_baranov_ << " catch = " << catches_by_year_[model_->current_year()] <<  " SSE = " << pow(catches_by_year_[model_->current_year()] - catch_based_on_baranov_,2) << " year = " << model_->current_year() << " lambda = " << lambda_;
 
   return pow(catches_by_year_[model_->current_year()] - catch_based_on_baranov_,2);
 }
@@ -416,6 +462,19 @@ void  MortalityEffortBased::FillReportCache(ostringstream& cache) {
     }
   }
 
+
+  cache << "AgeFrequency" << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\nyear ";
+  for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age)
+    cache << age << " ";
+  cache << "\n";
+  for (auto& values : age_freq_census_by_year_) {
+    cache << values.first << " ";
+    for (auto& age_val : values.second)
+      cache << age_val << " ";
+    cache << "\n";
+  }
+
+  /*
   for (auto& values : effort_by_year_and_cell_) {
     cache << "effort_by_cell_" << values.first << " " << REPORT_R_MATRIX << "\n";
     for (unsigned i = 0; i < values.second.size(); ++i) {
@@ -424,7 +483,7 @@ void  MortalityEffortBased::FillReportCache(ostringstream& cache) {
       cache << "\n";
     }
   }
-
+  */
   for (auto& values : vulnerable_by_year_and_cell_) {
     cache << "vulnerable_by_cell_" << values.first << " " << REPORT_R_MATRIX << "\n";
     for (unsigned i = 0; i < values.second.size(); ++i) {
@@ -442,6 +501,7 @@ void  MortalityEffortBased::FillReportCache(ostringstream& cache) {
       cache << "\n";
     }
   }
+
 }
 
 

@@ -60,6 +60,7 @@ protected:
   vector<float>                 age_results_;
   string                        process_label_;
 
+  bool                          are_obs_props_;
   unsigned                      time_step_to_execute_;
   map<unsigned, vector<float>>  error_values_by_year_;
   map<unsigned,vector<float>>   proportions_;

@@ -28,6 +28,8 @@ struct composition_data {
   unsigned year_;
   unsigned row_;
   unsigned col_;
+  float    biomass_; // Total biomass if unsexed otherwise male biomass in sexed model
+  float    female_biomass_; // Total female biomass
   vector<float> frequency_;
   vector<float> female_frequency_;
   composition_data(string type, unsigned year, unsigned row, unsigned col, unsigned size) : type_(type), year_(year),
@@ -35,6 +37,8 @@ struct composition_data {
   {
     frequency_.resize(size);
     female_frequency_.resize(size);
+    biomass_ = 0.0;
+    female_biomass_ = 0.0;
   }
 };
 

@@ -46,17 +46,17 @@ public:
 protected:
   // Methods
   void                        calculate_gradients();
-  void                        calculate_diffusion_parameter(float& preference_value, float& standard_deviation);  // zeta and d_max and diffusion_paraemter_ are assumed to be available to this function
+  void                        calculate_diffusion_parameter(double& preference_value, double& standard_deviation);  // zeta and d_max and diffusion_paraemter_ are assumed to be available to this function
 
   //Members
   bool                        brownian_motion_;
 
   // Report containers
-  float                       diffusion_parameter_;
-  float                       standard_deviation_;
-  float                       d_max_;
-  float                       zeta_;
-  float                       time_interval_;
+  double                       diffusion_parameter_;
+  double                       standard_deviation_;
+  double                       d_max_;
+  double                       zeta_;
+  double                       time_interval_;
   bool                        calculate_on_the_fly_ = false;
   vector<unsigned>            non_static_layer_ndx_;
   vector<string>              preference_function_labels_;
@@ -65,16 +65,16 @@ protected:
   vector<PreferenceFunction*> preference_functions_;
   vector<layers::NumericLayer*> preference_layers_;
 
-  map<unsigned, vector<vector<float>>> meridonal_gradient_;
-  map<unsigned, vector<vector<float>>> zonal_gradient_;
-  map<unsigned, vector<vector<float>>> preference_by_year_;
+  map<unsigned, vector<vector<double>>> meridonal_gradient_;
+  map<unsigned, vector<vector<double>>> zonal_gradient_;
+  map<unsigned, vector<vector<double>>> preference_by_year_;
 
-  map<unsigned, vector<vector<float>>> average_meridonal_jump_;
-  map<unsigned, vector<vector<float>>> average_zonal_jump_;
+  map<unsigned, vector<vector<double>>> average_meridonal_jump_;
+  map<unsigned, vector<vector<double>>> average_zonal_jump_;
 
-  vector<vector<float>>                initialisation_meridonal_gradient_;
-  vector<vector<float>>                initialisation_zonal_gradient_;
-  vector<vector<float>>                initialisation_preference_value_;
+  vector<vector<double>>                initialisation_meridonal_gradient_;
+  vector<vector<double>>                initialisation_zonal_gradient_;
+  vector<vector<double>>                initialisation_preference_value_;
 
   // objects for thread safety of rng
   vector<float>                       lat_random_numbers_;

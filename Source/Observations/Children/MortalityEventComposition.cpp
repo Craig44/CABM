@@ -50,6 +50,9 @@ MortalityEventComposition::MortalityEventComposition(Model* model) : Observation
   parameters_.Bind<string>(PARAM_COMPOSITION_TYPE, &comp_type_, "Is the composition Age or Length", "", PARAM_AGE)->set_allowed_values({PARAM_AGE, PARAM_LENGTH});
   parameters_.Bind<bool>(PARAM_NORMALISE, &are_obs_props_, "Are the compositions normalised to sum to one", "", true);
   parameters_.Bind<string>(PARAM_SIMULATION_LIKELIHOOD, &simulation_likelihood_label_, "Simulation likelihood to use", "");
+  parameters_.Bind<unsigned>(PARAM_MIN_AGE, &min_age_, "Minimum age", "", model_->min_age());
+  parameters_.Bind<unsigned>(PARAM_MAX_AGE, &max_age_, "Maximum age", "", model_->max_age());
+  parameters_.Bind<bool>(PARAM_PLUS_GROUP, &plus_group_, "max age is a plus group", "", true);
 
   parameters_.Bind<string>(PARAM_LAYER_OF_STRATUM_DEFINITIONS, &layer_label_, "The layer that indicates what the stratum boundaries are.", "");
   parameters_.Bind<string>(PARAM_STRATUMS_TO_INCLUDE, &cells_, "The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer", "", true);
@@ -396,7 +399,6 @@ void MortalityEventComposition::Simulate() {
         }
       } else {
         if (is_age_) {
-
           for (unsigned i = 0; i < stratum_comp_.size(); ++i) {
             SaveComparison(i + model_->min_age(), 0, 0.0, cells_[stratum_ndx], stratum_comp_[i], 0.0, error_value_by_year_and_stratum_[ years_[year_ndx]][cells_[stratum_ndx]], years_[year_ndx] );
           }
@@ -414,30 +416,39 @@ void MortalityEventComposition::Simulate() {
    */
   LOG_MEDIUM() << "Calculating score for observation = " << label_;
   // Convert to propotions before simulating for each year and cell sum = 1
-  for (auto& iter : comparisons_) {  // year
-    for (auto& second_iter : iter.second) {  // cell
-      float total_expec = 0.0;
+  float total = 0.0;
+  vector<float> total_by_cell(cells_.size() * years_.size(), 0.0);
+  unsigned counter = 0;
+  for (auto& iter : comparisons_) { // cell
+    for (auto& second_iter : iter.second) {  // year
+      total = 0.0;
+      for (auto& comparison : second_iter.second) {
+        total += comparison.expected_;
+      }
+      total_by_cell[counter] = total;
+      ++counter;
       for (auto& comparison : second_iter.second)
-        total_expec += comparison.expected_;
-
-      LOG_MEDIUM() << "total = " << total_expec;
-      for (auto& comparison : second_iter.second)
-        comparison.expected_ /= total_expec;
+        comparison.expected_ /= total;
     }
   }
-  LOG_MEDIUM() << "About to simulate";
+
   likelihood_->SimulateObserved(comparisons_);
   // Simualte numbers at age, but we want proportion
-  LOG_MEDIUM() << "check if we normalise";
-  if(are_obs_props_) {
-    for (auto& iter : comparisons_) {
-      for (auto& second_iter : iter.second) {  // cell
-        float total = 0.0;
-        for (auto& comparison : second_iter.second)
-          total += comparison.simulated_;
+  counter = 0;
+  for (auto& iter : comparisons_) {
+    for (auto& second_iter : iter.second) {  // cell
+      total = 0.0;
+      for (auto& comparison : second_iter.second)
+        total += comparison.simulated_;
+      if (are_obs_props_ & ((likelihood_->type() == PARAM_MULTINOMIAL) | (likelihood_->type() == PARAM_DIRICHLET))) {
         for (auto& comparison : second_iter.second)
           comparison.simulated_ /= total;
       }
+      if (not are_obs_props_& (likelihood_->type() == PARAM_LOGISTIC_NORMAL)) {
+        for (auto& comparison : second_iter.second)
+          comparison.simulated_ *=  total_by_cell[counter];
+      }
+      ++counter;
     }
   }
 } // Simulate

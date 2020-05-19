@@ -84,6 +84,9 @@ protected:
   vector<float>                       vulnerable_biomass_vector_format_;
   vector<float>                       effort_organised_vector_format_;
 
+  vector<float>                       age_freq_census_;
+  map<unsigned,vector<float>>         age_freq_census_by_year_;
+
   vector<float>                       effort_input_;
   string                              effort_layer_label_;
   layers::NumericLayer*               effort_layer_ = nullptr;

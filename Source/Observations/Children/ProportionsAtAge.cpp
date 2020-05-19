@@ -43,6 +43,7 @@ ProportionsAtAge::ProportionsAtAge(Model* model) : Observation(model) {
   parameters_.Bind<unsigned>(PARAM_MIN_AGE, &min_age_, "Minimum age", "");
   parameters_.Bind<unsigned>(PARAM_MAX_AGE, &max_age_, "Maximum age", "");
   parameters_.Bind<bool>(PARAM_SEXED, &sexed_, "Observation split by sex", "" , false);
+  parameters_.Bind<bool>(PARAM_NORMALISE, &are_obs_props_, "Are the compositions normalised to sum to one", "", true);
   parameters_.Bind<string>(PARAM_SELECTIVITIES, &selectivity_labels_, "Labels of the selectivities", "");
   parameters_.Bind<float>(PARAM_PROPORTION_TRHOUGH_MORTALITY, &time_step_proportion_, "Proportion through the mortality block of the time step to infer observation with", "", float(0.5))->set_range(0.0, 1.0);
   parameters_.Bind<bool>(PARAM_PLUS_GROUP, &plus_group_, "max age is a plus group", "", true);
@@ -473,26 +474,39 @@ void ProportionsAtAge::Simulate() {
    * Simulate or generate results
    * During simulation mode we'll simulate results for this observation
    */
-	LOG_FINE() << "Calculating score for observation = " << label_;
-  // Convert to propotions before simulating for each year and cell sum = 1
-  for (auto& iter : comparisons_) {  // year
-    for (auto& second_iter : iter.second) {  // cell
-      float total_expec = 0.0;
+  float total = 0.0;
+  vector<float> total_by_cell(cells_.size() * years_.size(), 0.0);
+  unsigned counter = 0;
+  for (auto& iter : comparisons_) { // cell
+    for (auto& second_iter : iter.second) {  // year
+      total = 0.0;
+      for (auto& comparison : second_iter.second) {
+        total += comparison.expected_;
+      }
+      total_by_cell[counter] = total;
+      ++counter;
       for (auto& comparison : second_iter.second)
-        total_expec += comparison.expected_;
-      for (auto& comparison : second_iter.second)
-        comparison.expected_ /= total_expec;
+        comparison.expected_ /= total;
     }
   }
+
   likelihood_->SimulateObserved(comparisons_);
   // Simualte numbers at age, but we want proportion
+  counter = 0;
   for (auto& iter : comparisons_) {
     for (auto& second_iter : iter.second) {  // cell
-      float total = 0.0;
+      total = 0.0;
       for (auto& comparison : second_iter.second)
         total += comparison.simulated_;
-      for (auto& comparison : second_iter.second)
-        comparison.simulated_ /= total;
+      if (are_obs_props_ & ((likelihood_->type() == PARAM_MULTINOMIAL) | (likelihood_->type() == PARAM_DIRICHLET))) {
+        for (auto& comparison : second_iter.second)
+          comparison.simulated_ /= total;
+      }
+      if (not are_obs_props_& (likelihood_->type() == PARAM_LOGISTIC_NORMAL)) {
+        for (auto& comparison : second_iter.second)
+          comparison.simulated_ *=  total_by_cell[counter];
+      }
+      ++counter;
     }
   }
 }

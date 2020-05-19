@@ -149,8 +149,7 @@ void RecruitmentBevertonHolt::DoBuild() {
 
 // DoExecute
 void RecruitmentBevertonHolt::DoExecute() {
-  LOG_FINE() << label_;
-
+  LOG_MEDIUM() << label_;
 
   if (model_->state() == State::kInitialise) {
     LOG_FINEST() << "applying recruitment in initialisation year " << model_->current_year();

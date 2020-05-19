@@ -58,6 +58,10 @@ void Biomass::DoBuild() {
   if (parameters_.Get(PARAM_SELECTIVITY)->has_been_defined()) {
     apply_selectivity_ = true;
 
+    // Build selectivity links
+    if (selectivity_label_.size() == 1)
+      selectivity_label_.assign(2, selectivity_label_[0]);
+
     if (selectivity_label_.size() > 2) {
       LOG_ERROR_P(PARAM_SELECTIVITY) << "You suppled " << selectivity_label_.size()  << " Selectiviites, you can only have one for each sex max = 2";
     }
@@ -79,20 +83,18 @@ void Biomass::DoBuild() {
         }
       }
     }
+    mature_ = false;
   } else {
     apply_selectivity_ = false;
   }
 
+
+  LOG_MEDIUM() << "apply mature = " << mature_ << " apply selectivity = " << apply_selectivity_ << " length based = " << length_based_selectivity_;
   if (parameters_.Get(PARAM_MATURE)->has_been_defined()){
     if (not mature_)
       LOG_ERROR_P(PARAM_MATURE) << "Only specify the subcommand " << PARAM_MATURE << " if you want it true, otherwise select a selectivity";
 
   }
-
-  // Build selectivity links
-  if (selectivity_label_.size() == 1)
-    selectivity_label_.assign(2, selectivity_label_[0]);
-
 }
 
 

@@ -41,6 +41,7 @@ ProcessRemovalsByAge::ProcessRemovalsByAge(Model* model) : Observation(model) {
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "Years for which there are observations", "");
   parameters_.Bind<string>(PARAM_AGEING_ERROR, &ageing_error_label_, "Label of ageing error to use", "", "");
   parameters_.Bind<string>(PARAM_PROCESS_LABEL, &process_label_, "Label of of removal process", "", "");
+  parameters_.Bind<bool>(PARAM_NORMALISE, &are_obs_props_, "Are the compositions normalised to sum to one", "", true);
   parameters_.BindTable(PARAM_ERROR_VALUES, error_values_table_, "Table of error values of the observed values (note the units depend on the likelihood)", "", false);
   parameters_.Bind<string>(PARAM_LAYER_OF_CELLS, &layer_label_, "The layer that indicates what area to summarise observations over.", "");
   parameters_.Bind<string>(PARAM_CELLS, &cells_, "The cells we want to generate observations for from the layer of cells supplied", "");
@@ -232,14 +233,14 @@ void ProcessRemovalsByAge::Simulate() {
    */
   if (first_simualtion_run_) {
     vector<processes::composition_data>& age_frequency = mortality_process_->get_removals_by_age();
-
-
     LOG_FINE() << "number of elements for this process block = " << age_frequency.size();
     unsigned age_offset = min_age_ - model_->min_age();
     // iterate over all the years that we want
     bool cell_found = false;
-    for (unsigned year : years_) {
-      for (string cell : cells_) {
+    float biomass = 0.0;
+    for (unsigned& year : years_) {
+      for (string& cell : cells_) {
+        biomass = 0.0;
         cell_found = false;
         fill(accumulated_age_frequency_.begin(), accumulated_age_frequency_.end(),0.0);
         for (auto age_comp_data : age_frequency) {
@@ -256,6 +257,7 @@ void ProcessRemovalsByAge::Simulate() {
                 accumulated_age_frequency_[i] += age_comp_data.frequency_[i];
             }
             cell_found = true;
+            biomass += age_comp_data.biomass_ + age_comp_data.female_biomass_;
           }
         }
         LOG_FINE() << "before ageing error";
@@ -279,7 +281,7 @@ void ProcessRemovalsByAge::Simulate() {
         float plus_group = 0.0;
         for (unsigned k = 0; k < model_->age_spread(); ++k) {
           if (k >= age_offset && (k - age_offset + min_age_) < max_age_)
-            SaveComparison(k + model_->min_age(), 0, cell, accumulated_age_frequency_[k], 0.0, error_values_by_year_[year][k - age_offset], year);
+            SaveComparison(k + model_->min_age(), 0, 0.0, biomass,cell, accumulated_age_frequency_[k], 0.0, error_values_by_year_[year][k - age_offset], year);
           // Deal with the plus group
           if (((k - age_offset + min_age_) >= max_age_) && plus_group_)
             plus_group += accumulated_age_frequency_[k];
@@ -287,7 +289,7 @@ void ProcessRemovalsByAge::Simulate() {
             plus_group = accumulated_age_frequency_[k]; // no plus group and we are max age
 
         }
-        SaveComparison(max_age_, 0, cell, plus_group, 0.0, error_values_by_year_[year][max_age_ - min_age_], year);
+        SaveComparison(max_age_, 0, 0.0,  biomass, cell, plus_group, 0.0, error_values_by_year_[year][max_age_ - min_age_], year); // In this observation, I am replacing Error with biomass
       }
     }
     // Convert to propotions before simulating for each year and cell sum = 1
@@ -301,27 +303,40 @@ void ProcessRemovalsByAge::Simulate() {
       }
     }*/
     first_simualtion_run_ = false;
-
   }
-
-  for (auto& iter : comparisons_) {
-    for (auto& second_iter : iter.second) {  // cell
-      float total = 0.0;
-      for (auto& comparison : second_iter.second)
+  float total = 0.0;
+  vector<float> total_by_cell(cells_.size() * years_.size(), 0.0);
+  unsigned counter = 0;
+  for (auto& iter : comparisons_) { // cell
+    for (auto& second_iter : iter.second) {  // year
+      total = 0.0;
+      for (auto& comparison : second_iter.second) {
         total += comparison.expected_;
+      }
+      total_by_cell[counter] = total;
+      ++counter;
       for (auto& comparison : second_iter.second)
         comparison.expected_ /= total;
     }
   }
+
   likelihood_->SimulateObserved(comparisons_);
   // Simualte numbers at age, but we want proportion
+  counter = 0;
   for (auto& iter : comparisons_) {
     for (auto& second_iter : iter.second) {  // cell
-      float total = 0.0;
+      total = 0.0;
       for (auto& comparison : second_iter.second)
         total += comparison.simulated_;
-      for (auto& comparison : second_iter.second)
-        comparison.simulated_ /= total;
+      if (are_obs_props_ & ((likelihood_->type() == PARAM_MULTINOMIAL) | (likelihood_->type() == PARAM_DIRICHLET))) {
+        for (auto& comparison : second_iter.second)
+          comparison.simulated_ /= total;
+      }
+      if (not are_obs_props_& (likelihood_->type() == PARAM_LOGISTIC_NORMAL)) {
+        for (auto& comparison : second_iter.second)
+          comparison.simulated_ *=  total_by_cell[counter];
+      }
+      ++counter;
     }
   }
 }

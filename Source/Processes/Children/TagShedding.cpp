@@ -39,7 +39,7 @@ TagShedding::TagShedding(Model* model) : Process(model) {
   parameters_.Bind<float>(PARAM_SHEDDING_RATE, &shedding_rate_, "Shedding rate per Tag release event", "");
   parameters_.Bind<string>(PARAM_RELEASE_REGION, &release_region_, "The Release region for the corresponding shedding rate, in the format 1-1 for the first row and first column, and '5-2' for the fifth row and secnd column", "");
   parameters_.Bind<unsigned>(PARAM_RELEASE_YEAR, &tag_release_year_, "The Release Year for the corresponding shedding rate", "");
-  parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "Years to execute the tag shedding, terminal year they are all moved across to untagged", "");
+  parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "Years to execute the tag shedding process", "");
 
   process_type_ = ProcessType::kTransition;
 
@@ -175,8 +175,7 @@ void TagShedding::DoExecute() {
     utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
     unsigned time_step = model_->managers().time_step()->current_time_step();
     float ratio = time_step_ratios_[time_step];
-    bool final_year = model_->current_year() == years_.back();
-    LOG_MEDIUM() << "time_step = " << time_step << " ratio = " << ratio << " final year = " << final_year;
+    LOG_MEDIUM() << "time_step = " << time_step << " ratio = " << ratio;
     /*
     // Agent is tagged and survived the process find a slot to add this tagged agent back in
     */
@@ -185,87 +184,65 @@ void TagShedding::DoExecute() {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         // get the ratio to apply first
         WorldCell* cell = world_->get_base_square(row, col);
-        if (cell->is_enabled()) {
-          if (final_year) {
-            LOG_MEDIUM() << "moving all across";
-            // Move them all across alive tagged agents  to untagged partition
-            for (auto &tag_agent : cell->tagged_agents_) {
-              if (tag_agent.is_alive()) {
-                tag_slot = 0;
-                while (tag_slot < cell->agents_.size()) {
-                  if (not cell->agents_[tag_slot].is_alive()) {
-                    cell->agents_[tag_slot] = tag_agent;
-                    break;
-                  } else {
-                    tag_slot++;
-                  }
+      if (cell->is_enabled()) {
+          if (not selectivity_length_based_) {
+            // age based selectivity
+            LOG_MEDIUM() << "age based tag shedding , num tags =  " << cell->tagged_agents_.size();
+            for(auto & tag_agent : cell->tagged_agents_) {
+              if(tag_agent.is_alive()) {
+                //LOG_FINE() << "tagged fish shedding rate = " << shedding_rate_by_year_cell_[tag_agent.get_tag_release_year()][tag_agent.get_tag_row()][tag_agent.get_tag_col()] << " release year = " << tag_agent.get_tag_release_year() << " release col = " << tag_agent.get_tag_col() << " release row = " << tag_agent.get_tag_row();
+                if (rng.chance() <= (1 - exp(-ratio * selectivity_[tag_agent.get_sex()]->GetResult(tag_agent.get_age_index()) * shedding_rate_by_year_cell_[tag_agent.get_tag_release_year()][tag_agent.get_tag_row()][tag_agent.get_tag_col()]))) {
+                  // Taghas been sheded
+                  if (tag_agent.get_number_tags() > 1) {
+                    tag_agent.shed_a_tag();
+                  } else if (tag_agent.get_number_tags() == 1) {
+                    // merge tagged fish backinto untagged partition
+                    tag_slot = 0;
+                    while(tag_slot < cell->agents_.size()) {
+                      if (not cell->agents_[tag_slot].is_alive()) {
+                        cell->agents_[tag_slot] = tag_agent;
+                        break;
+                      } else {
+                        tag_slot++;
+                      }
+                    }
+                    if (tag_slot >= cell->agents_.size()) {
+                      cell->agents_.push_back(tag_agent);
+                    }
+                    tag_agent.dies();
+                  }// the other conditions should not exist i.e. a tagged agent with < 0 tags
                 }
-                if (tag_slot >= cell->agents_.size()) {
-                  cell->agents_.push_back(tag_agent);
-                }
-                tag_agent.dies();
-              } // the other conditions should not exist i.e. a tagged agent with < 0 tags
+              }
             }
           } else {
-            if (not selectivity_length_based_) {
-              // age based selectivity
-              LOG_MEDIUM() << "age based tag shedding , num tags =  " << cell->tagged_agents_.size();
-              for(auto & tag_agent : cell->tagged_agents_) {
-                if(tag_agent.is_alive()) {
-                  //LOG_FINE() << "tagged fish shedding rate = " << shedding_rate_by_year_cell_[tag_agent.get_tag_release_year()][tag_agent.get_tag_row()][tag_agent.get_tag_col()] << " release year = " << tag_agent.get_tag_release_year() << " release col = " << tag_agent.get_tag_col() << " release row = " << tag_agent.get_tag_row();
-                  if (rng.chance() <= (1 - exp(-ratio * selectivity_[tag_agent.get_sex()]->GetResult(tag_agent.get_age_index()) * shedding_rate_by_year_cell_[tag_agent.get_tag_release_year()][tag_agent.get_tag_row()][tag_agent.get_tag_col()]))) {
-                    // Taghas been sheded
-                    if (tag_agent.get_number_tags() > 1) {
-                      tag_agent.shed_a_tag();
-                    } else if (tag_agent.get_number_tags() == 1) {
-                      // merge tagged fish backinto untagged partition
-                      tag_slot = 0;
-                      while(tag_slot < cell->agents_.size()) {
-                        if (not cell->agents_[tag_slot].is_alive()) {
-                          cell->agents_[tag_slot] = tag_agent;
-                          break;
-                        } else {
-                          tag_slot++;
-                        }
+            // length based selectivity
+            LOG_MEDIUM() << "length based tag shedding , num tags =  " << cell->tagged_agents_.size();
+            for(auto & tag_agent : cell->tagged_agents_) {
+              if(tag_agent.is_alive()) {
+                if (rng.chance() <= (1 - exp(-ratio * selectivity_[tag_agent.get_sex()]->GetResult(tag_agent.get_length_bin_index()) * shedding_rate_by_year_cell_[tag_agent.get_tag_release_year()][tag_agent.get_tag_row()][tag_agent.get_tag_col()]))) {
+                  // Taghas been sheded
+                  if (tag_agent.get_number_tags() > 1) {
+                    tag_agent.shed_a_tag();
+                  } else if (tag_agent.get_number_tags() == 1) {
+                    // merge tagged fish backinto untagged partition
+                    tag_slot = 0;
+                    while(tag_slot < cell->agents_.size()) {
+                      if (not cell->agents_[tag_slot].is_alive()) {
+                        cell->agents_[tag_slot] = tag_agent;
+                        break;
+                      } else {
+                        tag_slot++;
                       }
-                      if (tag_slot >= cell->agents_.size()) {
-                        cell->agents_.push_back(tag_agent);
-                      }
-                      tag_agent.dies();
-                    }// the other conditions should not exist i.e. a tagged agent with < 0 tags
-                  }
-                }
-              }
-            } else {
-              // length based selectivity
-              LOG_MEDIUM() << "length based tag shedding , num tags =  " << cell->tagged_agents_.size();
-              for(auto & tag_agent : cell->tagged_agents_) {
-                if(tag_agent.is_alive()) {
-                  if (rng.chance() <= (1 - exp(-ratio * selectivity_[tag_agent.get_sex()]->GetResult(tag_agent.get_length_bin_index()) * shedding_rate_by_year_cell_[tag_agent.get_tag_release_year()][tag_agent.get_tag_row()][tag_agent.get_tag_col()]))) {
-                    // Taghas been sheded
-                    if (tag_agent.get_number_tags() > 1) {
-                      tag_agent.shed_a_tag();
-                    } else if (tag_agent.get_number_tags() == 1) {
-                      // merge tagged fish backinto untagged partition
-                      tag_slot = 0;
-                      while(tag_slot < cell->agents_.size()) {
-                        if (not cell->agents_[tag_slot].is_alive()) {
-                          cell->agents_[tag_slot] = tag_agent;
-                          break;
-                        } else {
-                          tag_slot++;
-                        }
-                      }
-                      if (tag_slot >= cell->agents_.size()) {
-                        cell->agents_.push_back(tag_agent);
-                      }
-                      tag_agent.dies();
-                    }// the other conditions should not exist i.e. a tagged agent with < 0 tags
-                  }
+                    }
+                    if (tag_slot >= cell->agents_.size()) {
+                      cell->agents_.push_back(tag_agent);
+                    }
+                    tag_agent.dies();
+                  }// the other conditions should not exist i.e. a tagged agent with < 0 tags
                 }
               }
             }
-          } // final year
+          }
         } // cell enabled
       } // col enabled
     } // row enabled

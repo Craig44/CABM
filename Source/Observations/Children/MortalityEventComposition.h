@@ -71,6 +71,11 @@ protected:
   bool                            are_obs_props_;
   bool                            is_age_;
 
+  unsigned                        min_age_ = 0;
+  unsigned                        max_age_ = 0;
+  bool                            plus_group_ = false;
+  unsigned                        age_spread_ = 0;
+
   string                          fishery_label_;
   MortalityEventBiomass*          mortality_process_ = nullptr;
   vector<vector<processes::composition_data>>* fishery_comp_data_ = nullptr;

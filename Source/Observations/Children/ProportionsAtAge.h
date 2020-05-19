@@ -66,7 +66,7 @@ protected:
   vector<string>                cells_;
   layers::CategoricalLayer*     layer_ = nullptr;
   string                        layer_label_;
-
+  bool                          are_obs_props_ = true;
   map<string, vector<float>>     pre_age_freq_;
   map<string, vector<float>>     age_freq_;
   map<string, vector<float>>     final_age_freq_;
