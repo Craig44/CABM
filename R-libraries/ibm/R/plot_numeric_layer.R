@@ -12,7 +12,7 @@
 #' and the legend is the midpoint of these bins.
 #' @export 
 
-plot_numeric_layer = function(model, report_label, directory = "", file_name = "", Title = "") {
+plot_numeric_layer = function(model, report_label, directory = "", file_name = "", Title = "", breaks = NULL, width = NA, height = NA) {
   ## check report label exists
   if (!report_label %in% names(model))
     stop(Paste("In model the report label '", report_label, "' could not be found. The report labels available are ", paste(names(model),collapse = ", ")))
@@ -40,7 +40,9 @@ plot_numeric_layer = function(model, report_label, directory = "", file_name = "
     if( names(report)[i] != "type")
       vec_data = c(vec_data,as.numeric(report[[i]]$values))
   }
-  breaks = c(min(vec_data) - 1, quantile(vec_data, c(0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9)), max(vec_data) + 1)
+  if (is.null(breaks)) 
+    breaks = c(min(vec_data) - 1, quantile(vec_data, c(0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9)), max(vec_data) + 1)
+  
   dup_ndx = which(duplicated(breaks))
   ## because ggplot needs 10 breaks I am going to do a bit of a hack
   first_break = 0;
@@ -51,6 +53,7 @@ plot_numeric_layer = function(model, report_label, directory = "", file_name = "
     breaks[dup_ndx[i]] = first_break
   }
   breaks = unique(breaks)
+
   cols = colorRampPalette(brewer.pal(9,"YlOrRd"))(length(breaks) - 1)
   legend_lab = vector();
   for (i in 1:(length(breaks) - 1)) {
@@ -74,7 +77,7 @@ plot_numeric_layer = function(model, report_label, directory = "", file_name = "
         scale_y_discrete(expand=c(0,0)) +
         scale_x_discrete(expand=c(0,0)) + 
         scale_fill_manual("Key", values=cols,na.value="grey90",labels = round(breaks), guide = guide_legend(reverse=T),drop = FALSE)
-      ggsave(P, filename = paste0(report[[i]]$year,"_", file_name,".png"))
+      ggsave(P, filename = paste0(report[[i]]$year,"_", file_name,".png"), width = width, height = height)
     }
   }
   return (NULL);
