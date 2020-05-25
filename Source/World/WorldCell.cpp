@@ -112,8 +112,9 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
   if (number_agents_to_seed != growth_pars.size()) {
     LOG_CODE_ERROR() << "number_agents_to_seed != growth_pars.size(), this must be a code error as these should always be true";
   }
-  LOG_FINE() << "start seeding";
   if (model_->get_growth_model() == Growth::kVonbert) {
+    LOG_FINE() << "start seeding with VB";
+
     for (unsigned agent = 0; agent < number_agents_to_seed; ++agent) {
       sex = 0;
       mature = false;
@@ -138,6 +139,7 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
       }
     }
   } else if (model_->get_growth_model() == Growth::kSchnute) {
+    LOG_FINE() << "start seeding with schnute";
     for (unsigned agent = 0; agent < number_agents_to_seed; ++agent) {
       sex = 0;
       mature = false;

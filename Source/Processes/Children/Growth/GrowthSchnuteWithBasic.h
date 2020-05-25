@@ -18,7 +18,6 @@
 
 #include "Layers/Children/NumericLayer.h"
 #include "Agents/Agent.h"
-
 // namespaces
 namespace niwa {
 namespace processes {

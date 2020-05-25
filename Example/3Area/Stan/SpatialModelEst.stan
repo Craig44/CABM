@@ -345,6 +345,7 @@ transformed data {
   vector[A] length_at_age;                  // length at age
   vector[A] weight_at_age;                  // weight at age
   vector[n_quants] quants_values;           // quantiles for length based selectivity
+  matrix[A,L] age_length_probability_matrix;
 
   int total_groups = T + 1;                 // need to increment it so that we have untagged group accounted for when interating over the partition
 
@@ -363,7 +364,7 @@ transformed data {
   for(i in 1:n_quants)
     quants_values[i] /= sum(quants_values);
     
-  matrix[A,L] age_length_probability_matrix = age_length_transition_matrix(A, length_at_age, global_length_limits, cv);
+  age_length_probability_matrix = age_length_transition_matrix(A, length_at_age, global_length_limits, length_cv);
 }
 
 /*

@@ -47,7 +47,7 @@ function (file, path = "",fileEncoding = "") {
     }
     get_time = substring(get.lines(file, starts.with = "Total elapsed time:",fixed=F), first = 21)
     
-    multi_year_reports = c("summarise_agents", "world_age_frequency","numeric_layer","age_frequency_by_cell")
+    multi_year_reports = c("summarise_agents", "world_age_frequency","numeric_layer","age_frequency_by_cell","age_length_matrix_by_cell")
     
     result = list()
     for (i in 1:counter) {

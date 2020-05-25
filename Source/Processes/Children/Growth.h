@@ -16,7 +16,7 @@
 
 // headers
 #include "Processes/Process.h"
-
+#include "Utilities/Distribution.h"
 // namespaces
 namespace niwa {
 namespace processes {
@@ -40,10 +40,10 @@ public:
 protected:
   vector<float>			  time_step_proportions_;
   float					      cv_;
-  string					    distribution_;
+  string					    distribution_label_;
   bool                update_growth_parameters_;
   map<unsigned, float>   time_step_ratios_;
-
+  Distribution        distribution_ = Distribution::kNone;
 };
 
 } /* namespace processes */

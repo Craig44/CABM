@@ -1,6 +1,6 @@
 #
-detach("package:ibm", unload=TRUE)
-detach("package:rstan", unload=TRUE)
+#detach("package:ibm", unload=TRUE)
+#detach("package:rstan", unload=TRUE)
 
 # Set up Stan
 library(rstan)
@@ -55,6 +55,9 @@ stan_data$mat_a50 = 3.9
 stan_data$mat_ato95 = 4.2
 stan_data$apply_prior = 0 
 stan_data$ycs_prior_applies_to_standardised = 1;
+
+length_bins = seq(0,70, by = 2)
+
 
 #stan_data$proportion_recruitment_by_region = c(0.3,0.3,0.4)
 stan_data$proportion_recruitment_by_region = c(0.33333,0.33333,0.33333)
@@ -290,7 +293,7 @@ ibm$fishing$`tag_recapture_info-1995-1-1`$agents_caught * ibm$fishing$`tag_recap
 #ibm1 = extract.run(file = "../base_ibm/run.log")
 
 test = vector()
-ibm1 = extract.run(file = "../base_ibm/run1.log")
+#ibm1 = extract.run(file = "../base_ibm/run1.log")
 
 par(mfrow = c(1,2))
 plot(1:30,ibm1$fishing[[1]]$`tag_recapture_info-1995-1-1`$tagged_fish_available, type ="l", main = "comparison", ylim = c(0,1000))
@@ -467,7 +470,7 @@ sum(ibm$tag_recapture_1995_EN$Values$expected[ibm$tag_recapture_1995_EN$Values$y
 sum(stan_sim$par$recapture_expectations[1,1,,stan_data$years == 1995])
 ## plot it
 ## Release at 1995 in "EN"
-jpeg(filename = "../Figures/tag_recaptures_EN_1995.jpeg", units = "in", res = 300, width = 6, height = 14)
+#jpeg(filename = "../Figures/tag_recaptures_EN_1995.jpeg", units = "in", res = 300, width = 6, height = 14)
 par(mfrow = c(4,3), mar = c(3,3,1,1), oma = c(2,2,2,0))
 ## 1995
 boxplot(cbind(stan_en_tag_95[1,,1],en_tag_95[1,,1]), main = "recapture EN", xaxt = "n")
@@ -510,7 +513,7 @@ mtext(outer = T, line = -0.2, font = 2, text = "1998", las = 3, adj = 0.125, sid
 mtext(outer = T, line = -0.2, font = 2, text = "1997", las = 3, adj = 0.40, side = 2)
 mtext(outer = T, line = -0.2, font = 2, text = "1996", las = 3, adj = 0.67, side = 2)
 mtext(outer = T, line = -0.2, font = 2, text = "1995", las = 3, adj = 0.94, side = 2)
-dev.off()
+#dev.off()
 
 ###
 sum(stan_sim$par$recapture_expectations[1,1,,6])
@@ -525,6 +528,8 @@ stan_data$tag_release_by_age
 
 stan_dir = file.path(getwd(),"../Stan")
 list.files(stan_dir)
+
+library(cyrils)
 
 ## Single stock Recruit function
 stan_est_model = stan_model(file.path(stan_dir, "SpatialModelEst.stan"))

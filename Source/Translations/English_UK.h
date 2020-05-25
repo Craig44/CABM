@@ -115,6 +115,7 @@
 #define PARAM_AGE_LENGTHS                         "age_lengths"
 #define PARAM_AGE_LENGTH_KEY                      "age_length_key"
 #define PARAM_AGE_LENGTH_KEYS                     "age_length_keys"
+#define PARAM_AGE_LENGTH_MATRIX_BY_CELL           "age_length_matrix_by_cell"
 #define PARAM_AGE_PLUS                            "age_plus"
 #define PARAM_AGE_SAMPLES_PER_CLUSTER             "age_samples_per_cluster"
 #define PARAM_AGE_V                               "age_v"

@@ -70,6 +70,15 @@ void GrowthVonBertalanffyWithBasic::DoValidate() {
   if(!parameters_.Get(PARAM_T0)->has_been_defined() & !parameters_.Get(PARAM_T0_LAYER_LABEL)->has_been_defined())
     t0_.push_back(0.0); // Default value of t0 = 0
 
+  if (distribution_label_ == PARAM_NORMAL) {
+    distribution_ = Distribution::kNormal;
+    LOG_FINE() << "normal length increment";
+  } else if (distribution_label_ == PARAM_LOGNORMAL) {
+    distribution_ = Distribution::kLogNormal;
+    LOG_FINE() << "lognormal length increment";
+  } else {
+    LOG_ERROR_P(PARAM_DISTRIBUTION) << "unknown distribution";
+  }
 
 }
 
@@ -253,9 +262,9 @@ void  GrowthVonBertalanffyWithBasic::draw_growth_param(unsigned row, unsigned co
 
   vec.clear();
 	vec.resize(number_of_draws);
-  LOG_FINE() << "mean_linf " << mean_linf << " mean_k " << mean_k << " a " << a << " b " << b;// << " t0 " << t0_[sex];
 
-  if (distribution_ == PARAM_NORMAL) {
+  if (distribution_ == Distribution::kNormal) {
+    LOG_FINE() << "kNormal: mean_linf " << mean_linf << " mean_k " << mean_k << " a " << a << " b " << b;// << " t0 " << t0_[sex];
     for (unsigned i = 0; i < number_of_draws; ++i) {
       vec[i].push_back(rng.normal(mean_linf, cv_ * mean_linf));
       vec[i].push_back(rng.normal(mean_k, cv_ * mean_k));
@@ -263,14 +272,19 @@ void  GrowthVonBertalanffyWithBasic::draw_growth_param(unsigned row, unsigned co
       vec[i].push_back(a);
       vec[i].push_back(b);
     }
-  } else {
+  } else if(distribution_ == Distribution::kLogNormal) {
+    LOG_FINE() << " kLogNormal: mean_linf " << mean_linf << " mean_k " << mean_k << " a " << a << " b " << b;// << " t0 " << t0_[sex];
     for (unsigned i = 0; i < number_of_draws; ++i) {
       vec[i].push_back(rng.lognormal(mean_linf, cv_));
       vec[i].push_back(rng.lognormal(mean_k, cv_));
+      vec[i].push_back(mean_linf);
+      vec[i].push_back(mean_k);
       vec[i].push_back(t0);
       vec[i].push_back(a);
       vec[i].push_back(b);
     }
+  } else {
+    LOG_CODE_ERROR() << "not a recognised distribution for length increment.";
   }
 
 }

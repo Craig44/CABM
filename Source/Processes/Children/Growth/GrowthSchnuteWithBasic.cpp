@@ -82,6 +82,17 @@ void GrowthSchnuteWithBasic::DoValidate() {
       LOG_ERROR_P(PARAM_TAU1) << "tau1 should be the same as min_age on the model.";
   }
 
+  if (distribution_label_ == PARAM_NORMAL) {
+    distribution_ = Distribution::kNormal;
+    LOG_FINE() << "normal length increment";
+  } else if (distribution_label_ == PARAM_LOGNORMAL) {
+    distribution_ = Distribution::kLogNormal;
+    LOG_FINE() << "lognormal length increment";
+  } else {
+    LOG_ERROR_P(PARAM_DISTRIBUTION) << "unknown distribution";
+  }
+
+
 }
 
 
@@ -208,6 +219,7 @@ void GrowthSchnuteWithBasic::DoBuild() {
 
 // The work horse of the function.
 void GrowthSchnuteWithBasic::ApplyStochasticGrowth(vector<Agent>& agents) {
+  //utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   float new_length = 0.0;
   float weight = 0.0;
   float length_prop = time_step_ratios_[model_->managers().time_step()->current_time_step()];
@@ -281,7 +293,7 @@ void  GrowthSchnuteWithBasic::draw_growth_param(unsigned row, unsigned col, unsi
 	vec.resize(number_of_draws);
   LOG_FINE() << "mean_alpha " << mean_alpha << " mean_beta " << mean_beta << " a " << a << " b " << b;// << " t0 " << t0_[sex];
 
-  if (distribution_ == PARAM_NORMAL) {
+  if (distribution_ == Distribution::kNormal) {
     for (unsigned i = 0; i < number_of_draws; ++i) {
       vec[i].push_back(rng.normal(mean_alpha, cv_ * mean_alpha));
       vec[i].push_back(rng.normal(mean_beta, cv_ * mean_beta));
@@ -292,10 +304,12 @@ void  GrowthSchnuteWithBasic::draw_growth_param(unsigned row, unsigned col, unsi
       vec[i].push_back(a);
       vec[i].push_back(b);
     }
-  } else {
+  } else if(distribution_ == Distribution::kLogNormal) {
     for (unsigned i = 0; i < number_of_draws; ++i) {
       vec[i].push_back(rng.lognormal(mean_alpha, cv_));
       vec[i].push_back(rng.lognormal(mean_beta, cv_));
+      //vec[i].push_back(mean_alpha);
+      //vec[i].push_back(mean_beta);
       vec[i].push_back(t0);
       vec[i].push_back(y1_[sex]);
       vec[i].push_back(y2_[sex]);

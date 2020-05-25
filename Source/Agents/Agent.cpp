@@ -114,28 +114,19 @@ void Agent::apply_tagging_event(unsigned tags, unsigned row, unsigned col) {
 /*
  * An internal function to set initial length at age when initially seeding agents in the world,
  * So that we have the equivalent length and weight frequency. Calculate expected length at age assuming von Bert parameters
- * TODO figure out how to generalise this
  *
 */
 void Agent::growth_init() {
+  LOG_FINE() << "here";
   //utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   if (model_->get_growth_model() == Growth::kVonbert) {
-    if (get_age() == 0) {
-      // Add a jitter for the length of zero year olds
-      //length_ = first_age_length_par_ * (1-std::exp(-second_age_length_par_ * (rng.uniform(0.001,0.4) - third_age_length_par_)));
-      length_ = first_age_length_par_ * (1-std::exp(-second_age_length_par_ * (0.001 - third_age_length_par_)));
-    } else {
-      length_ = first_age_length_par_ * (1-std::exp(-second_age_length_par_ * ((float)get_age() - third_age_length_par_)));
-    }
+    length_ = first_age_length_par_ * (1 - std::exp(-second_age_length_par_ * ((float)get_age() - third_age_length_par_)));
   } else if(model_->get_growth_model() == Growth::kSchnute)  {
-
     length_ = pow(pow(fourth_age_length_par_, second_age_length_par_) + (pow(fith_age_length_par_, second_age_length_par_) - pow(fourth_age_length_par_, second_age_length_par_)) * ((1.0 - std::exp(-first_age_length_par_ * ((float)get_age() -  (float)model_->min_age()))) / (1.0 - std::exp(-first_age_length_par_ *(sixth_age_length_par_ - (float)model_->min_age())))), 1 / second_age_length_par_);
   }
 
   weight_ = first_length_weight_par_ * pow(length_, second_length_weight_par_); // Just update weight when ever we update length to save executions
-
-  //LOG_FINEST() << "initialise agent, age = " << get_age() << " length = " << length_ << " weight = " << weight_ << " 1 " << first_age_length_par_ << " 2 = " << second_age_length_par_ << " 3 = " << third_age_length_par_ <<
-  //    " 4 = " << fourth_age_length_par_ << " 5 = " << fith_age_length_par_ << " 6 = " << sixth_age_length_par_;
+  LOG_FINEST() << "length = " << length_ << " weight = " << weight_;
 }
 
 } /* namespace niwa */

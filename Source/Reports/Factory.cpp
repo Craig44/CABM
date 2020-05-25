@@ -20,6 +20,7 @@
 #include "Reports/Children/SummariseAgents.h"
 #include "Reports/Children/DerivedQuantity.h"
 #include "Reports/Children/AgeingErrorMatrix.h"
+#include "Reports/Children/AgeLengthMatrixByCell.h"
 #include "Reports/Children/AgeFrequencyByCell.h"
 #include "Reports/Children/Likelihood.h"
 #include "Reports/Children/Process.h"
@@ -52,6 +53,8 @@ Report* Factory::Create(Model* model, const string& object_type, const string& s
       result = new Process(model);
     else if (sub_type == PARAM_AGE_FREQUENCY_BY_CELL)
       result = new AgeFrequencyByCell(model);
+    else if (sub_type == PARAM_AGE_LENGTH_MATRIX_BY_CELL)
+      result = new AgeLengthMatrixByCell(model);
     else if (sub_type == PARAM_AGEING_ERROR)
       result = new AgeingErrorMatrix(model);
     else if (sub_type == PARAM_INITIALISATION_PARTITION)
