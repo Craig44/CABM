@@ -63,7 +63,7 @@ public:
   virtual const unsigned&      get_tag_row() const {return tag_row_;};
   virtual const unsigned&      get_tag_col() const {return tag_col_;};
   virtual const unsigned&      get_tag_release_year() const {return tag_year_;};
-  void                         shed_a_tag() {tag_--;} // anything that calls this will need to check get_number_tags() > 1, else this will cause a negative unsigned == issues
+  void                         shed_a_tag() {tag_ -= 1;} // anything that calls this will need to check get_number_tags() > 1, else this will cause a negative unsigned == issues
 
   float                        get_length_increment_since_tag()  {return length_ - length_at_tag_;};
   unsigned                     get_time_at_liberty(unsigned current_time_step)  {return current_time_step - tag_time_step_;};

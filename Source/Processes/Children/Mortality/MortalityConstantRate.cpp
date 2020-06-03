@@ -174,7 +174,7 @@ void MortalityConstantRate::ApplyStochasticMortality(vector<Agent>& agents) {
  * DoExecute
  */
 void MortalityConstantRate::DoExecute() {
-  LOG_MEDIUM();
+  LOG_MEDIUM() << label_;
   agents_removed_ = 0;
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {

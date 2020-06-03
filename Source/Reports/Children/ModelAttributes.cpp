@@ -50,6 +50,16 @@ void ModelAttributes::DoExecute() {
   for (auto scalar : scalars)
     cache_ << scalar.first << ": " << scalar.second << "\n";
 
+  cache_ << "model_years: ";
+  for (auto year : model_->years())
+    cache_ << year << " ";
+  cache_ << "\n";
+
+  cache_ << "ages: ";
+  for (auto age = model_->min_age(); age <= model_->max_age(); ++age)
+    cache_ << age << " ";
+  cache_ << "\n";
+
   cache_ << "length_mid_points: ";
   vector<float> length_mid_point = model_->length_bin_mid_points();
   for (unsigned length_ndx = 0; length_ndx < length_mid_point.size(); ++length_ndx)

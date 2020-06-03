@@ -82,7 +82,7 @@ void Maturity::ApplyStochasticMaturity(vector<Agent>& agents) {
  * Execute process
  */
 void Maturity::DoExecute() {
-  LOG_MEDIUM();
+  LOG_MEDIUM() << label_;
   mature_conversion_ = 0;
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {

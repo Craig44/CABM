@@ -86,7 +86,7 @@ unsigned Agent::get_age() {
     return age;
 }
 
-// an index for which length the individual falls in.
+// an index for which length bin the individual falls in.
 unsigned Agent::get_length_bin_index() {
   vector<unsigned> lengths = model_->length_bins();
   for(unsigned length_max = 1; length_max < lengths.size(); ++length_max) {
@@ -117,7 +117,7 @@ void Agent::apply_tagging_event(unsigned tags, unsigned row, unsigned col) {
  *
 */
 void Agent::growth_init() {
-  LOG_FINE() << "here";
+  //LOG_FINE() << "here";
   //utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   if (model_->get_growth_model() == Growth::kVonbert) {
     length_ = first_age_length_par_ * (1 - std::exp(-second_age_length_par_ * ((float)get_age() - third_age_length_par_)));
@@ -126,7 +126,7 @@ void Agent::growth_init() {
   }
 
   weight_ = first_length_weight_par_ * pow(length_, second_length_weight_par_); // Just update weight when ever we update length to save executions
-  LOG_FINEST() << "length = " << length_ << " weight = " << weight_;
+  //LOG_MEDIUM() << "length = " << length_ << " weight = " << weight_ << " age = " << get_age();
 }
 
 } /* namespace niwa */

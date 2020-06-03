@@ -197,24 +197,29 @@ void Tagging::DoBuild() {
   length_distribution_of_tagged_fish_by_year_cell_.resize(years_.size());
   length_observed_tag_of_tagged_fish_by_year_cell_.resize(years_.size());
   age_distribution_of_tagged_fish_by_year_cell_.resize(years_.size());
+  age_length_param1_of_tagged_fish_by_year_cell_.resize(years_.size());
+  age_length_param2_of_tagged_fish_by_year_cell_.resize(years_.size());
+
   for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     age_distribution_of_tagged_fish_by_year_[years_[year_ndx]].resize(model_->age_spread(),0);
     length_distribution_of_tagged_fish_by_year_[years_[year_ndx]].resize(model_->length_bin_mid_points().size(),0);
     length_distribution_of_tagged_fish_by_year_cell_[year_ndx].resize(model_->get_height());
     length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx].resize(model_->get_height());
+    age_length_param1_of_tagged_fish_by_year_cell_[year_ndx].resize(model_->get_height());
+    age_length_param2_of_tagged_fish_by_year_cell_[year_ndx].resize(model_->get_height());
 
     age_distribution_of_tagged_fish_by_year_cell_[year_ndx].resize(model_->get_height());
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       length_distribution_of_tagged_fish_by_year_cell_[year_ndx][row].resize(model_->get_width());
       length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row].resize(model_->get_width());
+      age_length_param1_of_tagged_fish_by_year_cell_[year_ndx][row].resize(model_->get_width());
+      age_length_param2_of_tagged_fish_by_year_cell_[year_ndx][row].resize(model_->get_width());
 
       age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row].resize(model_->get_width());
       for (unsigned col = 0; col < model_->get_width(); ++col) {
-    	length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row][col].resize(model_->number_of_length_bins(),0.0);
+        length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row][col].resize(model_->number_of_length_bins(),0.0);
         length_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].resize(model_->number_of_length_bins(),0.0);
         age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].resize(model_->age_spread(),0.0);
-
-
       }
     }
   }
@@ -310,11 +315,14 @@ void Tagging::DoExecute() {
                   tagged_agent.apply_tagging_event(1, row, col); // Any tagging attribute should be bundled into this method
                   this_agent.set_scalar(this_agent.get_scalar() - 1.0);
                   tagged_agent.set_scalar(1.0);
+                  LOG_MEDIUM() << "original tag " << this_agent.get_number_tags() << " tagged version = " << tagged_agent.get_number_tags();
                   age_freq[this_agent.get_age_index()]++;
                   length_freq[this_agent.get_length_bin_index()]++;
                   length_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col][this_agent.get_length_bin_index()]++;
                   age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col][this_agent.get_age_index()]++;
                   tags_to_release--;
+                  age_length_param1_of_tagged_fish_by_year_cell_[year_ndx][row][col].push_back(tagged_agent.get_first_age_length_par());
+                  age_length_param2_of_tagged_fish_by_year_cell_[year_ndx][row][col].push_back(tagged_agent.get_second_age_length_par());
 
                   // Lets see if it survives handling
                   if (handling_mortality_random_numbers_[cell_offset_[row][col] + counter] <= handling_mort_by_space_[row][col]) {
@@ -393,16 +401,17 @@ void Tagging::DoExecute() {
                     agent_ndx_available_to_sample_.push_back(agent_counter);
                   ++agent_counter;
                 }
-                LOG_MEDIUM() << "length bin = " << i + 1 << " tags " << tags_by_length_bin[i] << " agents alive that are in this length bin = " << agent_ndx_available_to_sample_.size();
+                LOG_FINE() << "length bin = " << i + 1 << " tags " << tags_by_length_bin[i] << " agents alive that are in this length bin = " << agent_ndx_available_to_sample_.size();
                 if(agent_ndx_available_to_sample_.size() <= tags_by_length_bin[i]) {
                   // jump out of this length bin
                   // push tags into next length bin if we aren't in the last bin
+                  LOG_WARNING() << "couldn't tag " << tags_by_length_bin[i] << " in length bin " << i + 1;
                   if ((i + 1) < tags_by_length_bin.size()) {
                     tags_by_length_bin[i + 1] += tags_by_length_bin[i];
                   }
                   continue;
                 }
-                LOG_MEDIUM() << "length bin = " << i + 1 << " tags " << tags_by_length_bin[i] << " agents alive that are in this length bin = " << agent_ndx_available_to_sample_.size();
+                LOG_FINE() << "length bin = " << i + 1 << " tags " << tags_by_length_bin[i] << " agents alive that are in this length bin = " << agent_ndx_available_to_sample_.size();
 
                 agent_counter = tags_by_length_bin[i];
                 unsigned agent_ndx = 0;
@@ -417,14 +426,20 @@ void Tagging::DoExecute() {
                   age_freq[tagged_agent.get_age_index()]++;
                   length_freq[tagged_agent.get_length_bin_index()]++;
                   tags_to_release--;
+                  //LOG_MEDIUM() << "original tag " << cell->agents_[agent_ndx].get_number_tags() << " tagged version = " << tagged_agent.get_number_tags();
+
                   length_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col][tagged_agent.get_length_bin_index()]++;
                   age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col][tagged_agent.get_age_index()]++;
+                  age_length_param1_of_tagged_fish_by_year_cell_[year_ndx][row][col].push_back(tagged_agent.get_first_age_length_par());
+                  age_length_param2_of_tagged_fish_by_year_cell_[year_ndx][row][col].push_back(tagged_agent.get_second_age_length_par());
+
                   // Lets see if it survives handling
                   if (rng.chance() <= handling_mortality_) {
                     // It died we will never see this or know about this tagged fish so I am just going to skip the rest of the algorithm
                     tagged_agent.dies();
                     continue;
                   }
+
                   // Agent is tagged and survived the process find a slot to add this tagged agent back in
                   while(tag_slot < cell->tagged_agents_.size()) {
                     if (not cell->tagged_agents_[tag_slot].is_alive()) {
@@ -499,6 +514,31 @@ void  Tagging::FillReportCache(ostringstream& cache) {
       }
     }
   }
+
+  for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        cache << "age_length_param1-" << years_[year_ndx] << "-" << row + 1 << "-" << col + 1 << ": ";
+        for (unsigned agent_ndx = 0; agent_ndx < age_length_param2_of_tagged_fish_by_year_cell_[year_ndx][row][col].size(); ++agent_ndx) {
+          cache << age_length_param2_of_tagged_fish_by_year_cell_[year_ndx][row][col][agent_ndx] << " ";
+        }
+        cache << "\n";
+      }
+    }
+  }
+
+  for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        cache << "age_length_param2-" << years_[year_ndx] << "-" << row + 1 << "-" << col + 1 << ": ";
+        for (unsigned agent_ndx = 0; agent_ndx < age_length_param2_of_tagged_fish_by_year_cell_[year_ndx][row][col].size(); ++agent_ndx) {
+          cache << age_length_param2_of_tagged_fish_by_year_cell_[year_ndx][row][col][agent_ndx] << " ";
+        }
+        cache << "\n";
+      }
+    }
+  }
+
   for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     cache << "tag_release_by_length-" << years_[year_ndx] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
     cache << "cell";

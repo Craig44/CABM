@@ -15,6 +15,7 @@
 
 namespace niwa {
 class WorldView;
+class Selectivity;
 namespace layers {
 
 //**********************************************************************
@@ -36,6 +37,10 @@ protected:
   // Variables
   bool                        mature_;
   WorldView*                  world_ = nullptr;
+  vector<string>              selectivity_label_;
+  vector<Selectivity*>        selectivity_;
+  bool                        length_based_selectivity_ = false;
+  bool                        apply_selectivity_;
 };
 } /* namespace layers */
 } /* namespace niwa */

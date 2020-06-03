@@ -80,6 +80,7 @@ struct tag_recapture {
   vector<float> scanned_age_comp_;
   // attributes of tagged fish
   vector<unsigned> age_;
+  vector<unsigned> length_;
   vector<unsigned> sex_;
   vector<unsigned> fishery_ndx_;
   vector<unsigned> length_ndx_;

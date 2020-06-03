@@ -50,8 +50,8 @@ MortalityEventComposition::MortalityEventComposition(Model* model) : Observation
   parameters_.Bind<string>(PARAM_COMPOSITION_TYPE, &comp_type_, "Is the composition Age or Length", "", PARAM_AGE)->set_allowed_values({PARAM_AGE, PARAM_LENGTH});
   parameters_.Bind<bool>(PARAM_NORMALISE, &are_obs_props_, "Are the compositions normalised to sum to one", "", true);
   parameters_.Bind<string>(PARAM_SIMULATION_LIKELIHOOD, &simulation_likelihood_label_, "Simulation likelihood to use", "");
-  parameters_.Bind<unsigned>(PARAM_MIN_AGE, &min_age_, "Minimum age", "", model_->min_age());
-  parameters_.Bind<unsigned>(PARAM_MAX_AGE, &max_age_, "Maximum age", "", model_->max_age());
+  parameters_.Bind<unsigned>(PARAM_MIN_AGE, &min_age_, "Minimum age", "");
+  parameters_.Bind<unsigned>(PARAM_MAX_AGE, &max_age_, "Maximum age", "");
   parameters_.Bind<bool>(PARAM_PLUS_GROUP, &plus_group_, "max age is a plus group", "", true);
 
   parameters_.Bind<string>(PARAM_LAYER_OF_STRATUM_DEFINITIONS, &layer_label_, "The layer that indicates what the stratum boundaries are.", "");
@@ -86,6 +86,12 @@ void MortalityEventComposition::DoValidate() {
       sexed_flag_ = false;
     }
   }
+
+  if (min_age_ < model_->min_age())
+    LOG_ERROR_P(PARAM_MIN_AGE) << ": min_age (" << min_age_ << ") is less than the model's min_age (" << model_->min_age() << ")";
+  if (max_age_ > model_->max_age())
+    LOG_ERROR_P(PARAM_MAX_AGE) << ": max_age (" << max_age_ << ") is greater than the model's max_age (" << model_->max_age() << ")";
+
 
   if (obs_type_ == PARAM_NUMBERS)
     are_obs_props_ = false;

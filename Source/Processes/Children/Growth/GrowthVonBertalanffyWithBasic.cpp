@@ -212,7 +212,7 @@ void GrowthVonBertalanffyWithBasic::ApplyStochasticGrowth(vector<Agent>& agents)
 
 // Execute the process
 void GrowthVonBertalanffyWithBasic::DoExecute() {
-  LOG_MEDIUM();
+  LOG_MEDIUM() << label_;
  // #pragma omp parallel for collapse(2)
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
@@ -277,8 +277,6 @@ void  GrowthVonBertalanffyWithBasic::draw_growth_param(unsigned row, unsigned co
     for (unsigned i = 0; i < number_of_draws; ++i) {
       vec[i].push_back(rng.lognormal(mean_linf, cv_));
       vec[i].push_back(rng.lognormal(mean_k, cv_));
-      vec[i].push_back(mean_linf);
-      vec[i].push_back(mean_k);
       vec[i].push_back(t0);
       vec[i].push_back(a);
       vec[i].push_back(b);

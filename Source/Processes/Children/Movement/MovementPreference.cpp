@@ -136,7 +136,7 @@ void MovementPreference::DoBuild() {
  *  Execute process
  */
 void MovementPreference::DoExecute() {
-  LOG_MEDIUM();
+  LOG_MEDIUM() << label_;
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   // Pre-calculate agents in the world to set aside our random numbers needed for the operation
   n_agents_ = 0;

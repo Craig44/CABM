@@ -20,8 +20,6 @@
 #include "World/WorldView.h"
 #include "TimeSteps/Manager.h"
 
-
-
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/trim_all.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -33,11 +31,13 @@ namespace processes {
 /**
  * constructor
  */
-TagShedding::TagShedding(Model* model) : Process(model) {
+TagShedding::TagShedding(Model *model) :
+    Process(model) {
   parameters_.Bind<string>(PARAM_SELECTIVITY_LABEL, &selectivity_label_, "Label for the selectivity block", "");
   parameters_.Bind<float>(PARAM_TIME_STEP_RATIO, &ratios_, "Time step ratios for the Shedding rates to apply in each time step. See manual for how this is applied", "");
   parameters_.Bind<float>(PARAM_SHEDDING_RATE, &shedding_rate_, "Shedding rate per Tag release event", "");
-  parameters_.Bind<string>(PARAM_RELEASE_REGION, &release_region_, "The Release region for the corresponding shedding rate, in the format 1-1 for the first row and first column, and '5-2' for the fifth row and secnd column", "");
+  parameters_.Bind<string>(PARAM_RELEASE_REGION, &release_region_,
+      "The Release region for the corresponding shedding rate, in the format 1-1 for the first row and first column, and '5-2' for the fifth row and secnd column", "");
   parameters_.Bind<unsigned>(PARAM_RELEASE_YEAR, &tag_release_year_, "The Release Year for the corresponding shedding rate", "");
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "Years to execute the tag shedding process", "");
 
@@ -51,9 +51,11 @@ TagShedding::TagShedding(Model* model) : Process(model) {
 void TagShedding::DoValidate() {
 
   if (shedding_rate_.size() != release_region_.size())
-    LOG_ERROR_P(PARAM_SHEDDING_RATE) << "You suppled " << shedding_rate_.size()  << " shedding rates, but '"<< release_region_.size() << "' release regions, there must be a shedding rate for each release regiond";
+    LOG_ERROR_P(PARAM_SHEDDING_RATE) << "You suppled " << shedding_rate_.size() << " shedding rates, but '" << release_region_.size()
+        << "' release regions, there must be a shedding rate for each release regiond";
   if (shedding_rate_.size() != tag_release_year_.size())
-    LOG_ERROR_P(PARAM_SHEDDING_RATE) << "You suppled " << shedding_rate_.size()  << " shedding rates, but '"<< tag_release_year_.size() << "' release year, there must be a shedding rate for each release year";
+    LOG_ERROR_P(PARAM_SHEDDING_RATE) << "You suppled " << shedding_rate_.size() << " shedding rates, but '" << tag_release_year_.size()
+        << "' release year, there must be a shedding rate for each release year";
 }
 /**
  * DoBuild
@@ -65,15 +67,14 @@ void TagShedding::DoBuild() {
   if (selectivity_label_.size() == 1)
     selectivity_label_.assign(2, selectivity_label_[0]);
 
-
   if (selectivity_label_.size() > 2) {
-    LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << "You suppled " << selectivity_label_.size()  << " Selectiviites, you can only have one for each sex max = 2";
+    LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << "You suppled " << selectivity_label_.size() << " Selectiviites, you can only have one for each sex max = 2";
   }
   LOG_FINEST() << "selectivities supplied = " << selectivity_label_.size();
 
   bool first = true;
   for (auto label : selectivity_label_) {
-    Selectivity* temp_selectivity = model_->managers().selectivity()->GetSelectivity(label);
+    Selectivity *temp_selectivity = model_->managers().selectivity()->GetSelectivity(label);
     if (!temp_selectivity)
       LOG_ERROR_P(PARAM_SELECTIVITY_LABEL) << ": selectivity " << label << " does not exist. Have you defined it?";
     temp_selectivity->SubscribeToRebuildCache(this);
@@ -107,8 +108,7 @@ void TagShedding::DoBuild() {
       time_step_ratios_[i] = 1.0;
   } else {
     if (ratios_.size() != active_time_steps.size())
-      LOG_ERROR_P(PARAM_TIME_STEP_RATIO) << " length (" << ratios_.size()
-          << ") does not match the number of time steps this process has been assigned to (" << active_time_steps.size() << ")";
+      LOG_ERROR_P(PARAM_TIME_STEP_RATIO) << " length (" << ratios_.size() << ") does not match the number of time steps this process has been assigned to (" << active_time_steps.size() << ")";
 
     for (float value : ratios_) {
       if (value < 0.0 || value > 1.0)
@@ -120,13 +120,13 @@ void TagShedding::DoBuild() {
   }
   vector<vector<float>> temp_empty_matrix;
   temp_empty_matrix.resize(model_->get_height());
-  for(unsigned row_ndx = 0; row_ndx < model_->get_height(); ++row_ndx) {
+  for (unsigned row_ndx = 0; row_ndx < model_->get_height(); ++row_ndx) {
     temp_empty_matrix[row_ndx].resize(model_->get_width(), 0.0);
   }
   unsigned row_ndx = 0;
   unsigned col_ndx = 0;
 
-  for(unsigned i = 0; i < tag_release_year_.size(); ++i) {
+  for (unsigned i = 0; i < tag_release_year_.size(); ++i) {
     shedding_rate_by_year_cell_[tag_release_year_[i]] = temp_empty_matrix;
     vector<string> split_cells;
     boost::split(split_cells, release_region_[i], boost::is_any_of("-"));
@@ -134,7 +134,7 @@ void TagShedding::DoBuild() {
     if (!utilities::To<unsigned>(split_cells[0], row_ndx))
       LOG_ERROR_P(PARAM_RELEASE_REGION) << " value (" << split_cells[0] << ") could not be converted to a unsigned";
     if (row_ndx > model_->get_height())
-      LOG_ERROR_P(PARAM_RELEASE_REGION) << "The release row " << row_ndx << " is large than the world = '"<< model_->get_height() << "'";
+      LOG_ERROR_P(PARAM_RELEASE_REGION) << "The release row " << row_ndx << " is large than the world = '" << model_->get_height() << "'";
     if (row_ndx <= 0)
       LOG_ERROR_P(PARAM_RELEASE_REGION) << "The release row " << row_ndx << " is less than equal to 0, it must be greater than 0";
     release_row_.push_back(row_ndx);
@@ -142,15 +142,15 @@ void TagShedding::DoBuild() {
     if (!utilities::To<unsigned>(split_cells[1], col_ndx))
       LOG_ERROR_P(PARAM_RELEASE_REGION) << " value (" << split_cells[1] << ") could not be converted to a unsigned";
     if (col_ndx > model_->get_width())
-      LOG_ERROR_P(PARAM_RELEASE_REGION) << "The release col " << col_ndx << " is large than the world = '"<< model_->get_width() << "'";
+      LOG_ERROR_P(PARAM_RELEASE_REGION) << "The release col " << col_ndx << " is large than the world = '" << model_->get_width() << "'";
     if (col_ndx <= 0)
       LOG_ERROR_P(PARAM_RELEASE_REGION) << "The release col " << col_ndx << " is less than equal to 0, it must be greater than 0";
     release_col_.push_back(col_ndx);
 
     shedding_rate_by_year_cell_[tag_release_year_[i]][row_ndx - 1][col_ndx - 1] = shedding_rate_[i];
 
-
-    LOG_MEDIUM() << "double check shedding rate has been entered correctly for " << i << " shedding rate = " << shedding_rate_by_year_cell_[tag_release_year_[i]][row_ndx - 1][col_ndx - 1] << " year = " << tag_release_year_[i] << " row = " << row_ndx - 1 << " col = " << col_ndx - 1;
+    LOG_MEDIUM() << "double check shedding rate has been entered correctly for " << i << " shedding rate = " << shedding_rate_by_year_cell_[tag_release_year_[i]][row_ndx - 1][col_ndx - 1]
+        << " year = " << tag_release_year_[i] << " row = " << row_ndx - 1 << " col = " << col_ndx - 1;
   }
   tag_shedded_per_release_event_.resize(tag_release_year_.size(), 0);
 }
@@ -169,36 +169,38 @@ void TagShedding::DoReset() {
 void TagShedding::DoExecute() {
   LOG_MEDIUM();
   std::pair<bool, int> check = utilities::math::findInVector<unsigned>(years_, model_->current_year());
-  LOG_MEDIUM() << "year = " <<  model_->current_year() << " check first = " << check.first;
+  LOG_MEDIUM() << "year = " << model_->current_year() << " check first = " << check.first;
 
   if ((model_->state() != State::kInitialise) & check.first) {
-    utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+    utilities::RandomNumberGenerator &rng = utilities::RandomNumberGenerator::Instance();
     unsigned time_step = model_->managers().time_step()->current_time_step();
     float ratio = time_step_ratios_[time_step];
     LOG_MEDIUM() << "time_step = " << time_step << " ratio = " << ratio;
     /*
-    // Agent is tagged and survived the process find a slot to add this tagged agent back in
-    */
+     // Agent is tagged and survived the process find a slot to add this tagged agent back in
+     */
     unsigned tag_slot = 0;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         // get the ratio to apply first
-        WorldCell* cell = world_->get_base_square(row, col);
-      if (cell->is_enabled()) {
+        WorldCell *cell = world_->get_base_square(row, col);
+        if (cell->is_enabled()) {
           if (not selectivity_length_based_) {
             // age based selectivity
             LOG_MEDIUM() << "age based tag shedding , num tags =  " << cell->tagged_agents_.size();
-            for(auto & tag_agent : cell->tagged_agents_) {
-              if(tag_agent.is_alive()) {
+            for (auto &tag_agent : cell->tagged_agents_) {
+              if (tag_agent.is_alive()) {
                 //LOG_FINE() << "tagged fish shedding rate = " << shedding_rate_by_year_cell_[tag_agent.get_tag_release_year()][tag_agent.get_tag_row()][tag_agent.get_tag_col()] << " release year = " << tag_agent.get_tag_release_year() << " release col = " << tag_agent.get_tag_col() << " release row = " << tag_agent.get_tag_row();
-                if (rng.chance() <= (1 - exp(-ratio * selectivity_[tag_agent.get_sex()]->GetResult(tag_agent.get_age_index()) * shedding_rate_by_year_cell_[tag_agent.get_tag_release_year()][tag_agent.get_tag_row()][tag_agent.get_tag_col()]))) {
+                if (rng.chance()  <= (1 - exp( -ratio * selectivity_[tag_agent.get_sex()]->GetResult(tag_agent.get_age_index())  * shedding_rate_by_year_cell_[tag_agent.get_tag_release_year()][tag_agent.get_tag_row()][tag_agent.get_tag_col()]))) {
                   // Taghas been sheded
-                  if (tag_agent.get_number_tags() > 1) {
-                    tag_agent.shed_a_tag();
-                  } else if (tag_agent.get_number_tags() == 1) {
+                  tag_agent.shed_a_tag();
+                  if (tag_agent.get_number_tags() >= 1) {
+                    // do nothing, was double tagged and so still in the tagged partition
+                    LOG_MEDIUM() << "found tagged agent with  " << tag_agent.get_number_tags() << " tags, this can't be how?";
+                  } else {
                     // merge tagged fish backinto untagged partition
                     tag_slot = 0;
-                    while(tag_slot < cell->agents_.size()) {
+                    while (tag_slot < cell->agents_.size()) {
                       if (not cell->agents_[tag_slot].is_alive()) {
                         cell->agents_[tag_slot] = tag_agent;
                         break;
@@ -210,23 +212,24 @@ void TagShedding::DoExecute() {
                       cell->agents_.push_back(tag_agent);
                     }
                     tag_agent.dies();
-                  }// the other conditions should not exist i.e. a tagged agent with < 0 tags
+                  } // the other conditions should not exist i.e. a tagged agent with < 0 tags
                 }
               }
             }
           } else {
             // length based selectivity
             LOG_MEDIUM() << "length based tag shedding , num tags =  " << cell->tagged_agents_.size();
-            for(auto & tag_agent : cell->tagged_agents_) {
-              if(tag_agent.is_alive()) {
-                if (rng.chance() <= (1 - exp(-ratio * selectivity_[tag_agent.get_sex()]->GetResult(tag_agent.get_length_bin_index()) * shedding_rate_by_year_cell_[tag_agent.get_tag_release_year()][tag_agent.get_tag_row()][tag_agent.get_tag_col()]))) {
+            for (auto &tag_agent : cell->tagged_agents_) {
+              if (tag_agent.is_alive()) {
+                if (rng.chance()  <= (1  - exp(  -ratio * selectivity_[tag_agent.get_sex()]->GetResult(tag_agent.get_length_bin_index())  * shedding_rate_by_year_cell_[tag_agent.get_tag_release_year()][tag_agent.get_tag_row()][tag_agent.get_tag_col()]))) {
                   // Taghas been sheded
-                  if (tag_agent.get_number_tags() > 1) {
-                    tag_agent.shed_a_tag();
-                  } else if (tag_agent.get_number_tags() == 1) {
+                  tag_agent.shed_a_tag();
+                  if (tag_agent.get_number_tags() >= 1) {
+                    // do nothing, was double tagged and so still in the tagged partition
+                  } else {
                     // merge tagged fish backinto untagged partition
                     tag_slot = 0;
-                    while(tag_slot < cell->agents_.size()) {
+                    while (tag_slot < cell->agents_.size()) {
                       if (not cell->agents_[tag_slot].is_alive()) {
                         cell->agents_[tag_slot] = tag_agent;
                         break;
@@ -238,7 +241,7 @@ void TagShedding::DoExecute() {
                       cell->agents_.push_back(tag_agent);
                     }
                     tag_agent.dies();
-                  }// the other conditions should not exist i.e. a tagged agent with < 0 tags
+                  } // the other conditions should not exist i.e. a tagged agent with < 0 tags
                 }
               }
             }
@@ -246,22 +249,21 @@ void TagShedding::DoExecute() {
         } // cell enabled
       } // col enabled
     } // row enabled
-   } // check year
+  } // check year
 } // Doexecute
-
 
 // FillReportCache, called in the report class, it will print out additional information that is stored in
 // containers in this class.
-void  TagShedding::FillReportCache(ostringstream& cache) {
-	/*
-  cache << "year: ";
-  for (auto& year : removals_by_year_)
-    cache << year.first << " ";
+void TagShedding::FillReportCache(ostringstream &cache) {
+  /*
+   cache << "year: ";
+   for (auto& year : removals_by_year_)
+   cache << year.first << " ";
 
-  cache << "\nagents_removed: ";
-  for (auto& year : removals_by_year_)
-    cache << year.second << " ";
-  cache << "\n";*/
+   cache << "\nagents_removed: ";
+   for (auto& year : removals_by_year_)
+   cache << year.second << " ";
+   cache << "\n";*/
 }
 
 // A Method for telling the world we need to redistribute Mortality parmaeters
