@@ -114,7 +114,8 @@ time_step_ratio 1
 # Fishing Mortality
 @process fishing
 type mortality_event_biomass
-print_extra_info false
+print_census_info false
+print_tag_recapture_info true
 table catch
 year Fishing_LL
 1990	1990_catch

@@ -74,7 +74,7 @@ time_step_ratio 0.45 0.55
 # Fishing Mortality
 @process Fishing_Mortality
 type mortality_event_biomass
-print_extra_info true
+print_census_info true
 table catch
 year FishingTrwl FishingLine
 1972 1972_Trwl 1972_Line

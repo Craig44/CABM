@@ -25,7 +25,7 @@ type iterative
 years 40
 #convergence_years 20 40
 #lambda 1
-initial_number_of_agents 1000000 ## initial number of agents
+initial_number_of_agents 700000 ## initial number of agents
 layer_label Base
 #recruitment_layer_label recruitment_labels
 # --------------
@@ -52,7 +52,7 @@ a 2.0e-9
 b 3.288
 update_growth_parameters false
 distribution lognormal
-cv 0.00000001
+cv 0.1
 time_step_proportions 1
 
 # Maturity
@@ -73,7 +73,8 @@ time_step_ratio 1
 # Fishing Mortality
 @process fishing
 type mortality_event_biomass
-print_extra_info true
+print_census_info true
+print_tag_recapture_info false
 table catch
 year FishingTrwl
 1970 catch_1970

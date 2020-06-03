@@ -15,8 +15,7 @@ setwd("../ibm")
 library(ibm)
 
 ibm = extract.run("output.log")
-ibm2 = extract.run("with_variation.out")
-ibm3 = extract.run("with_variation_less_agents.out")
+ibm2 = extract.run("run.log")
 
 names(ibm)
 
