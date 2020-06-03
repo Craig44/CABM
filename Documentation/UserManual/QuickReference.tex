@@ -18,9 +18,10 @@
 \defSub{type} {The type of initialisation}
 \par\textbf{\commandlabsubarg{initialisation\_phase}{type}{iterative}}\par
 \defSub{years} {The number of iterations (years) over which to execute this initialisation phase}
-\defSub{number\_of\_individuals} {The number of agents to initially seed in the partition}
+\defSub{initial\_number\_of\_agents} {The number of agents to initially seed in the partition}
 \defSub{layer\_label} {The label of a layer that you want to seed a distribution by.}
 \defSub{recruitment\_layer\_label} {The label of a layer has a recruitment process label in each cell to see how to set scalars}
+\defSub{initialisation\_mortality\_rate} {The instaneous mortality rate to use to approximate a crude initial age-structure}
 \defComLab{likelihood}{Define an object of type \emph{likelihood}}\par\par
 \par\textbf{\commandlabsubarg{likelihood}{type}{binomial}}\par
 \par\textbf{\commandlabsubarg{likelihood}{type}{binomial\_approx}}\par
@@ -79,18 +80,18 @@
 \defSub{cell\_layer} {The layer that indicates what area to summarise observations over.}
 \defSub{cells} {The cells we want to generate observations for from the layer of cells supplied}
 \defSub{simulation\_likelihood} {Simulation likelihood to use}
+\defSub{abundance} {Is the index biomass (abundance = false) or abundance (abundance = true}
 \par\textbf{\commandlabsubarg{observation}{type}{mortality\_event\_biomass\_age\_clusters}}\par
 \defSub{years} {The years of the observed values}
 \defSub{ageing\_error} {Label of ageing error to use}
 \defSub{process\_label} {Label of of removal process}
 \defSub{fishery\_label} {Label of of removal process}
-\defSub{min\_age} {Minimum age}
-\defSub{max\_age} {Maximum age}
 \defSub{cluster\_cv} {CV for randomly selecting clusters}
+\defSub{composition\_type} {}
 \defSub{cluster\_sigma} {Standard deviation for the M-H proposal distribution}
 \defSub{age\_samples\_per\_cluster} {Number of age samples available to be aged per cluster}
 \defSub{stratum\_weighting\_method} {Method to weight stratum estimates by}
-\defSub{sex} {You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female}
+\defSub{sexed} {You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female}
 \defSub{layer\_of\_stratum\_definitions} {The layer that indicates what the stratum boundaries are.}
 \defSub{strata\_to\_include} {The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer}
 \par\textbf{\commandlabsubarg{observation}{type}{mortality\_event\_biomass\_clusters}}\par
@@ -126,6 +127,36 @@
 \defSub{sex} {You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female}
 \defSub{layer\_of\_stratum\_definitions} {The layer that indicates what the stratum boundaries are.}
 \defSub{strata\_to\_include} {The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer}
+\par\textbf{\commandlabsubarg{observation}{type}{mortality\_event\_biomass\_clusters\_second\_cut}}\par
+\defSub{years} {The years of the observed values}
+\defSub{ageing\_error} {Label of ageing error to use}
+\defSub{process\_label} {Label of of removal process}
+\defSub{fishery\_label} {Label of of removal process}
+\defSub{min\_age} {Minimum age}
+\defSub{max\_age} {Maximum age}
+\defSub{cluster\_cv} {CV for randomly selecting clusters}
+\defSub{cluster\_attribute} {What attribute do you want to link clusters by, either age or length}
+\defSub{cluster\_correlation\_lambda} {The probability of being associated to a cluster based on distrance from attribute}
+\defSub{age\_samples\_per\_cluster} {Number of age samples available to be aged per cluster}
+\defSub{length\_samples\_per\_cluster} {Number of age samples available to be aged per cluster}
+\defSub{minimum\_cluster\_weight\_to\_sample} {The minimum weight (tonnes) threshold to consider sampling, should be well in the distribution of cluster sizes}
+\defSub{final\_age\_protocol} {What method do you want to use to calculate final age composition}
+\defSub{age\_allocation\_method} {The method used to allocate aged individuals across the length distribution}
+\defSub{sex} {You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female}
+\defSub{layer\_of\_stratum\_definitions} {The layer that indicates what the stratum boundaries are.}
+\defSub{strata\_to\_include} {The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer}
+\par\textbf{\commandlabsubarg{observation}{type}{mortality\_event\_biomass\_length\_clusters}}\par
+\defSub{years} {The years of the observed values}
+\defSub{process\_label} {Label of of removal process}
+\defSub{fishery\_label} {Label of of removal process}
+\defSub{cluster\_cv} {CV for randomly selecting clusters}
+\defSub{composition\_type} {}
+\defSub{cluster\_sigma} {Standard deviation for the M-H proposal distribution}
+\defSub{length\_samples\_per\_cluster} {Number of age samples available to be aged per cluster}
+\defSub{stratum\_weighting\_method} {Method to weight stratum estimates by}
+\defSub{sexed} {You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female}
+\defSub{layer\_of\_stratum\_definitions} {The layer that indicates what the stratum boundaries are.}
+\defSub{strata\_to\_include} {The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer}
 \par\textbf{\commandlabsubarg{observation}{type}{mortality\_event\_biomass\_scaled\_age\_frequency}}\par
 \defSub{years} {The years of the observed values}
 \defSub{ageing\_error} {Label of ageing error to use}
@@ -133,6 +164,21 @@
 \defSub{fishery\_label} {Label of of removal process}
 \defSub{age\_allocation\_method} {The method used to allocate aged individuals across the length distribution}
 \defSub{sex} {You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female}
+\defSub{layer\_of\_stratum\_definitions} {The layer that indicates what the stratum boundaries are.}
+\defSub{strata\_to\_include} {The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer}
+\par\textbf{\commandlabsubarg{observation}{type}{mortality\_event\_composition}}\par
+\defSub{years} {The years of the observed values}
+\defSub{ageing\_error} {Label of ageing error to use}
+\defSub{process\_label} {Label of of removal process}
+\defSub{fishery\_label} {Label of of removal process}
+\defSub{stratum\_weighting\_method} {Method to weight stratum estimates by}
+\defSub{sexed} {You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female}
+\defSub{composition\_type} {Is the composition Age or Length}
+\defSub{normalise} {Are the compositions normalised to sum to one}
+\defSub{simulation\_likelihood} {Simulation likelihood to use}
+\defSub{min\_age} {Minimum age}
+\defSub{max\_age} {Maximum age}
+\defSub{plus\_group} {max age is a plus group}
 \defSub{layer\_of\_stratum\_definitions} {The layer that indicates what the stratum boundaries are.}
 \defSub{strata\_to\_include} {The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer}
 \par\textbf{\commandlabsubarg{observation}{type}{mortality\_scaled\_age\_frequency}}\par
@@ -149,6 +195,7 @@
 \defSub{years} {Years for which there are observations}
 \defSub{ageing\_error} {Label of ageing error to use}
 \defSub{process\_label} {Label of of removal process}
+\defSub{normalise} {Are the compositions normalised to sum to one}
 \defSub{cell\_layer} {The layer that indicates what area to summarise observations over.}
 \defSub{cells} {The cells we want to generate observations for from the layer of cells supplied}
 \defSub{sex} {You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female}
@@ -163,6 +210,7 @@
 \defSub{min\_age} {Minimum age}
 \defSub{max\_age} {Maximum age}
 \defSub{sexed} {Observation split by sex}
+\defSub{normalise} {Are the compositions normalised to sum to one}
 \defSub{selectivities} {Labels of the selectivities}
 \defSub{proportion\_through\_mortality\_block} {Proportion through the mortality block of the time step to infer observation with}
 \defSub{plus\_group} {max age is a plus group}
@@ -177,18 +225,41 @@
 \defSub{tag\_release\_year} {The years that the tagged fish were released}
 \defSub{ageing\_error} {Label of ageing error to use}
 \defSub{process\_label} {Label of of removal process}
-\defSub{layer\_of\_stratum\_definitions} {The layer that indicates what the stratum boundaries are.}
-\defSub{strata\_to\_include} {The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer}
+\defSub{release\_stratum} {Stratum that individuals were released in}
+\defSub{recapture\_stratum} {Stratum to record recaptures, that were released in this year and in the release stratum}
 \par\textbf{\commandlabsubarg{observation}{type}{tag\_recapture\_by\_length}}\par
 \defSub{years} {The years of the observed values}
 \defSub{tag\_release\_year} {The years that the tagged fish were released}
 \defSub{sexed} {Seperate observation by sex}
 \defSub{process\_label} {Label of of removal process}
-\defSub{layer\_of\_stratum\_definitions} {The layer that indicates what the stratum boundaries are.}
-\defSub{strata\_to\_include} {The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer}
+\defSub{layer\_of\_strata\_definitions} {The layer that indicates what the stratum boundaries are.}
+\defSub{release\_stratum} {Stratum that individuals were released in}
+\defSub{recapture\_stratum} {Stratum to record recaptures, that were released in this year and in the release stratum}
 \defComLab{process}{Define an object of type \emph{process}}\par\par
 \defSub{label} {The label of the process}
 \defSub{type} {The type of process}
+\par\textbf{\commandlabsubarg{process}{type}{growth\_schnute\_with\_basic}}\par
+\defSub{distribution} {the distribution to allocate the parameters to the agents}
+\defSub{update\_growth\_parameters} {If an agent/individual moves do you want it to take on the growth parameters of the new spatial cell}
+\defSub{cv} {The cv of the distribution}
+\defSub{alpha\_layer\_label} {Label for the numeric layer that describes mean L inf by area}
+\defSub{beta\_layer\_label} {Label for the numeric layer that describes mean k by area}
+\defSub{t0\_layer\_label} {Label for the numeric layer that describes mean t0 by area}
+\defSub{a\_layer\_label} {Label for the numeric layer that describes mean a in the weight calcualtion through space}
+\defSub{b\_layer\_label} {Label for the numeric layer that describes mean b in the weight calcualtion through space}
+\defSub{t0} {The value for t0 default = 0}
+\defSub{alpha} {alpha value for schnute growth curve}
+\defSub{beta} {beta value for schnute growth curve}
+\defSub{a} {alpha value for weight at length function}
+\defSub{b} {beta value for weight at length function}
+\defSub{tau1} {reference age for y1}
+\defSub{tau2} {reference age for y2}
+\defSub{y1} {mean size at reference ages tau1}
+\defSub{y2} {mean size at reference ages tau2}
+\defSub{alpha} {}
+\defSub{beta} {}
+\defSub{tau1} {}
+\defSub{tau2} {}
 \par\textbf{\commandlabsubarg{process}{type}{growth\_von\_bertalanffy\_with\_basic}}\par
 \defSub{distribution} {the distribution to allocate the parameters to the agents}
 \defSub{update\_growth\_parameters} {If an agent/individual moves do you want it to take on the growth parameters of the new spatial cell}
@@ -230,11 +301,12 @@
 \defSub{minimiser} {Label of the minimser to solve the problem}
 \defSub{years} {years to apply the process}
 \defSub{catches} {Total catch by year}
-\defSub{effort\_values} {A vector of effort values, one for each enabled cell of the model}
+\defSub{effort\_values} {A vector of effort values, one for each enabled cell of the model, these should represent the variability of effort of the fishery mimicking}
 \defSub{effort\_layer\_label} {A layer label that is a numeric layer label that contains effort values for each year.}
 \defSub{starting\_value\_for\_lambda} {Total catch by year}
 \par\textbf{\commandlabsubarg{process}{type}{mortality\_event\_biomass}}\par
-\defSub{print\_extra\_info} {if you have process report for this process you can control the amount of information printed to the file.}
+\defSub{print\_census\_info} {if you have process report for this process you can control the amount of information printed to the file.}
+\defSub{print\_tag\_recapture\_info} {if you have process report for this process you can control the amount of information printed to the file.}
 \par\textbf{\commandlabsubarg{process}{type}{movement\_box\_transfer}}\par
 \defSub{origin\_cell} {The origin cell associated with each spatial layer (should have a one to one relationship with specified layers), format follows row-col (1-2}
 \defSub{probability\_layers} {Spatial layers (one layer for each origin cell) describing the probability of moving from an origin cell to all other cells in the spatial domain.}
@@ -255,6 +327,7 @@
 \defSub{ssb} {A label for the SSB derived quantity}
 \defSub{proportion\_male} {Proportion of recruits male}
 \defSub{b0} {}
+\defSub{proportion\_male} {}
 \defSub{steepness} {Steepness}
 \defSub{ycs\_values} {YCS (Year-Class-Strength) Values}
 \par\textbf{\commandlabsubarg{process}{type}{recruitment\_constant}}\par
@@ -263,6 +336,14 @@
 \defSub{ssb} {A label for the SSB derived quantity}
 \defSub{proportion\_male} {Proportion of recruits male}
 \defSub{b0} {}
+\defSub{proportion\_male} {}
+\par\textbf{\commandlabsubarg{process}{type}{tag\_shedding}}\par
+\defSub{selectivity\_label} {Label for the selectivity block}
+\defSub{time\_step\_ratio} {Time step ratios for the Shedding rates to apply in each time step. See manual for how this is applied}
+\defSub{shedding\_rates} {Shedding rate per Tag release event}
+\defSub{tag\_release\_region} {The Release region for the corresponding shedding rate, in the format 1-1 for the first row and first column, and '5-2' for the fifth row and secnd column}
+\defSub{tag\_release\_year} {The Release Year for the corresponding shedding rate}
+\defSub{years} {Years to execute the tag shedding process}
 \par\textbf{\commandlabsubarg{process}{type}{tagging}}\par
 \defSub{tag\_release\_layer} {Spatial layer describing catch by cell for each year, there is a one to one link with the year specified, so make sure the order is right}
 \defSub{selectivities} {selectivity used to capture agents}
@@ -276,10 +357,15 @@
 \par\textbf{\commandlabsubarg{report}{type}{age\_frequency\_by\_cell}}\par
 \defSub{years} {Years}
 \defSub{time\_step} {Time Step label}
+\defSub{do\_length\_frequency} {Print the report as length frequency not age.}
+\par\textbf{\commandlabsubarg{report}{type}{age\_length\_matrix\_by\_cell}}\par
+\defSub{years} {Years}
+\defSub{time\_step} {Time Step label}
 \par\textbf{\commandlabsubarg{report}{type}{ageing\_error\_matrix}}\par
 \defSub{ageing\_error} {Ageing Error label}
 \par\textbf{\commandlabsubarg{report}{type}{derived\_quantity}}\par
 \par\textbf{\commandlabsubarg{report}{type}{initialisation\_partition}}\par
+\defSub{do\_length\_frequency} {Print the report as length frequency not age.}
 \par\textbf{\commandlabsubarg{report}{type}{likelihood}}\par
 \defSub{likelihood} {Likelihood label that is reported}
 \par\textbf{\commandlabsubarg{report}{type}{model\_attributes}}\par
@@ -300,7 +386,7 @@
 \par\textbf{\commandlabsubarg{report}{type}{summarise\_agents}}\par
 \defSub{years} {Years}
 \defSub{time\_step} {Time Step label}
-\defSub{number\_of\_individuals} {Number of agents to summarise}
+\defSub{number\_of\_agents} {Number of agents to summarise}
 \par\textbf{\commandlabsubarg{report}{type}{time\_varying}}\par
 \par\textbf{\commandlabsubarg{report}{type}{world\_age\_frequency}}\par
 \defSub{years} {Years}
