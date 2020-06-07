@@ -16,6 +16,7 @@
 
 // headers
 #include "TimeVarying/TimeVarying.h"
+#include "Utilities/Distribution.h"
 
 // namespaces
 namespace niwa {
@@ -38,12 +39,10 @@ private:
   // members
   float                      mu_;
   float                      sigma_;
-  float                      intercept_;
-  bool                        has_at_estimate_ = false;
-  string                      distribution_;
-  float*                     value_;
+  string                     distribution_label_;
   float                      lower_bound_;
   float                      upper_bound_;
+  Distribution               distribution_ = Distribution::kNormal;
 
 };
 

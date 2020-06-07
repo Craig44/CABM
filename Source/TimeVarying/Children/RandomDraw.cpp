@@ -26,7 +26,9 @@ namespace timevarying {
 RandomDraw::RandomDraw(Model* model) : TimeVarying(model) {
   parameters_.Bind<float>(PARAM_MEAN, &mu_, "Mean", "", 0);
   parameters_.Bind<float>(PARAM_SIGMA, &sigma_, "Standard deviation", "", 1);
-  parameters_.Bind<string>(PARAM_DISTRIBUTION, &distribution_, "distribution", "", PARAM_NORMAL)->set_allowed_values({PARAM_NORMAL,PARAM_LOGNORMAL});
+  parameters_.Bind<string>(PARAM_DISTRIBUTION, &distribution_label_, "distribution", "", PARAM_NORMAL)->set_allowed_values({PARAM_NORMAL,PARAM_LOGNORMAL});
+  parameters_.Bind<float>(PARAM_LOWER_BOUND, &lower_bound_, "Lower bound", "");
+  parameters_.Bind<float>(PARAM_UPPER_BOUND, &upper_bound_, "Upper bound", "");
 
   RegisterAsAddressable(PARAM_MEAN, &mu_);
   RegisterAsAddressable(PARAM_SIGMA, &sigma_);
@@ -37,22 +39,18 @@ RandomDraw::RandomDraw(Model* model) : TimeVarying(model) {
  */
 void RandomDraw::DoValidate() {
 
+  if (distribution_label_ == PARAM_NORMAL) {
+    distribution_ = Distribution::kNormal;
+  } else {
+    distribution_ = Distribution::kLogNormal;
+  }
 }
 
 /**
  *
  */
 void RandomDraw::DoBuild() {
-  float* value = model_->objects().GetAddressable(parameter_);
-  if (value) {
-    LOG_FINEST() << "Found an addressable block for " << parameter_;
-
-  } else {
-    LOG_FATAL_P(PARAM_PARAMETER) << "could not find parameters";
-  }
-
-  if(model_->objects().GetAddressableType(parameter_) != addressable::kSingle)
-    LOG_ERROR_P(PARAM_TYPE) << "@time_varying blocks of type " << PARAM_RANDOMWALK << " can only be implemented in parameters that are scalars or single values";
+  LOG_FINE() << "Dobuild";
   DoReset();
 }
 
@@ -63,27 +61,25 @@ void RandomDraw::DoReset() {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   float new_value = 0.0;
   // Draw from the random distribution
-  if (distribution_ == PARAM_NORMAL) {
+  if (distribution_ == Distribution::kNormal) {
     for (unsigned year : years_) {
-    new_value = rng.normal((mu_), (sigma_));
-    LOG_FINEST() << "with mean = " << mu_ << " and sigma = " << sigma_ << " new value = " << new_value;
-
-    if (new_value <= 0.0) {
-      LOG_WARNING() << "parameter: " << parameter_ << " random draw of value = " << new_value << " a natural lower bound of 0.0 has been forced so resetting the value = 0.01";
-      new_value  = 0.01;
-    }
-    parameter_by_year_[year] = new_value;
-    }
-  } else if (distribution_ == PARAM_LOGNORMAL)  {
-    for (unsigned year : years_) {
-      float cv = sigma_ / mu_;
-      new_value = rng.lognormal((mu_), (cv));
+      new_value = rng.normal((mu_), (sigma_));
       LOG_FINEST() << "with mean = " << mu_ << " and sigma = " << sigma_ << " new value = " << new_value;
-      // Set value
-      if (new_value <= 0.0) {
-        LOG_WARNING() << "parameter: " << parameter_ << " random draw of value = " << new_value << " a natural lower bound of 0.0 has been forced so resetting the value = 0.01";
-        new_value  = 0.01;
-      }
+      if (new_value < lower_bound_)
+        new_value  = lower_bound_;
+      if (new_value > upper_bound_)
+        new_value  = upper_bound_;
+      parameter_by_year_[year] = new_value;
+    }
+  } else if (distribution_ == Distribution::kLogNormal)  {
+    for (unsigned year : years_) {
+      float cv = sqrt(exp(sigma_ * sigma_) - 1);
+      new_value = rng.lognormal(mu_, cv);
+      LOG_FINEST() << "with mean = " << mu_ << " and sigma = " << cv << " new value = " << new_value;
+      if (new_value < lower_bound_)
+        new_value  = lower_bound_;
+      if (new_value > upper_bound_)
+        new_value  = upper_bound_;
       parameter_by_year_[year] = new_value;
     }
   }

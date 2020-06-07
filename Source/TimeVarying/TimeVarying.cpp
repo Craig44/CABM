@@ -51,22 +51,27 @@ void TimeVarying::Build() {
   if (!model_->objects().VerfiyAddressableForUse(parameter_, addressable::kTimeVarying, error)) {
     LOG_FATAL_P(PARAM_PARAMETER) << "could not be verified for use in a time_varying block. Error was " << error << ", please float checked you have specified the parameter correctly.";
   }
+  LOG_FINE() << "Get addressable type for " << parameter_;
 
   addressable::Type addressable_type = model_->objects().GetAddressableType(parameter_);
+  LOG_FINE() << "addressable_type = " << addressable_type;
   switch(addressable_type) {
     case addressable::kInvalid:
       LOG_ERROR_P(PARAM_PARAMETER) << error;
       break;
     case addressable::kSingle:
+      LOG_FINE() << "Single";
       update_function_ = &TimeVarying::set_single_value;
       addressable_    = model_->objects().GetAddressable(parameter_);
       original_value_ = *addressable_;
       break;
     case addressable::kVector:
+      LOG_FINE() << "vector";
       update_function_ = &TimeVarying::set_vector_value;
       addressable_vector_ = model_->objects().GetAddressableVector(parameter_);
       break;
     case addressable::kUnsignedMap:
+      LOG_FINE() << "UMap";
       update_function_ = &TimeVarying::set_map_value;
       addressable_map_ = model_->objects().GetAddressableUMap(parameter_);
       break;
@@ -75,6 +80,7 @@ void TimeVarying::Build() {
       break;
   }
 
+  LOG_FINE() << "FindObject";
   target_object_ = model_->objects().FindObject(parameter_);
 
   DoBuild();
