@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "CMAKE-COMMANDS" "7" "Jul 17, 2018" "3.12.0" "CMake"
+.TH "CMAKE-COMMANDS" "7" "Nov 02, 2018" "3.12.4" "CMake"
 .SH NAME
 cmake-commands \- CMake Language Command Reference
 .
@@ -641,7 +641,7 @@ or:
 .UNINDENT
 .sp
 depending on whether \fBVAR\fP is set in CMake to any value not considered
-a false constant by the \fBif()\fP command.  The "..." content on the
+a false constant by the \fBif()\fP command.  The “…” content on the
 line after the variable name, if any, is processed as above.
 Input file lines of the form \fB#cmakedefine01 VAR\fP will be replaced with
 either \fB#define VAR 1\fP or \fB#define VAR 0\fP similarly.
@@ -996,11 +996,11 @@ Valid encoding names are:
 .TP
 .B \fBNONE\fP
 Perform no decoding.  This assumes that the process output is encoded
-in the same way as CMake\(aqs internal encoding (UTF\-8).
+in the same way as CMake’s internal encoding (UTF\-8).
 This is the default.
 .TP
 .B \fBAUTO\fP
-Use the current active console\(aqs codepage or if that isn\(aqt
+Use the current active console’s codepage or if that isn’t
 available then use ANSI.
 .TP
 .B \fBANSI\fP
@@ -1176,7 +1176,7 @@ file(TIMESTAMP <filename> <variable> [<format>] [UTC])
 .sp
 Compute a string representation of the modification time of \fB<filename>\fP
 and store it in \fB<variable>\fP\&.  Should the command be unable to obtain a
-timestamp variable will be set to the empty string ("").
+timestamp variable will be set to the empty string (“”).
 .sp
 See the \fBstring(TIMESTAMP)\fP command for documentation of
 the \fB<format>\fP and \fBUTC\fP options.
@@ -1273,7 +1273,7 @@ runs only if their content is changed.
 Note also that \fBfile(GENERATE)\fP does not create the output file until the
 generation phase. The output file will not yet have been written when the
 \fBfile(GENERATE)\fP command returns, it is written only after processing all
-of a project\(aqs \fBCMakeLists.txt\fP files.
+of a project’s \fBCMakeLists.txt\fP files.
 .SS Filesystem
 .INDENT 0.0
 .INDENT 3.5
@@ -1599,7 +1599,7 @@ and will be \fB0\fP on success or error message on failure.
 Note that lock is advisory \- there is no guarantee that other processes will
 respect this lock, i.e. lock synchronize two or more CMake instances sharing
 some modifiable resources. Similar logic applied to \fBDIRECTORY\fP option \-
-locking parent directory doesn\(aqt prevent other \fBLOCK\fP commands to lock any
+locking parent directory doesn’t prevent other \fBLOCK\fP commands to lock any
 child directory or file.
 .sp
 Trying to lock file twice is not allowed.  Any intermediate directories and
@@ -1685,20 +1685,26 @@ added to the search.
 If \fBNO_DEFAULT_PATH\fP is not specified, the search process is as follows:
 .INDENT 0.0
 .IP 1. 3
-If called from within a find module, search prefix paths unique to the
-current package being found.  Specifically look in the \fBPackageName_ROOT\fP
-CMake and environment variables.  The package root variables are maintained
-as a stack so if called from nested find modules, root paths from the
-parent\(aqs find module will be searched after paths from the current module,
-i.e. \fBCurrentPackage_ROOT\fP, \fBENV{CurrentPackage_ROOT}\fP,
-\fBParentPackage_ROOT\fP, \fBENV{ParentPackage_ROOT}\fP, etc.
+If called from within a find module loaded by
+\fBfind_package(<PackageName>)\fP, search prefixes unique to the
+current package being found.  Specifically look in the
+\fB<PackageName>_ROOT\fP CMake variable and the
+\fB<PackageName>_ROOT\fP environment variable.
+The package root variables are maintained as a stack so if called from
+nested find modules, root paths from the parent’s find module will be
+searched after paths from the current module,
+i.e. \fB<CurrentPackage>_ROOT\fP, \fBENV{<CurrentPackage>_ROOT}\fP,
+\fB<ParentPackage>_ROOT\fP, \fBENV{<ParentPackage>_ROOT}\fP, etc.
 This can be skipped if \fBNO_PACKAGE_ROOT_PATH\fP is passed.
 See policy \fBCMP0074\fP\&.
 .INDENT 3.0
 .IP \(bu 2
 \fB<prefix>/include/<arch>\fP if \fBCMAKE_LIBRARY_ARCHITECTURE\fP
-is set, and \fB<prefix>/include\fP for each \fB<prefix>\fP in \fBPackageName_ROOT\fP if called
-from within a find module
+is set, and \fB<prefix>/include\fP for each \fB<prefix>\fP in the
+\fB<PackageName>_ROOT\fP CMake variable and the
+\fB<PackageName>_ROOT\fP environment variable if
+called from within a find module loaded by
+\fBfind_package(<PackageName>)\fP
 .UNINDENT
 .IP 2. 3
 Search paths specified in cmake\-specific cache variables.
@@ -1716,8 +1722,8 @@ is set, and \fB<prefix>/include\fP for each \fB<prefix>\fP in \fBCMAKE_PREFIX_PA
 .UNINDENT
 .IP 3. 3
 Search paths specified in cmake\-specific environment variables.
-These are intended to be set in the user\(aqs shell configuration,
-and therefore use the host\(aqs native path separator
+These are intended to be set in the user’s shell configuration,
+and therefore use the host’s native path separator
 (\fB;\fP on Windows and \fB:\fP on UNIX).
 This can be skipped if \fBNO_CMAKE_ENVIRONMENT_PATH\fP is passed.
 .INDENT 3.0
@@ -1772,7 +1778,7 @@ preference between Apple\-style and unix\-style package components.
 .sp
 The CMake variable \fBCMAKE_FIND_ROOT_PATH\fP specifies one or more
 directories to be prepended to all other search directories.  This
-effectively "re\-roots" the entire search under given locations.
+effectively “re\-roots” the entire search under given locations.
 Paths which are descendants of the \fBCMAKE_STAGING_PREFIX\fP are excluded
 from this re\-rooting, because that variable is always a path on the host system.
 By default the \fBCMAKE_FIND_ROOT_PATH\fP is empty.
@@ -1900,20 +1906,26 @@ added to the search.
 If \fBNO_DEFAULT_PATH\fP is not specified, the search process is as follows:
 .INDENT 0.0
 .IP 1. 3
-If called from within a find module, search prefix paths unique to the
-current package being found.  Specifically look in the \fBPackageName_ROOT\fP
-CMake and environment variables.  The package root variables are maintained
-as a stack so if called from nested find modules, root paths from the
-parent\(aqs find module will be searched after paths from the current module,
-i.e. \fBCurrentPackage_ROOT\fP, \fBENV{CurrentPackage_ROOT}\fP,
-\fBParentPackage_ROOT\fP, \fBENV{ParentPackage_ROOT}\fP, etc.
+If called from within a find module loaded by
+\fBfind_package(<PackageName>)\fP, search prefixes unique to the
+current package being found.  Specifically look in the
+\fB<PackageName>_ROOT\fP CMake variable and the
+\fB<PackageName>_ROOT\fP environment variable.
+The package root variables are maintained as a stack so if called from
+nested find modules, root paths from the parent’s find module will be
+searched after paths from the current module,
+i.e. \fB<CurrentPackage>_ROOT\fP, \fBENV{<CurrentPackage>_ROOT}\fP,
+\fB<ParentPackage>_ROOT\fP, \fBENV{<ParentPackage>_ROOT}\fP, etc.
 This can be skipped if \fBNO_PACKAGE_ROOT_PATH\fP is passed.
 See policy \fBCMP0074\fP\&.
 .INDENT 3.0
 .IP \(bu 2
 \fB<prefix>/lib/<arch>\fP if \fBCMAKE_LIBRARY_ARCHITECTURE\fP is set,
-and \fB<prefix>/lib\fP for each \fB<prefix>\fP in \fBPackageName_ROOT\fP if called
-from within a find module
+and \fB<prefix>/lib\fP for each \fB<prefix>\fP in the
+\fB<PackageName>_ROOT\fP CMake variable and the
+\fB<PackageName>_ROOT\fP environment variable if
+called from within a find module loaded by
+\fBfind_package(<PackageName>)\fP
 .UNINDENT
 .IP 2. 3
 Search paths specified in cmake\-specific cache variables.
@@ -1931,8 +1943,8 @@ and \fB<prefix>/lib\fP for each \fB<prefix>\fP in \fBCMAKE_PREFIX_PATH\fP
 .UNINDENT
 .IP 3. 3
 Search paths specified in cmake\-specific environment variables.
-These are intended to be set in the user\(aqs shell configuration,
-and therefore use the host\(aqs native path separator
+These are intended to be set in the user’s shell configuration,
+and therefore use the host’s native path separator
 (\fB;\fP on Windows and \fB:\fP on UNIX).
 This can be skipped if \fBNO_CMAKE_ENVIRONMENT_PATH\fP is passed.
 .INDENT 3.0
@@ -1987,7 +1999,7 @@ preference between Apple\-style and unix\-style package components.
 .sp
 The CMake variable \fBCMAKE_FIND_ROOT_PATH\fP specifies one or more
 directories to be prepended to all other search directories.  This
-effectively "re\-roots" the entire search under given locations.
+effectively “re\-roots” the entire search under given locations.
 Paths which are descendants of the \fBCMAKE_STAGING_PREFIX\fP are excluded
 from this re\-rooting, because that variable is always a path on the host system.
 By default the \fBCMAKE_FIND_ROOT_PATH\fP is empty.
@@ -2128,8 +2140,8 @@ full command signature and details of the search process.  Project
 maintainers wishing to provide a package to be found by this command
 are encouraged to read on.
 .sp
-The command has two modes by which it searches for packages: "Module"
-mode and "Config" mode.  Module mode is available when the command is
+The command has two modes by which it searches for packages: “Module”
+mode and “Config” mode.  Module mode is available when the command is
 invoked with the above reduced signature.  CMake searches for a file
 called \fBFind<package>.cmake\fP in the \fBCMAKE_MODULE_PATH\fP
 followed by the CMake installation.  If the file is found, it is read
@@ -2208,7 +2220,7 @@ version (format is \fBmajor[.minor[.patch[.tweak]]]\fP).  If the \fBEXACT\fP
 option is given only a version of the package claiming an exact match
 of the requested version may be found.  CMake does not establish any
 convention for the meaning of version numbers.  Package version
-numbers are checked by "version" files provided by the packages
+numbers are checked by “version” files provided by the packages
 themselves.  For a candidate package configuration file
 \fB<config\-file>.cmake\fP the corresponding version file is located next
 to it and named either \fB<config\-file>\-version.cmake\fP or
@@ -2401,7 +2413,7 @@ If \fBPATH_SUFFIXES\fP is specified, the suffixes are appended to each
 This set of directories is intended to work in cooperation with
 projects that provide configuration files in their installation trees.
 Directories above marked with (W) are intended for installations on
-Windows where the prefix may point at the top of an application\(aqs
+Windows where the prefix may point at the top of an application’s
 installation directory.  Those marked with (U) are intended for
 installations on UNIX platforms where the prefix is shared by multiple
 packages.  This is merely a convention, so all (W) and (U) directories
@@ -2415,9 +2427,11 @@ steps.  If \fBNO_DEFAULT_PATH\fP is specified all \fBNO_*\fP options are
 enabled.
 .INDENT 0.0
 .IP 1. 3
-Search paths specified in the \fBPackageName_ROOT\fP CMake and environment
-variables.  The package root variables are maintained as a stack so if
-called from within a find module, root paths from the parent\(aqs find
+Search paths specified in the \fB<PackageName>_ROOT\fP CMake
+variable and the \fB<PackageName>_ROOT\fP environment variable,
+where \fB<PackageName>\fP is the package to be found.
+The package root variables are maintained as a stack so if
+called from within a find module, root paths from the parent’s find
 module will also be searched after paths for the current package.
 This can be skipped if \fBNO_PACKAGE_ROOT_PATH\fP is passed.
 See policy \fBCMP0074\fP\&.
@@ -2440,8 +2454,8 @@ CMAKE_APPBUNDLE_PATH
 .UNINDENT
 .IP 3. 3
 Search paths specified in cmake\-specific environment variables.
-These are intended to be set in the user\(aqs shell configuration,
-and therefore use the host\(aqs native path separator
+These are intended to be set in the user’s shell configuration,
+and therefore use the host’s native path separator
 (\fB;\fP on Windows and \fB:\fP on UNIX).
 This can be skipped if \fBNO_CMAKE_ENVIRONMENT_PATH\fP is passed:
 .INDENT 3.0
@@ -2514,7 +2528,7 @@ hard\-coded guesses.
 .sp
 The CMake variable \fBCMAKE_FIND_ROOT_PATH\fP specifies one or more
 directories to be prepended to all other search directories.  This
-effectively "re\-roots" the entire search under given locations.
+effectively “re\-roots” the entire search under given locations.
 Paths which are descendants of the \fBCMAKE_STAGING_PREFIX\fP are excluded
 from this re\-rooting, because that variable is always a path on the host system.
 By default the \fBCMAKE_FIND_ROOT_PATH\fP is empty.
@@ -2700,20 +2714,26 @@ added to the search.
 If \fBNO_DEFAULT_PATH\fP is not specified, the search process is as follows:
 .INDENT 0.0
 .IP 1. 3
-If called from within a find module, search prefix paths unique to the
-current package being found.  Specifically look in the \fBPackageName_ROOT\fP
-CMake and environment variables.  The package root variables are maintained
-as a stack so if called from nested find modules, root paths from the
-parent\(aqs find module will be searched after paths from the current module,
-i.e. \fBCurrentPackage_ROOT\fP, \fBENV{CurrentPackage_ROOT}\fP,
-\fBParentPackage_ROOT\fP, \fBENV{ParentPackage_ROOT}\fP, etc.
+If called from within a find module loaded by
+\fBfind_package(<PackageName>)\fP, search prefixes unique to the
+current package being found.  Specifically look in the
+\fB<PackageName>_ROOT\fP CMake variable and the
+\fB<PackageName>_ROOT\fP environment variable.
+The package root variables are maintained as a stack so if called from
+nested find modules, root paths from the parent’s find module will be
+searched after paths from the current module,
+i.e. \fB<CurrentPackage>_ROOT\fP, \fBENV{<CurrentPackage>_ROOT}\fP,
+\fB<ParentPackage>_ROOT\fP, \fBENV{<ParentPackage>_ROOT}\fP, etc.
 This can be skipped if \fBNO_PACKAGE_ROOT_PATH\fP is passed.
 See policy \fBCMP0074\fP\&.
 .INDENT 3.0
 .IP \(bu 2
 \fB<prefix>/include/<arch>\fP if \fBCMAKE_LIBRARY_ARCHITECTURE\fP
-is set, and \fB<prefix>/include\fP for each \fB<prefix>\fP in \fBPackageName_ROOT\fP if called
-from within a find module
+is set, and \fB<prefix>/include\fP for each \fB<prefix>\fP in the
+\fB<PackageName>_ROOT\fP CMake variable and the
+\fB<PackageName>_ROOT\fP environment variable if
+called from within a find module loaded by
+\fBfind_package(<PackageName>)\fP
 .UNINDENT
 .IP 2. 3
 Search paths specified in cmake\-specific cache variables.
@@ -2731,8 +2751,8 @@ is set, and \fB<prefix>/include\fP for each \fB<prefix>\fP in \fBCMAKE_PREFIX_PA
 .UNINDENT
 .IP 3. 3
 Search paths specified in cmake\-specific environment variables.
-These are intended to be set in the user\(aqs shell configuration,
-and therefore use the host\(aqs native path separator
+These are intended to be set in the user’s shell configuration,
+and therefore use the host’s native path separator
 (\fB;\fP on Windows and \fB:\fP on UNIX).
 This can be skipped if \fBNO_CMAKE_ENVIRONMENT_PATH\fP is passed.
 .INDENT 3.0
@@ -2787,7 +2807,7 @@ preference between Apple\-style and unix\-style package components.
 .sp
 The CMake variable \fBCMAKE_FIND_ROOT_PATH\fP specifies one or more
 directories to be prepended to all other search directories.  This
-effectively "re\-roots" the entire search under given locations.
+effectively “re\-roots” the entire search under given locations.
 Paths which are descendants of the \fBCMAKE_STAGING_PREFIX\fP are excluded
 from this re\-rooting, because that variable is always a path on the host system.
 By default the \fBCMAKE_FIND_ROOT_PATH\fP is empty.
@@ -2920,19 +2940,25 @@ added to the search.
 If \fBNO_DEFAULT_PATH\fP is not specified, the search process is as follows:
 .INDENT 0.0
 .IP 1. 3
-If called from within a find module, search prefix paths unique to the
-current package being found.  Specifically look in the \fBPackageName_ROOT\fP
-CMake and environment variables.  The package root variables are maintained
-as a stack so if called from nested find modules, root paths from the
-parent\(aqs find module will be searched after paths from the current module,
-i.e. \fBCurrentPackage_ROOT\fP, \fBENV{CurrentPackage_ROOT}\fP,
-\fBParentPackage_ROOT\fP, \fBENV{ParentPackage_ROOT}\fP, etc.
+If called from within a find module loaded by
+\fBfind_package(<PackageName>)\fP, search prefixes unique to the
+current package being found.  Specifically look in the
+\fB<PackageName>_ROOT\fP CMake variable and the
+\fB<PackageName>_ROOT\fP environment variable.
+The package root variables are maintained as a stack so if called from
+nested find modules, root paths from the parent’s find module will be
+searched after paths from the current module,
+i.e. \fB<CurrentPackage>_ROOT\fP, \fBENV{<CurrentPackage>_ROOT}\fP,
+\fB<ParentPackage>_ROOT\fP, \fBENV{<ParentPackage>_ROOT}\fP, etc.
 This can be skipped if \fBNO_PACKAGE_ROOT_PATH\fP is passed.
 See policy \fBCMP0074\fP\&.
 .INDENT 3.0
 .IP \(bu 2
-\fB<prefix>/[s]bin\fP for each \fB<prefix>\fP in \fBPackageName_ROOT\fP if called
-from within a find module
+\fB<prefix>/[s]bin\fP for each \fB<prefix>\fP in the
+\fB<PackageName>_ROOT\fP CMake variable and the
+\fB<PackageName>_ROOT\fP environment variable if
+called from within a find module loaded by
+\fBfind_package(<PackageName>)\fP
 .UNINDENT
 .IP 2. 3
 Search paths specified in cmake\-specific cache variables.
@@ -2949,8 +2975,8 @@ This can be skipped if \fBNO_CMAKE_PATH\fP is passed.
 .UNINDENT
 .IP 3. 3
 Search paths specified in cmake\-specific environment variables.
-These are intended to be set in the user\(aqs shell configuration,
-and therefore use the host\(aqs native path separator
+These are intended to be set in the user’s shell configuration,
+and therefore use the host’s native path separator
 (\fB;\fP on Windows and \fB:\fP on UNIX).
 This can be skipped if \fBNO_CMAKE_ENVIRONMENT_PATH\fP is passed.
 .INDENT 3.0
@@ -2998,7 +3024,7 @@ preference between Apple\-style and unix\-style package components.
 .sp
 The CMake variable \fBCMAKE_FIND_ROOT_PATH\fP specifies one or more
 directories to be prepended to all other search directories.  This
-effectively "re\-roots" the entire search under given locations.
+effectively “re\-roots” the entire search under given locations.
 Paths which are descendants of the \fBCMAKE_STAGING_PREFIX\fP are excluded
 from this re\-rooting, because that variable is always a path on the host system.
 By default the \fBCMAKE_FIND_ROOT_PATH\fP is empty.
@@ -3091,8 +3117,8 @@ Foreach can also iterate over a generated range of numbers.  There are
 three types of this iteration:
 .INDENT 0.0
 .IP \(bu 2
-When specifying single number, the range will have elements [0, ... to
-"total"] (inclusive).
+When specifying single number, the range will have elements [0, … to
+“total”] (inclusive).
 .IP \(bu 2
 When specifying two numbers, the range will have elements from the
 first number to the second number (inclusive).
@@ -3136,7 +3162,7 @@ endfunction(<name>)
 .UNINDENT
 .sp
 Define a function named \fB<name>\fP that takes arguments named \fBarg1\fP,
-\fBarg2\fP, \fBarg3\fP, (...).
+\fBarg2\fP, \fBarg3\fP, (…).
 Commands listed after function, but before the matching
 \fBendfunction()\fP, are not invoked until the function is invoked.
 When it is invoked, the commands recorded in the function are first
@@ -3144,7 +3170,7 @@ modified by replacing formal parameters (\fB${arg1}\fP) with the arguments
 passed, and then invoked as normal commands.
 In addition to referencing the formal parameters you can reference the
 \fBARGC\fP variable which will be set to the number of arguments passed
-into the function as well as \fBARGV0\fP, \fBARGV1\fP, \fBARGV2\fP, ...  which
+into the function as well as \fBARGV0\fP, \fBARGV1\fP, \fBARGV2\fP, …  which
 will have the actual values of the arguments passed in.
 This facilitates creating functions with optional arguments.
 Additionally \fBARGV\fP holds the list of all arguments given to the
@@ -3176,7 +3202,7 @@ get_cmake_property(VAR property)
 .sp
 Get a global property from the CMake instance.  The value of the property is
 stored in the variable \fBVAR\fP\&.  If the property is not found, \fBVAR\fP
-will be  set to "NOTFOUND".  See the \fBcmake\-properties(7)\fP manual
+will be  set to “NOTFOUND”.  See the \fBcmake\-properties(7)\fP manual
 for available properties.
 .sp
 See also the \fBget_property()\fP command \fBGLOBAL\fP option.
@@ -3495,7 +3521,7 @@ True if the named file or directory exists.  Behavior is well\-defined
 only for full paths.
 .TP
 .B \fBif(file1 IS_NEWER_THAN file2)\fP
-True if \fBfile1\fP is newer than \fBfile2\fP or if one of the two files doesn\(aqt
+True if \fBfile1\fP is newer than \fBfile2\fP or if one of the two files doesn’t
 exist.  Behavior is well\-defined only for full paths.  If the file
 time stamps are exactly the same, an \fBIS_NEWER_THAN\fP comparison returns
 true, so that any dependent build operations will occur in the event
@@ -3514,48 +3540,48 @@ only for full paths.
 True if the given path is an absolute path.
 .TP
 .B \fBif(<variable|string> MATCHES regex)\fP
-True if the given string or variable\(aqs value matches the given regular
+True if the given string or variable’s value matches the given regular
 expression.  See Regex Specification for regex format.
 \fB()\fP groups are captured in \fBCMAKE_MATCH_<n>\fP variables.
 .TP
 .B \fBif(<variable|string> LESS <variable|string>)\fP
-True if the given string or variable\(aqs value is a valid number and less
+True if the given string or variable’s value is a valid number and less
 than that on the right.
 .TP
 .B \fBif(<variable|string> GREATER <variable|string>)\fP
-True if the given string or variable\(aqs value is a valid number and greater
+True if the given string or variable’s value is a valid number and greater
 than that on the right.
 .TP
 .B \fBif(<variable|string> EQUAL <variable|string>)\fP
-True if the given string or variable\(aqs value is a valid number and equal
+True if the given string or variable’s value is a valid number and equal
 to that on the right.
 .TP
 .B \fBif(<variable|string> LESS_EQUAL <variable|string>)\fP
-True if the given string or variable\(aqs value is a valid number and less
+True if the given string or variable’s value is a valid number and less
 than or equal to that on the right.
 .TP
 .B \fBif(<variable|string> GREATER_EQUAL <variable|string>)\fP
-True if the given string or variable\(aqs value is a valid number and greater
+True if the given string or variable’s value is a valid number and greater
 than or equal to that on the right.
 .TP
 .B \fBif(<variable|string> STRLESS <variable|string>)\fP
-True if the given string or variable\(aqs value is lexicographically less
+True if the given string or variable’s value is lexicographically less
 than the string or variable on the right.
 .TP
 .B \fBif(<variable|string> STRGREATER <variable|string>)\fP
-True if the given string or variable\(aqs value is lexicographically greater
+True if the given string or variable’s value is lexicographically greater
 than the string or variable on the right.
 .TP
 .B \fBif(<variable|string> STREQUAL <variable|string>)\fP
-True if the given string or variable\(aqs value is lexicographically equal
+True if the given string or variable’s value is lexicographically equal
 to the string or variable on the right.
 .TP
 .B \fBif(<variable|string> STRLESS_EQUAL <variable|string>)\fP
-True if the given string or variable\(aqs value is lexicographically less
+True if the given string or variable’s value is lexicographically less
 than or equal to the string or variable on the right.
 .TP
 .B \fBif(<variable|string> STRGREATER_EQUAL <variable|string>)\fP
-True if the given string or variable\(aqs value is lexicographically greater
+True if the given string or variable’s value is lexicographically greater
 than or equal to the string or variable on the right.
 .TP
 .B \fBif(<variable|string> VERSION_LESS <variable|string>)\fP
@@ -3593,7 +3619,7 @@ Where there are nested parenthesis the innermost are evaluated as part
 of evaluating the expression that contains them.
 .UNINDENT
 .sp
-The if command was written very early in CMake\(aqs history, predating
+The if command was written very early in CMake’s history, predating
 the \fB${}\fP variable evaluation syntax, and for convenience evaluates
 variables named by its arguments as shown in the above signatures.
 Note that normal variable evaluation with \fB${}\fP applies before the if
@@ -3637,7 +3663,7 @@ if(var2)
 .UNINDENT
 .UNINDENT
 .sp
-which is true because \fBvar2\fP is defined to "var1" which is not a false
+which is true because \fBvar2\fP is defined to “var1” which is not a false
 constant.
 .sp
 Automatic evaluation applies in the other cases whenever the
@@ -3645,7 +3671,7 @@ above\-documented signature accepts \fB<variable|string>\fP:
 .INDENT 0.0
 .IP \(bu 2
 The left hand argument to \fBMATCHES\fP is first checked to see if it is
-a defined variable, if so the variable\(aqs value is used, otherwise the
+a defined variable, if so the variable’s value is used, otherwise the
 original value is used.
 .IP \(bu 2
 If the left hand argument to \fBMATCHES\fP is missing it returns false
@@ -3849,7 +3875,7 @@ list(LENGTH <list> <output variable>)
 .UNINDENT
 .UNINDENT
 .sp
-Returns the list\(aqs length.
+Returns the list’s length.
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -3873,7 +3899,7 @@ list(JOIN <list> <glue> <output variable>)
 .UNINDENT
 .UNINDENT
 .sp
-Returns a string joining all list\(aqs elements using the glue string.
+Returns a string joining all list’s elements using the glue string.
 To join multiple strings, which are not part of a list, use \fBJOIN\fP operator
 from \fBstring()\fP command.
 .INDENT 0.0
@@ -3904,7 +3930,7 @@ list(FIND <list> <value> <output variable>)
 .UNINDENT
 .sp
 Returns the index of the element specified in the list or \-1
-if it wasn\(aqt found.
+if it wasn’t found.
 .SS Modification
 .INDENT 0.0
 .INDENT 3.5
@@ -3929,7 +3955,7 @@ list(FILTER <list> <INCLUDE|EXCLUDE> REGEX <regular_expression>)
 .UNINDENT
 .UNINDENT
 .sp
-Includes or removes items from the list that match the mode\(aqs pattern.
+Includes or removes items from the list that match the mode’s pattern.
 In \fBREGEX\fP mode, items will be matched against the given regular expression.
 .sp
 For more information on regular expressions see also the
@@ -4168,7 +4194,7 @@ endmacro(<name>)
 .UNINDENT
 .sp
 Define a macro named \fB<name>\fP that takes arguments named \fBarg1\fP,
-\fBarg2\fP, \fBarg3\fP, (...).
+\fBarg2\fP, \fBarg3\fP, (…).
 Commands listed after macro, but before the matching
 \fBendmacro()\fP, are not invoked until the macro is invoked.
 When it is invoked, the commands recorded in the macro are first
@@ -4177,7 +4203,7 @@ passed, and then invoked as normal commands.
 In addition to referencing the formal parameters you can reference the
 values \fB${ARGC}\fP which will be set to the number of arguments passed
 into the function as well as \fB${ARGV0}\fP, \fB${ARGV1}\fP, \fB${ARGV2}\fP,
-...  which will have the actual values of the arguments passed in.
+…  which will have the actual values of the arguments passed in.
 This facilitates creating macros with optional arguments.
 Additionally \fB${ARGV}\fP holds the list of all arguments given to the
 macro and \fB${ARGN}\fP holds the list of arguments past the last expected
@@ -4398,9 +4424,9 @@ separate_arguments(<var> <NATIVE|UNIX|WINDOWS>_COMMAND "<args>")
 .UNINDENT
 .UNINDENT
 .sp
-Parses a UNIX\- or Windows\-style command\-line string "<args>" and
+Parses a UNIX\- or Windows\-style command\-line string “<args>” and
 stores a semicolon\-separated list of the arguments in \fB<var>\fP\&.  The
-entire command line must be given in one "<args>" argument.
+entire command line must be given in one “<args>” argument.
 .sp
 The \fBUNIX_COMMAND\fP mode separates arguments by unquoted whitespace.  It
 recognizes both single\-quote and double\-quote pairs.  A backslash
@@ -4427,7 +4453,7 @@ separate_arguments(<var>)
 .UNINDENT
 .sp
 Convert the value of \fB<var>\fP to a semi\-colon separated list.  All
-spaces are replaced with \(aq;\(aq.  This helps with generating command
+spaces are replaced with ‘;’.  This helps with generating command
 lines.
 .SS set_directory_properties
 .sp
@@ -4499,7 +4525,7 @@ Specific properties may apply to installed files and/or directories.
 Path components have to be separated by forward slashes,
 must be normalized and are case sensitive.
 .sp
-To reference the installation prefix itself with a relative path use ".".
+To reference the installation prefix itself with a relative path use “.”.
 .sp
 Currently installed file properties are only defined for
 the WIX generator where the given paths are relative
@@ -4558,7 +4584,7 @@ If the \fBPARENT_SCOPE\fP option is given the variable will be set in
 the scope above the current scope.  Each new directory or function
 creates a new scope.  This command will set the value of a variable
 into the parent directory or calling function (whichever is applicable
-to the case at hand). The previous state of the variable\(aqs value stays the
+to the case at hand). The previous state of the variable’s value stays the
 same in the current scope (e.g., if it was undefined before, it is still
 undefined and if it had a value, it is still that value).
 .SS Set Cache Entry
@@ -4771,7 +4797,7 @@ replacement expression for the match in the output.
 All \fB<input>\fP arguments are concatenated before matching.
 .sp
 The replace expression may refer to paren\-delimited subexpressions of the
-match using \fB\e1\fP, \fB\e2\fP, ..., \fB\e9\fP\&.  Note that two backslashes (\fB\e\e1\fP)
+match using \fB\e1\fP, \fB\e2\fP, …, \fB\e9\fP\&.  Note that two backslashes (\fB\e\e1\fP)
 are required in CMake code to get a backslash through argument parsing.
 .SS Regex Specification
 .sp
@@ -4876,7 +4902,7 @@ string(JOIN <glue> <output variable> [<input>...])
 Join all the input arguments together using the glue
 string and store the result in the named output variable.
 .sp
-To join list\(aqs elements, use preferably the \fBJOIN\fP operator
+To join list’s elements, use preferably the \fBJOIN\fP operator
 from \fBlist()\fP command. This allows for the elements to have
 special characters like \fB;\fP in them.
 .INDENT 0.0
@@ -4914,7 +4940,7 @@ string(LENGTH <string> <output variable>)
 .UNINDENT
 .UNINDENT
 .sp
-Store in an output variable a given string\(aqs length.
+Store in an output variable a given string’s length.
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -5100,7 +5126,7 @@ Write a string representation of the current date
 and/or time to the output variable.
 .sp
 Should the command be unable to obtain a timestamp the output variable
-will be set to the empty string "".
+will be set to the empty string “”.
 .sp
 The optional \fBUTC\fP flag requests the current date/time representation to
 be in Coordinated Universal Time (UTC) rather than local time.
@@ -5283,7 +5309,7 @@ Function\-style definitions are not supported. CMake will automatically
 escape the value correctly for the native build system (note that CMake
 language syntax may require escapes to specify some values).
 .sp
-Arguments to \fBadd_compile_definitions\fP may use "generator expressions" with
+Arguments to \fBadd_compile_definitions\fP may use “generator expressions” with
 the syntax \fB$<...>\fP\&.  See the \fBcmake\-generator\-expressions(7)\fP
 manual for available expressions.  See the \fBcmake\-buildsystem(7)\fP
 manual for more on defining buildsystem properties.
@@ -5311,7 +5337,7 @@ exist to add preprocessor definitions (\fBtarget_compile_definitions()\fP
 and \fBadd_compile_definitions()\fP) or include directories
 (\fBtarget_include_directories()\fP and \fBinclude_directories()\fP).
 .sp
-Arguments to \fBadd_compile_options\fP may use "generator expressions" with
+Arguments to \fBadd_compile_options\fP may use “generator expressions” with
 the syntax \fB$<...>\fP\&.  See the \fBcmake\-generator\-expressions(7)\fP
 manual for available expressions.  See the \fBcmake\-buildsystem(7)\fP
 manual for more on defining buildsystem properties.
@@ -5585,7 +5611,7 @@ it is possible to define \fBCOMMAND\fP lines or whole custom commands
 which evaluate to empty strings for certain configurations.
 For \fBVisual Studio 2010 (and newer)\fP generators these command
 lines or custom commands will be omitted for the specific
-configuration and no "empty\-string\-command" will be added.
+configuration and no “empty\-string\-command” will be added.
 .sp
 This allows to add individual build events for every configuration.
 .UNINDENT
@@ -5838,7 +5864,7 @@ If \fBEXCLUDE_FROM_ALL\fP is given the corresponding property will be set on
 the created target.  See documentation of the \fBEXCLUDE_FROM_ALL\fP
 target property for details.
 .sp
-Source arguments to \fBadd_executable\fP may use "generator expressions" with
+Source arguments to \fBadd_executable\fP may use “generator expressions” with
 the syntax \fB$<...>\fP\&.  See the \fBcmake\-generator\-expressions(7)\fP
 manual for available expressions.  See the \fBcmake\-buildsystem(7)\fP
 manual for more on defining buildsystem properties.
@@ -5963,7 +5989,7 @@ If \fBEXCLUDE_FROM_ALL\fP is given the corresponding property will be set on
 the created target.  See documentation of the \fBEXCLUDE_FROM_ALL\fP
 target property for details.
 .sp
-Source arguments to \fBadd_library\fP may use "generator expressions" with
+Source arguments to \fBadd_library\fP may use “generator expressions” with
 the syntax \fB$<...>\fP\&.  See the \fBcmake\-generator\-expressions(7)\fP
 manual for available expressions.  See the \fBcmake\-buildsystem(7)\fP
 manual for more on defining buildsystem properties.
@@ -6030,7 +6056,7 @@ add_executable(... $<TARGET_OBJECTS:objlib> ...)
 .UNINDENT
 .UNINDENT
 .sp
-will include objlib\(aqs object files in a library and an executable
+will include objlib’s object files in a library and an executable
 along with those compiled from their own sources.  Object libraries
 may contain only sources that compile, header files, and other files
 that would not affect linking of a normal library (e.g. \fB\&.txt\fP).
@@ -6190,8 +6216,8 @@ captured by \fBctest(1)\fP but does not affect the pass/fail status
 unless the \fBPASS_REGULAR_EXPRESSION\fP or
 \fBFAIL_REGULAR_EXPRESSION\fP test property is used.
 .sp
-The \fBCOMMAND\fP and \fBWORKING_DIRECTORY\fP options may use "generator
-expressions" with the syntax \fB$<...>\fP\&.  See the
+The \fBCOMMAND\fP and \fBWORKING_DIRECTORY\fP options may use “generator
+expressions” with the syntax \fB$<...>\fP\&.  See the
 \fBcmake\-generator\-expressions(7)\fP manual for available expressions.
 .sp
 Example usage:
@@ -6259,7 +6285,7 @@ Collects the names of all the source files in the specified directory
 and stores the list in the \fB<variable>\fP provided.  This command is
 intended to be used by projects that use explicit template
 instantiation.  Template instantiation files can be stored in a
-"Templates" subdirectory and collected automatically using this
+“Templates” subdirectory and collected automatically using this
 command to avoid manually listing all instantiations.
 .sp
 It is tempting to use this command to avoid writing the list of source
@@ -6425,7 +6451,7 @@ will chain up to the next higher scope when the requested property is not set
 in the scope given to the command.
 .INDENT 0.0
 .IP \(bu 2
-\fBDIRECTORY\fP scope chains to its parent directory\(aqs scope, continuing the
+\fBDIRECTORY\fP scope chains to its parent directory’s scope, continuing the
 walk up parent directories until a directory has the property set or there
 are no more parents.  If still not found at the top level directory, it
 chains to the \fBGLOBAL\fP scope.
@@ -6510,7 +6536,7 @@ export(EXPORT <export\-name> [NAMESPACE <namespace>] [FILE <filename>])
 .UNINDENT
 .sp
 Create a file \fB<filename>\fP that may be included by outside projects to
-import targets from the current project\(aqs build tree.  This is useful
+import targets from the current project’s build tree.  This is useful
 during cross\-compiling to build utility executables that can run on
 the host platform in one project and then import them into another
 project being compiled for the target platform.  If the \fBNAMESPACE\fP
@@ -6573,7 +6599,7 @@ export(PACKAGE <name>)
 Store the current build directory in the CMake user package registry
 for package \fB<name>\fP\&.  The find_package command may consider the
 directory while searching for package \fB<name>\fP\&.  This helps dependent
-projects find and use a package from the current project\(aqs build tree
+projects find and use a package from the current project’s build tree
 without help from the user.  Note that the entry in the package
 registry that this command creates works only in conjunction with a
 package configuration file (\fB<name>Config.cmake\fP) that works with the
@@ -6639,7 +6665,7 @@ Get a property from a source file.  The value of the property is
 stored in the variable \fBVAR\fP\&.  If the source property is not found, the
 behavior depends on whether it has been defined to be an \fBINHERITED\fP property
 or not (see \fBdefine_property()\fP).  Non\-inherited properties will set
-\fBVAR\fP to "NOTFOUND", whereas inherited properties will search the relevant
+\fBVAR\fP to “NOTFOUND”, whereas inherited properties will search the relevant
 parent scope as described for the \fBdefine_property()\fP command and
 if still unable to find the property, \fBVAR\fP will be set to an empty string.
 .sp
@@ -6666,7 +6692,7 @@ Get a property from a target.  The value of the property is stored in
 the variable \fBVAR\fP\&.  If the target property is not found, the behavior
 depends on whether it has been defined to be an \fBINHERITED\fP property
 or not (see \fBdefine_property()\fP).  Non\-inherited properties will
-set \fBVAR\fP to "NOTFOUND", whereas inherited properties will search the
+set \fBVAR\fP to “NOTFOUND”, whereas inherited properties will search the
 relevant parent scope as described for the \fBdefine_property()\fP
 command and if still unable to find the property, \fBVAR\fP will be set to
 an empty string.
@@ -6696,7 +6722,7 @@ Get a property from the test.  The value of the property is stored in
 the variable \fBVAR\fP\&.  If the test property is not found, the behavior
 depends on whether it has been defined to be an \fBINHERITED\fP property
 or not (see \fBdefine_property()\fP).  Non\-inherited properties will
-set \fBVAR\fP to "NOTFOUND", whereas inherited properties will search the
+set \fBVAR\fP to “NOTFOUND”, whereas inherited properties will search the
 relevant parent scope as described for the \fBdefine_property()\fP
 command and if still unable to find the property, \fBVAR\fP will be set to
 an empty string.
@@ -6740,8 +6766,8 @@ Signalling this setting might achieve effects such as the compiler
 skipping warnings, or these fixed\-install system files not being
 considered in dependency calculations \- see compiler docs.
 .sp
-Arguments to \fBinclude_directories\fP may use "generator expressions" with
-the syntax "$<...>".  See the \fBcmake\-generator\-expressions(7)\fP
+Arguments to \fBinclude_directories\fP may use “generator expressions” with
+the syntax “$<…>”.  See the \fBcmake\-generator\-expressions(7)\fP
 manual for available expressions.  See the \fBcmake\-buildsystem(7)\fP
 manual for more on defining buildsystem properties.
 .SS include_external_msproject
@@ -6878,11 +6904,11 @@ Note that \fBCONFIGURATIONS\fP appears BEFORE \fBRUNTIME DESTINATION\fP\&.
 .TP
 .B \fBCOMPONENT\fP
 Specify an installation component name with which the install rule
-is associated, such as "runtime" or "development".  During
+is associated, such as “runtime” or “development”.  During
 component\-specific installation only install rules associated with
 the given component name will be executed.  During a full installation
 all components are installed unless marked with \fBEXCLUDE_FROM_ALL\fP\&.
-If \fBCOMPONENT\fP is not provided a default component "Unspecified" is
+If \fBCOMPONENT\fP is not provided a default component “Unspecified” is
 created.  The default component name may be controlled with the
 \fBCMAKE_INSTALL_DEFAULT_COMPONENT_NAME\fP variable.
 .TP
@@ -7003,7 +7029,7 @@ lib<name>.so \-> lib<name>.so.1
 .UNINDENT
 .sp
 where \fBlib<name>.so.1\fP is the soname of the library and \fBlib<name>.so\fP
-is a "namelink" allowing linkers to find the library when given
+is a “namelink” allowing linkers to find the library when given
 \fB\-l<name>\fP\&. The \fBNAMELINK_COMPONENT\fP option is similar to the
 \fBCOMPONENT\fP option, but it changes the installation component of a shared
 library namelink if one is generated. If not specified, this defaults to the
@@ -7032,7 +7058,7 @@ install(TARGETS mylib
 .sp
 In this scenario, if you choose to install only the \fBDevelopment\fP
 component, both the headers and namelink will be installed without the
-library. (If you don\(aqt also install the \fBLibraries\fP component, the
+library. (If you don’t also install the \fBLibraries\fP component, the
 namelink will be a dangling symlink, and projects that link to the library
 will have build errors.) If you install only the \fBLibraries\fP component,
 only the library will be installed, without the headers and namelink.
@@ -7124,7 +7150,7 @@ Installing a target with the \fBEXCLUDE_FROM_ALL\fP target property
 set to \fBTRUE\fP has undefined behavior.
 .sp
 The install destination given to the target install \fBDESTINATION\fP may
-use "generator expressions" with the syntax \fB$<...>\fP\&.  See the
+use “generator expressions” with the syntax \fB$<...>\fP\&.  See the
 \fBcmake\-generator\-expressions(7)\fP manual for available expressions.
 .SS Installing Files
 .INDENT 0.0
@@ -7155,13 +7181,13 @@ programs that are not targets, such as shell scripts.  Use the \fBTARGETS\fP
 form to install targets built within the project.
 .sp
 The list of \fBfiles...\fP given to \fBFILES\fP or \fBPROGRAMS\fP may use
-"generator expressions" with the syntax \fB$<...>\fP\&.  See the
+“generator expressions” with the syntax \fB$<...>\fP\&.  See the
 \fBcmake\-generator\-expressions(7)\fP manual for available expressions.
 However, if any item begins in a generator expression it must evaluate
 to a full path.
 .sp
 The install destination given to the files install \fBDESTINATION\fP may
-use "generator expressions" with the syntax \fB$<...>\fP\&.  See the
+use “generator expressions” with the syntax \fB$<...>\fP\&.  See the
 \fBcmake\-generator\-expressions(7)\fP manual for available expressions.
 .SS Installing Directories
 .INDENT 0.0
@@ -7203,7 +7229,7 @@ directories will be given the default permissions specified in the
 The \fBMESSAGE_NEVER\fP option disables file installation status output.
 .sp
 Installation of directories may be controlled with fine granularity
-using the \fBPATTERN\fP or \fBREGEX\fP options.  These "match" options specify a
+using the \fBPATTERN\fP or \fBREGEX\fP options.  These “match” options specify a
 globbing pattern or regular expression to match directories or files
 encountered within input directories.  They may be used to apply
 certain options (see below) to a subset of the files and directories
@@ -7257,7 +7283,7 @@ file permissions, the scripts will be given specific permissions, and any
 \fBCVS\fP directories will be excluded.
 .sp
 The list of \fBdirs...\fP given to \fBDIRECTORY\fP and the install destination
-given to the directory install \fBDESTINATION\fP may use "generator expressions"
+given to the directory install \fBDESTINATION\fP may use “generator expressions”
 with the syntax \fB$<...>\fP\&.  See the \fBcmake\-generator\-expressions(7)\fP
 manual for available expressions.
 .SS Custom Installation Logic
@@ -7464,7 +7490,7 @@ specification of link libraries is rarely needed.
 .UNINDENT
 .SS load_cache
 .sp
-Load in the values from another project\(aqs CMake cache.
+Load in the values from another project’s CMake cache.
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -7479,7 +7505,7 @@ load_cache(pathToCacheFile READ_WITH_PREFIX
 .sp
 Read the cache and store the requested entries in variables with their
 name prefixed with the given prefix.  This only reads the values, and
-does not create entries in the local project\(aqs cache.
+does not create entries in the local project’s cache.
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -7493,7 +7519,7 @@ load_cache(pathToCacheFile [EXCLUDE entry1...]
 .UNINDENT
 .sp
 Load in the values from another cache and store them in the local
-project\(aqs cache as internal entries.  This is useful for a project
+project’s cache as internal entries.  This is useful for a project
 that depends on another project built in a different tree.  \fBEXCLUDE\fP
 option can be used to provide a list of entries to be excluded.
 \fBINCLUDE_INTERNALS\fP can be used to provide a list of internal entries to
@@ -7720,7 +7746,7 @@ set_tests_properties(test1 [test2...] PROPERTIES prop1 value1 prop2 value2)
 Set a property for the tests.  If the test is not found, CMake
 will report an error.
 \fBGenerator expressions\fP will be
-expanded the same as supported by the test\(aqs \fBadd_test()\fP call.  See
+expanded the same as supported by the test’s \fBadd_test()\fP call.  See
 Test Properties for the list of properties known to CMake.
 .SS source_group
 .sp
@@ -7835,7 +7861,7 @@ items will populate the \fBCOMPILE_DEFINITIONS\fP property of
 The following arguments specify compile definitions.  Repeated calls for the
 same \fB<target>\fP append items in the order called.
 .sp
-Arguments to \fBtarget_compile_definitions\fP may use "generator expressions"
+Arguments to \fBtarget_compile_definitions\fP may use “generator expressions”
 with the syntax \fB$<...>\fP\&.  See the \fBcmake\-generator\-expressions(7)\fP
 manual for available expressions.  See the \fBcmake\-buildsystem(7)\fP
 manual for more on defining buildsystem properties.
@@ -7888,7 +7914,7 @@ The named \fB<target>\fP must have been created by a command such as
 \fBadd_executable()\fP or \fBadd_library()\fP and must not be an
 ALIAS target\&.
 .sp
-Arguments to \fBtarget_compile_features\fP may use "generator expressions"
+Arguments to \fBtarget_compile_features\fP may use “generator expressions”
 with the syntax \fB$<...>\fP\&.
 See the \fBcmake\-generator\-expressions(7)\fP manual for available
 expressions.  See the \fBcmake\-compile\-features(7)\fP manual for
@@ -7934,7 +7960,7 @@ items will populate the \fBCOMPILE_OPTIONS\fP property of
 The following arguments specify compile options.  Repeated calls for the same
 \fB<target>\fP append items in the order called.
 .sp
-Arguments to \fBtarget_compile_options\fP may use "generator expressions"
+Arguments to \fBtarget_compile_options\fP may use “generator expressions”
 with the syntax \fB$<...>\fP\&. See the \fBcmake\-generator\-expressions(7)\fP
 manual for available expressions.  See the \fBcmake\-buildsystem(7)\fP
 manual for more on defining buildsystem properties.
@@ -7991,7 +8017,7 @@ is used together with \fBPUBLIC\fP or \fBINTERFACE\fP, the
 \fBINTERFACE_SYSTEM_INCLUDE_DIRECTORIES\fP target property will be
 populated with the specified directories.
 .sp
-Arguments to \fBtarget_include_directories\fP may use "generator expressions"
+Arguments to \fBtarget_include_directories\fP may use “generator expressions”
 with the syntax \fB$<...>\fP\&.  See the \fBcmake\-generator\-expressions(7)\fP
 manual for available expressions.  See the \fBcmake\-buildsystem(7)\fP
 manual for more on defining buildsystem properties.
@@ -8039,7 +8065,7 @@ packages for redistribution.
 Specify libraries or flags to use when linking a given target and/or
 its dependents.  Usage requirements
 from linked library targets will be propagated.  Usage requirements
-of a target\(aqs dependencies affect compilation of its own sources.
+of a target’s dependencies affect compilation of its own sources.
 .SS Overview
 .sp
 This command has several signatures as detailed in subsections below.
@@ -8129,7 +8155,7 @@ IMPORTED or ALIAS library
 target names and will cause an error if no such target exists.
 See policy \fBCMP0028\fP\&.
 .sp
-Arguments to \fBtarget_link_libraries\fP may use "generator expressions"
+Arguments to \fBtarget_link_libraries\fP may use “generator expressions”
 with the syntax \fB$<...>\fP\&.  Note however, that generator expressions
 will not be used in OLD handling of \fBCMP0003\fP or \fBCMP0004\fP\&.
 See the \fBcmake\-generator\-expressions(7)\fP manual for available
@@ -8171,7 +8197,7 @@ target_link_libraries(<target> <item>...)
 Library dependencies are transitive by default with this signature.
 When this target is linked into another target then the libraries
 linked to this target will appear on the link line for the other
-target too.  This transitive "link interface" is stored in the
+target too.  This transitive “link interface” is stored in the
 \fBINTERFACE_LINK_LIBRARIES\fP target property and may be overridden
 by setting the property directly.  When \fBCMP0022\fP is not set to
 \fBNEW\fP, transitive linking is built in but may be overridden by the
@@ -8292,10 +8318,10 @@ target_link_libraries(main B)
 .UNINDENT
 .sp
 compiles \fBmain.c\fP with \fB\-DA \-DOBJ\fP and links executable \fBmain\fP
-to \fBB\fP and \fBA\fP\&.  The object library\(aqs usage requirements are
+to \fBB\fP and \fBA\fP\&.  The object library’s usage requirements are
 propagated transitively through \fBB\fP, but its object files are not.
 .sp
-Object Libraries may "link" to other object libraries to get
+Object Libraries may “link” to other object libraries to get
 usage requirements, but since they do not have a link step nothing
 is done with their object files.  Continuing from the above example,
 the code:
@@ -8318,10 +8344,10 @@ compiles \fBobj2.c\fP with \fB\-DA \-DOBJ\fP, creates executable \fBmain2\fP
 with object files from \fBmain2.c\fP and \fBobj2.c\fP, and links \fBmain2\fP
 to \fBA\fP\&.
 .sp
-In other words, when Object Libraries appear in a target\(aqs
+In other words, when Object Libraries appear in a target’s
 \fBINTERFACE_LINK_LIBRARIES\fP property they will be
 treated as Interface Libraries, but when they appear in
-a target\(aqs \fBLINK_LIBRARIES\fP property their object files
+a target’s \fBLINK_LIBRARIES\fP property their object files
 will be included in the link too.
 .SS Cyclic Dependencies of Static Libraries
 .sp
@@ -8394,7 +8420,7 @@ items will populate the \fBSOURCES\fP property of
 The following arguments specify sources.  Repeated calls for the same
 \fB<target>\fP append items in the order called.
 .sp
-Arguments to \fBtarget_sources\fP may use "generator expressions"
+Arguments to \fBtarget_sources\fP may use “generator expressions”
 with the syntax \fB$<...>\fP\&. See the \fBcmake\-generator\-expressions(7)\fP
 manual for available expressions.  See the \fBcmake\-buildsystem(7)\fP
 manual for more on defining buildsystem properties.
@@ -8673,7 +8699,7 @@ only if really required.  If you use \fBtry_run\fP, use the
 \fBRUN_OUTPUT_VARIABLE\fP or \fBOUTPUT_VARIABLE\fP options only if really
 required.  Using them will require that when cross\-compiling, the cache
 variables will have to be set manually to the output of the executable.
-You can also "guard" the calls to \fBtry_run\fP with an \fBif()\fP
+You can also “guard” the calls to \fBtry_run\fP with an \fBif()\fP
 block checking the \fBCMAKE_CROSSCOMPILING\fP variable and
 provide an easy\-to\-preset alternative for this case.
 .SH CTEST COMMANDS
@@ -8744,7 +8770,7 @@ If not specified the \fBCTEST_PROJECT_NAME\fP variable will be checked.
 .B \fBTARGET <target\-name>\fP
 Specify the name of a target to build.  If not specified the
 \fBCTEST_BUILD_TARGET\fP variable will be checked.  Otherwise the
-default target will be built.  This is the "all" target
+default target will be built.  This is the “all” target
 (called \fBALL_BUILD\fP in Visual Studio Generators).
 .TP
 .B \fBNUMBER_ERRORS <num\-err\-var>\fP
@@ -9276,7 +9302,7 @@ Tests not matching this expression are excluded.
 .TP
 .B \fBEXCLUDE_FIXTURE <regex>\fP
 If a test in the set of tests to be executed requires a particular fixture,
-that fixture\(aqs setup and cleanup tests would normally be added to the test
+that fixture’s setup and cleanup tests would normally be added to the test
 set automatically. This option prevents adding setup or cleanup tests for
 fixtures matching the \fB<regex>\fP\&. Note that all other fixture behavior is
 retained, including test dependencies and skipping tests that have fixture
@@ -9502,7 +9528,7 @@ or its corresponding location in the binary tree may be listed.  If a
 file specified already has an extension, that extension will be
 removed first.  This is useful for providing lists of source files
 such as foo.cxx when you want the corresponding foo.h to be installed.
-A typical extension is \(aq.h\(aq.
+A typical extension is ‘.h’.
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -9775,7 +9801,7 @@ utility_source(cache_entry executable_name
 .UNINDENT
 .UNINDENT
 .sp
-When a third\-party utility\(aqs source is included in the distribution,
+When a third\-party utility’s source is included in the distribution,
 this command specifies its location and name.  The cache entry will
 not be set unless the \fBpath_to_source\fP and all listed files exist.  It
 is assumed that the source tree of the utility will have been built
@@ -9783,7 +9809,7 @@ before it is needed.
 .sp
 When cross compiling CMake will print a warning if a \fButility_source()\fP
 command is executed, because in many cases it is used to build an
-executable which is executed later on.  This doesn\(aqt work when cross
+executable which is executed later on.  This doesn’t work when cross
 compiling, since the executable can run only on their target platform.
 So in this case the cache entry has to be adjusted manually so it
 points to an executable which is runnable on the build host.
@@ -9793,7 +9819,7 @@ Disallowed.  See CMake Policy \fBCMP0035\fP\&.
 .sp
 Use the \fBif()\fP command instead.
 .sp
-Assert satisfaction of an option\(aqs required variables.
+Assert satisfaction of an option’s required variables.
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -9836,7 +9862,7 @@ NOTE 1: \fBfile(WRITE)\fP  and \fBfile(APPEND)\fP  do exactly
 the same as this one but add some more functionality.
 .sp
 NOTE 2: When using \fBwrite_file\fP the produced file cannot be used as an
-input to CMake (CONFIGURE_FILE, source file ...) because it will lead
+input to CMake (CONFIGURE_FILE, source file …) because it will lead
 to an infinite loop.  Use \fBconfigure_file()\fP if you want to
 generate input files to CMake.
 .SH COPYRIGHT

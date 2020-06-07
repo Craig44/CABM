@@ -241,7 +241,6 @@ macro(SWIG_MODULE_INITIALIZE name language)
   string(TOUPPER "${language}" SWIG_MODULE_${name}_LANGUAGE)
   string(TOLOWER "${language}" SWIG_MODULE_${name}_SWIG_LANGUAGE_FLAG)
 
-  set(SWIG_MODULE_${name}_EXTRA_FLAGS)
   if (NOT DEFINED SWIG_MODULE_${name}_NOPROXY)
     set (SWIG_MODULE_${name}_NOPROXY FALSE)
   endif()
@@ -249,12 +248,14 @@ macro(SWIG_MODULE_INITIALIZE name language)
     set (SWIG_MODULE_${name}_NOPROXY TRUE)
   endif ()
 
-  if (SWIG_MODULE_${name}_NOPROXY AND NOT "-noproxy" IN_LIST CMAKE_SWIG_FLAGS)
+  if (SWIG_MODULE_${name}_NOPROXY AND
+      NOT ("-noproxy" IN_LIST CMAKE_SWIG_FLAGS OR "-noproxy" IN_LIST SWIG_MODULE_${name}_EXTRA_FLAGS))
     list (APPEND SWIG_MODULE_${name}_EXTRA_FLAGS "-noproxy")
   endif()
   if(SWIG_MODULE_${name}_LANGUAGE STREQUAL "UNKNOWN")
     message(FATAL_ERROR "SWIG Error: Language \"${language}\" not found")
-  elseif(SWIG_MODULE_${name}_LANGUAGE STREQUAL "PERL")
+  elseif(SWIG_MODULE_${name}_LANGUAGE STREQUAL "PERL" AND
+         NOT "-shadow" IN_LIST SWIG_MODULE_${name}_EXTRA_FLAGS)
     list(APPEND SWIG_MODULE_${name}_EXTRA_FLAGS "-shadow")
   endif()
 endmacro()
@@ -294,7 +295,7 @@ function(SWIG_GET_EXTRA_OUTPUT_FILES language outfiles generatedpath infile)
   endif()
   foreach(it ${SWIG_${language}_EXTRA_FILE_EXTENSIONS})
     set(extra_file "${generatedpath}/${module_basename}${it}")
-    if (extra_file MATCHES "\\.cs$")
+    if (extra_file MATCHES "\\.cs$" AND CMAKE_CSharp_COMPILER_LOADED)
       set_source_files_properties(${extra_file} PROPERTIES LANGUAGE "CSharp")
     else()
       # Treat extra outputs as plain files regardless of language.
@@ -477,6 +478,10 @@ function(SWIG_ADD_SOURCE_TO_MODULE name outfiles infile)
 
   get_property (compile_options SOURCE "${infile}" PROPERTY GENERATED_COMPILE_OPTIONS)
   set_property (SOURCE "${swig_generated_file_fullname}" PROPERTY COMPILE_OPTIONS $<TARGET_GENEX_EVAL:${target_name},$<TARGET_PROPERTY:${target_name},SWIG_GENERATED_COMPILE_OPTIONS>> ${compile_options})
+
+  if (SWIG_MODULE_${name}_SWIG_LANGUAGE_FLAG MATCHES "php")
+    set_property (SOURCE "${swig_generated_file_fullname}" APPEND PROPERTY INCLUDE_DIRECTORIES "${outdir}")
+  endif()
 
   set(${outfiles} "${swig_generated_file_fullname}" ${swig_extra_generated_files} PARENT_SCOPE)
 

@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "CMAKE-BUILDSYSTEM" "7" "Jul 17, 2018" "3.12.0" "CMake"
+.TH "CMAKE-BUILDSYSTEM" "7" "Nov 02, 2018" "3.12.4" "CMake"
 .SH NAME
 cmake-buildsystem \- CMake Buildsystem Reference
 .
@@ -57,7 +57,7 @@ target_link_libraries(zipapp archive)
 .UNINDENT
 .UNINDENT
 .sp
-\fBarchive\fP is defined as a static library \-\- an archive containing objects
+\fBarchive\fP is defined as a static library – an archive containing objects
 compiled from \fBarchive.cpp\fP, \fBzip.cpp\fP, and \fBlzma.cpp\fP\&.  \fBzipapp\fP
 is defined as an executable formed by compiling and linking \fBzipapp.cpp\fP\&.
 When linking the \fBzipapp\fP executable, the \fBarchive\fP static library is
@@ -110,10 +110,10 @@ The \fBBUILD_SHARED_LIBS\fP variable may be enabled to change the
 behavior of \fBadd_library()\fP to build shared libraries by default.
 .sp
 In the context of the buildsystem definition as a whole, it is largely
-irrelevant whether particular libraries are \fBSHARED\fP or \fBSTATIC\fP \-\-
+irrelevant whether particular libraries are \fBSHARED\fP or \fBSTATIC\fP –
 the commands, dependency specifications and other APIs work similarly
 regardless of the library type.  The \fBMODULE\fP library type is
-dissimilar in that it is generally not linked to \-\- it is not used in
+dissimilar in that it is generally not linked to – it is not used in
 the right\-hand\-side of the \fBtarget_link_libraries()\fP command.
 It is a type which is loaded as a plugin using runtime techniques.
 If the library does not export any unmanaged symbols (e.g. Windows
@@ -265,7 +265,7 @@ special separate handling, such as \fBPOSITION_INDEPENDENT_CODE\fP\&.
 The contents of the \fBINTERFACE_INCLUDE_DIRECTORIES\fP,
 \fBINTERFACE_COMPILE_DEFINITIONS\fP and
 \fBINTERFACE_COMPILE_OPTIONS\fP target properties are
-\fIUsage Requirements\fP \-\- they specify content which consumers
+\fIUsage Requirements\fP – they specify content which consumers
 must use to correctly compile and link with the target they appear on.
 For any binary target, the contents of each \fBINTERFACE_\fP property on
 each target specified in a \fBtarget_link_libraries()\fP command is
@@ -446,23 +446,23 @@ target_link_libraries(exe2 lib1 lib2)
 .UNINDENT
 .sp
 The \fBlib1\fP requirement \fBINTERFACE_POSITION_INDEPENDENT_CODE\fP is not
-"compatible" with the \fBPOSITION_INDEPENDENT_CODE\fP property of the \fBexe1\fP
+“compatible” with the \fBPOSITION_INDEPENDENT_CODE\fP property of the \fBexe1\fP
 target.  The library requires that consumers are built as
 position\-independent\-code, while the executable specifies to not built as
 position\-independent\-code, so a diagnostic is issued.
 .sp
-The \fBlib1\fP and \fBlib2\fP requirements are not "compatible".  One of them
+The \fBlib1\fP and \fBlib2\fP requirements are not “compatible”.  One of them
 requires that consumers are built as position\-independent\-code, while
 the other requires that consumers are not built as position\-independent\-code.
 Because \fBexe2\fP links to both and they are in conflict, a diagnostic is
 issued.
 .sp
-To be "compatible", the \fBPOSITION_INDEPENDENT_CODE\fP property,
+To be “compatible”, the \fBPOSITION_INDEPENDENT_CODE\fP property,
 if set must be either the same, in a boolean sense, as the
 \fBINTERFACE_POSITION_INDEPENDENT_CODE\fP property of all transitively
 specified dependencies on which that property is set.
 .sp
-This property of "compatible interface requirement" may be extended to other
+This property of “compatible interface requirement” may be extended to other
 properties by specifying the property in the content of the
 \fBCOMPATIBLE_INTERFACE_BOOL\fP target property.  Each specified property
 must be compatible between the consuming target and the corresponding property
@@ -491,7 +491,7 @@ target_link_libraries(exe2 lib1Version2 lib1Version3) # Diagnostic
 .UNINDENT
 .UNINDENT
 .sp
-Non\-boolean properties may also participate in "compatible interface"
+Non\-boolean properties may also participate in “compatible interface”
 computations.  Properties specified in the
 \fBCOMPATIBLE_INTERFACE_STRING\fP
 property must be either unspecified or compare to the same string among
@@ -554,7 +554,7 @@ target_link_libraries(exe2 lib1Version2 lib1Version3)
 Similarly, the \fBCOMPATIBLE_INTERFACE_NUMBER_MIN\fP may be used to
 calculate the numeric minimum value for a property from dependencies.
 .sp
-Each calculated "compatible" property value may be read in the consumer at
+Each calculated “compatible” property value may be read in the consumer at
 generate\-time using generator expressions.
 .sp
 Note that for each dependee, the set of properties specified in each
@@ -600,7 +600,7 @@ the new extreme.
 Build specifications may use
 \fBgenerator expressions\fP containing
 content which may be conditional or known only at generate\-time.  For example,
-the calculated "compatible" value of a property may be read with the
+the calculated “compatible” value of a property may be read with the
 \fBTARGET_PROPERTY\fP expression:
 .INDENT 0.0
 .INDENT 3.5
@@ -865,8 +865,8 @@ directory.
 Like build specifications, \fBlink libraries\fP may be
 specified with generator expression conditions.  However, as consumption of
 usage requirements is based on collection from linked dependencies, there is
-an additional limitation that the link dependencies must form a "directed
-acyclic graph".  That is, if linking to a target is dependent on the value of
+an additional limitation that the link dependencies must form a “directed
+acyclic graph”.  That is, if linking to a target is dependent on the value of
 a target property, that target property may not be dependent on the linked
 dependencies:
 .INDENT 0.0

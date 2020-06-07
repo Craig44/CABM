@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "CMAKE-GENERATOR-EXPRESSIONS" "7" "Jul 17, 2018" "3.12.0" "CMake"
+.TH "CMAKE-GENERATOR-EXPRESSIONS" "7" "Nov 02, 2018" "3.12.4" "CMake"
 .SH NAME
 cmake-generator-expressions \- CMake Generator Expressions
 .
@@ -135,17 +135,17 @@ target.
 \fB1\fP if the version of the CXX compiler matches \fBver\fP, otherwise \fB0\fP\&.
 .TP
 .B \fB$<TARGET_POLICY:pol>\fP
-\fB1\fP if the policy \fBpol\fP was NEW when the \(aqhead\(aq target was created,
+\fB1\fP if the policy \fBpol\fP was NEW when the ‘head’ target was created,
 else \fB0\fP\&.  If the policy was not set, the warning message for the policy
 will be emitted. This generator expression only works for a subset of
 policies.
 .TP
 .B \fB$<COMPILE_FEATURES:feature[,feature]...>\fP
-\fB1\fP if all of the \fBfeature\fP features are available for the \(aqhead\(aq
+\fB1\fP if all of the \fBfeature\fP features are available for the ‘head’
 target, and \fB0\fP otherwise. If this expression is used while evaluating
 the link implementation of a target and if any dependency transitively
 increases the required \fBC_STANDARD\fP or \fBCXX_STANDARD\fP
-for the \(aqhead\(aq target, an error is reported.  See the
+for the ‘head’ target, an error is reported.  See the
 \fBcmake\-compile\-features(7)\fP manual for information on
 compile features and a list of supported compilers.
 .TP

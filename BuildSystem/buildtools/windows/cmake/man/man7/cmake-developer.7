@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "CMAKE-DEVELOPER" "7" "Jul 17, 2018" "3.12.0" "CMake"
+.TH "CMAKE-DEVELOPER" "7" "Nov 02, 2018" "3.12.4" "CMake"
 .SH NAME
 cmake-developer \- CMake Developer Reference
 .
@@ -160,7 +160,7 @@ document.
 .sp
 Inline markup constructs not listed above are printed literally in the
 command\-line help output.  We prefer to use inline markup constructs that
-look correct in source form, so avoid use of \e\-escapes in favor of inline
+look correct in source form, so avoid use of \-escapes in favor of inline
 literals when possible.
 .sp
 Explicit markup blocks not matching directives listed above are removed from
@@ -183,7 +183,7 @@ Try to avoid these cases in practice.
 .SS CMake Domain
 .sp
 CMake adds a \fI\%Sphinx Domain\fP called \fBcmake\fP, also called the
-"CMake Domain".  It defines several "object" types for CMake
+“CMake Domain”.  It defines several “object” types for CMake
 documentation:
 .INDENT 0.0
 .TP
@@ -192,7 +192,7 @@ A CMake language command.
 .TP
 .B \fBgenerator\fP
 A CMake native build system generator.
-See the \fBcmake(1)\fP command\-line tool\(aqs \fB\-G\fP option.
+See the \fBcmake(1)\fP command\-line tool’s \fB\-G\fP option.
 .TP
 .B \fBmanual\fP
 A CMake manual page, like this \fI\%cmake\-developer(7)\fP manual.
@@ -412,10 +412,10 @@ specified with angle brackets, and may be referred to in prose using
 \fBinline\-literal\fP syntax.
 .SS Style: Boolean Constants
 .sp
-Use "\fBOFF\fP" and "\fBON\fP" for boolean values which can be modified by
+Use “\fBOFF\fP” and “\fBON\fP” for boolean values which can be modified by
 the user, such as \fBPOSITION_INDEPENDENT_CODE\fP\&. Such properties
-may be "enabled" and "disabled". Use "\fBTrue\fP" and "\fBFalse\fP" for
-inherent values which can\(aqt be modified after being set, such as the
+may be “enabled” and “disabled”. Use “\fBTrue\fP” and “\fBFalse\fP” for
+inherent values which can’t be modified after being set, such as the
 \fBIMPORTED\fP property of a build target.
 .SS Style: Inline Literals
 .sp
@@ -705,7 +705,7 @@ documentation, simply leave out the \fBHelp/module/<module\-name>.rst\fP
 file and the \fBHelp/manual/cmake\-modules.7.rst\fP toctree entry.
 .SS Find Modules
 .sp
-A "find module" is a \fBModules/Find<package>.cmake\fP file to be loaded
+A “find module” is a \fBModules/Find<package>.cmake\fP file to be loaded
 by the \fBfind_package()\fP command when invoked for \fB<package>\fP\&.
 .sp
 The primary task of a find module is to determine whether a package
@@ -795,7 +795,7 @@ paths.  This should not be a cache entry.
 .TP
 .B \fBXxx_DEFINITIONS\fP
 Definitions to use when compiling code that uses Xxx. This really
-shouldn\(aqt include options such as \fB\-DHAS_JPEG\fP that a client
+shouldn’t include options such as \fB\-DHAS_JPEG\fP that a client
 source\-code file uses to decide whether to \fB#include <jpeg.h>\fP
 .TP
 .B \fBXxx_EXECUTABLE\fP
@@ -821,7 +821,7 @@ If False, do not try to use the relevant CMake wrapping command.
 If False, optional Yy part of Xxx system is not available.
 .TP
 .B \fBXxx_FOUND\fP
-Set to false, or undefined, if we haven\(aqt found, or don\(aqt want to use
+Set to false, or undefined, if we haven’t found, or don’t want to use
 Xxx.
 .TP
 .B \fBXxx_NOT_FOUND_MESSAGE\fP
@@ -902,7 +902,7 @@ The first thing that is needed is a license notice.
 .UNINDENT
 .UNINDENT
 .sp
-Next we need module documentation.  CMake\(aqs documentation system requires you
+Next we need module documentation.  CMake’s documentation system requires you
 to follow the license notice with a blank line and then with a documentation
 marker and the name of the module.  You should follow this with a simple
 statement of what the module does.

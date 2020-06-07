@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "CTEST" "1" "Jul 17, 2018" "3.12.0" "CMake"
+.TH "CTEST" "1" "Nov 02, 2018" "3.12.4" "CMake"
 .SH NAME
 ctest \- CTest Command-Line Reference
 .
@@ -98,7 +98,7 @@ ctest {\-D <dashboard> | \-M <model> \-T <action> | \-S <script> | \-SP <script>
 .UNINDENT
 .SH DESCRIPTION
 .sp
-The "ctest" executable is the CMake test driver program.
+The “ctest” executable is the CMake test driver program.
 CMake\-generated build trees created for projects that use the
 ENABLE_TESTING and ADD_TEST commands have testing support.  This
 program will run the tests and report results.
@@ -110,8 +110,8 @@ Choose configuration to test.
 .sp
 Some CMake\-generated build trees can have multiple build
 configurations in the same tree.  This option can be used to specify
-which one should be tested.  Example configurations are "Debug" and
-"Release".
+which one should be tested.  Example configurations are “Debug” and
+“Release”.
 .TP
 .B \fB\-V,\-\-verbose\fP
 Enable verbose output from tests.
@@ -210,7 +210,7 @@ Exclude fixtures matching \fB<regex>\fP from automatically adding any tests to
 the test set.
 .sp
 If a test in the set of tests to be executed requires a particular fixture,
-that fixture\(aqs setup and cleanup tests would normally be added to the test set
+that fixture’s setup and cleanup tests would normally be added to the test set
 automatically. This option prevents adding setup or cleanup tests for fixtures
 matching the \fB<regex>\fP\&. Note that all other fixture behavior is retained,
 including test dependencies and skipping tests that have fixture setup tests
@@ -580,13 +580,13 @@ the amount of time that CTest gave to run the tests for each label or
 subproject and gives a good representation of the total expense of the tests
 for each label or subproject when compared to other labels or subprojects.
 .sp
-For example, if "SubprojectA" showed "100 sec*proc" and "SubprojectB" showed
-"10 sec*proc", then CTest allocated approximately  10 times the CPU/core time
-to run the tests for "SubprojectA" than for "SubprojectB" (e.g. so if effort
+For example, if “SubprojectA” showed “100 sec*proc” and “SubprojectB” showed
+“10 sec*proc”, then CTest allocated approximately  10 times the CPU/core time
+to run the tests for “SubprojectA” than for “SubprojectB” (e.g. so if effort
 is going to be expended to reduce the cost of the test suite for the whole
-project, then reducing the cost of the test suite for "SubprojectA" would
+project, then reducing the cost of the test suite for “SubprojectA” would
 likely have a larger impact than effort to reduce the cost of the test suite
-for "SubprojectB").
+for “SubprojectB”).
 .SH BUILD AND TEST MODE
 .sp
 CTest provides a command\-line signature to configure (i.e. run cmake on),
@@ -726,7 +726,7 @@ Do not compress test output when submitting.
 .sp
 This flag will turn off automatic compression of test output.  Use
 this to maintain compatibility with an older version of CDash which
-doesn\(aqt support compressed test output.
+doesn’t support compressed test output.
 .UNINDENT
 .SS Dashboard Client Steps
 .sp
@@ -959,7 +959,7 @@ as \fBgit pull\fP except that any local moficiations are overwritten.
 Use \fBGITUpdateCustom\fP to specify a different approach.
 .TP
 .B \fBGITInitSubmodules\fP
-If set, CTest will update the repository\(aqs submodules before updating.
+If set, CTest will update the repository’s submodules before updating.
 .INDENT 7.0
 .IP \(bu 2
 \fI\%CTest Script\fP variable: \fBCTEST_GIT_INIT_SUBMODULES\fP
@@ -1127,7 +1127,7 @@ Additional configuration settings include:
 .INDENT 0.0
 .TP
 .B \fBNightlyStartTime\fP
-In the \fBNightly\fP dashboard mode, specify the "nightly start time".
+In the \fBNightly\fP dashboard mode, specify the “nightly start time”.
 With centralized version control systems (\fBcvs\fP and \fBsvn\fP),
 the \fBUpdate\fP step checks out the version of the software as of
 this time so that multiple clients choose a common version to test.
@@ -1230,10 +1230,10 @@ generator, specify whether the
 \fBCTestUseLaunchers\fP module (also included by the
 \fBCTest\fP module).  When enabled, the generated build
 system wraps each invocation of the compiler, linker, or
-custom command line with a "launcher" that communicates
+custom command line with a “launcher” that communicates
 with CTest via environment variables and files to report
 granular build warning and error information.  Otherwise,
-CTest must "scrape" the build output log for diagnostics.
+CTest must “scrape” the build output log for diagnostics.
 .INDENT 7.0
 .IP \(bu 2
 \fI\%CTest Script\fP variable: \fBCTEST_USE_LAUNCHERS\fP

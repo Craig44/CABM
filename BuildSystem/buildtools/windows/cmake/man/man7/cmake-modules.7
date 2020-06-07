@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "CMAKE-MODULES" "7" "Jul 17, 2018" "3.12.0" "CMake"
+.TH "CMAKE-MODULES" "7" "Nov 02, 2018" "3.12.4" "CMake"
 .SH NAME
 cmake-modules \- CMake Modules Reference
 .
@@ -33,7 +33,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .SH ALL MODULES
 .SS AddFileDependencies
 .sp
-ADD_FILE_DEPENDENCIES(source_file depend_files...)
+ADD_FILE_DEPENDENCIES(source_file depend_files…)
 .sp
 Adds the given files as dependencies to source_file
 .SS AndroidTestUtilities
@@ -67,7 +67,7 @@ android_add_test_data(
 .UNINDENT
 .UNINDENT
 .sp
-At build time a test named "example_setup_test" will be created.  Run this test
+At build time a test named “example_setup_test” will be created.  Run this test
 on the command line with \fBctest(1)\fP to load the data onto the Android
 device.
 .SS Module Functions
@@ -176,7 +176,7 @@ as all of the system libraries are compatible.
 .sp
 If you pass plugins to fixup_bundle as the libs parameter, you should
 install them or copy them into the bundle before calling fixup_bundle.
-The "libs" parameter is a list of libraries that must be fixed up, but
+The “libs” parameter is a list of libraries that must be fixed up, but
 that cannot be determined by otool output analysis.  (i.e., plugins)
 .sp
 Gather all the keys for all the executables and libraries in a bundle,
@@ -187,7 +187,7 @@ Then clear all the keys and call verify_app on the final bundle to
 ensure that it is truly standalone.
 .sp
 As an optional parameter (IGNORE_ITEM) a list of file names can be passed,
-which are then ignored (e.g. IGNORE_ITEM "vcredist_x86.exe;vcredist_x64.exe")
+which are then ignored (e.g. IGNORE_ITEM “vcredist_x86.exe;vcredist_x64.exe”)
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -200,7 +200,7 @@ COPY_AND_FIXUP_BUNDLE(<src> <dst> <libs> <dirs>)
 .UNINDENT
 .sp
 Makes a copy of the bundle <src> at location <dst> and then fixes up
-the new copied bundle in\-place at <dst>...
+the new copied bundle in\-place at <dst>…
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -213,11 +213,11 @@ VERIFY_APP(<app>)
 .UNINDENT
 .sp
 Verifies that an application <app> appears valid based on running
-analysis tools on it.  Calls "message(FATAL_ERROR" if the application
+analysis tools on it.  Calls “message(FATAL_ERROR” if the application
 is not verified.
 .sp
 As an optional parameter (IGNORE_ITEM) a list of file names can be passed,
-which are then ignored (e.g. IGNORE_ITEM "vcredist_x86.exe;vcredist_x64.exe")
+which are then ignored (e.g. IGNORE_ITEM “vcredist_x86.exe;vcredist_x64.exe”)
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -229,8 +229,8 @@ GET_BUNDLE_MAIN_EXECUTABLE(<bundle> <result_var>)
 .UNINDENT
 .UNINDENT
 .sp
-The result will be the full path name of the bundle\(aqs main executable
-file or an "error:" prefixed string if it could not be determined.
+The result will be the full path name of the bundle’s main executable
+file or an “error:” prefixed string if it could not be determined.
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -242,7 +242,7 @@ GET_DOTAPP_DIR(<exe> <dotapp_dir_var>)
 .UNINDENT
 .UNINDENT
 .sp
-Returns the nearest parent dir whose name ends with ".app" given the
+Returns the nearest parent dir whose name ends with “.app” given the
 full path to an executable.  If there is no such parent dir, then
 simply return the dir containing the executable.
 .sp
@@ -258,8 +258,8 @@ GET_BUNDLE_AND_EXECUTABLE(<app> <bundle_var> <executable_var> <valid_var>)
 .UNINDENT
 .UNINDENT
 .sp
-Takes either a ".app" directory name or the name of an executable
-nested inside a ".app" directory and returns the path to the ".app"
+Takes either a “.app” directory name or the name of an executable
+nested inside a “.app” directory and returns the path to the “.app”
 directory in <bundle_var> and the path to its main executable in
 <executable_var>
 .INDENT 0.0
@@ -289,7 +289,7 @@ GET_ITEM_KEY(<item> <key_var>)
 Given a file (item) name, generate a key that should be unique
 considering the set of libraries that need copying or fixing up to
 make a bundle standalone.  This is essentially the file name including
-extension with "." replaced by "_"
+extension with “.” replaced by “_”
 .sp
 This key is used as a prefix for CMake variables so that we can
 associate a set of variables with a given item based on its key.
@@ -341,7 +341,7 @@ all of them and copy prerequisite libs into the bundle and then do
 appropriate install_name_tool fixups.
 .sp
 As an optional parameter (IGNORE_ITEM) a list of file names can be passed,
-which are then ignored (e.g. IGNORE_ITEM "vcredist_x86.exe;vcredist_x64.exe")
+which are then ignored (e.g. IGNORE_ITEM “vcredist_x86.exe;vcredist_x64.exe”)
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -354,7 +354,7 @@ COPY_RESOLVED_ITEM_INTO_BUNDLE(<resolved_item> <resolved_embedded_item>)
 .UNINDENT
 .sp
 Copy a resolved item into the bundle if necessary.  Copy is not
-necessary if the resolved_item is "the same as" the
+necessary if the resolved_item is “the same as” the
 resolved_embedded_item.
 .INDENT 0.0
 .INDENT 3.5
@@ -368,7 +368,7 @@ COPY_RESOLVED_FRAMEWORK_INTO_BUNDLE(<resolved_item> <resolved_embedded_item>)
 .UNINDENT
 .sp
 Copy a resolved framework into the bundle if necessary.  Copy is not
-necessary if the resolved_item is "the same as" the
+necessary if the resolved_item is “the same as” the
 resolved_embedded_item.
 .sp
 By default, BU_COPY_FULL_FRAMEWORK_CONTENTS is not set.  If you want
@@ -390,12 +390,12 @@ FIXUP_BUNDLE_ITEM(<resolved_embedded_item> <exepath> <dirs>)
 Get the direct/non\-system prerequisites of the resolved embedded item.
 For each prerequisite, change the way it is referenced to the value of
 the _EMBEDDED_ITEM keyed variable for that prerequisite.  (Most likely
-changing to an "@executable_path" style reference.)
+changing to an “@executable_path” style reference.)
 .sp
-This function requires that the resolved_embedded_item be "inside" the
+This function requires that the resolved_embedded_item be “inside” the
 bundle already.  In other words, if you pass plugins to fixup_bundle
 as the libs parameter, you should install them or copy them into the
-bundle before calling fixup_bundle.  The "libs" parameter is a list of
+bundle before calling fixup_bundle.  The “libs” parameter is a list of
 libraries that must be fixed up, but that cannot be determined by
 otool output analysis.  (i.e., plugins)
 .sp
@@ -420,11 +420,11 @@ VERIFY_BUNDLE_PREREQUISITES(<bundle> <result_var> <info_var>)
 .UNINDENT
 .sp
 Verifies that the sum of all prerequisites of all files inside the
-bundle are contained within the bundle or are "system" libraries,
+bundle are contained within the bundle or are “system” libraries,
 presumed to exist everywhere.
 .sp
 As an optional parameter (IGNORE_ITEM) a list of file names can be passed,
-which are then ignored (e.g. IGNORE_ITEM "vcredist_x86.exe;vcredist_x64.exe")
+which are then ignored (e.g. IGNORE_ITEM “vcredist_x86.exe;vcredist_x64.exe”)
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -437,7 +437,7 @@ VERIFY_BUNDLE_SYMLINKS(<bundle> <result_var> <info_var>)
 .UNINDENT
 .sp
 Verifies that any symlinks found in the bundle point to other files
-that are already also in the bundle...  Anything that points to an
+that are already also in the bundle…  Anything that points to an
 external file causes this function to fail the verification.
 .SS CheckCCompilerFlag
 .sp
@@ -988,10 +988,10 @@ Prefer using \fBCheckSymbolExists\fP instead of this module,
 for the following reasons:
 .INDENT 0.0
 .IP \(bu 2
-\fBcheck_function_exists()\fP can\(aqt detect functions that are inlined
+\fBcheck_function_exists()\fP can’t detect functions that are inlined
 in headers or specified as a macro.
 .IP \(bu 2
-\fBcheck_function_exists()\fP can\(aqt detect anything in the 32\-bit
+\fBcheck_function_exists()\fP can’t detect anything in the 32\-bit
 versions of the Win32 API, because of a mismatch in calling conventions.
 .IP \(bu 2
 \fBcheck_function_exists()\fP only verifies linking, it does not verify
@@ -1225,7 +1225,7 @@ check_language(<lang>)
 .UNINDENT
 .sp
 where <lang> is a language that may be passed to enable_language()
-such as "Fortran".  If CMAKE_<lang>_COMPILER is already defined the
+such as “Fortran”.  If CMAKE_<lang>_COMPILER is already defined the
 check does nothing.  Otherwise it tries enabling the language in a
 test project.  The result is cached in CMAKE_<lang>_COMPILER as the
 compiler that was found, or NOTFOUND if the language cannot be
@@ -1381,7 +1381,7 @@ CMAKE_REQUIRED_QUIET = execute quietly without messages
 .UNINDENT
 .UNINDENT
 .sp
-Example: CHECK_STRUCT_HAS_MEMBER("struct timeval" tv_sec sys/select.h
+Example: CHECK_STRUCT_HAS_MEMBER(“struct timeval” tv_sec sys/select.h
 HAVE_TIMEVAL_TV_SEC LANGUAGE C)
 .SS CheckSymbolExists
 .sp
@@ -1451,7 +1451,7 @@ CHECK_TYPE_SIZE(TYPE VARIABLE [BUILTIN_TYPES_ONLY]
 .UNINDENT
 .sp
 Check if the type exists and determine its size.  On return,
-"HAVE_${VARIABLE}" holds the existence of the type, and "${VARIABLE}"
+“HAVE_${VARIABLE}” holds the existence of the type, and “${VARIABLE}”
 holds one of the following:
 .INDENT 0.0
 .INDENT 3.5
@@ -1469,17 +1469,17 @@ holds one of the following:
 Both \fBHAVE_${VARIABLE}\fP and \fB${VARIABLE}\fP will be created as internal
 cache variables.
 .sp
-Furthermore, the variable "${VARIABLE}_CODE" holds C preprocessor code
-to define the macro "${VARIABLE}" to the size of the type, or leave
+Furthermore, the variable “${VARIABLE}_CODE” holds C preprocessor code
+to define the macro “${VARIABLE}” to the size of the type, or leave
 the macro undefined if the type does not exist.
 .sp
-The variable "${VARIABLE}" may be "0" when CMAKE_OSX_ARCHITECTURES has
+The variable “${VARIABLE}” may be “0” when CMAKE_OSX_ARCHITECTURES has
 multiple architectures for building OS X universal binaries.  This
 indicates that the type size varies across architectures.  In this
-case "${VARIABLE}_CODE" contains C preprocessor tests mapping from
+case “${VARIABLE}_CODE” contains C preprocessor tests mapping from
 each architecture macro to the corresponding type size.  The list of
-architecture macros is stored in "${VARIABLE}_KEYS", and the value for
-each key is stored in "${VARIABLE}\-${KEY}".
+architecture macros is stored in “${VARIABLE}_KEYS”, and the value for
+each key is stored in “${VARIABLE}\-${KEY}”.
 .sp
 If the BUILTIN_TYPES_ONLY option is not given, the macro checks for
 headers <sys/types.h>, <stdint.h>, and <stddef.h>, and saves results
@@ -1568,7 +1568,7 @@ CMAKE_REQUIRED_QUIET = execute quietly without messages
 .sp
 Use MinGW gfortran from VS if a fortran compiler is not found.
 .sp
-The \(aqadd_fortran_subdirectory\(aq function adds a subdirectory to a
+The ‘add_fortran_subdirectory’ function adds a subdirectory to a
 project that contains a fortran only sub\-project.  The module will
 check the current compiler and see if it can support fortran.  If no
 fortran compiler is found and the compiler is MSVC, then this module
@@ -1607,7 +1607,7 @@ Limitations:
 .sp
 NO_EXTERNAL_INSTALL is required for forward compatibility with a
 future version that supports installation of the external project
-binaries during "make install".
+binaries during “make install”.
 .SS CMakeBackwardCompatibilityCXX
 .sp
 define a bunch of backwards compatibility variables
@@ -1659,7 +1659,7 @@ The functionality of this module has been superseded by the
 \fBCMAKE_<LANG>_COMPILER_VERSION\fP variable that contains
 the compiler version number.
 .sp
-Determine the Visual Studio service pack of the \(aqcl\(aq in use.
+Determine the Visual Studio service pack of the ‘cl’ in use.
 .sp
 Usage:
 .INDENT 0.0
@@ -1793,7 +1793,7 @@ CMAKE_FIND_FRAMEWORK_EXTRA_LOCATIONS \- Extra directories
 .UNINDENT
 .SS CMakeFindPackageMode
 .sp
-This file is executed by cmake when invoked with \-\-find\-package.  It
+This file is executed by cmake when invoked with –find\-package.  It
 expects that the following variables are set using \-D:
 .INDENT 0.0
 .TP
@@ -1823,7 +1823,7 @@ print the flags needed for linking when using the given package
 .UNINDENT
 .TP
 .B \fBQUIET\fP
-if TRUE, don\(aqt print anything
+if TRUE, don’t print anything
 .UNINDENT
 .SS CMakeForceCompiler
 .sp
@@ -1832,12 +1832,12 @@ Deprecated.  Do not use.
 The macros provided by this module were once intended for use by
 cross\-compiling toolchain files when CMake was not able to automatically
 detect the compiler identification.  Since the introduction of this module,
-CMake\(aqs compiler identification capabilities have improved and can now be
+CMake’s compiler identification capabilities have improved and can now be
 taught to recognize any compiler.  Furthermore, the suite of information
 CMake detects from a compiler is now too extensive to be provided by
 toolchain files using these macros.
 .sp
-One common use case for this module was to skip CMake\(aqs checks for a
+One common use case for this module was to skip CMake’s checks for a
 working compiler when using a cross\-compiler that cannot link binaries
 without special flags or custom linker scripts.  This case is now supported
 by setting the \fBCMAKE_TRY_COMPILE_TARGET_TYPE\fP variable in the
@@ -1951,19 +1951,19 @@ The graph type.
 .IP \(bu 2
 Mandatory : NO
 .IP \(bu 2
-Default   : "digraph"
+Default   : “digraph”
 .UNINDENT
 .sp
 Valid graph types are:
 .INDENT 7.0
 .IP \(bu 2
-"graph" : Nodes are joined with lines
+“graph” : Nodes are joined with lines
 .IP \(bu 2
-"digraph" : Nodes are joined with arrows showing direction
+“digraph” : Nodes are joined with arrows showing direction
 .IP \(bu 2
-"strict graph" : Like "graph" but max one line between each node
+“strict graph” : Like “graph” but max one line between each node
 .IP \(bu 2
-"strict digraph" : Like "graph" but max one line between each node in each direction
+“strict digraph” : Like “graph” but max one line between each node in each direction
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -1974,7 +1974,7 @@ The graph name.
 .IP \(bu 2
 Mandatory : NO
 .IP \(bu 2
-Default   : "GG"
+Default   : “GG”
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -1985,7 +1985,7 @@ The header written at the top of the graphviz file.
 .IP \(bu 2
 Mandatory : NO
 .IP \(bu 2
-Default   : "node [n  fontsize = "12"];"
+Default   : “node [n  fontsize = “12”];”
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -1996,7 +1996,7 @@ The prefix for each node in the graphviz file.
 .IP \(bu 2
 Mandatory : NO
 .IP \(bu 2
-Default   : "node"
+Default   : “node”
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -2207,7 +2207,7 @@ non\-optional components have been found, and if this is not the case, sets
 the \fBFoo_FOUND\fP variable to \fBFALSE\fP, so that the package is considered to
 be not found.  It does that by testing the \fBFoo_<Component>_FOUND\fP
 variables for all requested required components.  This macro should be
-called even if the package doesn\(aqt provide any components to make sure
+called even if the package doesn’t provide any components to make sure
 users are not specifying components erroneously.  When using the
 \fBNO_CHECK_REQUIRED_COMPONENTS_MACRO\fP option, this macro is not generated
 into the \fBFooConfig.cmake\fP file.
@@ -2241,7 +2241,7 @@ details on this.
 \fB<major.minor.patch>\fP is the version number of the project to be installed.
 .sp
 If no \fBVERSION\fP is given, the \fBPROJECT_VERSION\fP variable is used.
-If this hasn\(aqt been set, it errors out.
+If this hasn’t been set, it errors out.
 .sp
 The \fBCOMPATIBILITY\fP mode \fBAnyNewerVersion\fP means that the installed
 package version will be considered compatible if it is newer or exactly the
@@ -2410,7 +2410,7 @@ after the Find\-module has been executed they should have the same
 value as they had before.
 .sp
 CMAKE_PUSH_CHECK_STATE() macro receives optional argument RESET.
-Whether it\(aqs specified, CMAKE_PUSH_CHECK_STATE() will set all
+Whether it’s specified, CMAKE_PUSH_CHECK_STATE() will set all
 CMAKE_REQUIRED_* variables to empty values, same as
 CMAKE_RESET_CHECK_STATE() call will do.
 .sp
@@ -2481,7 +2481,7 @@ Mandatory : YES
 .TP
 .B Default
 \fB<CPACK_PACKAGE_FILE_NAME>[\-<component>].<extension>\fP with
-spaces replaced by \(aq\-\(aq
+spaces replaced by ‘\-‘
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -2538,8 +2538,8 @@ OSX Finder. Optional.
 .TP
 .B CPACK_BUNDLE_APPLE_CERT_APP
 The name of your Apple supplied code signing certificate for the application.
-The name usually takes the form "Developer ID Application: [Name]" or
-"3rd Party Mac Developer Application: [Name]". If this variable is not set
+The name usually takes the form “Developer ID Application: [Name]” or
+“3rd Party Mac Developer Application: [Name]”. If this variable is not set
 the application will not be signed.
 .UNINDENT
 .INDENT 0.0
@@ -2559,7 +2559,7 @@ list any frameworks and plugins that are included in your app bundle.
 .TP
 .B CPACK_BUNDLE_APPLE_CODESIGN_PARAMETER
 Additional parameter that will passed to codesign.
-Default value: "\-\-deep \-f"
+Default value: “–deep \-f”
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -2581,7 +2581,7 @@ For certain kinds of binary installers (including the graphical
 installers on Mac OS X and Windows), CPack generates installers that
 allow users to select individual application components to install.
 The contents of each of the components are identified by the COMPONENT
-argument of CMake\(aqs INSTALL command.  These components can be
+argument of CMake’s INSTALL command.  These components can be
 annotated with user\-friendly names and descriptions, inter\-component
 dependencies, etc., and grouped in various ways to customize the
 resulting installer.  See the cpack_add_* commands, described below,
@@ -2589,7 +2589,7 @@ for more information about component\-specific installations.
 .sp
 Component\-specific installation allows users to select specific sets
 of components to install during the install process.  Installation
-components are identified by the COMPONENT argument of CMake\(aqs INSTALL
+components are identified by the COMPONENT argument of CMake’s INSTALL
 commands, and should be further described by the following CPack
 commands:
 .INDENT 0.0
@@ -2624,7 +2624,7 @@ list(REMOVE_ITEM CPACK_COMPONENTS_ALL "foo" "bar")
 .B CPACK_<GENNAME>_COMPONENT_INSTALL
 Enable/Disable component install for CPack generator <GENNAME>.
 .sp
-Each CPack Generator (RPM, DEB, ARCHIVE, NSIS, DMG, etc...) has a legacy
+Each CPack Generator (RPM, DEB, ARCHIVE, NSIS, DMG, etc…) has a legacy
 default behavior.  e.g.  RPM builds monolithic whereas NSIS builds
 component.  One can change the default behavior by setting this variable to
 0/1 or OFF/ON.
@@ -2635,7 +2635,7 @@ component.  One can change the default behavior by setting this variable to
 Specify how components are grouped for multi\-package component\-aware CPack
 generators.
 .sp
-Some generators like RPM or ARCHIVE family (TGZ, ZIP, ...) generates
+Some generators like RPM or ARCHIVE family (TGZ, ZIP, …) generates
 several packages files when asked for component packaging.  They group
 the component differently depending on the value of this variable:
 .INDENT 7.0
@@ -2816,12 +2816,12 @@ Parent groups are used to establish a hierarchy of groups, providing
 an arbitrary hierarchy of groups.
 .sp
 EXPANDED indicates that, by default, the group should show up as
-"expanded", so that the user immediately sees all of the components
+“expanded”, so that the user immediately sees all of the components
 within the group.  Otherwise, the group will initially show up as a
 single entry.
 .sp
 BOLD_TITLE indicates that the group title should appear in bold, to
-call the user\(aqs attention to the group.
+call the user’s attention to the group.
 .INDENT 0.0
 .TP
 .B cpack_add_install_type
@@ -2843,9 +2843,9 @@ cpack_add_install_type(typename
 .sp
 The cpack_add_install_type command identifies a set of preselected
 components that represents a common use case for an application.  For
-example, a "Developer" install type might include an application along
-with its header and library files, while an "End user" install type
-might just include the application\(aqs executable.  Each component
+example, a “Developer” install type might include an application along
+with its header and library files, while an “End user” install type
+might just include the application’s executable.  Each component
 identifies itself with one or more install types via the INSTALL_TYPES
 argument to cpack_add_component.
 .sp
@@ -2882,7 +2882,7 @@ and extract the component in place.  This feature is useful for
 creating small installers that only download the requested components,
 saving bandwidth.  Additionally, the installers are small enough that
 they will be installed as part of the normal installation process, and
-the "Change" button in Windows Add/Remove Programs control panel will
+the “Change” button in Windows Add/Remove Programs control panel will
 allow one to add or remove parts of the application after the original
 installation.  On Windows, the downloaded\-components functionality
 requires the ZipDLL plug\-in for NSIS, available at:
@@ -2918,8 +2918,8 @@ specified ARCHIVE_FILE will be downloaded.  Additionally, the ALL
 option implies ADD_REMOVE (unless NO_ADD_REMOVE is specified).
 .sp
 ADD_REMOVE indicates that CPack should install a copy of the installer
-that can be called from Windows\(aq Add/Remove Programs dialog (via the
-"Modify" button) to change the set of installed components.
+that can be called from Windows’ Add/Remove Programs dialog (via the
+“Modify” button) to change the set of installed components.
 NO_ADD_REMOVE turns off this behavior.  This option is ignored on Mac
 OS X.
 .SS CPackCygwin
@@ -3099,7 +3099,7 @@ allowed.
 .INDENT 7.0
 .INDENT 3.5
 For backward compatibility with CMake 3.9 and lower a failed test of this
-variable\(aqs content is not a hard error when both
+variable’s content is not a hard error when both
 \fI\%CPACK_DEBIAN_PACKAGE_RELEASE\fP and
 \fI\%CPACK_DEBIAN_PACKAGE_EPOCH\fP variables are not set. An author
 warning is reported instead.
@@ -3230,12 +3230,12 @@ Default   :
 .B CPACK_DEBIAN_PACKAGE_SECTION
 .TP
 .B CPACK_DEBIAN_<COMPONENT>_PACKAGE_SECTION
-Set Section control field e.g. admin, devel, doc, ...
+Set Section control field e.g. admin, devel, doc, …
 .INDENT 7.0
 .IP \(bu 2
 Mandatory : YES
 .IP \(bu 2
-Default   : "devel"
+Default   : “devel”
 .UNINDENT
 .sp
 See \fI\%https://www.debian.org/doc/debian\-policy/ch\-archive.html#s\-subsections\fP
@@ -3248,7 +3248,7 @@ The archive format used for creating the Debian package.
 .IP \(bu 2
 Mandatory : YES
 .IP \(bu 2
-Default   : "paxr"
+Default   : “paxr”
 .UNINDENT
 .sp
 Possible values are:
@@ -3276,7 +3276,7 @@ The compression used for creating the Debian package.
 .IP \(bu 2
 Mandatory : YES
 .IP \(bu 2
-Default   : "gzip"
+Default   : “gzip”
 .UNINDENT
 .sp
 Possible values are:
@@ -3302,7 +3302,7 @@ extra
 .IP \(bu 2
 Mandatory : YES
 .IP \(bu 2
-Default   : "optional"
+Default   : “optional”
 .UNINDENT
 .sp
 See \fI\%https://www.debian.org/doc/debian\-policy/ch\-archive.html#s\-priorities\fP
@@ -3352,7 +3352,7 @@ OFF
 .INDENT 7.0
 .INDENT 3.5
 You may need set \fBCMAKE_INSTALL_RPATH\fP to an appropriate value
-if you use this feature, because if you don\(aqt \fBdpkg\-shlibdeps\fP
+if you use this feature, because if you don’t \fBdpkg\-shlibdeps\fP
 may fail to find your own shared libs.
 See \fI\%https://gitlab.kitware.com/cmake/community/wikis/doc/cmake/RPATH\-handling\fP
 .UNINDENT
@@ -3480,7 +3480,7 @@ See \fI\%https://www.debian.org/doc/debian\-policy/ch\-relationships.html#s\-con
 This is a stronger restriction than
 \fI\%Breaks\fP, which prevents the
 broken package from being configured while the breaking package is in
-the "Unpacked" state but allows both packages to be unpacked at the same
+the “Unpacked” state but allows both packages to be unpacked at the same
 time.
 .UNINDENT
 .UNINDENT
@@ -3610,11 +3610,11 @@ Compatibility policy for auto\-generated shlibs control file.
 .IP \(bu 2
 Mandatory : NO
 .IP \(bu 2
-Default   : "="
+Default   : “=”
 .UNINDENT
 .sp
 Defines compatibility policy for auto\-generated shlibs control file.
-Possible values: "=", ">="
+Possible values: “=”, “>=”
 .sp
 See \fI\%https://www.debian.org/doc/debian\-policy/ch\-sharedlibs.html#s\-sharedlibs\-shlibdeps\fP
 .UNINDENT
@@ -3729,7 +3729,7 @@ revision number of the referenced source package as well.
 .SS Building Debian packages on Windows
 .sp
 To communicate UNIX file permissions from the install stage
-to the CPack DEB generator the "cmake_mode_t" NTFS
+to the CPack DEB generator the “cmake_mode_t” NTFS
 alternate data stream (ADT) is used.
 .sp
 When a filesystem without ADT support is used only owner read/write
@@ -3813,10 +3813,10 @@ Disagree
 .IP \(bu 2
 Print
 .IP \(bu 2
-Save...
+Save…
 .IP \(bu 2
 You agree to the terms of the License Agreement when you click the
-"Agree" button.
+“Agree” button.
 .IP \(bu 2
 Software License Agreement
 .IP \(bu 2
@@ -3857,9 +3857,9 @@ specify its location if the auto\-detection fails to find it.)
 The built in (binary) CPack FreeBSD (pkg) generator (Unix only)
 .SS Variables specific to CPack FreeBSD (pkg) generator
 .sp
-CPackFreeBSD may be used to create pkg(8) packages \-\- these may be used
+CPackFreeBSD may be used to create pkg(8) packages – these may be used
 on FreeBSD, DragonflyBSD, NetBSD, OpenBSD, but also on Linux or OSX,
-depending on the installed package\-management tools \-\- using \fBCPack\fP\&.
+depending on the installed package\-management tools – using \fBCPack\fP\&.
 .sp
 CPackFreeBSD is a \fBCPack\fP generator and uses the \fBCPACK_XXX\fP
 variables used by \fBCPack\fP\&. It tries to re\-use packaging information
@@ -3903,7 +3903,7 @@ based on CMAKE_PROJECT_NAME).
 .TP
 .B CPACK_FREEBSD_PACKAGE_COMMENT
 Sets the package comment. This is the short description displayed by
-pkg(8) in standard "pkg info" output.
+pkg(8) in standard “pkg info” output.
 .INDENT 7.0
 .IP \(bu 2
 Mandatory: YES
@@ -3923,7 +3923,7 @@ parameter for \fBproject()\fP).
 .TP
 .B CPACK_FREEBSD_PACKAGE_DESCRIPTION
 Sets the package description. This is the long description of the package,
-given by "pkg info" with a specific package as argument.
+given by “pkg info” with a specific package as argument.
 .INDENT 7.0
 .IP \(bu 2
 Mandatory: YES
@@ -3964,7 +3964,7 @@ for Debian packaging, so we may as well re\-use it).
 .B CPACK_FREEBSD_PACKAGE_LICENSE
 The license, or licenses, which apply to this software package. This must
 be one or more license\-identifiers that pkg recognizes as acceptable license
-identifiers (e.g. "GPLv2").
+identifiers (e.g. “GPLv2”).
 .INDENT 7.0
 .IP \(bu 2
 Mandatory: YES
@@ -3980,8 +3980,8 @@ Default:
 .TP
 .B CPACK_FREEBSD_PACKAGE_LICENSE_LOGIC
 This variable is only of importance if there is more than one license.
-The default is "single", which is only applicable to a single license.
-Other acceptable values are determined by pkg \-\- those are "dual" or "multi" \-\-
+The default is “single”, which is only applicable to a single license.
+Other acceptable values are determined by pkg – those are “dual” or “multi” –
 meaning choice (OR) or simultaneous (AND) application of the licenses.
 .INDENT 7.0
 .IP \(bu 2
@@ -4064,7 +4064,7 @@ You should also install \fI\%QtIFW\fP to use CPack \fBIFW\fP generator.
 .SS Hints
 .sp
 Generally, the CPack \fBIFW\fP generator automatically finds \fI\%QtIFW\fP tools,
-but if you don\(aqt use a default path for installation of the \fI\%QtIFW\fP tools,
+but if you don’t use a default path for installation of the \fI\%QtIFW\fP tools,
 the path may be specified in either a CMake or an environment variable:
 .INDENT 0.0
 .TP
@@ -4084,8 +4084,8 @@ suite.
 \fBNOTE:\fP
 .INDENT 0.0
 .INDENT 3.5
-The specified path should not contain "bin" at the end
-(for example: "D:\eDevTools\eQtIFW2.0.5").
+The specified path should not contain “bin” at the end
+(for example: “D:\eDevTools\eQtIFW2.0.5”).
 .UNINDENT
 .UNINDENT
 .sp
@@ -4154,8 +4154,8 @@ URL to a page that contains product information on your web site.
 .INDENT 0.0
 .TP
 .B CPACK_IFW_PACKAGE_ICON
-Filename for a custom installer icon. The actual file is \(aq.icns\(aq (Mac OS X),
-\(aq.ico\(aq (Windows). No functionality on Unix.
+Filename for a custom installer icon. The actual file is ‘.icns’ (Mac OS X),
+‘.ico’ (Windows). No functionality on Unix.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -4186,7 +4186,7 @@ Filename for an image used as QWizard::BackgroundPixmap (only used by MacStyle).
 .INDENT 0.0
 .TP
 .B CPACK_IFW_PACKAGE_WIZARD_STYLE
-Wizard style to be used ("Modern", "Mac", "Aero" or "Classic").
+Wizard style to be used (“Modern”, “Mac”, “Aero” or “Classic”).
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -4201,7 +4201,7 @@ Default height of the wizard in pixels. Setting a watermark image will override 
 .INDENT 0.0
 .TP
 .B CPACK_IFW_PACKAGE_TITLE_COLOR
-Color of the titles and subtitles (takes an HTML color code, such as "#88FF33").
+Color of the titles and subtitles (takes an HTML color code, such as “#88FF33”).
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -4215,7 +4215,7 @@ By default used \fI\%CPACK_IFW_PACKAGE_NAME\fP\&.
 .B CPACK_IFW_TARGET_DIRECTORY
 Default target directory for installation.
 By default used
-"@ApplicationsDir@/\fBCPACK_PACKAGE_INSTALL_DIRECTORY\fP"
+“@ApplicationsDir@/\fBCPACK_PACKAGE_INSTALL_DIRECTORY\fP”
 .sp
 You can use predefined variables.
 .UNINDENT
@@ -4281,7 +4281,7 @@ Filename for a custom installer control script.
 .INDENT 0.0
 .TP
 .B CPACK_IFW_PACKAGE_RESOURCES
-List of additional resources (\(aq.qrc\(aq files) to include in the installer
+List of additional resources (‘.qrc’ files) to include in the installer
 binary.
 .sp
 You can use \fI\%cpack_ifw_add_package_resources()\fP command to resolve
@@ -4293,13 +4293,13 @@ relative paths.
 The target binary extension.
 .sp
 On Linux, the name of the target binary is automatically extended with
-\(aq.run\(aq, if you do not specify the extension.
+‘.run’, if you do not specify the extension.
 .sp
 On Windows, the target is created as an application with the extension
-\(aq.exe\(aq, which is automatically added, if not supplied.
+‘.exe’, which is automatically added, if not supplied.
 .sp
 On Mac, the target is created as an DMG disk image with the extension
-\(aq.dmg\(aq, which is automatically added, if not supplied.
+‘.dmg’, which is automatically added, if not supplied.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -4345,28 +4345,28 @@ The version of used \fI\%QtIFW\fP tools.
 .INDENT 0.0
 .TP
 .B CPACK_IFW_BINARYCREATOR_EXECUTABLE
-The path to "binarycreator" command line client.
+The path to “binarycreator” command line client.
 .sp
 This variable is cached and may be configured if needed.
 .UNINDENT
 .INDENT 0.0
 .TP
 .B CPACK_IFW_REPOGEN_EXECUTABLE
-The path to "repogen" command line client.
+The path to “repogen” command line client.
 .sp
 This variable is cached and may be configured if needed.
 .UNINDENT
 .INDENT 0.0
 .TP
 .B CPACK_IFW_INSTALLERBASE_EXECUTABLE
-The path to "installerbase" installer executable base.
+The path to “installerbase” installer executable base.
 .sp
 This variable is cached and may be configured if needed.
 .UNINDENT
 .INDENT 0.0
 .TP
 .B CPACK_IFW_DEVTOOL_EXECUTABLE
-The path to "devtool" command line client.
+The path to “devtool” command line client.
 .sp
 This variable is cached and may be configured if needed.
 .UNINDENT
@@ -4476,14 +4476,14 @@ component. You can specify more then one license.
 .B \fBDEFAULT\fP
 Possible values are: TRUE, FALSE, and SCRIPT.
 Set to FALSE to disable the component in the installer or to SCRIPT
-to resolved during runtime (don\(aqt forget add the file of the script
+to resolved during runtime (don’t forget add the file of the script
 as a value of the \fBSCRIPT\fP option).
 .TP
 .B \fBUSER_INTERFACES\fP
-is a list of <file_path> (\(aq.ui\(aq files) representing pages to load.
+is a list of <file_path> (‘.ui’ files) representing pages to load.
 .TP
 .B \fBTRANSLATIONS\fP
-is a list of <file_path> (\(aq.qm\(aq files) representing translations to load.
+is a list of <file_path> (‘.qm’ files) representing translations to load.
 .TP
 .B \fBREPLACES\fP
 list of identifiers of component or component group to replace.
@@ -4590,14 +4590,14 @@ component group. You can specify more then one license.
 Possible values are: TRUE, FALSE, and SCRIPT.
 Set to TRUE to preselect the group in the installer
 (this takes effect only on groups that have no visible child components)
-or to SCRIPT to resolved during runtime (don\(aqt forget add the file of
+or to SCRIPT to resolved during runtime (don’t forget add the file of
 the script as a value of the \fBSCRIPT\fP option).
 .TP
 .B \fBUSER_INTERFACES\fP
-is a list of <file_path> (\(aq.ui\(aq files) representing pages to load.
+is a list of <file_path> (‘.ui’ files) representing pages to load.
 .TP
 .B \fBTRANSLATIONS\fP
-is a list of <file_path> (\(aq.qm\(aq files) representing translations to load.
+is a list of <file_path> (‘.qm’ files) representing translations to load.
 .TP
 .B \fBREPLACES\fP
 list of identifiers of component or component group to replace.
@@ -4754,7 +4754,7 @@ If you set \fBALL\fP option all components will be downloaded.
 You also can use command \fI\%cpack_ifw_add_repository()\fP and
 variable \fI\%CPACK_IFW_DOWNLOAD_ALL\fP for more specific configuration.
 .sp
-CPack IFW generator creates "repository" dir in current binary dir. You
+CPack IFW generator creates “repository” dir in current binary dir. You
 would copy content of this dir to specified \fBsite\fP (\fBurl\fP).
 .SS See Also
 .sp
@@ -4872,7 +4872,7 @@ The arguments that will be passed to the NSIS SetCompressor command.
 .INDENT 0.0
 .TP
 .B CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL
-Ask about uninstalling previous versions first.  If this is set to "ON",
+Ask about uninstalling previous versions first.  If this is set to “ON”,
 then an installer will look for previous installed versions and if one is
 found, ask the user whether to uninstall it before proceeding with the
 install.
@@ -4880,7 +4880,7 @@ install.
 .INDENT 0.0
 .TP
 .B CPACK_NSIS_MODIFY_PATH
-Modify PATH toggle.  If this is set to "ON", then an extra page will appear
+Modify PATH toggle.  If this is set to “ON”, then an extra page will appear
 in the installer that will allow the user to choose whether the program
 directory should be added to the system PATH variable.
 .UNINDENT
@@ -4935,8 +4935,8 @@ Additional NSIS commands to uninstall start menu shortcuts.
 .INDENT 0.0
 .TP
 .B CPACK_NSIS_EXECUTABLES_DIRECTORY
-Creating NSIS start menu links assumes that they are in \(aqbin\(aq unless this
-variable is set.  For example, you would set this to \(aqexec\(aq if your
+Creating NSIS start menu links assumes that they are in ‘bin’ unless this
+variable is set.  For example, you would set this to ‘exec’ if your
 executables are in an exec directory.
 .UNINDENT
 .INDENT 0.0
@@ -4949,7 +4949,7 @@ NSIS installer.
 .TP
 .B CPACK_NSIS_MENU_LINKS
 Specify links in [application] menu.  This should contain a list of pair
-"link" "link name". The link may be a URL or a path relative to
+“link” “link name”. The link may be a URL or a path relative to
 installation prefix.  Like:
 .INDENT 7.0
 .INDENT 3.5
@@ -4980,10 +4980,10 @@ CPackNuGet is a \fBCPack\fP generator thus it uses the \fBCPACK_XXX\fP
 variables used by \fBCPack\fP\&.
 .sp
 CPackNuGet has specific features which are controlled by the specifics
-\fBCPACK_NUGET_XXX\fP variables. In the "one per group" mode
+\fBCPACK_NUGET_XXX\fP variables. In the “one per group” mode
 (see \fBCPACK_COMPONENTS_GROUPING\fP), \fB<compName>\fP placeholder
 in the variables below would contain a group name (uppercased and turned into
-a "C" identifier).
+a “C” identifier).
 .sp
 List of CPackNuGet specific variables:
 .INDENT 0.0
@@ -5107,7 +5107,7 @@ Default   : \-
 .B CPACK_NUGET_PACKAGE_HOMEPAGE_URL
 .TP
 .B CPACK_NUGET_<compName>_PACKAGE_HOMEPAGE_URL
-A URL for the package\(aqs home page, often shown in UI displays as well
+A URL for the package’s home page, often shown in UI displays as well
 as \fI\%nuget.org\fP\&.
 .INDENT 7.0
 .IP \(bu 2
@@ -5121,7 +5121,7 @@ Default   : \fBCPACK_PACKAGE_HOMEPAGE_URL\fP
 .B CPACK_NUGET_PACKAGE_LICENSEURL
 .TP
 .B CPACK_NUGET_<compName>_PACKAGE_LICENSEURL
-A URL for the package\(aqs license, often shown in UI displays as well
+A URL for the package’s license, often shown in UI displays as well
 as \fI\%nuget.org\fP\&.
 .INDENT 7.0
 .IP \(bu 2
@@ -5259,7 +5259,7 @@ component son\-the\-fly for Mac OS X 10.5 or newer. If left blank, this value
 will be set to the minimum version of Mac OS X that supports the requested
 features. Set this variable to some value (e.g., 10.4) only if you want to
 guarantee that your installer will work on that version of Mac OS X, and
-don\(aqt mind missing extra features available in the installer shipping with
+don’t mind missing extra features available in the installer shipping with
 later versions of Mac OS X.
 .UNINDENT
 .SS CPackProductBuild
@@ -5308,7 +5308,7 @@ Specify a specific keychain to search for the signing identity.
 .TP
 .B CPACK_PREFLIGHT_<COMP>_SCRIPT
 Full path to a file that will be used as the \fBpreinstall\fP script for the
-named \fB<COMP>\fP component\(aqs package, where \fB<COMP>\fP is the uppercased
+named \fB<COMP>\fP component’s package, where \fB<COMP>\fP is the uppercased
 component name.  No \fBpreinstall\fP script is added if this variable is not
 defined for a given component.
 .UNINDENT
@@ -5316,7 +5316,7 @@ defined for a given component.
 .TP
 .B CPACK_POSTFLIGHT_<COMP>_SCRIPT
 Full path to a file that will be used as the \fBpostinstall\fP script for the
-named \fB<COMP>\fP component\(aqs package, where \fB<COMP>\fP is the uppercased
+named \fB<COMP>\fP component’s package, where \fB<COMP>\fP is the uppercased
 component name.  No \fBpostinstall\fP script is added if this variable is not
 defined for a given component.
 .UNINDENT
@@ -5432,7 +5432,7 @@ Mandatory : YES
 .TP
 .B Default
 \fB<CPACK_PACKAGE_FILE_NAME>[\-<component>].rpm\fP with spaces
-replaced by \(aq\-\(aq
+replaced by ‘\-‘
 .UNINDENT
 .UNINDENT
 .sp
@@ -5446,7 +5446,7 @@ Alternatively provided package file name must end with \fB\&.rpm\fP suffix.
 By using user provided spec file, rpm macro extensions such as for
 generating debuginfo packages or by simply using multiple components more
 than one rpm file may be generated, either from a single spec file or from
-multiple spec files (each component execution produces it\(aqs own spec file).
+multiple spec files (each component execution produces it’s own spec file).
 In such cases duplicate file names may occur as a result of this variable
 setting or spec file content structure. Duplicate files get overwritten
 and it is up to the packager to set the variables in a manner that will
@@ -5558,7 +5558,7 @@ The RPM package license policy.
 .IP \(bu 2
 Mandatory : YES
 .IP \(bu 2
-Default   : "unknown"
+Default   : “unknown”
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -5571,7 +5571,7 @@ The RPM package group.
 .IP \(bu 2
 Mandatory : YES
 .IP \(bu 2
-Default   : "unknown"
+Default   : “unknown”
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -5582,7 +5582,7 @@ The RPM package vendor.
 .IP \(bu 2
 Mandatory : YES
 .IP \(bu 2
-Default   : CPACK_PACKAGE_VENDOR if set or "unknown"
+Default   : CPACK_PACKAGE_VENDOR if set or “unknown”
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -5610,7 +5610,7 @@ Mandatory : YES
 .IP \(bu 2
 Default : \fBCPACK_COMPONENT_<compName>_DESCRIPTION\fP (component
 based installers only) if set, \fBCPACK_PACKAGE_DESCRIPTION_FILE\fP
-if set or "no package description available"
+if set or “no package description available”
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -5978,7 +5978,7 @@ rpm \-\-prefix or \-\-relocate
 in order to install it at an alternate place see rpm(8). Note that
 currently this may fail if \fBCPACK_SET_DESTDIR\fP is set to \fBON\fP\&. If
 \fBCPACK_SET_DESTDIR\fP is set then you will get a warning message but
-if there is file installed with absolute path you\(aqll get unexpected behavior.
+if there is file installed with absolute path you’ll get unexpected behavior.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -6497,7 +6497,7 @@ invalid location.
 Debuginfo packages contain debug symbols and sources for debugging packaged
 binaries.
 .sp
-Debuginfo RPM packaging has it\(aqs own set of variables:
+Debuginfo RPM packaging has it’s own set of variables:
 .INDENT 0.0
 .TP
 .B CPACK_RPM_DEBUGINFO_PACKAGE
@@ -6569,8 +6569,8 @@ Mandatory : YES if \fI\%CPACK_RPM_DEBUGINFO_PACKAGE\fP is set
 .INDENT 2.0
 .TP
 .B Default
-"/usr/src/debug/<CPACK_PACKAGE_FILE_NAME>" and
-for component packaging "/usr/src/debug/<CPACK_PACKAGE_FILE_NAME>\-<component>"
+“/usr/src/debug/<CPACK_PACKAGE_FILE_NAME>” and
+for component packaging “/usr/src/debug/<CPACK_PACKAGE_FILE_NAME>\-<component>”
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -6596,7 +6596,7 @@ Directories containing sources that should be excluded from debuginfo packages.
 .IP \(bu 2
 Mandatory : NO
 .IP \(bu 2
-Default   : "/usr /usr/src /usr/src/debug"
+Default   : “/usr /usr/src /usr/src/debug”
 .UNINDENT
 .sp
 Listed paths are owned by other RPM packages and should therefore not be
@@ -6730,12 +6730,12 @@ what content the package(s) should have as well as how they should be packaged
 (monolithic or components). CMake can decide this for e.g. by reading environment
 variables set by the package manager before starting the process of generating
 binary rpm packages. This way a single SRPM package can be used to produce
-different binary rpm packages on different platforms depending on the platform\(aqs
+different binary rpm packages on different platforms depending on the platform’s
 packaging rules.
 .UNINDENT
 .UNINDENT
 .sp
-Source RPM packaging has it\(aqs own set of variables:
+Source RPM packaging has it’s own set of variables:
 .INDENT 0.0
 .TP
 .B CPACK_RPM_PACKAGE_SOURCES
@@ -6776,7 +6776,7 @@ variable for producing binary RPM packages.
 .IP \(bu 2
 Mandatory : YES
 .IP \(bu 2
-Default   : "/"
+Default   : “/”
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -6813,7 +6813,7 @@ The CPack module generates binary and source installers in a variety of
 formats using the cpack program.  Inclusion of the CPack module adds
 two new build targets, \fBpackage\fP and \fBpackage_source\fP, which build
 the binary and source installers respectively.  The generated binary
-installers contain everything installed via CMake\(aqs \fBinstall()\fP
+installers contain everything installed via CMake’s \fBinstall()\fP
 command (and the deprecated \fBinstall_files()\fP,
 \fBinstall_programs()\fP and \fBinstall_targets()\fP commands).
 .sp
@@ -6837,7 +6837,7 @@ See the top level file \fBCMakeCPackOptions.cmake.in\fP for an example.
 If set, the \fI\%CPACK_PROJECT_CONFIG_FILE\fP is included automatically
 on a per\-generator basis.  It only need contain overrides.
 .sp
-Here\(aqs how it works:
+Here’s how it works:
 .INDENT 0.0
 .IP \(bu 2
 \fBcpack\fP runs
@@ -6877,7 +6877,7 @@ the project name.
 .INDENT 0.0
 .TP
 .B CPACK_PACKAGE_VENDOR
-The name of the package vendor. (e.g., "Kitware").  The default is "Humanity".
+The name of the package vendor. (e.g., “Kitware”).  The default is “Humanity”.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -6977,7 +6977,7 @@ ${CPACK_PACKAGE_NAME}\-${CPACK_PACKAGE_VERSION}\-${CPACK_SYSTEM_NAME}
 .B CPACK_PACKAGE_INSTALL_DIRECTORY
 Installation directory on the target system. This may be used by some
 CPack generators like NSIS to create an installation directory e.g.,
-"CMake 2.5" below the installation prefix.  All installed elements will be
+“CMake 2.5” below the installation prefix.  All installed elements will be
 put inside this directory.
 .UNINDENT
 .INDENT 0.0
@@ -7017,7 +7017,7 @@ to the actual generator being used.  It allows per\-generator setting of
 .TP
 .B CPACK_RESOURCE_FILE_LICENSE
 License to be embedded in the installer.  It will typically be displayed
-to the user by the produced installer (often with an explicit "Accept"
+to the user by the produced installer (often with an explicit “Accept”
 button, for graphical installers) prior to installation.  This license
 file is NOT added to the installed files but is used by some CPack generators
 like NSIS.  If you want to install a license file (may be the same as this
@@ -7043,7 +7043,7 @@ OS X.
 .B CPACK_MONOLITHIC_INSTALL
 Disables the component\-based installation mechanism.  When set, the
 component specification is ignored and all installed items are put in a
-single "MONOLITHIC" package.  Some CPack generators do monolithic
+single “MONOLITHIC” package.  Some CPack generators do monolithic
 packaging by default and may be asked to do component packaging by
 setting \fBCPACK_<GENNAME>_COMPONENT_INSTALL\fP to \fBTRUE\fP\&.
 .UNINDENT
@@ -7069,7 +7069,7 @@ Defaults to \fBCPackConfig.cmake\fP\&.
 .B CPACK_PACKAGE_EXECUTABLES
 Lists each of the executables and associated text label to be used to
 create Start Menu shortcuts.  For example, setting this to the list
-\fBccmake;CMake\fP will create a shortcut named "CMake" that will execute the
+\fBccmake;CMake\fP will create a shortcut named “CMake” that will execute the
 installed executable \fBccmake\fP\&.  Not all CPack generators use it (at least
 NSIS, WIX and OSXX11 do).
 .UNINDENT
@@ -7125,7 +7125,7 @@ Defaults to \fBCPackSourceConfig.cmake\fP\&.
 .INDENT 0.0
 .TP
 .B CPACK_SOURCE_IGNORE_FILES
-Pattern of files in the source tree that won\(aqt be packaged when building
+Pattern of files in the source tree that won’t be packaged when building
 a source package.  This is a list of regular expression patterns (that
 must be properly escaped), e.g.,
 \fB/CVS/;/\e\e.svn/;\e\e.swp$;\e\e.#;/#;.*~;cscope.*\fP
@@ -7471,7 +7471,7 @@ the Windows Installer property \fB<PROPERTY>\fP
 .sp
 The following list contains some example properties that can be used to
 customize information under
-"Programs and Features" (also known as "Add or Remove Programs")
+“Programs and Features” (also known as “Add or Remove Programs”)
 .INDENT 7.0
 .IP \(bu 2
 ARPCOMMENTS \- Comments
@@ -7607,7 +7607,7 @@ same base name but only \fB\&.cs\fP as extension is searched.  If this is found,
 for the \fB\&.cs\fP file:
 .INDENT 7.0
 .IP \(bu 2
-VS_CSHARP_SubType "Form"
+VS_CSHARP_SubType “Form”
 .UNINDENT
 .TP
 for the \fB\&.Designer.cs\fP file (if it exists):
@@ -7615,19 +7615,19 @@ for the \fB\&.Designer.cs\fP file (if it exists):
 .IP \(bu 2
 VS_CSHARP_DependentUpon <cs\-filename>
 .IP \(bu 2
-VS_CSHARP_DesignTime "" (delete tag if previously defined)
+VS_CSHARP_DesignTime “” (delete tag if previously defined)
 .IP \(bu 2
-VS_CSHARP_AutoGen ""(delete tag if previously defined)
+VS_CSHARP_AutoGen “”(delete tag if previously defined)
 .UNINDENT
 .TP
 for the \fB\&.resx\fP file (if it exists):
 .INDENT 7.0
 .IP \(bu 2
-VS_RESOURCE_GENERATOR "" (delete tag if previously defined)
+VS_RESOURCE_GENERATOR “” (delete tag if previously defined)
 .IP \(bu 2
 VS_CSHARP_DependentUpon <cs\-filename>
 .IP \(bu 2
-VS_CSHARP_SubType "Designer"
+VS_CSHARP_SubType “Designer”
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -7666,9 +7666,9 @@ are set depending on the extension of the matched file:
 if match is \fB\&.resx\fP file:
 .INDENT 7.0
 .IP \(bu 2
-VS_CSHARP_AutoGen "True"
+VS_CSHARP_AutoGen “True”
 .IP \(bu 2
-VS_CSHARP_DesignTime "True"
+VS_CSHARP_DesignTime “True”
 .IP \(bu 2
 VS_CSHARP_DependentUpon <resx\-filename>
 .UNINDENT
@@ -7682,9 +7682,9 @@ VS_CSHARP_DependentUpon <cs\-filename>
 if match is \fB\&.settings\fP file:
 .INDENT 7.0
 .IP \(bu 2
-VS_CSHARP_AutoGen "True"
+VS_CSHARP_AutoGen “True”
 .IP \(bu 2
-VS_CSHARP_DesignTimeSharedInput "True"
+VS_CSHARP_DesignTimeSharedInput “True”
 .IP \(bu 2
 VS_CSHARP_DependentUpon <settings\-filename>
 .UNINDENT
@@ -7806,7 +7806,7 @@ csharp_get_filename_key_base(BASE KEY)
 .INDENT 7.0
 .TP
 .B \fBBASE\fP
-Name of the variable with the computed "base" of \fBKEY\fP\&.
+Name of the variable with the computed “base” of \fBKEY\fP\&.
 .TP
 .B \fBKEY\fP
 The key of which the base will be computed. Expected to be a
@@ -7985,7 +7985,7 @@ Recursively search for .gcda files in build_dir rather than
 determining search locations by reading TargetDirectories.txt.
 .TP
 .B \fBDELETE\fP
-Delete coverage files after they\(aqve been packaged into the .tar.
+Delete coverage files after they’ve been packaged into the .tar.
 .TP
 .B \fBQUIET\fP
 Suppress non\-error messages that otherwise would have been
@@ -8093,7 +8093,7 @@ RESOLVE_QT4_PATHS(<paths_var> [<executable_path>])
 .UNINDENT
 .UNINDENT
 .sp
-Loop through <paths_var> list and if any don\(aqt exist resolve them
+Loop through <paths_var> list and if any don’t exist resolve them
 relative to the <executable_path> (if supplied) or the
 CMAKE_INSTALL_PREFIX.
 .INDENT 0.0
@@ -8416,7 +8416,7 @@ flexibility in remote URLs.
 .sp
 The \fBDATA{}\fP syntax is literal and the \fB<name>\fP is a full or relative path
 within the source tree.  The source tree must contain either a real
-data file at \fB<name>\fP or a "content link" at \fB<name><ext>\fP containing a
+data file at \fB<name>\fP or a “content link” at \fB<name><ext>\fP containing a
 hash of the real file using a hash algorithm corresponding to \fB<ext>\fP\&.
 For example, the argument \fBDATA{img.png}\fP may be satisfied by either a
 real \fBimg.png\fP file in the current source directory or a \fBimg.png.md5\fP
@@ -8606,7 +8606,7 @@ to tailor the external project behavior.
 .TP
 \fBDirectory Options:\fP
 Most of the time, the default directory layout is sufficient. It is largely
-an implementation detail that the main project usually doesn\(aqt need to
+an implementation detail that the main project usually doesn’t need to
 change. In some circumstances, however, control over the directory layout
 can be useful or necessary. The directory options are potentially more
 useful from the point of view that the main build can use the
@@ -8723,7 +8723,7 @@ the download step.
 .INDENT 7.0
 .TP
 .B \fBURL <url1> [<url2>...]\fP
-List of paths and/or URL(s) of the external project\(aqs source. When more
+List of paths and/or URL(s) of the external project’s source. When more
 than one URL is given, they are tried in turn until one succeeds. A URL
 may be an ordinary path in the local file system (in which case it
 must be the only URL provided) or any downloadable URL supported by the
@@ -8845,10 +8845,10 @@ no \fBgit fetch\fP needs to be performed to check for changes each time
 CMake is re\-run. This can result in a significant speed up if many
 external projects are being used.
 .IP \(bu 2
-Using a specific git hash ensures that the main project\(aqs own history
-is fully traceable to a specific point in the external project\(aqs
+Using a specific git hash ensures that the main project’s own history
+is fully traceable to a specific point in the external project’s
 evolution. If a branch or tag name is used instead, then checking out
-a specific commit of the main project doesn\(aqt necessarily pin the
+a specific commit of the main project doesn’t necessarily pin the
 whole build to a specific point in the life of the external project.
 The lack of such deterministic behavior makes the main project lose
 traceability and repeatability.
@@ -8930,13 +8930,13 @@ Tag to checkout from the CVS repository.
 .UNINDENT
 .TP
 \fBUpdate/Patch Step Options:\fP
-Whenever CMake is re\-run, by default the external project\(aqs sources will be
+Whenever CMake is re\-run, by default the external project’s sources will be
 updated if the download method supports updates (e.g. a git repository
 would be checked if the \fBGIT_TAG\fP does not refer to a specific commit).
 .INDENT 7.0
 .TP
 .B \fBUPDATE_COMMAND <cmd>...\fP
-Overrides the download method\(aqs update step with a custom command.
+Overrides the download method’s update step with a custom command.
 The command may use
 \fBgenerator expressions\fP\&.
 .TP
@@ -8949,12 +8949,12 @@ build the project when disconnected from the network (the network may
 still be needed for the download step though).
 .sp
 When this option is present, it is generally advisable to make the value
-a cache variable under the developer\(aqs control rather than hard\-coding
+a cache variable under the developer’s control rather than hard\-coding
 it. If this option is not present, the default value is taken from the
 \fBEP_UPDATE_DISCONNECTED\fP directory property. If that is also not
 defined, updates are performed as normal. The \fBEP_UPDATE_DISCONNECTED\fP
 directory property is intended as a convenience for controlling the
-\fBUPDATE_DISCONNECTED\fP behavior for an entire section of a project\(aqs
+\fBUPDATE_DISCONNECTED\fP behavior for an entire section of a project’s
 directory hierarchy and may be a more convenient method of giving
 developers control over whether or not to perform updates (assuming the
 project also provides a cache variable or some other convenient method
@@ -9065,17 +9065,17 @@ nothing.
 .TP
 .B \fBBUILD_IN_SOURCE <bool>\fP
 When this option is enabled, the build will be done directly within the
-external project\(aqs source tree. This should generally be avoided, the use
+external project’s source tree. This should generally be avoided, the use
 of a separate build directory is usually preferred, but it can be useful
 when the external project assumes an in\-source build. The \fBBINARY_DIR\fP
 option should not be specified if building in\-source.
 .TP
 .B \fBBUILD_ALWAYS <bool>\fP
 Enabling this option forces the build step to always be run. This can be
-the easiest way to robustly ensure that the external project\(aqs own build
+the easiest way to robustly ensure that the external project’s own build
 dependencies are evaluated rather than relying on the default
 success timestamp\-based method. This option is not normally needed unless
-developers are expected to modify something the external project\(aqs build
+developers are expected to modify something the external project’s build
 depends on in a way that is not detectable via the step target
 dependencies (e.g. \fBSOURCE_DIR\fP is used without a download method and
 developers might modify the sources in \fBSOURCE_DIR\fP).
@@ -9084,7 +9084,7 @@ developers might modify the sources in \fBSOURCE_DIR\fP).
 Specifies files that will be generated by the build command but which
 might or might not have their modification time updated by subsequent
 builds. These ultimately get passed through as \fBBYPRODUCTS\fP to the
-build step\(aqs own underlying call to \fBadd_custom_command()\fP\&.
+build step’s own underlying call to \fBadd_custom_command()\fP\&.
 .UNINDENT
 .TP
 \fBInstall Step Options:\fP
@@ -9095,11 +9095,11 @@ step. This can be overridden with custom install commands if required.
 .INDENT 7.0
 .TP
 .B \fBINSTALL_COMMAND <cmd>...\fP
-The external project\(aqs own install step is invoked as part of the main
-project\(aqs \fIbuild\fP\&. It is done after the external project\(aqs build step
-and may be before or after the external project\(aqs test step (see the
-\fBTEST_BEFORE_INSTALL\fP option below). The external project\(aqs install
-rules are not part of the main project\(aqs install rules, so if anything
+The external project’s own install step is invoked as part of the main
+project’s \fIbuild\fP\&. It is done after the external project’s build step
+and may be before or after the external project’s test step (see the
+\fBTEST_BEFORE_INSTALL\fP option below). The external project’s install
+rules are not part of the main project’s install rules, so if anything
 from the external project should be installed as part of the main build,
 these need to be specified in the main build as additional
 \fBinstall()\fP commands. The default install step builds the
@@ -9119,7 +9119,7 @@ options are provided.
 Overrides the default test command
 (\fBgenerator expressions\fP are
 supported). If this option is not given, the default behavior of the test
-step is to build the external project\(aqs own \fBtest\fP target. This option
+step is to build the external project’s own \fBtest\fP target. This option
 can be specified with \fB<cmd>\fP as an empty string, which allows the test
 step to still be defined, but it will do nothing. Do not specify any of
 the other \fBTEST_...\fP options if providing an empty string as the test
@@ -9139,7 +9139,7 @@ comes after the install step. If both \fBTEST_BEFORE_INSTALL\fP and
 \fBTEST_AFTER_INSTALL\fP are enabled, the latter is silently ignored.
 .TP
 .B \fBTEST_EXCLUDE_FROM_MAIN <bool>\fP
-If enabled, the main build\(aqs default ALL target will not depend on the
+If enabled, the main build’s default ALL target will not depend on the
 test step. This can be a useful way of ensuring the test step is defined
 but only gets invoked when manually requested.
 .UNINDENT
@@ -9202,7 +9202,7 @@ Give the test step access to the terminal.
 .TP
 .B \fBDEPENDS <targets>...\fP
 Specify other targets on which the external project depends. The other
-targets will be brought up to date before any of the external project\(aqs
+targets will be brought up to date before any of the external project’s
 steps are executed. Because the external project uses additional custom
 targets internally for each step, the \fBDEPENDS\fP option is the most
 convenient way to ensure all of those steps depend on the other targets.
@@ -9269,7 +9269,7 @@ ExternalProject_Add(example
 .UNINDENT
 .sp
 It should also be noted that each build step is created via a call to
-\fI\%ExternalProject_Add_Step()\fP\&. See that command\(aqs documentation for the
+\fI\%ExternalProject_Add_Step()\fP\&. See that command’s documentation for the
 automatic substitutions that are supported for some options.
 .UNINDENT
 .SS Obtaining Project Properties
@@ -9366,18 +9366,18 @@ When enabled, this option specifies that the custom step should always be
 run (i.e. that it is always considered out of date).
 .TP
 .B \fBEXCLUDE_FROM_MAIN <bool>\fP
-When enabled, this option specifies that the external project\(aqs main target
+When enabled, this option specifies that the external project’s main target
 does not depend on the custom step.
 .TP
 .B \fBWORKING_DIRECTORY <dir>\fP
-Specifies the working directory to set before running the custom step\(aqs
+Specifies the working directory to set before running the custom step’s
 command. If this option is not specified, the directory will be the value
 of the \fBCMAKE_CURRENT_BINARY_DIR\fP at the point where
 \fBExternalProject_Add_Step()\fP was called.
 .TP
 .B \fBLOG <bool>\fP
 If set, this causes the output from the custom step to be captured to files
-in the external project\(aqs \fBSTAMP_DIR\fP\&.
+in the external project’s \fBSTAMP_DIR\fP\&.
 .TP
 .B \fBUSES_TERMINAL <bool>\fP
 If enabled, this gives the custom step direct access to the terminal if
@@ -9529,9 +9529,9 @@ ExternalProject_Add_StepDependencies(secretsauce build foobar)
 .UNINDENT
 .UNINDENT
 .sp
-Another alternative would be to create a custom target for \fBfoobar\fP\(aqs build
+Another alternative would be to create a custom target for \fBfoobar\fP’s build
 step and make \fBsecretsauce\fP depend on that rather than the whole \fBfoobar\fP
-project. This would mean \fBfoobar\fP only needs to be built, it doesn\(aqt need to
+project. This would mean \fBfoobar\fP only needs to be built, it doesn’t need to
 run its install or test steps before \fBsecretsauce\fP can be built. The
 dependency can also be defined along with the \fBsecretsauce\fP project:
 .INDENT 0.0
@@ -9670,7 +9670,7 @@ package types are required.
 .sp
 If one or more package in this categories has not been found, CMake will abort
 when calling \fI\%feature_summary()\fP with the
-\(aqFATAL_ON_MISSING_REQUIRED_PACKAGES\(aq option enabled.
+‘FATAL_ON_MISSING_REQUIRED_PACKAGES’ option enabled.
 .sp
 The default value for this global property is \fBREQUIRED\fP\&.
 .INDENT 0.0
@@ -9697,7 +9697,7 @@ The global property \fI\%FeatureSummary_<TYPE>_DESCRIPTION\fP can be defined
 for each type to replace the type name with the specified string whenever the
 package type is used in an output string.
 .sp
-If not set, the string "\fB<TYPE>\fP packages" is used.
+If not set, the string “\fB<TYPE>\fP packages” is used.
 .SS Functions
 .INDENT 0.0
 .TP
@@ -9779,7 +9779,7 @@ feature_summary(WHAT ENABLED_FEATURES DISABLED_FEATURES)
 If a \fBFILENAME\fP is given, the information is printed into this file.  If
 \fBAPPEND\fP is used, it is appended to this file, otherwise the file is
 overwritten if it already existed.  If the VAR option is used, the
-information is "printed" into the specified variable.  If \fBFILENAME\fP is
+information is “printed” into the specified variable.  If \fBFILENAME\fP is
 not used, the information is printed to the terminal.  Using the
 \fBDESCRIPTION\fP option a description or headline can be set which will be
 printed above the actual content.  If only one type of
@@ -10138,7 +10138,7 @@ content in a single call, with no check for whether the content has been
 populated elsewhere in the project already.  This is a more low level
 operation and would not normally be the way the module is used, but it is
 sometimes useful as part of implementing some higher level feature or to
-populate some content in CMake\(aqs script mode.
+populate some content in CMake’s script mode.
 .SS Declaring Content Details
 .INDENT 0.0
 .TP
@@ -10158,7 +10158,7 @@ The \fBFetchContent_Declare()\fP function records the options that describe
 how to populate the specified content, but if such details have already
 been recorded earlier in this project (regardless of where in the project
 hierarchy), this and all later calls for the same content \fB<name>\fP are
-ignored.  This "first to record, wins" approach is what allows hierarchical
+ignored.  This “first to record, wins” approach is what allows hierarchical
 projects to have parent projects override content details of child projects.
 .sp
 The content \fB<name>\fP can be any string without spaces, but good practice
@@ -10223,7 +10223,7 @@ In most cases, the only argument given to \fBFetchContent_Populate()\fP is the
 \fB<name>\fP\&.  When used this way, the command assumes the content details have
 been recorded by an earlier call to \fI\%FetchContent_Declare()\fP\&.  The
 details are stored in a global property, so they are unaffected by things
-like variable or directory scope.  Therefore, it doesn\(aqt matter where in the
+like variable or directory scope.  Therefore, it doesn’t matter where in the
 project the details were previously declared, as long as they have been
 declared before the call to \fBFetchContent_Populate()\fP\&.  Those saved details
 are then used to construct a call to \fBExternalProject_Add()\fP in a
@@ -10273,7 +10273,7 @@ performed using details saved from a \fI\%FetchContent_Declare()\fP call:
 In most cases, the saved details do not specify any options relating to the
 directories to use for the internal sub\-build, final source and build areas.
 It is generally best to leave these decisions up to the \fBFetchContent\fP
-module to handle on the project\(aqs behalf.  The \fBFETCHCONTENT_BASE_DIR\fP
+module to handle on the project’s behalf.  The \fBFETCHCONTENT_BASE_DIR\fP
 cache variable controls the point under which all content population
 directories are collected, but in most cases developers would not need to
 change this.  The default location is \fB${CMAKE_BINARY_DIR}/_deps\fP, but if
@@ -10381,7 +10381,7 @@ The \fB<lcName>_SOURCE_DIR\fP and \fB<lcName>_BINARY_DIR\fP variables are still
 returned to the caller, but since these locations are not stored as global
 properties when this form is used, they are only available to the calling
 scope and below rather than the entire project hierarchy.  No
-\fB<lcName>_POPULATED\fP variable is set in the caller\(aqs scope with this form.
+\fB<lcName>_POPULATED\fP variable is set in the caller’s scope with this form.
 .sp
 The supported options for \fBFetchContent_Populate()\fP are the same as those
 for \fI\%FetchContent_Declare()\fP\&.  Those few options shown just
@@ -10429,7 +10429,7 @@ prohibited (they are disabled by the \fBFetchContent_Populate()\fP command):
 \fBTEST_COMMAND\fP
 .UNINDENT
 .sp
-If using \fBFetchContent_Populate()\fP within CMake\(aqs script mode, be aware
+If using \fBFetchContent_Populate()\fP within CMake’s script mode, be aware
 that the implementation sets up a sub\-build which therefore requires a CMake
 generator and build tool to be available. If these cannot be found by
 default, then the \fBCMAKE_GENERATOR\fP and/or
@@ -10620,7 +10620,7 @@ level project at the time.
 .UNINDENT
 .sp
 The following example demonstrates how one might download and unpack a
-firmware tarball using CMake\(aqs \fBscript mode\fP\&.  The call to
+firmware tarball using CMake’s \fBscript mode\fP\&.  The call to
 \fI\%FetchContent_Populate()\fP specifies all the content details and the
 unpacked firmware will be placed in a \fBfirmware\fP directory below the
 current working directory.
@@ -10741,7 +10741,7 @@ Locate AVIFILE library and include paths
 .sp
 AVIFILE (\fI\%http://avifile.sourceforge.net/)is\fP a set of libraries for
 i386 machines to use various AVI codecs.  Support is limited beyond
-Linux.  Windows provides native AVI support, and so doesn\(aqt need this
+Linux.  Windows provides native AVI support, and so doesn’t need this
 library.  This module defines
 .INDENT 0.0
 .INDENT 3.5
@@ -11024,8 +11024,8 @@ find_package(Boost
 .UNINDENT
 .sp
 This module finds headers and requested component libraries OR a CMake
-package configuration file provided by a "Boost CMake" build.  For the
-latter case skip to the "Boost CMake" section below.  For the former
+package configuration file provided by a “Boost CMake” build.  For the
+latter case skip to the “Boost CMake” section below.  For the former
 case results are reported in variables:
 .INDENT 0.0
 .INDENT 3.5
@@ -11136,14 +11136,14 @@ values of the targets created by the first call.
 Users may set these hints or results as cache entries.  Projects
 should not read these entries directly but instead use the above
 result variables.  Note that some hint names start in upper\-case
-"BOOST".  One may specify these as environment variables if they are
+“BOOST”.  One may specify these as environment variables if they are
 not specified as CMake variables or cache entries.
 .sp
 This module first searches for the Boost header files using the above
 hint variables (excluding BOOST_LIBRARYDIR) and saves the result in
 Boost_INCLUDE_DIR.  Then it searches for requested component libraries
 using the above hints (excluding BOOST_INCLUDEDIR and
-Boost_ADDITIONAL_VERSIONS), "lib" directories near Boost_INCLUDE_DIR,
+Boost_ADDITIONAL_VERSIONS), “lib” directories near Boost_INCLUDE_DIR,
 and the library name configuration settings below.  It saves the
 library directories in Boost_LIBRARY_DIR_DEBUG and
 Boost_LIBRARY_DIR_RELEASE and individual library
@@ -11315,10 +11315,10 @@ endif()
 .SS Boost CMake
 .sp
 If Boost was built using the boost\-cmake project it provides a package
-configuration file for use with find_package\(aqs Config mode.  This
+configuration file for use with find_package’s Config mode.  This
 module looks for the package configuration file called
 BoostConfig.cmake or boost\-config.cmake and stores the result in cache
-entry "Boost_DIR".  If found, the package configuration file is loaded
+entry “Boost_DIR”.  If found, the package configuration file is loaded
 and this module returns with no further action.  See documentation of
 the Boost CMake package configuration for details on what it provides.
 .sp
@@ -11490,7 +11490,7 @@ depend on the path will be relocated.
 It might be necessary to set \fBCUDA_TOOLKIT_ROOT_DIR\fP manually on certain
 platforms, or to use a CUDA runtime not installed in the default
 location.  In newer versions of the toolkit the CUDA library is
-included with the graphics driver \-\- be sure that the driver version
+included with the graphics driver – be sure that the driver version
 matches what is needed by the CUDA runtime version.
 .sp
 The following variables affect the behavior of the macros in the
@@ -12297,7 +12297,7 @@ _
 Legend:
 .INDENT 0.0
 .INDENT 3.5
-NA ...............: Means that no System or Local DCMTK is available
+NA ……………: Means that no System or Local DCMTK is available
 .sp
 [ ] DCMTKConfig ..: Means that the version of DCMTK does NOT export a DCMTKConfig.cmake file.
 .sp
@@ -12312,7 +12312,7 @@ Remove DCMTK entry from the CMake cache per \fBfind_package()\fP
 documentation.
 .SS FindDevIL
 .sp
-This module locates the developer\(aqs image library.
+This module locates the developer’s image library.
 \fI\%http://openil.sourceforge.net/\fP
 .sp
 This module sets:
@@ -12354,10 +12354,10 @@ graphs.
 .TP
 .B \fBmscgen\fP
 \fI\%Message Chart Generator\fP utility used
-by Doxygen\(aqs \fB\emsc\fP and \fB\emscfile\fP commands.
+by Doxygen’s \fB\emsc\fP and \fB\emscfile\fP commands.
 .TP
 .B \fBdia\fP
-\fI\%Dia\fP the diagram editor used by Doxygen\(aqs
+\fI\%Dia\fP the diagram editor used by Doxygen’s
 \fB\ediafile\fP command.
 .UNINDENT
 .sp
@@ -12436,13 +12436,13 @@ The function constructs a \fBDoxyfile\fP and defines a custom target that runs
 Doxygen on that generated file. The listed files and directories are used as
 the \fBINPUT\fP of the generated \fBDoxyfile\fP and they can contain wildcards.
 Any files that are listed explicitly will also be added as \fBSOURCES\fP of the
-custom target so they will show up in an IDE project\(aqs source list.
+custom target so they will show up in an IDE project’s source list.
 .sp
 So that relative input paths work as expected, by default the working
 directory of the Doxygen command will be the current source directory (i.e.
 \fBCMAKE_CURRENT_SOURCE_DIR\fP). This can be overridden with the
 \fBWORKING_DIRECTORY\fP option to change the directory used as the relative
-base point. Note also that Doxygen\(aqs default behavior is to strip the working
+base point. Note also that Doxygen’s default behavior is to strip the working
 directory from relative paths in the generated documentation (see the
 \fBSTRIP_FROM_PATH\fP \fI\%Doxygen config option\fP for details).
 .sp
@@ -12459,7 +12459,7 @@ corresponding \fB<tag>\fP configuration option in the \fBDoxyfile\fP\&. See the
 \fI\%Doxygen documentation\fP for the
 full list of supported configuration options.
 .sp
-Some of Doxygen\(aqs defaults are overridden to provide more appropriate
+Some of Doxygen’s defaults are overridden to provide more appropriate
 behavior for a CMake project. Each of the following will be explicitly set
 unless the variable already has a value before \fBdoxygen_add_docs()\fP is
 called (with some exceptions noted):
@@ -12486,7 +12486,7 @@ Set to \fBNO\fP by this module.
 .B DOXYGEN_WARN_FORMAT
 For Visual Studio based generators, this is set to the form recognized by
 the Visual Studio IDE: \fB$file($line) : $text\fP\&. For all other generators,
-Doxygen\(aqs default value is not overridden.
+Doxygen’s default value is not overridden.
 .UNINDENT
 .INDENT 7.0
 .TP
@@ -12589,7 +12589,7 @@ A number of Doxygen config options accept lists of values, but Doxygen requires
 them to be separated by whitespace. CMake variables hold lists as a string with
 items separated by semi\-colons, so a conversion needs to be performed. The
 \fBdoxygen_add_docs()\fP command specifically checks the following Doxygen config
-options and will convert their associated CMake variable\(aqs contents into the
+options and will convert their associated CMake variable’s contents into the
 required form if set.
 .INDENT 0.0
 .INDENT 3.5
@@ -12698,7 +12698,7 @@ to be automatically quoted by \fBdoxygen_add_docs()\fP, such as \fBALIASES\fP wh
 may need to include its own embedded quoting.  The \fBDOXYGEN_VERBATIM_VARS\fP
 variable can be used to specify a list of Doxygen variables (including the
 leading \fBDOXYGEN_\fP prefix) which should not be quoted.  The project is then
-responsible for ensuring that those variables\(aq values make sense when placed
+responsible for ensuring that those variables’ values make sense when placed
 directly in the Doxygen input file.  In the case of list variables, list items
 are still separated by spaces, it is only the automatic quoting that is
 skipped.  For example, the following allows \fBdoxygen_add_docs()\fP to apply
@@ -12774,7 +12774,7 @@ configuration file.
 .B DOXYGEN_SKIP_DOT
 This variable has no effect for the component form of \fBfind_package\fP\&.
 In backward compatibility mode (i.e. without components list) it prevents
-the finder module from searching for Graphviz\(aqs \fBdot\fP utility.
+the finder module from searching for Graphviz’s \fBdot\fP utility.
 .UNINDENT
 .SS FindEXPAT
 .sp
@@ -13143,7 +13143,7 @@ GETTEXT_VERSION_STRING: the version of gettext found (since CMake 2.8.8)
 .sp
 Additionally it provides the following macros:
 .sp
-GETTEXT_CREATE_TRANSLATIONS ( outputFile [ALL] file1 ...  fileN )
+GETTEXT_CREATE_TRANSLATIONS ( outputFile [ALL] file1 …  fileN )
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -13159,7 +13159,7 @@ building the default target.
 .UNINDENT
 .sp
 GETTEXT_PROCESS_POT_FILE( <potfile> [ALL] [INSTALL_DESTINATION <destdir>]
-LANGUAGES <lang1> <lang2> ...  )
+LANGUAGES <lang1> <lang2> …  )
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -13177,7 +13177,7 @@ It creates a custom target "potfile".
 .UNINDENT
 .sp
 GETTEXT_PROCESS_PO_FILES( <lang> [ALL] [INSTALL_DESTINATION <dir>]
-PO_FILES <po1> <po2> ...  )
+PO_FILES <po1> <po2> …  )
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -13224,7 +13224,7 @@ The minimum required version of giflib can be specified using the
 standard syntax, e.g.  find_package(GIF 4)
 .sp
 $GIF_DIR is an environment variable that would correspond to the
-./configure \-\-prefix=$GIF_DIR
+./configure –prefix=$GIF_DIR
 .SS FindGit
 .sp
 The module defines the following variables:
@@ -13667,7 +13667,7 @@ attempt to find only the C bindings.
 .sp
 This module will read the variable
 HDF5_USE_STATIC_LIBRARIES to determine whether or not to prefer a
-static link to a dynamic link for HDF5 and all of it\(aqs dependencies.
+static link to a dynamic link for HDF5 and all of it’s dependencies.
 To use this feature, make sure that the HDF5_USE_STATIC_LIBRARIES
 variable is set before the call to find_package.
 .sp
@@ -14066,7 +14066,7 @@ found through the registry.  On Unix, the programs, headers and
 libraries will usually be in standard locations, but Ice_SLICE_DIRS
 might not be automatically detected (commonly known locations are
 searched).  All the other variables are defaulted using Ice_HOME,
-if set.  It\(aqs possible to set Ice_HOME and selectively specify
+if set.  It’s possible to set Ice_HOME and selectively specify
 alternative locations for the other components; this might be
 required for e.g. newer versions of Visual Studio if the
 heuristics are not sufficient to identify the correct programs and
@@ -14691,7 +14691,7 @@ It also adds the following macros (from KDE3Macros.cmake) SRCS_VAR is
 always the variable which contains the list of source files for your
 application or library.
 .sp
-KDE3_AUTOMOC(file1 ...  fileN)
+KDE3_AUTOMOC(file1 …  fileN)
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -14707,7 +14707,7 @@ to exclude some files in the list from being processed.
 .UNINDENT
 .UNINDENT
 .sp
-KDE3_ADD_MOC_FILES(SRCS_VAR file1 ...  fileN )
+KDE3_ADD_MOC_FILES(SRCS_VAR file1 …  fileN )
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -14720,7 +14720,7 @@ listed here moc files will be created (named "foo.moc.cpp")
 .UNINDENT
 .UNINDENT
 .sp
-KDE3_ADD_DCOP_SKELS(SRCS_VAR header1.h ...  headerN.h )
+KDE3_ADD_DCOP_SKELS(SRCS_VAR header1.h …  headerN.h )
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -14732,7 +14732,7 @@ Use this to generate DCOP skeletions from the listed headers.
 .UNINDENT
 .UNINDENT
 .sp
-KDE3_ADD_DCOP_STUBS(SRCS_VAR header1.h ...  headerN.h )
+KDE3_ADD_DCOP_STUBS(SRCS_VAR header1.h …  headerN.h )
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -14744,7 +14744,7 @@ Use this to generate DCOP stubs from the listed headers.
 .UNINDENT
 .UNINDENT
 .sp
-KDE3_ADD_UI_FILES(SRCS_VAR file1.ui ...  fileN.ui )
+KDE3_ADD_UI_FILES(SRCS_VAR file1.ui …  fileN.ui )
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -14756,7 +14756,7 @@ Use this to add the Qt designer ui files to your application/library.
 .UNINDENT
 .UNINDENT
 .sp
-KDE3_ADD_KCFG_FILES(SRCS_VAR file1.kcfgc ...  fileN.kcfgc )
+KDE3_ADD_KCFG_FILES(SRCS_VAR file1.kcfgc …  fileN.kcfgc )
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -14780,7 +14780,7 @@ This will create and install a simple libtool file for the given target.
 .UNINDENT
 .UNINDENT
 .sp
-KDE3_ADD_EXECUTABLE(name file1 ...  fileN )
+KDE3_ADD_EXECUTABLE(name file1 …  fileN )
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -14793,7 +14793,7 @@ features in the future.
 .UNINDENT
 .UNINDENT
 .sp
-KDE3_ADD_KPART(name [WITH_PREFIX] file1 ...  fileN )
+KDE3_ADD_KPART(name [WITH_PREFIX] file1 …  fileN )
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -14808,7 +14808,7 @@ It creates and installs an appropriate libtool la\-file.
 .UNINDENT
 .UNINDENT
 .sp
-KDE3_ADD_KDEINIT_EXECUTABLE(name file1 ...  fileN )
+KDE3_ADD_KDEINIT_EXECUTABLE(name file1 …  fileN )
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -15119,10 +15119,10 @@ The libraries needed to use LTTng\-UST
 The LTTng\-UST version
 .TP
 .B \fBLTTNGUST_HAS_TRACEF\fP
-\fBTRUE\fP if the \fBtracef()\fP API is available in the system\(aqs LTTng\-UST
+\fBTRUE\fP if the \fBtracef()\fP API is available in the system’s LTTng\-UST
 .TP
 .B \fBLTTNGUST_HAS_TRACELOG\fP
-\fBTRUE\fP if the \fBtracelog()\fP API is available in the system\(aqs LTTng\-UST
+\fBTRUE\fP if the \fBtracelog()\fP API is available in the system’s LTTng\-UST
 .UNINDENT
 .SS FindLua50
 .sp
@@ -15270,7 +15270,7 @@ to run specific commands in Matlab in case Matlab is available
 for declaring Matlab unit test
 .IP \(bu 2
 to retrieve various information from Matlab (mex extensions, versions and
-release queries, ...)
+release queries, …)
 .UNINDENT
 .sp
 The module supports the following components:
@@ -15700,7 +15700,7 @@ to run Matlab from the command line.
 .TP
 .B \fBTEST_ARGS\fP
 Additional options provided to the add_test command. These
-options are added to the default options (eg. "CONFIGURATIONS Release")
+options are added to the default options (eg. “CONFIGURATIONS Release”)
 .TP
 .B \fBNO_UNITTEST_FRAMEWORK\fP
 when set, indicates that the test should not
@@ -15801,7 +15801,7 @@ MFC_FOUND \- Was MFC support found
 .UNINDENT
 .UNINDENT
 .sp
-You don\(aqt need to include anything or link anything to use it.
+You don’t need to include anything or link anything to use it.
 .SS FindMotif
 .sp
 Try to find Motif (or lesstif)
@@ -15972,7 +15972,7 @@ Minor version of MPI implemented for \fB<lang>\fP by the MPI distribution.
 MPI version implemented for \fB<lang>\fP by the MPI distribution.
 .UNINDENT
 .sp
-Note that there\(aqs no variable for the C bindings being accessible through \fBmpi.h\fP, since the MPI standards
+Note that there’s no variable for the C bindings being accessible through \fBmpi.h\fP, since the MPI standards
 always have required this binding to work in both C and C++ code.
 .sp
 For running MPI programs, the module sets the following variables
@@ -16000,7 +16000,7 @@ This module performs a three step search for an MPI implementation:
 .INDENT 0.0
 .IP 1. 3
 Check if the compiler has MPI support built\-in. This is the case if the user passed a
-compiler wrapper as \fBCMAKE_<LANG>_COMPILER\fP or if they\(aqre on a Cray system.
+compiler wrapper as \fBCMAKE_<LANG>_COMPILER\fP or if they’re on a Cray system.
 .IP 2. 3
 Attempt to find an MPI compiler wrapper and determine the compiler information from it.
 .IP 3. 3
@@ -16309,7 +16309,7 @@ false, do not try to link to OpenAL OPENAL_INCLUDE_DIR, where to find
 the headers
 .sp
 $OPENALDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OPENALDIR used in building OpenAL.
+./configure –prefix=$OPENALDIR used in building OpenAL.
 .sp
 Created by Eric Wing.  This was influenced by the FindSDL.cmake
 module.
@@ -16424,10 +16424,10 @@ Path to the EGL library.
 Path to the GLU library.
 .TP
 .B \fBOPENGL_glx_LIBRARY\fP
-Path to the GLVND \(aqGLX\(aq library.
+Path to the GLVND ‘GLX’ library.
 .TP
 .B \fBOPENGL_opengl_LIBRARY\fP
-Path to the GLVND \(aqOpenGL\(aq library
+Path to the GLVND ‘OpenGL’ library
 .TP
 .B \fBOPENGL_gl_LIBRARY\fP
 Path to the OpenGL library.  New code should prefer the \fBOpenGL::*\fP import
@@ -16436,8 +16436,8 @@ targets.
 .SS Linux\-specific
 .sp
 Some Linux systems utilize GLVND as a new ABI for OpenGL.  GLVND separates
-context libraries from OpenGL itself; OpenGL lives in "libOpenGL", and
-contexts are defined in "libGLX" or "libEGL".  GLVND is currently the only way
+context libraries from OpenGL itself; OpenGL lives in “libOpenGL”, and
+contexts are defined in “libGLX” or “libEGL”.  GLVND is currently the only way
 to get OpenGL 3+ functionality via EGL in a manner portable across vendors.
 Projects may use GLVND explicitly with target \fBOpenGL::OpenGL\fP and either
 \fBOpenGL::GLX\fP or \fBOpenGL::EGL\fP\&.
@@ -16468,7 +16468,7 @@ This is the default if no components were requested and
 policy \fBCMP0072\fP is not set to \fBNEW\fP\&.
 .UNINDENT
 .sp
-For EGL targets the client must rely on GLVND support on the user\(aqs system.
+For EGL targets the client must rely on GLVND support on the user’s system.
 Linking should use the \fBOpenGL::OpenGL OpenGL::EGL\fP targets.  Using GLES*
 libraries is theoretically possible in place of \fBOpenGL::OpenGL\fP, but this
 module does not currently support that; contributions welcome.
@@ -16572,7 +16572,7 @@ the OpenMP specification implemented by the \fB<lang>\fP compiler.
 .sp
 Find OpenSceneGraph
 .sp
-This module searches for the OpenSceneGraph core "osg" library as well
+This module searches for the OpenSceneGraph core “osg” library as well
 as OpenThreads, and whatever additional COMPONENTS (nodekits) that you
 specify.
 .INDENT 0.0
@@ -16622,12 +16622,12 @@ OpenSceneGraph_MARK_AS_ADVANCED \- Mark cache variables as advanced
 .UNINDENT
 .sp
 The following environment variables are also respected for finding the
-OSG and it\(aqs various components.  CMAKE_PREFIX_PATH can also be used
+OSG and it’s various components.  CMAKE_PREFIX_PATH can also be used
 for this (see find_library() CMake documentation).
 .INDENT 0.0
 .TP
 .B \fB<MODULE>_DIR\fP
-(where MODULE is of the form "OSGVOLUME" and there is a FindosgVolume.cmake file)
+(where MODULE is of the form “OSGVOLUME” and there is a FindosgVolume.cmake file)
 .TP
 .B \fBOSG_DIR\fP
 .TP
@@ -16766,7 +16766,7 @@ OPENTHREADS_FOUND, if false, do not try to link to OpenThreads
 OPENTHREADS_INCLUDE_DIR, where to find the headers
 .sp
 $OPENTHREADS_DIR is an environment variable that would correspond to
-the ./configure \-\-prefix=$OPENTHREADS_DIR used in building osg.
+the ./configure –prefix=$OPENTHREADS_DIR used in building osg.
 .sp
 [CMake 2.8.10]: The CMake variables OPENTHREADS_DIR or OSG_DIR can now
 be used as well to influence detection, instead of needing to specify
@@ -16778,10 +16778,10 @@ Created by Eric Wing.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -16796,7 +16796,7 @@ OSGANIMATION_LIBRARY \- The OSG library OSGANIMATION_LIBRARY_DEBUG \-
 The OSG debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS FindosgDB
@@ -16804,10 +16804,10 @@ Created by Eric Wing.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -16822,7 +16822,7 @@ OSGDB_LIBRARY \- The osgDB library OSGDB_LIBRARY_DEBUG \- The osgDB
 debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS Findosg_functions
@@ -16835,10 +16835,10 @@ documentation.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -16853,7 +16853,7 @@ OSGFX_LIBRARY \- The osgFX library OSGFX_LIBRARY_DEBUG \- The osgFX
 debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS FindosgGA
@@ -16861,10 +16861,10 @@ Created by Eric Wing.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -16879,7 +16879,7 @@ OSGGA_LIBRARY \- The osgGA library OSGGA_LIBRARY_DEBUG \- The osgGA
 debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS FindosgIntrospection
@@ -16887,10 +16887,10 @@ Created by Eric Wing.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -16906,7 +16906,7 @@ OSGINTROSPECTION_LIBRARY \- The osgIntrospection library
 OSGINTROSPECTION_LIBRARY_DEBUG \- The osgIntrospection debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS FindosgManipulator
@@ -16914,10 +16914,10 @@ Created by Eric Wing.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -16933,7 +16933,7 @@ OSGMANIPULATOR_LIBRARY \- The osgManipulator library
 OSGMANIPULATOR_LIBRARY_DEBUG \- The osgManipulator debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS FindosgParticle
@@ -16941,10 +16941,10 @@ Created by Eric Wing.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -16959,7 +16959,7 @@ OSGPARTICLE_LIBRARY \- The osgParticle library
 OSGPARTICLE_LIBRARY_DEBUG \- The osgParticle debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS FindosgPresentation
@@ -16967,10 +16967,10 @@ Created by Eric Wing.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -16986,7 +16986,7 @@ OSGPRESENTATION_LIBRARY \- The osgPresentation library
 OSGPRESENTATION_LIBRARY_DEBUG \- The osgPresentation debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.  Modified to work with osgPresentation by Robert
 Osfield, January 2012.
@@ -16995,10 +16995,10 @@ Osfield, January 2012.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -17013,7 +17013,7 @@ OSGPRODUCER_LIBRARY \- The osgProducer library
 OSGPRODUCER_LIBRARY_DEBUG \- The osgProducer debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS FindosgQt
@@ -17021,10 +17021,10 @@ Created by Eric Wing.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -17038,7 +17038,7 @@ OSGQT_LIBRARY \- The osgQt library OSGQT_LIBRARY_DEBUG \- The osgQt
 debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.  Modified to work with osgQt by Robert Osfield,
 January 2012.
@@ -17051,10 +17051,10 @@ Find module directly.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -17069,7 +17069,7 @@ OSG_LIBRARY \- The OSG library OSG_LIBRARY_DEBUG \- The OSG debug
 library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS FindosgShadow
@@ -17077,10 +17077,10 @@ Created by Eric Wing.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -17095,7 +17095,7 @@ OSGSHADOW_LIBRARY \- The osgShadow library OSGSHADOW_LIBRARY_DEBUG \-
 The osgShadow debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS FindosgSim
@@ -17103,10 +17103,10 @@ Created by Eric Wing.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -17121,7 +17121,7 @@ OSGSIM_LIBRARY \- The osgSim library OSGSIM_LIBRARY_DEBUG \- The osgSim
 debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS FindosgTerrain
@@ -17129,10 +17129,10 @@ Created by Eric Wing.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -17147,7 +17147,7 @@ OSGTERRAIN_LIBRARY \- The osgTerrain library OSGTERRAIN_LIBRARY_DEBUG \-
 The osgTerrain debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS FindosgText
@@ -17155,10 +17155,10 @@ Created by Eric Wing.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -17173,7 +17173,7 @@ OSGTEXT_LIBRARY \- The osgText library OSGTEXT_LIBRARY_DEBUG \- The
 osgText debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS FindosgUtil
@@ -17181,10 +17181,10 @@ Created by Eric Wing.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -17199,7 +17199,7 @@ OSGUTIL_LIBRARY \- The osgUtil library OSGUTIL_LIBRARY_DEBUG \- The
 osgUtil debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS FindosgViewer
@@ -17207,10 +17207,10 @@ Created by Eric Wing.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -17225,7 +17225,7 @@ OSGVIEWER_LIBRARY \- The osgViewer library OSGVIEWER_LIBRARY_DEBUG \-
 The osgViewer debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS FindosgVolume
@@ -17233,10 +17233,10 @@ Created by Eric Wing.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -17251,7 +17251,7 @@ OSGVOLUME_LIBRARY \- The osgVolume library OSGVOLUME_LIBRARY_DEBUG \-
 The osgVolume debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS FindosgWidget
@@ -17259,10 +17259,10 @@ Created by Eric Wing.
 This is part of the Findosg* suite used to find OpenSceneGraph
 components.  Each component is separate and you must opt in to each
 module.  You must also opt into OpenGL and OpenThreads (and Producer
-if needed) as these modules won\(aqt do it for you.  This is to allow you
+if needed) as these modules won’t do it for you.  This is to allow you
 control over your own system piece by piece in case you need to opt
 out of certain components or change the Find behavior for a particular
-module (perhaps because the default FindOpenGL.cmake module doesn\(aqt
+module (perhaps because the default FindOpenGL.cmake module doesn’t
 work with your system as an example).  If you want to use a more
 convenient module that includes everything, use the
 FindOpenSceneGraph.cmake instead of the Findosg*.cmake modules.
@@ -17277,7 +17277,7 @@ OSGWIDGET_LIBRARY \- The osgWidget library OSGWIDGET_LIBRARY_DEBUG \-
 The osgWidget debug library
 .sp
 $OSGDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$OSGDIR used in building osg.
+./configure –prefix=$OSGDIR used in building osg.
 .sp
 FindosgWidget.cmake tweaked from Findosg* suite as created by Eric
 Wing.
@@ -17436,7 +17436,7 @@ directory for \fBautomoc4\fP\&.  Then the call to
 message.
 .SS FindPackageMessage
 .sp
-FIND_PACKAGE_MESSAGE(<name> "message for user" "find result details")
+FIND_PACKAGE_MESSAGE(<name> “message for user” “find result details”)
 .sp
 This macro is intended to be used in FindXXX.cmake modules files.  It
 will print a message once for each unique find result.  This is useful
@@ -17591,7 +17591,7 @@ the library to link against PHYSFS_FOUND, if false, do not try to link
 to PHYSFS PHYSFS_INCLUDE_DIR, where to find physfs.h
 .sp
 $PHYSFSDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$PHYSFSDIR used in building PHYSFS.
+./configure –prefix=$PHYSFSDIR used in building PHYSFS.
 .sp
 Created by Eric Wing.
 .SS FindPike
@@ -17949,17 +17949,17 @@ PostgreSQL_VERSION_STRING \- the version of PostgreSQL found (since CMake 2.8.8)
 .UNINDENT
 .SS FindProducer
 .sp
-Though Producer isn\(aqt directly part of OpenSceneGraph, its primary
+Though Producer isn’t directly part of OpenSceneGraph, its primary
 user is OSG so I consider this part of the Findosg* suite used to find
-OpenSceneGraph components.  You\(aqll notice that I accept OSGDIR as an
+OpenSceneGraph components.  You’ll notice that I accept OSGDIR as an
 environment path.
 .sp
 Each component is separate and you must opt in to each module.  You
-must also opt into OpenGL (and OpenThreads?) as these modules won\(aqt do
+must also opt into OpenGL (and OpenThreads?) as these modules won’t do
 it for you.  This is to allow you control over your own system piece
 by piece in case you need to opt out of certain components or change
 the Find behavior for a particular module (perhaps because the default
-FindOpenGL.cmake module doesn\(aqt work with your system as an example).
+FindOpenGL.cmake module doesn’t work with your system as an example).
 If you want to use a more convenient module that includes everything,
 use the FindOpenSceneGraph.cmake instead of the Findosg*.cmake
 modules.
@@ -17969,7 +17969,7 @@ if false, do not try to link to Producer PRODUCER_INCLUDE_DIR, where
 to find the headers
 .sp
 $PRODUCER_DIR is an environment variable that would correspond to the
-./configure \-\-prefix=$PRODUCER_DIR used in building osg.
+./configure –prefix=$PRODUCER_DIR used in building osg.
 .sp
 Created by Eric Wing.
 .SS FindProtobuf
@@ -18778,7 +18778,7 @@ of version numbers that should be taken into account when searching
 for Python.  You need to set this variable before calling
 find_package(PythonLibs).
 .sp
-If you\(aqd like to specify the installation of Python to use, you should
+If you’d like to specify the installation of Python to use, you should
 modify the following cache variables:
 .INDENT 0.0
 .INDENT 3.5
@@ -19217,13 +19217,13 @@ Below is a detailed list of variables that FindQt4.cmake sets.
 .INDENT 0.0
 .TP
 .B \fBQt4_FOUND\fP
-If false, don\(aqt try to use Qt 4.
+If false, don’t try to use Qt 4.
 .TP
 .B \fBQT_FOUND\fP
-If false, don\(aqt try to use Qt. This variable is for compatibility only.
+If false, don’t try to use Qt. This variable is for compatibility only.
 .TP
 .B \fBQT4_FOUND\fP
-If false, don\(aqt try to use Qt 4. This variable is for compatibility only.
+If false, don’t try to use Qt 4. This variable is for compatibility only.
 .TP
 .B \fBQT_VERSION_MAJOR\fP
 The major version of Qt found.
@@ -19280,7 +19280,7 @@ QUICKTIME_FOUND, if false, do not try to link to gdal
 QUICKTIME_INCLUDE_DIR, where to find the headers
 .sp
 $QUICKTIME_DIR is an environment variable that would correspond to the
-./configure \-\-prefix=$QUICKTIME_DIR
+./configure –prefix=$QUICKTIME_DIR
 .sp
 Created by Eric Wing.
 .SS FindRTI
@@ -19345,7 +19345,7 @@ include dirs to be used when using the ruby library
 full path to the ruby library
 .TP
 .B \fBRUBY_VERSION\fP
-the version of ruby which was found, e.g. "1.8.7"
+the version of ruby which was found, e.g. “1.8.7”
 .TP
 .B \fBRUBY_FOUND\fP
 set to true if ruby ws found successfully
@@ -19355,7 +19355,7 @@ Also:
 .INDENT 0.0
 .TP
 .B \fBRUBY_INCLUDE_PATH\fP
-same as RUBY_INCLUDE_DIRS, only provided for compatibility reasons, don\(aqt use it
+same as RUBY_INCLUDE_DIRS, only provided for compatibility reasons, don’t use it
 .UNINDENT
 .SS FindSDL_image
 .sp
@@ -19392,7 +19392,7 @@ SDLIMAGE_FOUND (same value as SDL_IMAGE_FOUND)
 .UNINDENT
 .sp
 $SDLDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$SDLDIR used in building SDL.
+./configure –prefix=$SDLDIR used in building SDL.
 .sp
 Created by Eric Wing.  This was influenced by the FindSDL.cmake
 module, but with modifications to recognize OS X frameworks and
@@ -19432,7 +19432,7 @@ SDLMIXER_FOUND (same value as SDL_MIXER_FOUND)
 .UNINDENT
 .sp
 $SDLDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$SDLDIR used in building SDL.
+./configure –prefix=$SDLDIR used in building SDL.
 .sp
 Created by Eric Wing.  This was influenced by the FindSDL.cmake
 module, but with modifications to recognize OS X frameworks and
@@ -19471,7 +19471,7 @@ SDLNET_FOUND (same value as SDL_NET_FOUND)
 .UNINDENT
 .sp
 $SDLDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$SDLDIR used in building SDL.
+./configure –prefix=$SDLDIR used in building SDL.
 .sp
 Created by Eric Wing.  This was influenced by the FindSDL.cmake
 module, but with modifications to recognize OS X frameworks and
@@ -19512,7 +19512,7 @@ SDL_BUILDING_LIBRARY
 .UNINDENT
 .UNINDENT
 .sp
-Don\(aqt forget to include SDLmain.h and SDLmain.m your project for the
+Don’t forget to include SDLmain.h and SDLmain.m your project for the
 OS X framework based version.  (Other versions link to \-lSDLmain which
 this module will try to find on your behalf.) Also for OS X, this
 module will automatically add the \-framework Cocoa on your behalf.
@@ -19527,13 +19527,13 @@ SDL_LIBRARY variable, but when these values are unset, SDL_LIBRARY
 does not get created.
 .sp
 $SDLDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$SDLDIR used in building SDL.  l.e.galup 9\-20\-02
+./configure –prefix=$SDLDIR used in building SDL.  l.e.galup 9\-20\-02
 .sp
 Modified by Eric Wing.  Added code to assist with automated building
 by using environmental variables and providing a more
 controlled/consistent search behavior.  Added new modifications to
 recognize OS X frameworks and additional Unix paths (FreeBSD, etc).
-Also corrected the header search path to follow "proper" SDL
+Also corrected the header search path to follow “proper” SDL
 guidelines.  Added a search for SDLmain which is needed by some
 platforms.  Added a search for threads which is needed by some
 platforms.  Added needed compile switches for MinGW.
@@ -19544,8 +19544,8 @@ override this selection or set the CMake environment
 CMAKE_INCLUDE_PATH to modify the search paths.
 .sp
 Note that the header path has changed from SDL/SDL.h to just SDL.h
-This needed to change because "proper" SDL convention is #include
-"SDL.h", not <SDL/SDL.h>.  This is done for portability reasons
+This needed to change because “proper” SDL convention is #include
+“SDL.h”, not <SDL/SDL.h>.  This is done for portability reasons
 because not all systems place things in SDL/ (see FreeBSD).
 .SS FindSDL_sound
 .sp
@@ -19575,7 +19575,7 @@ SDL_SOUND_VERSION_STRING, human\-readable string containing the
 .UNINDENT
 .UNINDENT
 .sp
-This module also defines (but you shouldn\(aqt need to use directly)
+This module also defines (but you shouldn’t need to use directly)
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -19616,7 +19616,7 @@ compiled in a large variety of different ways which are independent of
 platform.  SDL_sound may dynamically link against other 3rd party
 libraries to get additional codec support, such as Ogg Vorbis, SMPEG,
 ModPlug, MikMod, FLAC, Speex, and potentially others.  Under some
-circumstances which I don\(aqt fully understand, there seems to be a
+circumstances which I don’t fully understand, there seems to be a
 requirement that dependent libraries of libraries you use must also be
 explicitly linked against in order to successfully compile.  SDL_sound
 does not currently have any system in place to know how it was
@@ -19628,7 +19628,7 @@ parses the error output for known symbol names to figure out which
 libraries are needed.
 .sp
 Responds to the $SDLDIR and $SDLSOUNDDIR environmental variable that
-would correspond to the ./configure \-\-prefix=$SDLDIR used in building
+would correspond to the ./configure –prefix=$SDLDIR used in building
 SDL.
 .sp
 On OSX, this will prefer the Framework version (if found) over others.
@@ -19669,7 +19669,7 @@ SDLTTF_FOUND (same value as SDL_TTF_FOUND)
 .UNINDENT
 .sp
 $SDLDIR is an environment variable that would correspond to the
-./configure \-\-prefix=$SDLDIR used in building SDL.
+./configure –prefix=$SDLDIR used in building SDL.
 .sp
 Created by Eric Wing.  This was influenced by the FindSDL.cmake
 module, but with modifications to recognize OS X frameworks and
@@ -19693,7 +19693,7 @@ UPX: http://wildsau.idv.uni\-linz.ac.at/mfx/upx.html
 .UNINDENT
 .SS FindSquish
 .sp
-\-\- Typical Use
+– Typical Use
 .sp
 This module can be used to find Squish.  Currently Squish versions 3
 and 4 are supported.
@@ -19774,7 +19774,7 @@ of the test inside the suite directory.
 .TP
 .B \fBSETTINGSGROUP group\fP
 if specified, the given settings group will be used for executing the test.
-If not specified, the groupname will be "CTest_<username>"
+If not specified, the groupname will be “CTest_<username>”
 .TP
 .B \fBPRE_COMMAND command\fP
 if specified, the given command will be executed before starting the squish test.
@@ -20021,7 +20021,7 @@ TCL_TCLSH = the path to the tclsh executable
 .UNINDENT
 .UNINDENT
 .sp
-In cygwin, look for the cygwin version first.  Don\(aqt look for it later
+In cygwin, look for the cygwin version first.  Don’t look for it later
 to avoid finding the cygwin version on a Win32 build.
 .SS FindTclStub
 .sp
@@ -20278,7 +20278,7 @@ configuration to use.  wxWidgets is a modular library.  To specify the
 modules that you will use, you need to name them as components to the
 package:
 .sp
-find_package(wxWidgets COMPONENTS core base ...)
+find_package(wxWidgets COMPONENTS core base …)
 .sp
 There are two search branches: a windows style and a unix style.  For
 windows, the following variables are searched for and set to defaults
@@ -20453,7 +20453,7 @@ HAVE_ISYSTEM      \- true required to replace \-I by \-isystem on g++
 .UNINDENT
 .UNINDENT
 .sp
-For convenience include Use_wxWindows.cmake in your project\(aqs
+For convenience include Use_wxWindows.cmake in your project’s
 CMakeLists.txt using
 include(${CMAKE_CURRENT_LIST_DIR}/Use_wxWindows.cmake).
 .sp
@@ -20732,7 +20732,7 @@ XMLRPC_FOUND             \- True if xmlrpc found.
 .UNINDENT
 .sp
 XMLRPC modules may be specified as components for this find module.
-Modules may be listed by running "xmlrpc\-c\-config".  Modules include:
+Modules may be listed by running “xmlrpc\-c\-config”.  Modules include:
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -20828,7 +20828,7 @@ Variables that indicate if the mangling is found:
 Global subroutines and functions.
 .TP
 .B \fBFortranCInterface_MODULE_FOUND\fP
-Module subroutines and functions (declared by "MODULE PROCEDURE").
+Module subroutines and functions (declared by “MODULE PROCEDURE”).
 .UNINDENT
 .sp
 This module also provides the following variables to specify
@@ -20922,13 +20922,13 @@ It generates in \fB<file>\fP definitions of the following macros:
 These macros mangle four categories of Fortran symbols, respectively:
 .INDENT 7.0
 .IP \(bu 2
-Global symbols without \(aq_\(aq: \fBcall mysub()\fP
+Global symbols without ‘_’: \fBcall mysub()\fP
 .IP \(bu 2
-Global symbols with \(aq_\(aq   : \fBcall my_sub()\fP
+Global symbols with ‘_’   : \fBcall my_sub()\fP
 .IP \(bu 2
-Module symbols without \(aq_\(aq: \fBuse mymod; call mysub()\fP
+Module symbols without ‘_’: \fBuse mymod; call mysub()\fP
 .IP \(bu 2
-Module symbols with \(aq_\(aq   : \fBuse mymod; call my_sub()\fP
+Module symbols with ‘_’   : \fBuse mymod; call my_sub()\fP
 .UNINDENT
 .sp
 If mangling for a category is not known, its macro is left undefined.
@@ -21001,7 +21001,7 @@ FortranCInterface_HEADER(FC.h MACRO_NAMESPACE "FC_")
 .UNINDENT
 .UNINDENT
 .sp
-This creates a "FC.h" header that defines mangling macros \fBFC_GLOBAL()\fP,
+This creates a “FC.h” header that defines mangling macros \fBFC_GLOBAL()\fP,
 \fBFC_GLOBAL_()\fP, \fBFC_MODULE()\fP, and \fBFC_MODULE_()\fP\&.
 .INDENT 0.0
 .INDENT 3.5
@@ -21018,7 +21018,7 @@ FortranCInterface_HEADER(FCMangle.h
 .UNINDENT
 .UNINDENT
 .sp
-This creates a "FCMangle.h" header that defines the same \fBFC_*()\fP
+This creates a “FCMangle.h” header that defines the same \fBFC_*()\fP
 mangling macros as the previous example plus preprocessor symbols
 \fBFC_mysub\fP and \fBFC_mymod_my_sub\fP\&.
 .SS Additional Manglings
@@ -21376,14 +21376,14 @@ list of required shared library files.
 <target> is the full path to an executable file.  <prerequisites_var>
 is the name of a CMake variable to contain the results.
 <exclude_system> must be 0 or 1 indicating whether to include or
-exclude "system" prerequisites.  If <recurse> is set to 1 all
+exclude “system” prerequisites.  If <recurse> is set to 1 all
 prerequisites will be found recursively, if set to 0 only direct
 prerequisites are listed.  <exepath> is the path to the top level
 executable used for @executable_path replacment on the Mac.  <dirs> is
 a list of paths where libraries might be found: these paths are
 searched first when a target without any path info is given.  Then
 standard system locations are also searched: PATH, Framework
-locations, /usr/lib...
+locations, /usr/lib…
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -21401,7 +21401,7 @@ Print a message listing the prerequisites of <target>.
 full path to a shared library or executable file.  If <recurse> is set
 to 1 all prerequisites will be found recursively, if set to 0 only
 direct prerequisites are listed.  <exclude_system> must be 0 or 1
-indicating whether to include or exclude "system" prerequisites.  With
+indicating whether to include or exclude “system” prerequisites.  With
 <verbose> set to 0 only the full path names of the prerequisites are
 printed, set to 1 extra informatin will be displayed.
 .INDENT 0.0
@@ -21417,8 +21417,8 @@ LIST_PREREQUISITES_BY_GLOB(<glob_arg> <glob_exp>)
 .sp
 Print the prerequisites of shared library and executable files
 matching a globbing pattern.  <glob_arg> is GLOB or GLOB_RECURSE and
-<glob_exp> is a globbing expression used with "file(GLOB" or
-"file(GLOB_RECURSE" to retrieve a list of matching files.  If a
+<glob_exp> is a globbing expression used with “file(GLOB” or
+“file(GLOB_RECURSE” to retrieve a list of matching files.  If a
 matching file is executable, its prerequisites are listed.
 .sp
 Any additional (optional) arguments provided are passed along as the
@@ -21498,7 +21498,7 @@ describing type of prerequisite is returned in variable named
 <type_var>.
 .sp
 Use <exepath> and <dirs> if necessary to resolve non\-absolute <file>
-values \-\- but only for non\-embedded items.
+values – but only for non\-embedded items.
 .sp
 Possible types are:
 .INDENT 0.0
@@ -21754,7 +21754,7 @@ gtest_add_tests(TARGET target
 \fBgtest_add_tests\fP attempts to identify tests by scanning source files.
 Although this is generally effective, it uses only a basic regular expression
 match, which can be defeated by atypical test declarations, and is unable to
-fully "split" parameterized tests.  Additionally, it requires that CMake be
+fully “split” parameterized tests.  Additionally, it requires that CMake be
 re\-run to discover any newly added, removed or renamed tests (by default,
 this means that CMake is re\-run when any test source file is changed, but see
 \fBSKIP_DEPENDENCY\fP).  However, it has the advantage of declaring tests at
@@ -22035,12 +22035,12 @@ option.  If not specified, no such option will be used.
 .UNINDENT
 .SS MacroAddFileDependencies
 .sp
-MACRO_ADD_FILE_DEPENDENCIES(<_file> depend_files...)
+MACRO_ADD_FILE_DEPENDENCIES(<_file> depend_files…)
 .sp
 Using the macro MACRO_ADD_FILE_DEPENDENCIES() is discouraged.  There
 are usually better ways to specify the correct dependencies.
 .sp
-MACRO_ADD_FILE_DEPENDENCIES(<_file> depend_files...) is just a
+MACRO_ADD_FILE_DEPENDENCIES(<_file> depend_files…) is just a
 convenience wrapper around the OBJECT_DEPENDS source file property.
 You can just use set_property(SOURCE <file> APPEND PROPERTY
 OBJECT_DEPENDS depend_files) instead.
@@ -22057,7 +22057,7 @@ for AIX, cygwin, FreeBSD, HPUX, IRIX, Linux, Mac OS X, QNX, Sun and
 Windows.
 .sp
 This function is guaranteed to return a positive integer (>=1) if it
-succeeds.  It returns 0 if there\(aqs a problem determining the processor
+succeeds.  It returns 0 if there’s a problem determining the processor
 count.
 .sp
 Example use, in a ctest \-S dashboard script:
@@ -22083,7 +22083,7 @@ that you may use that value for parallel building and parallel
 testing.  It is meant to help utilize as much of the machine as seems
 reasonable.  Of course, knowledge of what else might be running on the
 machine simultaneously should be used when deciding whether to request
-a machine\(aqs full capacity all for yourself.
+a machine’s full capacity all for yourself.
 .SS SelectLibraryConfigurations
 .sp
 select_library_configurations( basename )
@@ -22221,8 +22221,8 @@ This module defines variables and macros required to build eCos application.
 .sp
 This file contains the following macros:
 ECOS_ADD_INCLUDE_DIRECTORIES() \- add the eCos include dirs
-ECOS_ADD_EXECUTABLE(name source1 ...  sourceN ) \- create an eCos
-executable ECOS_ADJUST_DIRECTORY(VAR source1 ...  sourceN ) \- adjusts
+ECOS_ADD_EXECUTABLE(name source1 …  sourceN ) \- create an eCos
+executable ECOS_ADJUST_DIRECTORY(VAR source1 …  sourceN ) \- adjusts
 the path of the source files and puts the result into VAR
 .sp
 Macros for selecting the toolchain: ECOS_USE_ARM_ELF_TOOLS() \- enable
@@ -22279,7 +22279,7 @@ add_jar(target_name
 This command creates a <target_name>.jar.  It compiles the given
 source files (source) and adds the given resource files (resource) to
 the jar file.  Source files can be java files or listing files
-(prefixed by \(aq@\(aq).  If only resource files are given then just a jar file
+(prefixed by ‘@’).  If only resource files are given then just a jar file
 is created.  The list of include jars are added to the classpath when
 compiling the java sources and also to the dependencies of the target.
 INCLUDE_JARS also accepts other target names created by add_jar.  For
@@ -22774,7 +22774,7 @@ ${CMAKE_INSTALL_PREFIX}/share/javadoc/<VAR>
 .UNINDENT
 .UNINDENT
 .sp
-if you don\(aqt set the INSTALLPATH.
+if you don’t set the INSTALLPATH.
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -22850,11 +22850,11 @@ Targets on which the javah target depends
 .TP
 .B \fBOUTPUT_NAME <path>\fP
 Concatenates the resulting header files for all the classes listed by option CLASSES
-into <path>. Same behavior as option \(aq\-o\(aq of javah tool.
+into <path>. Same behavior as option ‘\-o’ of javah tool.
 .TP
 .B \fBOUTPUT_DIR <path>\fP
 Sets the directory where the header files will be generated. Same behavior as option
-\(aq\-d\(aq of javah tool. If not specified, ${CMAKE_CURRENT_BINARY_DIR} is used as output directory.
+‘\-d’ of javah tool. If not specified, ${CMAKE_CURRENT_BINARY_DIR} is used as output directory.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -22872,7 +22872,7 @@ PKGCONFIG(package includedir libdir linkflags cflags)
 Calling PKGCONFIG will fill the desired information into the 4 given
 arguments, e.g.  PKGCONFIG(libart\-2.0 LIBART_INCLUDE_DIR
 LIBART_LINK_DIR LIBART_LINK_FLAGS LIBART_CFLAGS) if pkg\-config was NOT
-found or the specified software package doesn\(aqt exist, the variable
+found or the specified software package doesn’t exist, the variable
 will be empty when the function returns, otherwise they will contain
 the respective information
 .SS UseSWIG
@@ -23334,7 +23334,7 @@ to the version of CMake that introduced the given API and less
 than the version of CMake that introduced its succeeding API.
 The value of the \fBCMAKE_MINIMUM_REQUIRED_VERSION\fP
 variable is used if no explicit version is specified.
-(As of CMake version 3.12.0 there is only one API version.)
+(As of CMake version 3.12.4 there is only one API version.)
 .sp
 \fBPROLOG\fP may be specified as text content to write at the start of the
 header. \fBEPILOG\fP may be specified as text content to write at the end

@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "CMAKE-PACKAGES" "7" "Jul 17, 2018" "3.12.0" "CMake"
+.TH "CMAKE-PACKAGES" "7" "Nov 02, 2018" "3.12.4" "CMake"
 .SH NAME
 cmake-packages \- CMake Packages Reference
 .
@@ -877,7 +877,7 @@ entry and the corresponding uninstaller is responsible for removing it.
 .sp
 The \fBexport(PACKAGE)\fP command populates the user package registry
 with the location of a project build tree.  Build trees tend to be deleted by
-developers and have no "uninstall" event that could trigger removal of their
+developers and have no “uninstall” event that could trigger removal of their
 entries.  In order to keep the registries clean the \fBfind_package()\fP
 command automatically removes stale entries it encounters if it has sufficient
 permissions.  CMake provides no interface to remove an entry referencing an

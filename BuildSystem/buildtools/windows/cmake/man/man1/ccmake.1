@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "CCMAKE" "1" "Jul 17, 2018" "3.12.0" "CMake"
+.TH "CCMAKE" "1" "Nov 02, 2018" "3.12.4" "CMake"
 .SH NAME
 ccmake \- CMake Curses Dialog Command-Line Reference
 .
@@ -43,7 +43,7 @@ ccmake [<options>] {<path\-to\-source> | <path\-to\-existing\-build>}
 .UNINDENT
 .SH DESCRIPTION
 .sp
-The "ccmake" executable is the CMake curses interface.  Project
+The “ccmake” executable is the CMake curses interface.  Project
 configuration settings may be specified interactively through this
 GUI.  Brief instructions are provided at the bottom of the terminal
 when the program is running.
@@ -62,9 +62,9 @@ Pre\-load a script to populate the cache.
 When cmake is first run in an empty build tree, it creates a
 CMakeCache.txt file and populates it with customizable settings for
 the project.  This option may be used to specify a file from which
-to load cache entries before the first pass through the project\(aqs
+to load cache entries before the first pass through the project’s
 cmake listfiles.  The loaded entries take priority over the
-project\(aqs default values.  The given file should be a CMake script
+project’s default values.  The given file should be a CMake script
 containing SET commands that use the CACHE option, not a
 cache\-format file.
 .TP
@@ -74,7 +74,7 @@ Create or update a cmake cache entry.
 When cmake is first run in an empty build tree, it creates a
 CMakeCache.txt file and populates it with customizable settings for
 the project.  This option may be used to specify a setting that
-takes priority over the project\(aqs default value.  The option may be
+takes priority over the project’s default value.  The option may be
 repeated for as many cache entries as desired.
 .sp
 If the \fB:<type>\fP portion is given it must be one of the types

@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "CMAKE-ENV-VARIABLES" "7" "Jul 17, 2018" "3.12.0" "CMake"
+.TH "CMAKE-ENV-VARIABLES" "7" "Nov 02, 2018" "3.12.4" "CMake"
 .SH NAME
 cmake-env-variables \- CMake Environment Variables Reference
 .
@@ -37,7 +37,7 @@ Specifies the maximum number of concurrent processes to use when building
 using the \fBcmake \-\-build\fP command line
 Build Tool Mode\&.
 .sp
-If this variable is defined empty the native build tool\(aqs default number is
+If this variable is defined empty the native build tool’s default number is
 used.
 .SS CMAKE_CONFIG_TYPE
 .sp
@@ -97,6 +97,20 @@ to be deployed.
 .sp
 The \fBMACOSX_DEPLOYMENT_TARGET\fP environment variable sets the default value for
 the \fBCMAKE_OSX_DEPLOYMENT_TARGET\fP variable.
+.SS <PackageName>_ROOT
+.sp
+Calls to \fBfind_package(<PackageName>)\fP will search in prefixes
+specified by the \fB<PackageName>_ROOT\fP environment variable, where
+\fB<PackageName>\fP is the name given to the \fBfind_package\fP call
+and \fB_ROOT\fP is literal.  For example, \fBfind_package(Foo)\fP will search
+prefixes specified in the \fBFoo_ROOT\fP environment variable (if set).
+See policy \fBCMP0074\fP\&.
+.sp
+This variable may hold a single prefix or a list of prefixes separated
+by \fB:\fP on UNIX or \fB;\fP on Windows (the same as the \fBPATH\fP environment
+variable convention on those platforms).
+.sp
+See also the \fB<PackageName>_ROOT\fP CMake variable.
 .SH ENVIRONMENT VARIABLES FOR LANGUAGES
 .SS ASM<DIALECT>
 .sp

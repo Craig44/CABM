@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "CMAKE-VARIABLES" "7" "Jul 17, 2018" "3.12.0" "CMake"
+.TH "CMAKE-VARIABLES" "7" "Nov 02, 2018" "3.12.4" "CMake"
 .SH NAME
 cmake-variables \- CMake Variables Reference
 .
@@ -43,14 +43,14 @@ Number of command line arguments passed to CMake in script mode.
 .sp
 When run in \-P script mode, CMake sets this variable to
 the number of command line arguments.  See also \fBCMAKE_ARGV0\fP,
-\fB1\fP, \fB2\fP ...
+\fB1\fP, \fB2\fP …
 .SS CMAKE_ARGV0
 .sp
 Command line argument passed to CMake in script mode.
 .sp
 When run in \-P script mode, CMake sets this variable to
 the first command line argument.  It then also sets \fBCMAKE_ARGV1\fP,
-\fBCMAKE_ARGV2\fP, ... and so on, up to the number of command line arguments
+\fBCMAKE_ARGV2\fP, … and so on, up to the number of command line arguments
 given.  See also \fBCMAKE_ARGC\fP\&.
 .SS CMAKE_BINARY_DIR
 .sp
@@ -292,7 +292,7 @@ VS 2010 and above.
 .SS CMAKE_EDIT_COMMAND
 .sp
 Full path to \fBcmake\-gui(1)\fP or \fBccmake(1)\fP\&.  Defined only for
-Makefile Generators when not using an "extra" generator for an IDE.
+Makefile Generators when not using an “extra” generator for an IDE.
 .sp
 This is the full path to the CMake executable that can graphically
 edit the cache.  For example, \fBcmake\-gui(1)\fP or \fBccmake(1)\fP\&.
@@ -576,7 +576,7 @@ back to its starting type.  This property switches the final linker
 search type to \fB\-Bstatic\fP regardless of how it started.
 .sp
 This variable is used to initialize the target property
-\fBLINK_SEARCH_END_STATIC\fP for all targets. If set, it\(aqs
+\fBLINK_SEARCH_END_STATIC\fP for all targets. If set, it’s
 value is also used by the \fBtry_compile()\fP command.
 .sp
 See also \fBCMAKE_LINK_SEARCH_START_STATIC\fP\&.
@@ -595,7 +595,7 @@ when linking an executable statically (e.g.  with the GNU \fB\-static\fP
 option).
 .sp
 This variable is used to initialize the target property
-\fBLINK_SEARCH_START_STATIC\fP for all targets.  If set, it\(aqs
+\fBLINK_SEARCH_START_STATIC\fP for all targets.  If set, it’s
 value is also used by the \fBtry_compile()\fP command.
 .sp
 See also \fBCMAKE_LINK_SEARCH_END_STATIC\fP\&.
@@ -1447,7 +1447,7 @@ Specifies the build type on single\-configuration generators.
 .sp
 This statically specifies what build type (configuration) will be
 built in this build tree.  Possible values are empty, \fBDebug\fP, \fBRelease\fP,
-\fBRelWithDebInfo\fP, \fBMinSizeRel\fP, ...  This variable is only meaningful to
+\fBRelWithDebInfo\fP, \fBMinSizeRel\fP, …  This variable is only meaningful to
 single\-configuration generators (such as Makefile Generators and
 \fBNinja\fP) i.e.  those which choose a single configuration when CMake
 runs to generate a build tree as opposed to multi\-configuration generators
@@ -1571,7 +1571,7 @@ This cache variable is used by the Eclipse project generator.  See
 .sp
 When using the Eclipse project generator, CMake tries to find the Eclipse
 executable and detect the version of it. Depending on the version it finds,
-some features are enabled or disabled. If CMake doesn\(aqt find
+some features are enabled or disabled. If CMake doesn’t find
 Eclipse, it assumes the oldest supported version, Eclipse Callisto (3.2).
 .SS CMAKE_ERROR_DEPRECATED
 .sp
@@ -2114,7 +2114,7 @@ command.  This is intended for injecting custom code into project
 builds without modifying their source.
 .SS CMAKE_SKIP_INSTALL_ALL_DEPENDENCY
 .sp
-Don\(aqt make the \fBinstall\fP target depend on the \fBall\fP target.
+Don’t make the \fBinstall\fP target depend on the \fBall\fP target.
 .sp
 By default, the \fBinstall\fP target depends on the \fBall\fP target.  This
 has the effect, that when \fBmake install\fP is invoked or \fBINSTALL\fP is
@@ -2294,9 +2294,9 @@ Specify a CMake file that overrides platform information.
 .sp
 CMake loads the specified file while enabling support for each
 language from either the \fBproject()\fP or \fBenable_language()\fP
-commands.  It is loaded after CMake\(aqs builtin compiler and platform information
+commands.  It is loaded after CMake’s builtin compiler and platform information
 modules have been loaded but before the information is used.  The file
-may set platform information variables to override CMake\(aqs defaults.
+may set platform information variables to override CMake’s defaults.
 .sp
 This feature is intended for use only in overriding information
 variables that must be set before CMake builds its first test project
@@ -2337,6 +2337,19 @@ instead of generating one for every \fBproject()\fP command.
 .sp
 This could be useful to speed up the CMake generation step for
 large projects and to work\-around a bug in the \fBZERO_CHECK\fP logic.
+.SS <PackageName>_ROOT
+.sp
+Calls to \fBfind_package(<PackageName>)\fP will search in prefixes
+specified by the \fB<PackageName>_ROOT\fP CMake variable, where
+\fB<PackageName>\fP is the name given to the \fBfind_package\fP call
+and \fB_ROOT\fP is literal.  For example, \fBfind_package(Foo)\fP will search
+prefixes specified in the \fBFoo_ROOT\fP CMake variable (if set).
+See policy \fBCMP0074\fP\&.
+.sp
+This variable may hold a single prefix or a
+;\-list of multiple prefixes.
+.sp
+See also the \fB<PackageName>_ROOT\fP environment variable.
 .SH VARIABLES THAT DESCRIBE THE SYSTEM
 .SS ANDROID
 .sp
@@ -2455,7 +2468,7 @@ The name of the operating system for which CMake is to build.
 See the \fBCMAKE_SYSTEM_VERSION\fP variable for the OS version.
 .sp
 Note that \fBCMAKE_SYSTEM_NAME\fP is not set to anything by default when running
-in script mode, since it\(aqs not building anything.
+in script mode, since it’s not building anything.
 .SS System Name for Host Builds
 .sp
 \fBCMAKE_SYSTEM_NAME\fP is by default set to the same value as the
@@ -2803,7 +2816,7 @@ that provides the unified headers and \fItrue\fP otherwise.
 .SS CMAKE_ANDROID_NDK_TOOLCHAIN_HOST_TAG
 .sp
 When Cross Compiling for Android with the NDK, this variable
-provides the NDK\(aqs "host tag" used to construct the path to prebuilt
+provides the NDK’s “host tag” used to construct the path to prebuilt
 toolchains that run on the host.
 .SS CMAKE_ANDROID_NDK_TOOLCHAIN_VERSION
 .sp
@@ -2891,7 +2904,8 @@ STLport Static
 STLport Shared
 .UNINDENT
 .sp
-The default value is \fBgnustl_static\fP\&.  Note that this default differs from
+The default value is \fBgnustl_static\fP on NDK versions that provide it
+and otherwise \fBc++_static\fP\&.  Note that this default differs from
 the native NDK build system because CMake may be used to build projects for
 Android that are not natively implemented for it and use the C++ standard
 library.
@@ -3248,7 +3262,7 @@ created.  For example:
 .sp
 .nf
 .ft C
-set(CMAKE_CXX_CLANG_TIDY clang\-tidy checks=\-*,readability\-*)
+set(CMAKE_CXX_CLANG_TIDY clang\-tidy \-checks=\-*,readability\-*)
 add_executable(foo foo.cxx)
 .ft P
 .fi
@@ -3389,7 +3403,7 @@ See also the configuration\-specific variable
 Extra PATH locations that should be used when executing
 \fBadd_custom_command()\fP or \fBadd_custom_target()\fP when using the
 \fBVisual Studio 9 2008\fP (or above) generator. This allows
-for running commands and using dll\(aqs that the IDE environment is not aware of.
+for running commands and using dll’s that the IDE environment is not aware of.
 .sp
 If not set explicitly the value is initialized by the \fBCMAKE_MSVCIDE_RUN_PATH\fP
 environment variable, if set, and otherwise left empty.
@@ -3538,7 +3552,7 @@ Default value for \fBPOSITION_INDEPENDENT_CODE\fP of targets.
 .sp
 This variable is used to initialize the
 \fBPOSITION_INDEPENDENT_CODE\fP property on all the targets.
-See that target property for additional information.  If set, it\(aqs
+See that target property for additional information.  If set, it’s
 value is also used by the \fBtry_compile()\fP command.
 .SS CMAKE_RUNTIME_OUTPUT_DIRECTORY
 .sp
@@ -3650,7 +3664,7 @@ must propagate into the test project in order to target the same platform as
 the host project.
 .sp
 This variable should not be set by project code.  It is meant to be set by
-CMake\(aqs platform information modules for the current toolchain, or by a
+CMake’s platform information modules for the current toolchain, or by a
 toolchain file when used with \fBCMAKE_TOOLCHAIN_FILE\fP\&.
 .sp
 Variables meaningful to CMake, such as \fBCMAKE_<LANG>_FLAGS\fP, are
@@ -3749,14 +3763,14 @@ created.
 .sp
 Set Xcode target attributes directly.
 .sp
-Tell the \fBXcode\fP generator to set \(aq<an\-attribute>\(aq to a given value
+Tell the \fBXcode\fP generator to set ‘<an\-attribute>’ to a given value
 in the generated Xcode project.  Ignored on other generators.
 .sp
 See the \fBXCODE_ATTRIBUTE_<an\-attribute>\fP target property
 to set attributes on a specific target.
 .sp
 Contents of \fBCMAKE_XCODE_ATTRIBUTE_<an\-attribute>\fP may use
-"generator expressions" with the syntax \fB$<...>\fP\&.  See the
+“generator expressions” with the syntax \fB$<...>\fP\&.  See the
 \fBcmake\-generator\-expressions(7)\fP manual for available
 expressions.  See the \fBcmake\-buildsystem(7)\fP manual
 for more on defining buildsystem properties.
@@ -4247,7 +4261,7 @@ Implicit linker search path detected for language \fB<LANG>\fP\&.
 .sp
 Compilers typically pass directories containing language runtime
 libraries and default library search paths when they invoke a linker.
-These paths are implicit linker search directories for the compiler\(aqs
+These paths are implicit linker search directories for the compiler’s
 language.  CMake automatically detects these directories for each
 language and reports the results in this variable.
 .sp
@@ -4265,7 +4279,7 @@ purposes.
 Implicit linker framework search path detected for language \fB<LANG>\fP\&.
 .sp
 These paths are implicit linker framework search directories for the
-compiler\(aqs language.  CMake automatically detects these directories
+compiler’s language.  CMake automatically detects these directories
 for each language and reports the results in this variable.
 .SS CMAKE_<LANG>_IMPLICIT_LINK_LIBRARIES
 .sp
@@ -4273,7 +4287,7 @@ Implicit link libraries and flags detected for language \fB<LANG>\fP\&.
 .sp
 Compilers typically pass language runtime library names and other
 flags when they invoke a linker.  These flags are implicit link
-options for the compiler\(aqs language.  CMake automatically detects
+options for the compiler’s language.  CMake automatically detects
 these libraries and flags for each language and reports the results in
 this variable.
 .SS CMAKE_<LANG>_LIBRARY_ARCHITECTURE
@@ -4287,7 +4301,7 @@ variable contains the \fB<arch>\fP name if/as detected by CMake.
 .sp
 Preference value for linker language selection.
 .sp
-The "linker language" for executable, shared library, and module
+The “linker language” for executable, shared library, and module
 targets is the language whose compiler will invoke the linker.  The
 \fBLINKER_LANGUAGE\fP target property sets the language explicitly.
 Otherwise, the linker language is that whose linker preference value
@@ -4319,7 +4333,7 @@ An internal variable subject to change.
 This is used in determining the platform and is subject to change.
 .SS CMAKE_<LANG>_SIMULATE_ID
 .sp
-Identification string of "simulated" compiler.
+Identification string of “simulated” compiler.
 .sp
 Some compilers simulate other compilers to serve as drop\-in
 replacements.  When CMake detects such a compiler it sets this
@@ -4327,7 +4341,7 @@ variable to what would have been the \fBCMAKE_<LANG>_COMPILER_ID\fP for
 the simulated compiler.
 .SS CMAKE_<LANG>_SIMULATE_VERSION
 .sp
-Version string of "simulated" compiler.
+Version string of “simulated” compiler.
 .sp
 Some compilers simulate other compilers to serve as drop\-in
 replacements.  When CMake detects such a compiler it sets this
@@ -4343,7 +4357,7 @@ platform ABI.  It is defined for languages \fBC\fP and \fBCXX\fP (C++).
 .sp
 Extensions of source files for the given language.
 .sp
-This is the list of extensions for a given language\(aqs source files.
+This is the list of extensions for a given language’s source files.
 .SS CMAKE_<LANG>_STANDARD_INCLUDE_DIRECTORIES
 .sp
 Include directories to be used for every source file compiled with
@@ -4353,7 +4367,7 @@ The directories always appear at the end of the include path passed
 to the compiler.
 .sp
 This variable should not be set by project code.  It is meant to be set by
-CMake\(aqs platform information modules for the current toolchain, or by a
+CMake’s platform information modules for the current toolchain, or by a
 toolchain file when used with \fBCMAKE_TOOLCHAIN_FILE\fP\&.
 .sp
 See also \fBCMAKE_<LANG>_STANDARD_LIBRARIES\fP\&.
@@ -4364,13 +4378,13 @@ for language \fB<LANG>\fP\&.  This is meant for specification of system
 libraries needed by the language for the current platform.
 .sp
 This variable should not be set by project code.  It is meant to be set by
-CMake\(aqs platform information modules for the current toolchain, or by a
+CMake’s platform information modules for the current toolchain, or by a
 toolchain file when used with \fBCMAKE_TOOLCHAIN_FILE\fP\&.
 .sp
 See also \fBCMAKE_<LANG>_STANDARD_INCLUDE_DIRECTORIES\fP\&.
 .SS CMAKE_Swift_LANGUAGE_VERSION
 .sp
-Set to the Swift language version number.  If not set, the legacy "2.3"
+Set to the Swift language version number.  If not set, the legacy “2.3”
 version is assumed.
 .SS CMAKE_USER_MAKE_RULES_OVERRIDE_<LANG>
 .sp
@@ -4467,7 +4481,7 @@ cobertura\-report \-\-datafile coberturamerge.ser \-\-destination . \e
 .UNINDENT
 .sp
 The script uses \fBfind\fP to capture the paths to all of the \fBcobertura.ser\fP
-files found below the project\(aqs source directory.  It keeps the list of files
+files found below the project’s source directory.  It keeps the list of files
 and supplies it as an argument to the \fBcobertura\-merge\fP program. The
 \fB\-\-datafile\fP argument signifies where the result of the merge will be kept.
 .sp
@@ -4534,7 +4548,7 @@ It is initialized by \fBctest(1)\fP, but may be edited in a \fBCTestCustom\fP
 file. See \fBctest_read_custom_files()\fP documentation.
 .SS CTEST_CUSTOM_MAXIMUM_FAILED_TEST_OUTPUT_SIZE
 .sp
-When saving a failing test\(aqs output, this is the maximum size, in bytes, that
+When saving a failing test’s output, this is the maximum size, in bytes, that
 will be collected by the \fBctest_test()\fP command. Defaults to 307200
 (300 KiB).
 .sp
@@ -4558,7 +4572,7 @@ It is initialized by \fBctest(1)\fP, but may be edited in a \fBCTestCustom\fP
 file. See \fBctest_read_custom_files()\fP documentation.
 .SS CTEST_CUSTOM_MAXIMUM_PASSED_TEST_OUTPUT_SIZE
 .sp
-When saving a passing test\(aqs output, this is the maximum size, in bytes, that
+When saving a passing test’s output, this is the maximum size, in bytes, that
 will be collected by the \fBctest_test()\fP command. Defaults to 1024
 (1 KiB).
 .sp
@@ -4825,8 +4839,8 @@ top level directory.  The purpose of is to include (set to \fB1\fP or \fBON\fP o
 \fBOFF\fP or \fBFALSE\fP).
 .sp
 Each CPack generator has a built\-in default value for this variable.
-E.g.  Archive generators (ZIP, TGZ, ...) includes the top level
-whereas RPM or DEB don\(aqt.  The user may override the default value by
+E.g.  Archive generators (ZIP, TGZ, …) includes the top level
+whereas RPM or DEB don’t.  The user may override the default value by
 setting this variable.
 .sp
 There is a similar variable

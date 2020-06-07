@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "CMAKE-QT" "7" "Jul 17, 2018" "3.12.0" "CMake"
+.TH "CMAKE-QT" "7" "Nov 02, 2018" "3.12.4" "CMake"
 .SH NAME
 cmake-qt \- CMake Qt Features Reference
 .
@@ -34,7 +34,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .sp
 CMake can find and use Qt 4 and Qt 5 libraries.  The Qt 4 libraries are found
 by the \fBFindQt4\fP find\-module shipped with CMake, whereas the
-Qt 5 libraries are found using "Config\-file Packages" shipped with Qt 5. See
+Qt 5 libraries are found using “Config\-file Packages” shipped with Qt 5. See
 \fBcmake\-packages(7)\fP for more information about CMake packages, and
 see \fI\%the Qt cmake manual\fP
 for your Qt version.
@@ -94,7 +94,7 @@ be included by the user in the C++ implementation file with a preprocessor
 .sp
 Included \fBmoc_*.cpp\fP and \fB*.moc\fP files will be generated in the
 \fB<AUTOGEN_BUILD_DIR>/include\fP directory which is
-automatically added to the target\(aqs \fBINCLUDE_DIRECTORIES\fP\&.
+automatically added to the target’s \fBINCLUDE_DIRECTORIES\fP\&.
 .INDENT 0.0
 .IP \(bu 2
 This differs from CMake 3.7 and below; see their documentation for details.
@@ -158,7 +158,7 @@ where \fB<source_dir>\fP is the directory of the C++ file and
 .sp
 The generated generated \fBui_*.h\fP files are placed in the
 \fB<AUTOGEN_BUILD_DIR>/include\fP directory which is
-automatically added to the target\(aqs \fBINCLUDE_DIRECTORIES\fP\&.
+automatically added to the target’s \fBINCLUDE_DIRECTORIES\fP\&.
 .INDENT 0.0
 .IP \(bu 2
 This differs from CMake 3.7 and below; see their documentation for details.
@@ -268,7 +268,7 @@ a \fBcustom target\fP is used instead.
 This happens when
 .INDENT 0.0
 .IP \(bu 2
-The origin target depends on \fBGENERATED\fP files which aren\(aqt excluded
+The origin target depends on \fBGENERATED\fP files which aren’t excluded
 from \fBAUTOMOC\fP and \fBAUTOUIC\fP by \fBSKIP_AUTOMOC\fP,
 \fBSKIP_AUTOUIC\fP, \fBSKIP_AUTOGEN\fP or \fBCMP0071\fP
 .IP \(bu 2

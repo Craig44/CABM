@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "CMAKE" "1" "Jul 17, 2018" "3.12.0" "CMake"
+.TH "CMAKE" "1" "Nov 02, 2018" "3.12.4" "CMake"
 .SH NAME
 cmake \- CMake Command-Line Reference
 .
@@ -48,7 +48,7 @@ cmake \-\-find\-package <options>...
 .UNINDENT
 .SH DESCRIPTION
 .sp
-The "cmake" executable is the CMake command\-line interface.  It may be
+The “cmake” executable is the CMake command\-line interface.  It may be
 used to configure projects in scripts.  Project configuration settings
 may be specified on the command line with the \-D option.
 .sp
@@ -66,9 +66,9 @@ Pre\-load a script to populate the cache.
 When cmake is first run in an empty build tree, it creates a
 CMakeCache.txt file and populates it with customizable settings for
 the project.  This option may be used to specify a file from which
-to load cache entries before the first pass through the project\(aqs
+to load cache entries before the first pass through the project’s
 cmake listfiles.  The loaded entries take priority over the
-project\(aqs default values.  The given file should be a CMake script
+project’s default values.  The given file should be a CMake script
 containing SET commands that use the CACHE option, not a
 cache\-format file.
 .TP
@@ -78,7 +78,7 @@ Create or update a cmake cache entry.
 When cmake is first run in an empty build tree, it creates a
 CMakeCache.txt file and populates it with customizable settings for
 the project.  This option may be used to specify a setting that
-takes priority over the project\(aqs default value.  The option may be
+takes priority over the project’s default value.  The option may be
 repeated for as many cache entries as desired.
 .sp
 If the \fB:<type>\fP portion is given it must be one of the types
@@ -267,9 +267,9 @@ Warn about unused variables.
 Find variables that are declared or set, but not used.
 .TP
 .B \fB\-\-no\-warn\-unused\-cli\fP
-Don\(aqt warn about command line options.
+Don’t warn about command line options.
 .sp
-Don\(aqt find variables that are declared on the command line, but not
+Don’t find variables that are declared on the command line, but not
 used.
 .TP
 .B \fB\-\-check\-system\-vars\fP
@@ -431,7 +431,7 @@ cmake \-\-build <dir> [<options>...] [\-\- <build\-tool\-options>...]
 .UNINDENT
 .UNINDENT
 .sp
-This abstracts a native build tool\(aqs command\-line interface with the
+This abstracts a native build tool’s command\-line interface with the
 following options:
 .INDENT 0.0
 .TP
@@ -440,7 +440,7 @@ Project binary directory to be built.  This is required and must be first.
 .TP
 .B \fB\-j [<jobs>], \-\-parallel [<jobs>]\fP
 The maximum number of concurrent processes to use when building.
-If \fB<jobs>\fP is omitted the native build tool\(aqs default number is used.
+If \fB<jobs>\fP is omitted the native build tool’s default number is used.
 .sp
 The \fBCMAKE_BUILD_PARALLEL_LEVEL\fP environment variable, if set,
 specifies a default parallel level when this option is not given.
