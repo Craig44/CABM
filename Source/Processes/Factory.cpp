@@ -22,7 +22,6 @@
 #include "Children/Recruitment/RecruitmentConstant.h"
 #include "Children/Growth/GrowthVonBertalanffyWithBasic.h"
 #include "Children/Growth/GrowthSchnuteWithBasic.h"
-#include "Children/Mortality/MortalityBaranov.h"
 #include "Children/Mortality/MortalityConstantRate.h"
 #include "Children/Mortality/MortalityEventBiomass.h"
 #include "Children/Mortality/MortalityEffortBased.h"
@@ -31,6 +30,8 @@
 #include "Children/Tagging.h"
 #include "Children/TagShedding.h"
 #include "Children/Maturity.h"
+#include "Children/Mortality/MortalityBaranovSimple.h"
+#include "Children/Mortality/MortalityBaranov.h"
 
 // Namespaces
 namespace niwa {
@@ -80,6 +81,8 @@ Process* Factory::Create(Model* model, const string& object_type, const string& 
       result = new GrowthSchnuteWithBasic(model);
     else if (sub == PARAM_MORTALITY_BARANOV)
       result = new MortalityBaranov(model);
+    else if (sub == PARAM_MORTALITY_BARANOV_SIMPLE)
+      result = new MortalityBaranovSimple(model);
     else if (sub == PARAM_MORTALITY_CONSTANT_RATE)
       result = new MortalityConstantRate(model);
     else if (sub == PARAM_MORTALITY_EVENT_BIOMASS)

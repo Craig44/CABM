@@ -200,12 +200,15 @@ map<unsigned, float>* Object::GetAddressableUMap(const string& label) {
 }
 
 map<unsigned, float>* Object::GetAddressableUMap(const string& label, bool& create_missing) {
+  LOG_FINE() << "label " << label << " size = " << addressable_u_maps_.size();
   if (addressable_types_.find(label) == addressable_types_.end())
     LOG_CODE_ERROR() << "addressable_types_.find(" << label << ") == addressable_types_.end()";
   if (addressable_types_[label] != addressable::kUnsignedMap)
     LOG_CODE_ERROR() << "addressable_types_[" << label << "] != Addressable::kUnsignedMap";
 
   create_missing = create_missing_addressables_.find(label) != create_missing_addressables_.end();
+  LOG_FINE() << "create_missing " << create_missing;
+
   return addressable_u_maps_[label];
 }
 
@@ -254,6 +257,7 @@ vector<float>* Object::GetAddressableVector(const string& label) {
  */
 
 addressable::Type Object::GetAddressableType(const string& label) const {
+  LOG_FINE() << "looking for addressablestype of " << label;
   if (addressable_types_.find(label) == addressable_types_.end()) {
     for (auto container : unnamed_addressable_s_map_vector_) {
       if (container->find(label) != container->end())
@@ -334,6 +338,7 @@ void Object::RegisterAsAddressable(const string& label, OrderedMap<string, float
   addressable_initphase_[label] = re_run_init;
 }
 void Object::RegisterAsAddressable(const string& label, map<unsigned, float>* variables, addressable::Usage usage, addressable::rerun_initialisation re_run_init) {
+  LOG_FINE() << "addressable Umap = " << label;
   addressable_u_maps_[label]  = variables;
   addressable_types_[label]   = addressable::kUnsignedMap;
   addressable_usage_[label] = usage;

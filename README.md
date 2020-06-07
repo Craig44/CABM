@@ -1,15 +1,16 @@
-# Individual Based Model (IBM)
+# Agent Based Model (ABM)
 
-This repository is for a generalised IBM that I am trying to generate during my PhD. I abuse the term Individual a bit I actually mean agent or super individual, where one entity can represent
-many entities that have identical attributes. The purpose of this is for scaling up results to population levels. It will be a stochastic simulator used 
+This repository is for a generalised ABM that I am trying to generate during my PhD. An single agent may represent
+many entities that have identical attributes, the exception is tagging which represents individuals. The purpose of this is for scaling up results to population levels. 
+It will be a stochastic simulator used 
 for investigating different stock assessment methods under hypothetical scenarios. The current repository is a mixture of  ideas that need to be acknowledged. 
 Firstly to the Casal2 team found [here](https://github.com/NIWAFisheriesModelling/CASAL2),
-which formulated the basis of the core code for error handling, parameter structure, configuration syntax and more. I also learnt about IBM's 
+which formulated the basis of the core code for error handling, parameter structure, configuration syntax and more. I also learnt about ABM's 
 via the model found [here](https://github.com/trophia/sna1), where some idea's have been brought across. And finally to the SPM  team found [here](https://github.com/NIWAFisheriesModelling/SPM),
 where most of the spatial code structure comes from.
 
 This is an open source project and if anyone is interested in this project please get in touch the more input the better. Because I will be using this as an operating model during my PhD, I would really appreciate
-if people who use this tool get in touch to minimize over lap and also to just share ideas. I am interested in adding features that are being used in recent applications of IBM's such as; [energetic functionality](https://www.sciencedirect.com/science/article/pii/S0304380018301327) 
+if people who use this tool get in touch to minimize over lap and also to just share ideas. I am interested in adding features that are being used in recent applications of ABM's such as; [energetic functionality](https://www.sciencedirect.com/science/article/pii/S0304380018301327) 
 habitat based movement, via currents and active gradient searches like in [this paper](https://www.sciencedirect.com/science/article/pii/S0079661117302896)
 Also make it a full life cycle model so that we can do [end to end model](https://www-sciencedirect-com.ezproxy.auckland.ac.nz/science/article/pii/S0079661115000233)
 It would also need to simulate data that could easily be used in a stock assessment model for management strategy evaluation.
@@ -69,6 +70,14 @@ For more information on build parameters look at the python scripts or run the c
 ```
 doBuild.bat help
 ```
+
+### Tips for compiling on windows
+I use the cross gcc compiler found [here](https://jmeubank.github.io/tdm-gcc/). Make sure when you install, that openMP and I think fortran tool sets are available in the gcc compiler. 
+If you use the compiler that is linked above, this will involve manually selecting extra settings in the install process.
+
+
+Avoid white space in the absolute path name of the repository, in the past we have found issues when white space is present in the absolute path of the repository.
+
 
 ### Running the Program
 

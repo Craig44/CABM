@@ -52,7 +52,6 @@ protected:
   vector<float>                       catches_;
   vector<string>                      selectivity_label_;
   vector<Selectivity*>                selectivity_;
-  vector<unsigned>                    years_;
   bool                                selectivity_length_based_ = false;
   map<unsigned, float>                catches_by_year_;
   float                               catchability_;

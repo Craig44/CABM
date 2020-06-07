@@ -157,12 +157,12 @@ void MortalityEventBiomass::DoBuild() {
       LOG_ERROR_P(PARAM_CATCH) << "year " << year << " is not a valid year in this model";
     // Check years are consecutive ascending order.
     // This will mean when I reference catch_ndx later in the code we can have faith it is in order.
-    if (catch_year_.size() > 1) {
-      if ((year - 1) != catch_year_[catch_year_.size() - 1]) {
-        LOG_ERROR_P(PARAM_CATCH) << "years need to be in consecutive ascending order, the year " << catch_year_[catch_year_.size() - 1] << " was followed by " << year << " please sort this out";
+    if (years_.size() > 1) {
+      if ((year - 1) != years_[years_.size() - 1]) {
+        LOG_ERROR_P(PARAM_CATCH) << "years need to be in consecutive ascending order, the year " << years_[years_.size() - 1] << " was followed by " << year << " please sort this out";
       }
     }
-    catch_year_.push_back(year);
+    years_.push_back(year);
     for (unsigned i = 1; i < row.size(); ++i) {
       fishery_catch_layer_labels_[i - 1].push_back(row[i]);
       layers::NumericLayer *temp_layer = nullptr;
@@ -294,7 +294,7 @@ void MortalityEventBiomass::DoBuild() {
       if (!utilities::To<string, unsigned>(scan_row[0], year))
         LOG_FATAL_P(PARAM_SCANNING)
         << "year value " << scan_row[0] << " is not numeric.";
-      if (std::find(catch_year_.begin(), catch_year_.end(), year) == catch_year_.end())
+      if (std::find(years_.begin(), years_.end(), year) == years_.end())
         LOG_FATAL_P(PARAM_SCANNING)
         << "year " << year << " is not found in the catch table, there needs to be a year for every catch year.";
       scanning_years_.push_back(year);
@@ -314,9 +314,9 @@ void MortalityEventBiomass::DoBuild() {
   }
 
   for (unsigned i = 0; i < age_comp_by_fishery_.size(); ++i) {
-    age_comp_by_fishery_[i].resize(catch_year_.size());
-    length_comp_by_fishery_[i].resize(catch_year_.size());
-    fishery_census_data_[i].resize(catch_year_.size());
+    age_comp_by_fishery_[i].resize(years_.size());
+    length_comp_by_fishery_[i].resize(years_.size());
+    fishery_census_data_[i].resize(years_.size());
   }
 
   scanning_this_year_.resize(fishery_index_.size(), false);
@@ -324,9 +324,9 @@ void MortalityEventBiomass::DoBuild() {
 
   catch_to_take_by_fishery_.resize(fishery_index_.size(), 0.0);
 
-  actual_catch_by_area_.resize(catch_year_.size());
-  for (unsigned year_ndx = 0; year_ndx < catch_year_.size(); ++year_ndx) {
-    actual_catch_by_area_[year_ndx].resize(catch_year_.size());
+  actual_catch_by_area_.resize(years_.size());
+  for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    actual_catch_by_area_[year_ndx].resize(years_.size());
     for (unsigned fishery_ndx = 0; fishery_ndx < fishery_label_.size(); ++fishery_ndx) {
       actual_catch_by_area_[year_ndx][fishery_ndx].resize(model_->get_height());
       for (unsigned row = 0; row < model_->get_height(); ++row)
@@ -344,7 +344,7 @@ void MortalityEventBiomass::DoReset() {
   removals_by_length_and_area_.clear();
   removals_census_.clear();
   removals_tag_recapture_.clear();
-  for (unsigned year_ndx = 0; year_ndx < catch_year_.size(); ++year_ndx) {
+  for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     for (unsigned fishery_ndx = 0; fishery_ndx < fishery_label_.size(); ++fishery_ndx) {
       fishery_census_data_[fishery_ndx][year_ndx].clear();
       age_comp_by_fishery_[fishery_ndx][year_ndx].clear();
@@ -363,11 +363,11 @@ void MortalityEventBiomass::DoExecute() {
   vector<unsigned> global_age_freq(model_->age_spread(), 0);
   unsigned time_step = model_->get_time_step_counter();
   account_for_tag_population_ = false;
-  auto iter = catch_year_.begin();
+  auto iter = years_.begin();
   if (model_->state() != State::kInitialise) {
-    if (std::find(iter, catch_year_.end(), model_->current_year()) != catch_year_.end()) {
-      iter = find(catch_year_.begin(), catch_year_.end(), model_->current_year());
-      unsigned catch_ndx = distance(catch_year_.begin(), iter);
+    if (std::find(iter, years_.end(), model_->current_year()) != years_.end()) {
+      iter = find(years_.begin(), years_.end(), model_->current_year());
+      unsigned catch_ndx = distance(years_.begin(), iter);
 
       if (scanning_years_.size() > 0) {
         LOG_MEDIUM() << "checking scanning";
@@ -1033,8 +1033,8 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
           fill(temp_age_freq.begin(), temp_age_freq.end(), 0.0);
           // Print by cell
           for (unsigned cell_ndx = 0; cell_ndx < age_comp_by_fishery_[fishery][year_ndx].size(); ++cell_ndx) {
-            cache << catch_year_[year_ndx] << " " << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].row_ + 1 << "-" << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].col_ + 1 << " ";
-            if (age_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
+            cache << years_[year_ndx] << " " << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].row_ + 1 << "-" << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].col_ + 1 << " ";
+            if (age_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == years_[year_ndx]) {
               for (unsigned age_ndx = 0; age_ndx < age_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_.size(); ++age_ndx) {
                 cache << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_[age_ndx] << " ";
                 temp_age_freq[age_ndx] += age_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_[age_ndx];
@@ -1058,8 +1058,8 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
           fill(temp_age_freq.begin(), temp_age_freq.end(), 0.0);
           // By cell
           for (unsigned cell_ndx = 0; cell_ndx < age_comp_by_fishery_[fishery][year_ndx].size(); ++cell_ndx) {
-            if (age_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
-              cache << catch_year_[year_ndx] << " " << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].row_ + 1 << "-" << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].col_ + 1 << " ";
+            if (age_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == years_[year_ndx]) {
+              cache << years_[year_ndx] << " " << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].row_ + 1 << "-" << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].col_ + 1 << " ";
 
               for (unsigned age_ndx = 0; age_ndx < age_comp_by_fishery_[fishery][year_ndx][cell_ndx].female_frequency_.size(); ++age_ndx) {
                 cache << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].female_frequency_[age_ndx] << " ";
@@ -1069,7 +1069,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
               cache << "\n";
             }
           }
-          cache << catch_year_[year_ndx] << " Total ";
+          cache << years_[year_ndx] << " Total ";
           for (auto &age_freq : temp_age_freq)
             cache << age_freq << " ";
           cache << "\n";
@@ -1086,8 +1086,8 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
           fill(temp_age_freq.begin(), temp_age_freq.end(), 0.0);
           // By cell
           for (unsigned cell_ndx = 0; cell_ndx < age_comp_by_fishery_[fishery][year_ndx].size(); ++cell_ndx) {
-            if (age_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
-              cache << catch_year_[year_ndx] << " " << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].row_ + 1 << "-" << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].col_ + 1 << " ";
+            if (age_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == years_[year_ndx]) {
+              cache << years_[year_ndx] << " " << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].row_ + 1 << "-" << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].col_ + 1 << " ";
               for (unsigned age_ndx = 0; age_ndx < age_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_.size(); ++age_ndx) {
                 cache << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_[age_ndx] << " ";
                 temp_age_freq[age_ndx] += age_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_[age_ndx];
@@ -1095,7 +1095,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
               cache << "\n";
             }
           }
-          cache << catch_year_[year_ndx] << " Total ";
+          cache << years_[year_ndx] << " Total ";
           for (auto &age_freq : temp_age_freq)
             cache << age_freq << " ";
           cache << "\n";
@@ -1117,8 +1117,8 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
           fill(temp_len_freq.begin(), temp_len_freq.end(), 0.0);
           // By cell
           for (unsigned cell_ndx = 0; cell_ndx < length_comp_by_fishery_[fishery][year_ndx].size(); ++cell_ndx) {
-            if (length_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
-              cache << catch_year_[year_ndx] << " " << length_comp_by_fishery_[fishery][year_ndx][cell_ndx].row_ + 1 << "-" << length_comp_by_fishery_[fishery][year_ndx][cell_ndx].col_ + 1 << " ";
+            if (length_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == years_[year_ndx]) {
+              cache << years_[year_ndx] << " " << length_comp_by_fishery_[fishery][year_ndx][cell_ndx].row_ + 1 << "-" << length_comp_by_fishery_[fishery][year_ndx][cell_ndx].col_ + 1 << " ";
               for (unsigned len_ndx = 0; len_ndx < length_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_.size(); ++len_ndx) {
                 cache << length_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_[len_ndx] << " ";
                 temp_len_freq[len_ndx] += length_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_[len_ndx];
@@ -1126,7 +1126,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
               cache << "\n";
             }
           }
-          cache << catch_year_[year_ndx] << " Total ";
+          cache << years_[year_ndx] << " Total ";
           for (auto &len_freq : temp_len_freq)
             cache << len_freq << " ";
           cache << "\n";
@@ -1143,8 +1143,8 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
           fill(temp_len_freq.begin(), temp_len_freq.end(), 0.0);
           // By cell
           for (unsigned cell_ndx = 0; cell_ndx < length_comp_by_fishery_[fishery][year_ndx].size(); ++cell_ndx) {
-            if (length_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
-              cache << catch_year_[year_ndx] << " " << length_comp_by_fishery_[fishery][year_ndx][cell_ndx].row_ + 1 << "-" << length_comp_by_fishery_[fishery][year_ndx][cell_ndx].col_ + 1 << " ";
+            if (length_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == years_[year_ndx]) {
+              cache << years_[year_ndx] << " " << length_comp_by_fishery_[fishery][year_ndx][cell_ndx].row_ + 1 << "-" << length_comp_by_fishery_[fishery][year_ndx][cell_ndx].col_ + 1 << " ";
               for (unsigned len_ndx = 0; len_ndx < length_comp_by_fishery_[fishery][year_ndx][cell_ndx].female_frequency_.size(); ++len_ndx) {
                 cache << length_comp_by_fishery_[fishery][year_ndx][cell_ndx].female_frequency_[len_ndx] << " ";
                 temp_len_freq[len_ndx] += length_comp_by_fishery_[fishery][year_ndx][cell_ndx].female_frequency_[len_ndx];
@@ -1152,7 +1152,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
               cache << "\n";
             }
           }
-          cache << catch_year_[year_ndx] << " Total ";
+          cache << years_[year_ndx] << " Total ";
           for (auto &len_freq : temp_len_freq)
             cache << len_freq << " ";
           cache << "\n";
@@ -1169,8 +1169,8 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
           fill(temp_len_freq.begin(), temp_len_freq.end(), 0.0);
           // By cell
           for (unsigned cell_ndx = 0; cell_ndx < length_comp_by_fishery_[fishery][year_ndx].size(); ++cell_ndx) {
-            if (length_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == catch_year_[year_ndx]) {
-              cache << catch_year_[year_ndx] << " " << length_comp_by_fishery_[fishery][year_ndx][cell_ndx].row_ + 1 << "-" << length_comp_by_fishery_[fishery][year_ndx][cell_ndx].col_ + 1 << " ";
+            if (length_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == years_[year_ndx]) {
+              cache << years_[year_ndx] << " " << length_comp_by_fishery_[fishery][year_ndx][cell_ndx].row_ + 1 << "-" << length_comp_by_fishery_[fishery][year_ndx][cell_ndx].col_ + 1 << " ";
               for (unsigned len_ndx = 0; len_ndx < length_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_.size(); ++len_ndx) {
                 cache << length_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_[len_ndx] << " ";
                 temp_len_freq[len_ndx] += length_comp_by_fishery_[fishery][year_ndx][cell_ndx].frequency_[len_ndx];
@@ -1178,7 +1178,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
               cache << "\n";
             }
           }
-          cache << catch_year_[year_ndx] << " Total ";
+          cache << years_[year_ndx] << " Total ";
           for (auto &len_freq : temp_len_freq)
             cache << len_freq << " ";
           cache << "\n";
@@ -1187,8 +1187,8 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
     }
   }
   // Print actual catches by year x fishery x area
-  for (unsigned year_ndx = 0; year_ndx < catch_year_.size(); ++year_ndx) {
-    cache << "actual_catches-" << catch_year_[year_ndx] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
+  for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    cache << "actual_catches-" << years_[year_ndx] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
     cache << "cell ";
     for (unsigned fishery_ndx = 0; fishery_ndx < fishery_label_.size(); ++fishery_ndx)
       cache << fishery_label_[fishery_ndx] << " ";
@@ -1317,68 +1317,6 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
       }
     }
   }
-}
-
-// true means all years are found, false means there is a mismatch in years
-bool MortalityEventBiomass::check_years(vector<unsigned> years_to_check_) {
-  LOG_FINE();
-  for (unsigned year_ndx = 0; year_ndx < years_to_check_.size(); ++year_ndx) {
-    if (find(catch_year_.begin(), catch_year_.end(), years_to_check_[year_ndx]) == catch_year_.end())
-      return false;
-  }
-
-  return true;
-
-}
-// Does this fishery exist?
-// yes = true
-// no = false
-bool MortalityEventBiomass::check_fishery_exists(string fishery_label) {
-  LOG_FINE();
-  if (find(fishery_label_.begin(), fishery_label_.end(), fishery_label) != fishery_label_.end())
-    return true;
-
-  return false;
-
-}
-
-// find and return age comp data for this fishery.
-// TODO: change this, make void and pass a pointer of class vector<vector<census_data>> and fishery label,
-// and assign the address of the pointer to this fisher label, that way no copies are being made.
-vector<vector<census_data>> MortalityEventBiomass::get_fishery_census_data(string fishery_label) {
-  LOG_FINE();
-  vector<vector<census_data>> fish_comp;
-  for (unsigned i = 0; i < fishery_label_.size(); ++i) {
-    if (fishery_label_[i] == fishery_label)
-      return fishery_census_data_[fishery_index_[i]];
-  }
-  return fish_comp;
-}
-
-// Return Fishery specific Length composition
-vector<vector<composition_data>>* MortalityEventBiomass::get_fishery_length_comp(string &fishery_label) {
-  LOG_FINE();
-  vector<vector<composition_data>> *fish_comp = nullptr;
-  for (unsigned i = 0; i < fishery_label_.size(); ++i) {
-    if (fishery_label_[i] == fishery_label)
-      return &length_comp_by_fishery_[fishery_index_[i]];
-  }
-  LOG_FATAL()
-  << "This should not reach this point";
-  return fish_comp;
-}
-
-// Return Fishery specific Age composition
-vector<vector<composition_data>>* MortalityEventBiomass::get_fishery_age_comp(string &fishery_label) {
-  LOG_FINE();
-  vector<vector<composition_data>> *fish_comp = nullptr;
-  for (unsigned i = 0; i < fishery_label_.size(); ++i) {
-    if (fishery_label_[i] == fishery_label)
-      return &age_comp_by_fishery_[fishery_index_[i]];
-  }
-  LOG_FATAL()
-  << "This should not reach this point";
-  return fish_comp;
 }
 
 } /* namespace processes */

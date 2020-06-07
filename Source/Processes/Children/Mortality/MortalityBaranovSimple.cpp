@@ -1,5 +1,5 @@
 /**
- * @file MortalityBaranov.cpp
+ * @file MortalityBaranovSimple.cpp
  * @author C.Marsh
  * @github https://github.com/Craig44
  * @date 21/09/2018
@@ -11,7 +11,7 @@
  */
 
 // headers
-#include "MortalityBaranov.h"
+#include "MortalityBaranovSimple.h"
 
 #include "Layers/Manager.h"
 #include "Selectivities/Manager.h"
@@ -26,11 +26,11 @@ namespace processes {
 /**
  * constructor
  */
-MortalityBaranov::MortalityBaranov(Model* model) : Mortality(model) {
+MortalityBaranovSimple::MortalityBaranovSimple(Model* model) : Mortality(model) {
   // F information
   parameters_.Bind<string>(PARAM_FISHERY_SELECTIVITY, &fishery_selectivity_label_, "Selectivity label for the fishery process", "");
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "years to apply the fishery process in", "");
-  parameters_.Bind<string>(PARAM_FISHING_MORTALITY_LAYERS, &f_layer_label_, "Spatial layer describing catch by cell for each year, there is a one to one link with the year specified, so make sure the order is right", "");
+  parameters_.Bind<string>(PARAM_FISHING_MORTALITY_LAYERS, &f_layer_label_, "Spatial layer describing F by area for each year, there is a one to one link with the year specified, so make sure the order is right", "");
   parameters_.Bind<float>(PARAM_MINIMUM_LEGAL_LENGTH, &mls_, "The minimum legal length for this fishery, any individual less than this will be returned using some discard mortality", "", 0);
   parameters_.Bind<float>(PARAM_HANDLING_MORTALITY, &discard_mortality_, "if discarded due to being under the minimum legal length, what is the probability the individual will die when released", "", 0.0);
   parameters_.Bind<bool>(PARAM_PRINT_EXTRA_INFO, &print_extra_info_, "if you have process report for this process you can control the amount of information printed to the file.", "", true);
@@ -55,7 +55,7 @@ MortalityBaranov::MortalityBaranov(Model* model) : Mortality(model) {
 /**
  * Do some initial checks of user supplied parameters.
  */
-void MortalityBaranov::DoValidate() {
+void MortalityBaranovSimple::DoValidate() {
   LOG_TRACE();
   if (years_.size() != f_layer_label_.size())
     LOG_ERROR_P(PARAM_YEARS) << "you must specify a layer label for each year. You have supplied '" << years_.size() << "' years but '" << f_layer_label_.size() << "' fishing mortality labels, please sort this out.";
@@ -75,7 +75,7 @@ void MortalityBaranov::DoValidate() {
 /**
  * DoBuild
  */
-void MortalityBaranov::DoBuild() {
+void MortalityBaranovSimple::DoBuild() {
   LOG_FINE();
 
   if (model_->get_sexed()) {
@@ -209,7 +209,7 @@ void MortalityBaranov::DoBuild() {
 /**
  * DoReset
  */
-void MortalityBaranov::DoReset() {
+void MortalityBaranovSimple::DoReset() {
   LOG_FINE() << "clearing containers";
   removals_by_age_and_area_.clear();
   removals_by_length_and_area_.clear();
@@ -220,7 +220,7 @@ void MortalityBaranov::DoReset() {
 /**
  * DoExecute
  */
-void MortalityBaranov::DoExecute() {
+void MortalityBaranovSimple::DoExecute() {
   LOG_MEDIUM();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   unsigned current_year = model_->current_year();
@@ -616,7 +616,7 @@ void MortalityBaranov::DoExecute() {
  * This method is called at when ever an agent is created/seeded or moves. Agents will get a new/updated growth parameters
  * based on the spatial cells of the process. This is called in initialisation/Recruitment and movement processes if needed.
 */
-void  MortalityBaranov::draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) {
+void  MortalityBaranovSimple::draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   float mean_m;
   if (m_layer_)
@@ -648,7 +648,7 @@ void  MortalityBaranov::draw_rate_param(unsigned row, unsigned col, unsigned num
 
 // FillReportCache, called in the report class, it will print out additional information that is stored in
 // containers in this class.
-void  MortalityBaranov::FillReportCache(ostringstream& cache) {
+void  MortalityBaranovSimple::FillReportCache(ostringstream& cache) {
   LOG_FINE();
   cache << "biomass_removed: ";
   for (auto& year : actual_removals_by_year_)
@@ -731,7 +731,7 @@ void  MortalityBaranov::FillReportCache(ostringstream& cache) {
 }
 
 // A Method for telling the world we need to redistribute Mortality parmaeters
-void MortalityBaranov::RebuildCache() {
+void MortalityBaranovSimple::RebuildCache() {
   LOG_FINE();
   world_->rebuild_mort_params();
 }
@@ -739,7 +739,7 @@ void MortalityBaranov::RebuildCache() {
 
 
 // true means all years are found, false means there is a mismatch in years
-bool MortalityBaranov::check_years(vector<unsigned> years_to_check_) {
+bool MortalityBaranovSimple::check_years(vector<unsigned> years_to_check_) {
   LOG_FINE();
   for (unsigned year_ndx = 0; year_ndx < years_to_check_.size(); ++year_ndx) {
     if (find(years_.begin(), years_.end(), years_to_check_[year_ndx]) == years_.end())

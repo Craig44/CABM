@@ -92,14 +92,22 @@ bool Objects::VerfiyAddressableForUse(const string& parameter_absolute_name, add
  */
 addressable::Type Objects::GetAddressableType(const string& parameter_absolute_name) {
   std::pair<string, string> parameter_index = ExplodeParameterAndIndex(parameter_absolute_name);
-  LOG_FINEST() << "parameter type = " << parameter_index.first << " index = " << parameter_index.second;
-  if (parameter_index.second != "") {
-    if (utilities::String::explode(parameter_index.second).size() == 1)
-      return addressable::kSingle;
-    else
-      return addressable::kMultiple;
-  } // TODO; Write unit tests for the above
+  LOG_FINEST() << "absolute = " << parameter_absolute_name << " parameter type = " << parameter_index.first << " index = " << parameter_index.second;
+/*
 
+  if (parameter_index.second != "") {
+    if (utilities::String::explode(parameter_index.second).size() == 1) {
+      // no index, this doesn't mean it isnot a vector or map
+      // get pointer to target
+      base::Object* target = FindObjectOrNull(parameter_absolute_name);
+      return target->GetAddressableType(parameter_index.first);
+    } else {
+      // get pointer to target
+      base::Object* target = FindObjectOrNull(parameter_absolute_name);
+      return target->GetAddressableType(parameter_index.first);
+    }
+  } // TODO; Write unit tests for the above
+*/
   base::Object* target = FindObjectOrNull(parameter_absolute_name); // TODO: Mock FIndObject() so we can unit test this.
   return target->GetAddressableType(parameter_index.first);
 }
@@ -162,8 +170,10 @@ vector<Double*>* Objects::GetAddressables(const string& addressable_absolute_nam
  * @return Pointer to the addressable or nullptr if none exists
  */
 map<unsigned, Double>* Objects::GetAddressableUMap(const string& parameter_absolute_name) {
+  LOG_FINE() << "parameter_absolute_name " << parameter_absolute_name;
   base::Object* target = FindObject(parameter_absolute_name);
   std::pair<string, string> parameter_index = ExplodeParameterAndIndex(parameter_absolute_name);
+  LOG_FINE() << "first = " << parameter_index.first << " second = " << parameter_index.second;
   return target->GetAddressableUMap(parameter_index.first);
 }
 
@@ -253,8 +263,8 @@ base::Object* Objects::FindObject(const string& parameter_absolute_name) {
 std::pair<string, string> Objects::ExplodeParameterAndIndex(const string& parameter_absolute_name) {
   string blank        = "";
   std::pair<string, string> result;
-
   ExplodeString(parameter_absolute_name, blank, blank, result.first, result.second);
+  LOG_FINE() << "parameter_absolute_name = " << parameter_absolute_name << " first = " << result.first << " second = " <<  result.second;
   return result;
 }
 

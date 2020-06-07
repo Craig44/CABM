@@ -19,7 +19,7 @@
 
 #include "AgeingErrors/AgeingError.h"
 //#include "Processes/Children/Mortality.h"
-#include "Processes/Children/Mortality/MortalityEventBiomass.h"
+#include "Processes/Children/Mortality.h"
 #include <boost/math/distributions/normal.hpp>
 
 
@@ -27,7 +27,7 @@
 namespace niwa {
 namespace observations {
 
-using processes::MortalityEventBiomass;
+using processes::Mortality;
 
 /**
  * class definition
@@ -77,7 +77,7 @@ protected:
   unsigned                        age_spread_ = 0;
 
   string                          fishery_label_;
-  MortalityEventBiomass*          mortality_process_ = nullptr;
+  Mortality*                      mortality_process_ = nullptr;
   vector<vector<processes::composition_data>>* fishery_comp_data_ = nullptr;
   string                          process_label_;
   string                          stratum_weight_method_ = PARAM_NONE;

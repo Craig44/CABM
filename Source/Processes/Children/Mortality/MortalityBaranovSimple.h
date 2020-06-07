@@ -1,5 +1,5 @@
 /**
- * @file MortalityBaranov.h
+ * @file MortalityBaranovSimple.h
  * @author C.Marsh
  * @github https://github.com/Craig44
  * @date 21/09/2018
@@ -10,8 +10,8 @@
  *
  * This is a child mortality that applies a fishing event
  */
-#ifndef SOURCE_PROCESSES_CHILDREN_MORTALITY_BARANOV_H_
-#define SOURCE_PROCESSES_CHILDREN_MORTALITY_BARANOV_H_
+#ifndef SOURCE_PROCESSES_CHILDREN_MORTALITY_BARANOV_SIMPLE_H_
+#define SOURCE_PROCESSES_CHILDREN_MORTALITY_BARANOV_SIMPLE_H_
 
 // headers
 #include "Processes/Children/Mortality.h"
@@ -28,11 +28,11 @@ using std::string;
 /**
  * Class definition
  */
-class MortalityBaranov : public Mortality {
+class MortalityBaranovSimple : public Mortality {
 public:
   // methods
-  explicit MortalityBaranov(Model* model);
-  virtual                     ~MortalityBaranov() = default;
+  explicit MortalityBaranovSimple(Model* model);
+  virtual                     ~MortalityBaranovSimple() = default;
   virtual void                        DoValidate() override final;
   virtual void                        DoBuild() override final;
   virtual void                        DoReset() override final;
@@ -90,4 +90,4 @@ protected:
 } /* namespace processes */
 } /* namespace niwa */
 
-#endif /* SOURCE_PROCESSES_CHILDREN_MORTALITY_BARANOV_H_ */
+#endif /* SOURCE_PROCESSES_CHILDREN_MORTALITY_BARANOV_SIMPLE_H_ */

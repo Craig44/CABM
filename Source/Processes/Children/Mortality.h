@@ -111,11 +111,16 @@ public:
   vector<census_data>&                get_census_data() {return removals_census_;};
   vector<tag_recapture>&              get_tag_recapture_info() {return removals_tag_recapture_;};
 
+  virtual bool                        check_years(vector<unsigned> years_to_check_);
+  bool                                check_fishery_exists(string fishery_label);
+  vector<unsigned>&                   get_fishery_years() {return years_;};
+  vector<vector<census_data>>         get_fishery_census_data(string fishery_label);
+  vector<vector<composition_data>>*   get_fishery_length_comp(string& fishery_label);
+  vector<vector<composition_data>>*   get_fishery_age_comp(string& fishery_label);
 
   virtual bool                        update_mortality() {return update_natural_mortality_parameters_;};
   virtual double                      SolveBaranov() { return 1.0;};
   void                                set_lambda(double lambda) {lambda_ = lambda;};
-  virtual bool                        check_years(vector<unsigned> years_to_check_) {return false;};
 
 protected:
   vector<composition_data>            removals_by_age_and_area_;
@@ -126,6 +131,12 @@ protected:
   map<unsigned, vector<unsigned>>     removals_by_length_;
   bool                                update_natural_mortality_parameters_;
   double                              lambda_;
+  vector<vector<vector<composition_data>>>    age_comp_by_fishery_; // n_fishery * n_years * n_cells
+  vector<vector<vector<composition_data>>>   length_comp_by_fishery_; // n_fishery * n_years * n_cells
+  vector<vector<vector<census_data>>>   fishery_census_data_; // n_fishery * n_years * n_cells
+  vector<unsigned>                    years_;
+  vector<string>                      fishery_label_;
+  vector<unsigned>                    fishery_index_; // used for look up on all the vectors specific fishery objects, better than maps for random access
 
 
 

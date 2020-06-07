@@ -39,20 +39,12 @@ public:
   virtual void                        DoExecute() override final;
   void                                draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) override final { };
   void                                FillReportCache(ostringstream& cache) override final;
-  virtual bool                        check_years(vector<unsigned> years_to_check_) override final;
-  bool                                check_fishery_exists(string fishery_label);
-  vector<unsigned>&                   get_fishery_years() {return catch_year_;};
-  vector<vector<census_data>>         get_fishery_census_data(string fishery_label);
-  vector<vector<composition_data>>*   get_fishery_length_comp(string& fishery_label);
-  vector<vector<composition_data>>*   get_fishery_age_comp(string& fishery_label);
+
 
 
 protected:
   parameters::Table*                  catch_table_ = nullptr;
   parameters::Table*                  method_table_ = nullptr;
-  vector<unsigned>                    fishery_index_; // used for look up on all the vectors specific fishery objects, better than maps for random access
-  vector<string>                      fishery_label_;
-  vector<unsigned>                    catch_year_;
   vector<vector<string>>              fishery_catch_layer_labels_; // n_fishery * n_years
   vector<vector<float>>               fishery_actual_catch_taken_; // n_fishery * n_years
   vector<vector<float>>               fishery_catch_to_take_; // n_fishery * n_years
@@ -78,9 +70,6 @@ protected:
   bool                                print_tag_recap_info_ = false;
 
   // need to be reset for any multi run format in DoReset
-  vector<vector<vector<composition_data>>>    age_comp_by_fishery_; // n_fishery * n_years * n_cells
-  vector<vector<vector<composition_data>>>   length_comp_by_fishery_; // n_fishery * n_years * n_cells
-  vector<vector<vector<census_data>>>   fishery_census_data_; // n_fishery * n_years * n_cells
   vector<vector<vector<vector<float>>>> actual_catch_by_area_; // n_years * n_fishery * rows * cols
 
   vector<unsigned>                    cell_ndx_;
