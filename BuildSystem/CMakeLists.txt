@@ -66,7 +66,7 @@ FOREACH(library ${specialLibraries})
 SET(thirdPartyLibraries ${thirdPartyLibraries} ${library})
 ENDFOREACH()
 
-SET(LINK_OPTIONS "${OpenMP_CXX_FLAGS}")
+SET(LINK_OPTIONS "-fopenmp")
 
 IF (LIBRARY)
   ADD_LIBRARY(${EXE_NAME} SHARED ${sourceFiles} )
