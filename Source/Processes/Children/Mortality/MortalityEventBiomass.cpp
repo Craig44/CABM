@@ -163,6 +163,7 @@ void MortalityEventBiomass::DoBuild() {
       }
     }
     years_.push_back(year);
+    LOG_FINE() << "year = " << year;
     for (unsigned i = 1; i < row.size(); ++i) {
       fishery_catch_layer_labels_[i - 1].push_back(row[i]);
       layers::NumericLayer *temp_layer = nullptr;
@@ -364,6 +365,7 @@ void MortalityEventBiomass::DoExecute() {
   unsigned time_step = model_->get_time_step_counter();
   account_for_tag_population_ = false;
   auto iter = years_.begin();
+  scanning_ = false;
   if (model_->state() != State::kInitialise) {
     if (std::find(iter, years_.end(), model_->current_year()) != years_.end()) {
       iter = find(years_.begin(), years_.end(), model_->current_year());
@@ -382,6 +384,7 @@ void MortalityEventBiomass::DoExecute() {
           if (scanning_proportion_by_fishery_[i][scan_ndx] > 0) {
             scanning_this_year_[i] = true;
             account_for_tag_population_ = true;
+            scanning_ = true;
             LOG_MEDIUM() << "scanning for fishery " << fishery_label_[i] << " in year " << model_->current_year();
           } else {
             scanning_this_year_[i] = false;
@@ -1011,7 +1014,7 @@ void MortalityEventBiomass::DoExecute() {
       } // length based
     } // find(years_.begin(), years_.end(), model_->current_year()) != years_.end()
   }  //model_->state() != State::kInitialise
-  LOG_FINE() << "finished Biomass Mort process.";
+  LOG_FINE() << "finished Biomass Mort process. NUmber of tag-recapture obs " << removals_tag_recapture_.size();
 }
 
 // FillReportCache, called in the report class, it will print out additional information that is stored in

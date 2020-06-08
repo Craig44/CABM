@@ -37,7 +37,7 @@ void Mortality::DoReset() {
 
 
 // true means all years are found, false means there is a mismatch in years
-bool Mortality::check_years(vector<unsigned> years_to_check_) {
+bool Mortality::check_years(vector<unsigned>& years_to_check_) {
   LOG_FINE();
   for (unsigned year_ndx = 0; year_ndx < years_to_check_.size(); ++year_ndx) {
     if (find(years_.begin(), years_.end(), years_to_check_[year_ndx]) == years_.end())

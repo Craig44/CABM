@@ -40,6 +40,7 @@ TagShedding::TagShedding(Model *model) :
       "The Release region for the corresponding shedding rate, in the format 1-1 for the first row and first column, and '5-2' for the fifth row and secnd column", "");
   parameters_.Bind<unsigned>(PARAM_RELEASE_YEAR, &tag_release_year_, "The Release Year for the corresponding shedding rate", "");
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "Years to execute the tag shedding process", "");
+  parameters_.Bind<unsigned>(PARAM_STOP_TRACKING_IN_YEARS, &stop_tracking_tags_in_year_, "Stop Tracking tagged partition in this year, they will just die. But will stop containimation in observations.", "");
 
   process_type_ = ProcessType::kTransition;
 
@@ -56,6 +57,15 @@ void TagShedding::DoValidate() {
   if (shedding_rate_.size() != tag_release_year_.size())
     LOG_ERROR_P(PARAM_SHEDDING_RATE) << "You suppled " << shedding_rate_.size() << " shedding rates, but '" << tag_release_year_.size()
         << "' release year, there must be a shedding rate for each release year";
+
+  for(unsigned year_ndx = 0; year_ndx < stop_tracking_tags_in_year_.size(); ++year_ndx) {
+    if(find(years_.begin(), years_.end(), stop_tracking_tags_in_year_[year_ndx]) == years_.end())
+      LOG_ERROR_P(PARAM_STOP_TRACKING_IN_YEARS) << "year = " << stop_tracking_tags_in_year_[year_ndx] << " needs to be in year " << PARAM_YEARS;
+  }
+  if(stop_tracking_tags_in_year_.size() != release_region_.size())
+    LOG_ERROR_P(PARAM_STOP_TRACKING_IN_YEARS) << "You suppled " << stop_tracking_tags_in_year_.size() << " years to stop tracking, but '" << release_region_.size()
+        << "' release regions, there must be a stop year for each release region";
+
 }
 /**
  * DoBuild
@@ -137,7 +147,7 @@ void TagShedding::DoBuild() {
       LOG_ERROR_P(PARAM_RELEASE_REGION) << "The release row " << row_ndx << " is large than the world = '" << model_->get_height() << "'";
     if (row_ndx <= 0)
       LOG_ERROR_P(PARAM_RELEASE_REGION) << "The release row " << row_ndx << " is less than equal to 0, it must be greater than 0";
-    release_row_.push_back(row_ndx);
+    release_row_.push_back(row_ndx - 1);
 
     if (!utilities::To<unsigned>(split_cells[1], col_ndx))
       LOG_ERROR_P(PARAM_RELEASE_REGION) << " value (" << split_cells[1] << ") could not be converted to a unsigned";
@@ -145,7 +155,7 @@ void TagShedding::DoBuild() {
       LOG_ERROR_P(PARAM_RELEASE_REGION) << "The release col " << col_ndx << " is large than the world = '" << model_->get_width() << "'";
     if (col_ndx <= 0)
       LOG_ERROR_P(PARAM_RELEASE_REGION) << "The release col " << col_ndx << " is less than equal to 0, it must be greater than 0";
-    release_col_.push_back(col_ndx);
+    release_col_.push_back(col_ndx - 1);
 
     shedding_rate_by_year_cell_[tag_release_year_[i]][row_ndx - 1][col_ndx - 1] = shedding_rate_[i];
 
@@ -153,6 +163,7 @@ void TagShedding::DoBuild() {
         << " year = " << tag_release_year_[i] << " row = " << row_ndx - 1 << " col = " << col_ndx - 1;
   }
   tag_shedded_per_release_event_.resize(tag_release_year_.size(), 0);
+
 }
 
 /**
@@ -170,12 +181,29 @@ void TagShedding::DoExecute() {
   LOG_MEDIUM();
   std::pair<bool, int> check = utilities::math::findInVector<unsigned>(years_, model_->current_year());
   LOG_MEDIUM() << "year = " << model_->current_year() << " check first = " << check.first;
-
   if ((model_->state() != State::kInitialise) & check.first) {
     utilities::RandomNumberGenerator &rng = utilities::RandomNumberGenerator::Instance();
     unsigned time_step = model_->managers().time_step()->current_time_step();
     float ratio = time_step_ratios_[time_step];
     LOG_MEDIUM() << "time_step = " << time_step << " ratio = " << ratio;
+    /*
+     * Are we removing this cohort of tagged agents
+     */
+    for(unsigned year_ndx = 0; year_ndx < stop_tracking_tags_in_year_.size(); ++year_ndx) {
+      if(model_->current_year() == stop_tracking_tags_in_year_[year_ndx]) {
+        LOG_FINE() << "year = " << model_->current_year() << " years to track = " << release_row_[year_ndx] << " year ndx = " << year_ndx;
+        LOG_FINE() << "row = " << release_row_[year_ndx] << " col = " << release_col_[year_ndx] << " release year = " << tag_release_year_[year_ndx];
+        WorldCell *cell = world_->get_base_square(release_row_[year_ndx], release_col_[year_ndx]);
+        LOG_FINE() << "number of tagged agents = " << cell->tagged_agents_.size();
+
+        for (unsigned agent_ndx = 0;  agent_ndx < cell->tagged_agents_.size(); ++agent_ndx) {
+          if (cell->tagged_agents_[agent_ndx].is_alive()) {
+            if(cell->tagged_agents_[agent_ndx].get_tag_release_year() == tag_release_year_[year_ndx])
+              cell->tagged_agents_[agent_ndx].dies();
+          }
+        }
+      }
+    }
     /*
      // Agent is tagged and survived the process find a slot to add this tagged agent back in
      */

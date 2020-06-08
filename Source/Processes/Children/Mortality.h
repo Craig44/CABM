@@ -109,9 +109,9 @@ public:
   vector<composition_data>&           get_removals_by_age() {return removals_by_age_and_area_;};
   vector<composition_data>&           get_removals_by_length() {return removals_by_length_and_area_;};
   vector<census_data>&                get_census_data() {return removals_census_;};
-  vector<tag_recapture>&              get_tag_recapture_info() {return removals_tag_recapture_;};
+  vector<tag_recapture>*              get_tag_recapture_info() {return &removals_tag_recapture_;};
 
-  virtual bool                        check_years(vector<unsigned> years_to_check_);
+  virtual bool                        check_years(vector<unsigned>& years_to_check_);
   bool                                check_fishery_exists(string fishery_label);
   vector<unsigned>&                   get_fishery_years() {return years_;};
   vector<vector<census_data>>         get_fishery_census_data(string fishery_label);

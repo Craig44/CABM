@@ -623,6 +623,7 @@
 #define PARAM_STEP_SIZE                           "step_size"
 #define PARAM_STEPS                               "steps"
 #define PARAM_STEEPNESS                           "steepness"
+#define PARAM_STOP_TRACKING_IN_YEARS              "stop_tracking_tags_in_year"
 #define PARAM_STRATUM_WEIGHT_METHOD               "stratum_weighting_method"
 #define PARAM_STRATUMS_TO_INCLUDE                 "strata_to_include"
 #define PARAM_STRING                              "categorical"

@@ -47,14 +47,10 @@ protected:
   vector<float>                       random_numbers_;
   vector<float>                       selectivity_random_numbers_;
   vector<float>                       handling_mortality_random_numbers_;
-  vector<vector<vector<float>>>       cell_offset_for_selectivity_;
-
   unsigned                            n_agents_;
-  vector<vector<unsigned>>            cell_offset_;
-  vector<vector<unsigned>>            model_length_bins_;
-  vector<vector<unsigned>>            model_age_bins_;
-  vector<vector<unsigned>>            current_year_by_space_;
-  vector<vector<unsigned>>            handling_mort_by_space_;
+
+  vector<unsigned>                    age_freq_;
+  vector<unsigned>                    length_freq_;
 
   vector<string>                      tag_layer_label_;
   vector<layers::IntLayer*>           tag_layer_;

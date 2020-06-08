@@ -42,6 +42,7 @@ Tagging::Tagging(Model* model) : Process(model) {
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "Years to execute the transition in", "");
   parameters_.BindTable(PARAM_PROPORTIONS, proportions_table_, "Table of proportions to move", "" , true, true);
 
+
   process_type_ = ProcessType::kTransition;
 }
 
@@ -114,13 +115,9 @@ void Tagging::DoBuild() {
     if (columns[1] != PARAM_CELL)
       LOG_ERROR_P(PARAM_PROPORTIONS) << " second column label (" << columns[1] << ") provided must be 'cell'";
     unsigned number_bins = columns.size();
-    if (model_->length_plus()) {
-      if ((number_bins - 2) != model_->length_bins().size())
-        LOG_ERROR_P(PARAM_PROPORTIONS) << "Length bins for this observation are defined in the @model block, there must be a column for each length bin '" << model_->length_bins().size() << "' you supplied '"<< number_bins - 2  << "'. please address this";
-    } else {
-      if ((number_bins - 2) != (model_->length_bins().size() - 1))
-        LOG_ERROR_P(PARAM_PROPORTIONS) << "Length bins for this observation are defined in the @model block, there must be a column for each length bin '" << model_->length_bins().size() - 1 << "' you supplied '"<< number_bins - 2  << "'. please address this";
-    }
+    if ((number_bins - 2) != model_->number_of_length_bins())
+      LOG_ERROR_P(PARAM_PROPORTIONS) << "Length bins for this observation are defined in the @model block, there must be a column for each length bin '" << model_->number_of_length_bins() << "' you supplied '"<< number_bins - 2  << "'. please address this";
+
 
     // load our table data in to our map
     vector<vector<string>> data = proportions_table_->data();
@@ -164,10 +161,11 @@ void Tagging::DoBuild() {
       for (unsigned i = 2; i < iter.size(); ++i) {
         if (!utilities::To<float>(iter[i], proportion))
           LOG_ERROR_P(PARAM_PROPORTIONS) << " value (" << iter[i] << ") could not be converted to a double. Please ensure it's a numeric value";
+        LOG_FINE() << "i = " << i << " prop = " << proportion;
         proportions.push_back(proportion);
         total_proportion += proportion;
       }
-
+      LOG_FINE() << "size of prop = " << proportions.size();
       if (fabs(1.0 - total_proportion) > 0.01)
         LOG_ERROR_P(PARAM_PROPORTIONS) << " total (" << total_proportion << ") is not 1.0 (+- 0.01) for year " << year;
       proportions_data_.push_back(proportions);
@@ -175,24 +173,10 @@ void Tagging::DoBuild() {
   }
 
 
-
-
+  age_freq_.resize(model_->age_spread(),0);
+  length_freq_.resize(model_->number_of_length_bins(),0);
   // Build cell specific containers in the hope that we can thread
   // Allocate memory so we are doing this during execute
-  cell_offset_for_selectivity_.resize(model_->get_height());
-  cell_offset_.resize(model_->get_height());
-  model_length_bins_.resize(model_->get_height());
-  model_age_bins_.resize(model_->get_height());
-  handling_mort_by_space_.resize(model_->get_height());
-  current_year_by_space_.resize(model_->get_height());
-  for (unsigned i = 0; i < model_->get_height(); ++i) {
-    cell_offset_[i].resize(model_->get_width());
-    cell_offset_for_selectivity_[i].resize(model_->get_width());
-    model_length_bins_[i].resize(model_->get_width(), model_->length_bin_mid_points().size());
-    model_age_bins_[i].resize(model_->get_width(), model_->age_spread());
-    current_year_by_space_[i].resize(model_->get_width());
-    handling_mort_by_space_[i].resize(model_->get_width(), handling_mortality_);
-  }
 
   length_distribution_of_tagged_fish_by_year_cell_.resize(years_.size());
   length_observed_tag_of_tagged_fish_by_year_cell_.resize(years_.size());
@@ -247,6 +231,7 @@ void Tagging::DoReset() {
 
 void Tagging::DoExecute() {
   LOG_MEDIUM();
+
   std::pair<bool, int> check = utilities::math::findInVector<unsigned>(years_, model_->current_year());
   if ((model_->state() != State::kInitialise) & check.first) {
     utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
@@ -254,30 +239,10 @@ void Tagging::DoExecute() {
     // Are we applying Tagging either releases or scanning, or both
     LOG_MEDIUM() << "applying tagging in year " << years_[year_ndx] << " should be = " << model_->current_year() << " ndx = " << year_ndx;
     // Pre-calculate agents in the world to set aside our random numbers needed for the operation
-    n_agents_ = 0;
-    for (unsigned row = 0; row < model_->get_height(); ++row) {
-      for (unsigned col = 0; col < model_->get_width(); ++col) {
-        WorldCell* cell = world_->get_base_square(row, col);
-        if (cell->is_enabled()) {
-          cell_offset_[row][col] = n_agents_;
-          n_agents_ += cell->agents_.size();
-          current_year_by_space_[row][col] = model_->current_year();
-        }
-      }
-    }
+
     fill(age_distribution_of_tagged_fish_by_year_[model_->current_year()].begin(), age_distribution_of_tagged_fish_by_year_[model_->current_year()].end(), 0.0);
     fill(length_distribution_of_tagged_fish_by_year_[model_->current_year()].begin(), length_distribution_of_tagged_fish_by_year_[model_->current_year()].end(), 0.0);
 
-    LOG_FINE() << "allocate";
-    // Allocate a single block of memory rather than each thread temporarily allocating their own memory.
-    random_numbers_.resize(n_agents_ + 1);
-    selectivity_random_numbers_.resize(n_agents_ + 1);
-    handling_mortality_random_numbers_.resize(n_agents_ + 1);
-    for (unsigned i = 0; i <= n_agents_; ++i) {
-      random_numbers_[i] = rng.chance();
-      selectivity_random_numbers_[i] = rng.chance();
-      handling_mortality_random_numbers_[i] = rng.chance();
-    }
     LOG_MEDIUM() << "about to apply tagging";
     if (not selectivity_length_based_ & not apply_using_proportions_) {
       // Thread out each loop
@@ -285,7 +250,7 @@ void Tagging::DoExecute() {
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
           WorldCell* cell = nullptr;
-          unsigned tags_to_release = 0;
+          int tags_to_release = 0;
 
           cell = world_->get_base_square(row, col); // Shared resource...
           tags_to_release = tag_layer_[year_ndx]->get_value(row, col);
@@ -295,18 +260,19 @@ void Tagging::DoExecute() {
             unsigned random_agent;
             unsigned counter = 0;
             unsigned tag_max = cell->agents_.size();
-            vector<unsigned>  age_freq(model_age_bins_[row][col],0);
-            vector<unsigned>  length_freq(model_length_bins_[row][col],0);
+            fill(age_freq_.begin(), age_freq_.end(), 0.0);
+            fill(length_freq_.begin(), length_freq_.end(), 0.0);
+
             LOG_FINE() << "row " << row + 1 << " col = " << col + 1 << " tags to release = " << tags_to_release;
             unsigned tag_slot = 0;
             while (tags_to_release > 0) {
               ++tag_attempts;
               // pick a random agent
-              random_agent = random_numbers_[cell_offset_[row][col] + counter] * cell->agents_.size();
+              random_agent = rng.chance() * cell->agents_.size();
               if (cell->agents_[random_agent].is_alive()) {
                 auto& this_agent = cell->agents_[random_agent];
                 // See if it is vulnerable to selectivity
-                if (selectivity_random_numbers_[cell_offset_[row][col] + counter] <= selectivities_[this_agent.get_sex()]->GetResult(this_agent.get_age_index())) {
+                if (rng.chance() <= selectivities_[this_agent.get_sex()]->GetResult(this_agent.get_age_index())) {
                   if (this_agent.get_number_tags() > 1) // This fish is alread tagged so pretend we didn't catch it
                     continue;
 
@@ -316,8 +282,8 @@ void Tagging::DoExecute() {
                   this_agent.set_scalar(this_agent.get_scalar() - 1.0);
                   tagged_agent.set_scalar(1.0);
                   LOG_MEDIUM() << "original tag " << this_agent.get_number_tags() << " tagged version = " << tagged_agent.get_number_tags();
-                  age_freq[this_agent.get_age_index()]++;
-                  length_freq[this_agent.get_length_bin_index()]++;
+                  age_freq_[this_agent.get_age_index()]++;
+                  length_freq_[this_agent.get_length_bin_index()]++;
                   length_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col][this_agent.get_length_bin_index()]++;
                   age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col][this_agent.get_age_index()]++;
                   tags_to_release--;
@@ -325,7 +291,7 @@ void Tagging::DoExecute() {
                   age_length_param2_of_tagged_fish_by_year_cell_[year_ndx][row][col].push_back(tagged_agent.get_second_age_length_par());
 
                   // Lets see if it survives handling
-                  if (handling_mortality_random_numbers_[cell_offset_[row][col] + counter] <= handling_mort_by_space_[row][col]) {
+                  if (rng.chance() <= handling_mortality_) {
                     // It died we will never see this or know about this tagged fish so I am just going to skip the rest of the algorithm
                     cell->remove_agent_alive(this_agent.get_scalar());
                     tagged_agent.dies();
@@ -347,7 +313,7 @@ void Tagging::DoExecute() {
                 }
                 // Make sure we don't end up fishing for infinity
                 if (tag_attempts >= tag_max) {
-                  LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << current_year_by_space_[row][col] << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have" <<
+                  LOG_FATAL_P(PARAM_LABEL) << "Too many attempts to catch an agent in the process " << label_ << " in year " << model_->current_year() << " in row " << row + 1 << " and column " << col + 1 << " this most likely means you have" <<
                      " a model that suggests there should be more agents in this space than than the current agent dynamics are putting in this cell, check the user manual for tips to resolve this situation, agents in cell = " << tag_max << " attempts made = " << tag_attempts;
                 }
               }
@@ -355,9 +321,9 @@ void Tagging::DoExecute() {
             }
             // Store global information
             for (unsigned age = 0; age < model_->age_spread(); ++age)
-              age_distribution_of_tagged_fish_by_year_[model_->current_year()][age] += age_freq[age];
+              age_distribution_of_tagged_fish_by_year_[model_->current_year()][age] += age_freq_[age];
             for (unsigned length_ndx = 0; length_ndx < model_->length_bin_mid_points().size(); ++length_ndx)
-              length_distribution_of_tagged_fish_by_year_[model_->current_year()][length_ndx] += length_freq[length_ndx];
+              length_distribution_of_tagged_fish_by_year_[model_->current_year()][length_ndx] += length_freq_[length_ndx];
 
 
           }
@@ -372,7 +338,6 @@ void Tagging::DoExecute() {
       LOG_FINE() << "applying tagging via given proportions";
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
-          WorldCell* cell = nullptr;
           unsigned tags_to_release = 0;
           // find row index
           unsigned row_ndx = 0;
@@ -381,19 +346,26 @@ void Tagging::DoExecute() {
               break;
           }
           LOG_MEDIUM() << "Year = " << model_->current_year() << " row = " << row + 1<< " col = " << col + 1 << " table ndx = " << row_ndx;
-          cell = world_->get_base_square(row, col); // Shared resource...
+          WorldCell* cell = world_->get_base_square(row, col); // Shared resource...
+
           tags_to_release = tag_layer_[year_ndx]->get_value(row, col);
+          LOG_FINE() << "tags to release = " << tags_to_release;
+          LOG_FINE() << "prop data = " << proportions_data_[row_ndx].size() << " length bins = " << length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row][col].size();
+
           vector<unsigned> tags_by_length_bin(proportions_data_[row_ndx].size(), 0);
           for(unsigned i = 0; i < tags_by_length_bin.size(); ++i) {
             tags_by_length_bin[i] = (unsigned)(proportions_data_[row_ndx][i] * tags_to_release);
             length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row][col][i] = tags_by_length_bin[i];
           }
+
           if (cell->is_enabled()) {
             unsigned tag_slot = 0;
-            vector<unsigned>  age_freq(model_age_bins_[row][col],0);
-            vector<unsigned>  length_freq(model_length_bins_[row][col],0);
+            fill(age_freq_.begin(), age_freq_.end(), 0.0);
+            fill(length_freq_.begin(), length_freq_.end(), 0.0);
+
             for(unsigned i = 0; i < tags_by_length_bin.size(); ++i) {
               if (tags_by_length_bin[i] > 0) {
+
                 vector<unsigned> agent_ndx_available_to_sample_;
                 unsigned agent_counter = 0;
                 for (auto& agent : cell->agents_) {
@@ -414,17 +386,21 @@ void Tagging::DoExecute() {
                 LOG_FINE() << "length bin = " << i + 1 << " tags " << tags_by_length_bin[i] << " agents alive that are in this length bin = " << agent_ndx_available_to_sample_.size();
 
                 agent_counter = tags_by_length_bin[i];
+
                 unsigned agent_ndx = 0;
+                float updated_scalar = 0.0;
                 while(agent_counter > 0) {
+
                   //LOG_MEDIUM() << "agent counter = " << agent_counter;
                   agent_ndx = agent_ndx_available_to_sample_[agent_ndx_available_to_sample_.size() * rng.chance()];
                   agent_counter--;
                   Agent tagged_agent(cell->agents_[agent_ndx]);
                   tagged_agent.apply_tagging_event(1, row, col); // Any tagging attribute should be bundled into this method
-                  cell->agents_[agent_ndx].set_scalar(cell->agents_[agent_ndx].get_scalar() - 1.0);
+                  updated_scalar = cell->agents_[agent_ndx].get_scalar() - 1.0;
+                  cell->agents_[agent_ndx].set_scalar(updated_scalar);
                   tagged_agent.set_scalar(1.0);
-                  age_freq[tagged_agent.get_age_index()]++;
-                  length_freq[tagged_agent.get_length_bin_index()]++;
+                  age_freq_[tagged_agent.get_age_index()]++;
+                  length_freq_[tagged_agent.get_length_bin_index()]++;
                   tags_to_release--;
                   //LOG_MEDIUM() << "original tag " << cell->agents_[agent_ndx].get_number_tags() << " tagged version = " << tagged_agent.get_number_tags();
 
@@ -453,23 +429,27 @@ void Tagging::DoExecute() {
                   if (tag_slot >= cell->tagged_agents_.size()) {
                     cell->tagged_agents_.push_back(tagged_agent);
                   }
+
                 }
                 if (agent_counter < 0) {
                 	LOG_WARNING() << "in Process " << label_ << " couldn't apply all tags in year " << model_->current_year() << " tags that didn't get released = " << tags_to_release;
                 }
+
               }
             }
+
             // Store global information
             for (unsigned age = 0; age < model_->age_spread(); ++age)
-              age_distribution_of_tagged_fish_by_year_[model_->current_year()][age] += age_freq[age];
+              age_distribution_of_tagged_fish_by_year_[model_->current_year()][age] += age_freq_[age];
             for (unsigned length_ndx = 0; length_ndx < model_->length_bin_mid_points().size(); ++length_ndx)
-              length_distribution_of_tagged_fish_by_year_[model_->current_year()][length_ndx] += length_freq[length_ndx];
+              length_distribution_of_tagged_fish_by_year_[model_->current_year()][length_ndx] += length_freq_[length_ndx];
 
           }
         }
       }
     }
   }
+
 }
 
 // FillReportCache, called in the report class, it will print out additional information that is stored in

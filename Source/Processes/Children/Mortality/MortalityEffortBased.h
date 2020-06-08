@@ -46,7 +46,6 @@ public:
 
   void                                draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) override final { };
   void                                FillReportCache(ostringstream& cache) override final;
-  virtual bool                        check_years(vector<unsigned> years_to_check_) override final;
 
 protected:
   vector<float>                       catches_;

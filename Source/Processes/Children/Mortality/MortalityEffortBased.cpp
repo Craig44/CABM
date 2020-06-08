@@ -505,15 +505,6 @@ void  MortalityEffortBased::FillReportCache(ostringstream& cache) {
 }
 
 
-// true means all years are found, false means there is a mismatch in years
-bool MortalityEffortBased::check_years(vector<unsigned> years_to_check_) {
-  LOG_FINE();
-  for (unsigned year_ndx = 0; year_ndx < years_to_check_.size(); ++year_ndx) {
-    if (find(years_.begin(), years_.end(), years_to_check_[year_ndx]) == years_.end())
-      return false;
-  }
-  return true;
-}
 
 } /* namespace processes */
 } /* namespace niwa */

@@ -57,6 +57,7 @@ protected:
 
   Mortality*                      mortality_process_ = nullptr;
   string                          process_label_;
+  vector<processes::tag_recapture>* tag_recapture_data_ = nullptr;
 
   vector<unsigned>                release_stratum_rows_;
   vector<unsigned>                release_stratum_cols_;

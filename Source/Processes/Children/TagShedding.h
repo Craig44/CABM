@@ -52,6 +52,7 @@ protected:
 
   vector<unsigned>                    release_row_;
   vector<unsigned>                    release_col_;
+  vector<unsigned>                    stop_tracking_tags_in_year_;
 
   map<unsigned, float>                time_step_ratios_;
   unsigned                            agents_removed_ = 0;

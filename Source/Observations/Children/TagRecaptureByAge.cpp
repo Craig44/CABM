@@ -187,9 +187,9 @@ void TagRecaptureByAge::Execute() {
 void TagRecaptureByAge::Simulate() {
   LOG_MEDIUM() << "Simulating data for observation = " << label_;
   ClearComparison(); // Clear comparisons
-  vector<processes::tag_recapture>& tag_recapture_data = mortality_process_->get_tag_recapture_info();
+  tag_recapture_data_ = mortality_process_->get_tag_recapture_info();
   //vector<processes::composition_data>& length_frequency = mortality_process_->get_removals_by_length();
-  LOG_FINE() << "length of census data = " << tag_recapture_data.size();
+  LOG_FINE() << "length of census data = " << (*tag_recapture_data_).size();
   vector<unsigned> tag_recapture_stratum_ndx;
   for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     LOG_MEDIUM() << "About to sort our info for year " << years_[year_ndx];
@@ -206,7 +206,7 @@ void TagRecaptureByAge::Simulate() {
       fill(scanned_age_freq_.begin(), scanned_age_freq_.end(), 0.0);
 
       unsigned tag_recap_ndx = 0; // links back to the tag-recapture data
-      for (processes::tag_recapture &tag_recap : tag_recapture_data) {
+      for (processes::tag_recapture &tag_recap : (*tag_recapture_data_)) {
         // Find tag_recap elements that are in this year and stratum
         if ((tag_recap.year_ == years_[year_ndx])
             && (find(recapture_stratum_rows_[recapture_stratum_[recapture_area_ndx]].begin(), recapture_stratum_rows_[recapture_stratum_[recapture_area_ndx]].end(), tag_recap.row_) != recapture_stratum_rows_[recapture_stratum_[recapture_area_ndx]].end())
