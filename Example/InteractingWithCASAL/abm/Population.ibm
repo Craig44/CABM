@@ -1,0 +1,231 @@
+#' HAK 3 & 4 ABM model
+#' single area, 2 fisheries
+#' 
+@model
+start_year 1960 # first data at 1990, start with variable recruitment 30 years earlier and fishing start at 1975.
+final_year 2016
+min_age 1
+max_age 30
+age_plus true # other acceptable inputs for bool are '1' and 'yes'
+initialisation_phase_labels Iterative #label to an @initialisation block
+time_steps AnnualTimeStep
+length_bins 0   2   4   6   8  10  12  14  16  18  20  22  24  26  28  30  32  34  36  38  40  42  44  46  48  50  52  54  56  58  60  62  64  66  68  70  72  74  76  78  80  82  84  86  88  90 92  94  96  98 100 102 104 106 108 110 112 114 116 118 120 # assumed cm's
+length_plus true ## is the last bin a plus group
+base_layer_label Base #
+growth_process_label Growth
+natural_mortality_process_label Natural_Mortality
+sexed false
+maturity_ogive_label MaturationSel
+nrows 1
+ncols 1
+# --------------
+# Init Phase
+# --------------
+@initialisation_phase Iterative
+type iterative
+years 40
+initial_number_of_agents 1000000 ## initial number of agents
+layer_label initial_values
+recruitment_layer_label recruitment_layer # stock identification, important for when you are scaling SSB = B0 for an agent model to population model
+initialisation_mortality_rate 0.19
+# --------------
+# Annual Sequence
+# --------------
+@time_step AnnualTimeStep  
+processes Growth Recruitment Maturity Natural_Mortality Fishing Natural_Mortality
+#Fishing_Mortality
+# --------------
+# Process definitions
+# --------------
+@process Nop 
+type nop
+
+# Growth
+@process Growth
+type growth_schnute_with_basic_weight
+y1 24.5
+y2 104.8
+tau1 1 
+tau2 20 
+alpha 0.131
+beta 1.70
+t0 24.5
+a 2.0e-9
+b 3.288
+cv 0.1
+update_growth_parameters false ## if an agent moves we don't update growth info
+distribution lognormal
+time_step_proportions 1.0
+
+# Maturity
+@process Maturity
+type maturation
+
+# Natural Mortality
+@process Natural_Mortality
+type mortality_constant_rate
+m_multiplier_layer_label M_layer
+m 0.19
+update_mortality_parameters false
+distribution lognormal
+cv 0.0001
+selectivity_label half
+time_step_ratio 1.0
+
+# Fishing Mortality
+@process Fishing
+type mortality_event_biomass
+print_census_info false
+table catch
+year chatFwest chatFeast
+1975 chatFwest_1975 chatFeast_1975
+1976 chatFwest_1976 chatFeast_1976
+1977 chatFwest_1977 chatFeast_1977
+1978 chatFwest_1978 chatFeast_1978
+1979 chatFwest_1979 chatFeast_1979
+1980 chatFwest_1980 chatFeast_1980
+1981 chatFwest_1981 chatFeast_1981
+1982 chatFwest_1982 chatFeast_1982
+1983 chatFwest_1983 chatFeast_1983
+1984 chatFwest_1984 chatFeast_1984
+1985 chatFwest_1985 chatFeast_1985
+1986 chatFwest_1986 chatFeast_1986
+1987 chatFwest_1987 chatFeast_1987
+1988 chatFwest_1988 chatFeast_1988
+1989 chatFwest_1989 chatFeast_1989
+1990 chatFwest_1990 chatFeast_1990
+1991 chatFwest_1991 chatFeast_1991
+1992 chatFwest_1992 chatFeast_1992
+1993 chatFwest_1993 chatFeast_1993
+1994 chatFwest_1994 chatFeast_1994
+1995 chatFwest_1995 chatFeast_1995
+1996 chatFwest_1996 chatFeast_1996
+1997 chatFwest_1997 chatFeast_1997
+1998 chatFwest_1998 chatFeast_1998
+1999 chatFwest_1999 chatFeast_1999
+2000 chatFwest_2000 chatFeast_2000
+2001 chatFwest_2001 chatFeast_2001
+2002 chatFwest_2002 chatFeast_2002
+2003 chatFwest_2003 chatFeast_2003
+2004 chatFwest_2004 chatFeast_2004
+2005 chatFwest_2005 chatFeast_2005
+2006 chatFwest_2006 chatFeast_2006
+2007 chatFwest_2007 chatFeast_2007
+2008 chatFwest_2008 chatFeast_2008
+2009 chatFwest_2009 chatFeast_2009
+2010 chatFwest_2010 chatFeast_2010
+2011 chatFwest_2011 chatFeast_2011
+2012 chatFwest_2012 chatFeast_2012
+2013 chatFwest_2013 chatFeast_2013
+2014 chatFwest_2014 chatFeast_2014
+2015 chatFwest_2015 chatFeast_2015
+2016 chatFwest_2016 chatFeast_2016
+end_table
+
+table method_info
+method 	 	selectivity 	minimum_legel_length  handling_mortality
+chatFwest       chatFwestSel	0			0
+chatFeast	chatFeastSel	0			0
+end_table
+
+# Recruitment
+@process Recruitment
+type recruitment_beverton_holt
+recruitment_layer_label recruitment
+b0 40539.4
+ssb SSB
+steepness 0.84
+	   #1960 1961 1962 1963 1964 1965 1966 1967 1968 1969 1970 1971 1972 1973 1974 1975 1976 1977 1978 1979 1980 1981 1982 1983 1984 1985 1986 1987 1988 1989 1990 1991 1992 1993 1994 1995 1996 1997 1998 1999 2000 2001 2002 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 2016
+ycs_values 1.026 0.41 0.667 1.74 0.357 0.506 0.223 0.256 1.458 5.291 0.89 0.217 1.11 0.447 1.384 1.507 1.535 1.559 1.578 1.591 1.593 1.576 1.553 1.537 0.795 0.819 0.932 0.674 0.953 0.792 1.207 1.782 1.362 1.155 1.086 0.871 0.575 0.543 0.377 0.586 0.38 0.515 1.508 0.829 0.668 0.312 0.513 0.595 0.494 0.708 1.158 1.505 0.781 0.491 1.505 0.229 0.673
+
+
+# --------------
+# Define selectivities
+# --------------
+@selectivity natural_mortality_by_age
+type double_exponential
+x1 3
+x0 12.191300 
+x2 25
+y0 0.138376 
+y1 0.328585 
+y2 0.341879 
+   
+@selectivity One
+type constant
+c 1
+
+@selectivity half
+type constant
+c 0.5
+
+@selectivity MaturationSel
+type logistic_producing
+l 2 
+h 13
+a50 6.206341
+ato95 3.124704
+
+## research selectivities
+/*
+@selectivity chatTANsel 
+type double_normal 
+mu 5.25885 
+sigma_l 1.71782 	
+sigma_r 45.2101 
+
+@selectivity chatFwestSel
+type double_normal 
+mu 6.97053 
+sigma_l 3.38162 	
+sigma_r 8.25739
+
+@selectivity chatFeastSel
+type double_normal
+mu 10.90750  	
+sigma_l 3.77949   
+sigma_r 7.65940
+*/
+
+
+@selectivity chatTANsel 
+type logistic 
+a50 3  	
+ato95 2
+
+@selectivity chatFwestSel
+type logistic
+a50 4  	
+ato95 3.17   
+
+@selectivity chatFeastSel
+type logistic
+a50 7 	
+ato95 3.77949   
+
+
+
+
+# --------------
+# Derived Quantities
+# --------------
+@derived_quantity SSB
+type mature_biomass
+biomass_layer_label SSB
+time_step AnnualTimeStep
+proportion_through_mortality_block 0.5
+
+# --------------
+# Time Varying Quantities
+# --------------
+
+@time_varying natMort
+type random_draw
+parameter process[Natural_Mortality].m
+years 1960:2016
+mean 0.19
+sigma 0.02
+lower_bound 0.05
+upper_bound 0.4
+
+

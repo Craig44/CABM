@@ -1,0 +1,13 @@
+@observation chatTANbiomass_sim
+catchability 0.0965648 
+cell_layer cells 
+cells r1-c1 
+proportion_through_mortality_block 0.5 
+selectivities chatTANsel 
+likelihood lognormal
+time_step AnnualTimeStep 
+type biomass 
+years 1992 1993 1994 1995 1996 1997 1998 1999 2000 2001 2002 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2016 
+obs 6732.48 5098.86 4537.34 3472.01 4789.43 3668.29 3182.67 3614.9 3114.43 2780.8 2872.42 2932.27 3163.97 2246.8 2852.85 2307.59 2169.93 2581.29 2176.68 1957.98 2183.37 2778.58 2821.59 3639.95 
+error_value  0.15  0.17  0.1  0.23  0.13  0.17  0.18  0.12  0.09  0.13  0.15  0.16  0.17  0.18  0.19  0.12  0.13  0.21  0.25  0.15  0.15  0.15  0.15  0.14 
+

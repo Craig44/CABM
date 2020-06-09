@@ -1,0 +1,5 @@
+@layer cells
+type categorical
+table layer
+r1-c1
+end_table
