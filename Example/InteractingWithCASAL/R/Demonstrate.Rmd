@@ -3,8 +3,7 @@ title: "How to interact With CASAL"
 author: "C.Marsh"
 date: "09/06/2020"
 output: pdf_document
-bibliography: bibliography.bib
-citation_package: natbib
+
 
 header-includes:
   \usepackage{float}
@@ -12,7 +11,7 @@ header-includes:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, tidy.opts=list(width.cutoff=60),tidy=TRUE)
+knitr::opts_chunk$set(echo = TRUE, tidy.opts=list(width.cutoff=80),tidy=TRUE)
 ```
 
 
@@ -63,8 +62,8 @@ lines(names(time_vary_ssb$values), time_vary_ssb$values, lwd = 3, col = "red", l
 plot(single_run$agents$`1975`$values$age, single_run$agents$`1975`$values$length, ylim = c(0,140), xlab = "Age", ylab = "Length (cm)", pch = 16)
 
 ## check time-vary M applied correctly
-plot(with_time_vary_m$time_vary$natMort$year, with_time_vary_m$time_vary$natMort$Value, type = "l", lwd = 3, ylim = c(0,0.4))
-years = as.numeric(names(with_time_vary_m$agents)[names(with_time_vary_m$agents) != "type"], xlab = "Year", ylab = "M")
+plot(with_time_vary_m$time_vary$natMort$year, with_time_vary_m$time_vary$natMort$Value, type = "l", lwd = 3, ylim = c(0,0.4), xlab = "Year", ylab = "M")
+years = as.numeric(names(with_time_vary_m$agents)[names(with_time_vary_m$agents) != "type"])
 for(i in 1:length(years)) {
   this_ndx = with_time_vary_m$agents[[which(names(with_time_vary_m$agents) == years[i])]]
   points(years[i], mean(this_ndx$values$M), col = "red", pch = 16, cex = 1.2)
@@ -116,12 +115,15 @@ for(sim in 1:N_sims) {
   max_age = as.numeric(cas_mpd$`proportions_at[chatTANage]`$max_class)
   min_age = as.numeric(cas_mpd$`proportions_at[chatTANage]`$min_class)
   for(i in 1:length(year_ndx)) {
-    cas_mpd$`proportions_at[chatTANage]`[[year_ndx[i]]] = as.numeric(sim_ibm$`observation[chatTANage_sim]`$Table$obs[[i]]) / sum(as.numeric(sim_ibm$`observation[chatTANage_sim]`$Table$obs[[i]]))
+    cas_mpd$`proportions_at[chatTANage]`[[year_ndx[i]]] = as.numeric(sim_ibm$`observation[chatTANage_sim]`$Table$obs[[i]]) /
+      sum(as.numeric(sim_ibm$`observation[chatTANage_sim]`$Table$obs[[i]]))
     ## truncate
     if (cas_mpd$`proportions_at[chatTANage]`$plus_group %in% c("1","TRUE","T","True"))
-      cas_mpd$`proportions_at[chatTANage]`[[year_ndx[i]]][max_age] = sum(cas_mpd$`proportions_at[chatTANage]`[[year_ndx[i]]][max_age:length(sim_ibm$`observation[chatTANage_sim]`$Table$obs[[i]])])
+      cas_mpd$`proportions_at[chatTANage]`[[year_ndx[i]]][max_age] =
+        sum(cas_mpd$`proportions_at[chatTANage]`[[year_ndx[i]]][max_age:length(sim_ibm$`observation[chatTANage_sim]`$Table$obs[[i]])])
     cas_mpd$`proportions_at[chatTANage]`[[year_ndx[i]]] = cas_mpd$`proportions_at[chatTANage]`[[year_ndx[i]]][min_age:max_age]
-    cas_mpd$`proportions_at[chatTANage]`[[year_ndx[i]]]= cas_mpd$`proportions_at[chatTANage]`[[year_ndx[i]]] / sum(cas_mpd$`proportions_at[chatTANage]`[[year_ndx[i]]])
+    cas_mpd$`proportions_at[chatTANage]`[[year_ndx[i]]]= cas_mpd$`proportions_at[chatTANage]`[[year_ndx[i]]] /
+      sum(cas_mpd$`proportions_at[chatTANage]`[[year_ndx[i]]])
   }
   # Chat west
   sim_ibm = ibm::extract.ibm.file(file = file.path(sim_obs, paste0(sim_file_names[sim_west_ndx],".",extensions[sim])))
@@ -129,12 +131,15 @@ for(sim in 1:N_sims) {
   max_age = as.numeric(cas_mpd$`catch_at[chatOBSwst]`$max_class)
   min_age = as.numeric(cas_mpd$`catch_at[chatOBSwst]`$min_class)
   for(i in 1:length(year_ndx)) {
-    cas_mpd$`catch_at[chatOBSwst]`[[year_ndx[i]]] = as.numeric(sim_ibm$`observation[chatOBSwst_sim]`$Table$obs[[i]]) / sum(as.numeric(sim_ibm$`observation[chatOBSwst_sim]`$Table$obs[[i]]))
+    cas_mpd$`catch_at[chatOBSwst]`[[year_ndx[i]]] = as.numeric(sim_ibm$`observation[chatOBSwst_sim]`$Table$obs[[i]]) /
+      sum(as.numeric(sim_ibm$`observation[chatOBSwst_sim]`$Table$obs[[i]]))
     ## truncate
     if (cas_mpd$`catch_at[chatOBSwst]`$plus_group %in% c("1","TRUE","T","True"))
-      cas_mpd$`catch_at[chatOBSwst]`[[year_ndx[i]]][max_age] = sum(cas_mpd$`catch_at[chatOBSwst]`[[year_ndx[i]]][max_age:length(sim_ibm$`observation[chatOBSwst_sim]`$Table$obs[[i]])])
+      cas_mpd$`catch_at[chatOBSwst]`[[year_ndx[i]]][max_age] =
+        sum(cas_mpd$`catch_at[chatOBSwst]`[[year_ndx[i]]][max_age:length(sim_ibm$`observation[chatOBSwst_sim]`$Table$obs[[i]])])
     cas_mpd$`catch_at[chatOBSwst]`[[year_ndx[i]]] = cas_mpd$`catch_at[chatOBSwst]`[[year_ndx[i]]][min_age:max_age]
-    cas_mpd$`catch_at[chatOBSwst]`[[year_ndx[i]]]= cas_mpd$`catch_at[chatOBSwst]`[[year_ndx[i]]] / sum(cas_mpd$`catch_at[chatOBSwst]`[[year_ndx[i]]])
+    cas_mpd$`catch_at[chatOBSwst]`[[year_ndx[i]]]= cas_mpd$`catch_at[chatOBSwst]`[[year_ndx[i]]] / 
+      sum(cas_mpd$`catch_at[chatOBSwst]`[[year_ndx[i]]])
   }
   
   # Chat east
@@ -143,12 +148,16 @@ for(sim in 1:N_sims) {
   max_age = as.numeric(cas_mpd$`catch_at[chatOBSest]`$max_class)
   min_age = as.numeric(cas_mpd$`catch_at[chatOBSest]`$min_class)
   for(i in 1:length(year_ndx)) {
-    cas_mpd$`catch_at[chatOBSest]`[[year_ndx[i]]] = as.numeric(sim_ibm$`observation[chatOBSest_sim]`$Table$obs[[i]]) / sum(as.numeric(sim_ibm$`observation[chatOBSest_sim]`$Table$obs[[i]]))
+    cas_mpd$`catch_at[chatOBSest]`[[year_ndx[i]]] = as.numeric(sim_ibm$`observation[chatOBSest_sim]`$Table$obs[[i]]) /
+      sum(as.numeric(sim_ibm$`observation[chatOBSest_sim]`$Table$obs[[i]]))
     ## truncate
     if (cas_mpd$`catch_at[chatOBSest]`$plus_group %in% c("1","TRUE","T","True"))
-      cas_mpd$`catch_at[chatOBSest]`[[year_ndx[i]]][max_age] = sum(cas_mpd$`catch_at[chatOBSest]`[[year_ndx[i]]][max_age:length(sim_ibm$`observation[chatOBSest_sim]`$Table$obs[[i]])])
-    cas_mpd$`catch_at[chatOBSest]`[[year_ndx[i]]] = cas_mpd$`catch_at[chatOBSest]`[[year_ndx[i]]][min_age:max_age]
-    cas_mpd$`catch_at[chatOBSest]`[[year_ndx[i]]]= cas_mpd$`catch_at[chatOBSest]`[[year_ndx[i]]] / sum(cas_mpd$`catch_at[chatOBSest]`[[year_ndx[i]]])
+      cas_mpd$`catch_at[chatOBSest]`[[year_ndx[i]]][max_age] =
+        sum(cas_mpd$`catch_at[chatOBSest]`[[year_ndx[i]]][max_age:length(sim_ibm$`observation[chatOBSest_sim]`$Table$obs[[i]])])
+    cas_mpd$`catch_at[chatOBSest]`[[year_ndx[i]]] = 
+      cas_mpd$`catch_at[chatOBSest]`[[year_ndx[i]]][min_age:max_age]
+    cas_mpd$`catch_at[chatOBSest]`[[year_ndx[i]]]= 
+      cas_mpd$`catch_at[chatOBSest]`[[year_ndx[i]]] / sum(cas_mpd$`catch_at[chatOBSest]`[[year_ndx[i]]])
   }
   ## write estimation.csl.
   casal::write.csl.file(cas_mpd, file = file.path("..","CASAL","estimation.csl"))
@@ -161,15 +170,21 @@ for(sim in 1:N_sims) {
     cas_mpd_est_alt = casal::extract.csl.file(file = file.path("..","CASAL","estimation.csl"))
     error_ndx = grepl(names(cas_mpd_est_alt$`proportions_at[chatTANage]`), pattern = "N_")
     chat_age_weight = Method.TA1.8(est_mpd$fits$chatTANage, plotit = T)
-    cas_mpd_est_alt$`proportions_at[chatTANage]`[error_ndx] = lapply(cas_mpd_est_alt$`proportions_at[chatTANage]`[error_ndx], FUN = function(x) {as.numeric(x) * chat_age_weight})
+    cas_mpd_est_alt$`proportions_at[chatTANage]`[error_ndx] = 
+      lapply(cas_mpd_est_alt$`proportions_at[chatTANage]`[error_ndx], 
+             FUN = function(x) {as.numeric(x) * chat_age_weight})
     
     error_ndx = grepl(names(cas_mpd_est_alt$`catch_at[chatOBSwst]`), pattern = "N_")
     chat_west_weight = Method.TA1.8(est_mpd$fits$chatOBSwst, plotit = F)
-    cas_mpd_est_alt$`catch_at[chatOBSwst]`[error_ndx] = lapply(cas_mpd_est_alt$`catch_at[chatOBSwst]`[error_ndx], FUN = function(x) {as.numeric(x) * chat_west_weight})
+    cas_mpd_est_alt$`catch_at[chatOBSwst]`[error_ndx] = 
+      lapply(cas_mpd_est_alt$`catch_at[chatOBSwst]`[error_ndx], 
+             FUN = function(x) {as.numeric(x) * chat_west_weight})
     
     error_ndx = grepl(names(cas_mpd_est_alt$`catch_at[chatOBSest]`), pattern = "N_")
     chat_east_weight = Method.TA1.8(est_mpd$fits$chatOBSest, plotit = F)
-    cas_mpd_est_alt$`catch_at[chatOBSest]`[error_ndx] = lapply(cas_mpd_est_alt$`catch_at[chatOBSest]`[error_ndx], FUN = function(x) {as.numeric(x) * chat_east_weight})
+    cas_mpd_est_alt$`catch_at[chatOBSest]`[error_ndx] = 
+      lapply(cas_mpd_est_alt$`catch_at[chatOBSest]`[error_ndx], 
+             FUN = function(x) {as.numeric(x) * chat_east_weight})
     casal::write.csl.file(object = cas_mpd, file = file.path("..","CASAL","estimation.csl"))
   }
 }
