@@ -1,0 +1,11 @@
+\section{Investigating undefined behaviour in the IBM\label{sec:debugging}}
+
+Whilst the model is in development (This could be forever haha) some classes will be left behind which might leave bugs when reusing these. If a model run quits/exits middway through a run with no error message. The first thing you want to do is use the internal logging system. This involves the following command \texttt{ibm -r --loglevel fine > run.log 2> log.out}. This will pipe out the logging info into the file \texttt{log.out}. I have found in the past that some undefined model behaviour will still work when the logging is on. If you can't isolate where the error occurs or when you use the logging system the undefined behaviour doesn't repeat. Then we suggest using a C++ debugger as it will almost certainly be an out of memory issue. 
+
+
+\subsection{Using a C++ debugger}
+Compile the code base with debug setting \texttt{doBuild.bat debug}. When this has been successfully compiled copy the model configuration files into the executable location \path{BuildSystem\bin\windows\debug}. Then use gdbsource open a command prompt and use the command prompt \texttt{gdb ibm} this will load ibm into gdbsource. Then type \texttt{run -r > run.log}. Because this is not optimised during compilation so I suggest decreasing the number of agents significantly. For more info on using gdb see \href{https://www.gnu.org/software/gdb/}{here}
+
+
+
+

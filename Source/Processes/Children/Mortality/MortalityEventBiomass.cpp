@@ -327,7 +327,7 @@ void MortalityEventBiomass::DoBuild() {
 
   actual_catch_by_area_.resize(years_.size());
   for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
-    actual_catch_by_area_[year_ndx].resize(years_.size());
+    actual_catch_by_area_[year_ndx].resize(fishery_label_.size());
     for (unsigned fishery_ndx = 0; fishery_ndx < fishery_label_.size(); ++fishery_ndx) {
       actual_catch_by_area_[year_ndx][fishery_ndx].resize(model_->get_height());
       for (unsigned row = 0; row < model_->get_height(); ++row)

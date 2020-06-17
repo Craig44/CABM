@@ -344,7 +344,7 @@ void WorldView::get_cell_element(unsigned& row, unsigned& col, const float lat, 
 */
 void WorldView::get_world_age_frequency(vector<float>& world_age_freq) {
   LOG_TRACE();
-  bool do_age;
+  bool do_age = true;
   world_age_freq.clear();
   world_age_freq.resize(model_->age_spread());
   vector<float> temp;
