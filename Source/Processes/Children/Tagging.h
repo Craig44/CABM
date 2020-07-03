@@ -63,6 +63,7 @@ protected:
 
   vector<vector<vector<vector<float>>>>       age_length_param1_of_tagged_fish_by_year_cell_; // year * row * col * agents
   vector<vector<vector<vector<float>>>>       age_length_param2_of_tagged_fish_by_year_cell_; // year * row * col * agents
+  vector<vector<vector<vector<vector<float>>>>>  age_length_key_by_release_event; // year * row * col * age * length
 
   vector<vector<vector<vector<unsigned>>>>    length_observed_tag_of_tagged_fish_by_year_cell_; // year * row * col * length_bins
   vector<vector<vector<vector<unsigned>>>>    length_distribution_of_tagged_fish_by_year_cell_; // year * row * col * length_bins

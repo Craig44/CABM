@@ -183,7 +183,7 @@ void Tagging::DoBuild() {
   age_distribution_of_tagged_fish_by_year_cell_.resize(years_.size());
   age_length_param1_of_tagged_fish_by_year_cell_.resize(years_.size());
   age_length_param2_of_tagged_fish_by_year_cell_.resize(years_.size());
-
+  age_length_key_by_release_event.resize(years_.size());
   for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     age_distribution_of_tagged_fish_by_year_[years_[year_ndx]].resize(model_->age_spread(),0);
     length_distribution_of_tagged_fish_by_year_[years_[year_ndx]].resize(model_->length_bin_mid_points().size(),0);
@@ -191,19 +191,22 @@ void Tagging::DoBuild() {
     length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx].resize(model_->get_height());
     age_length_param1_of_tagged_fish_by_year_cell_[year_ndx].resize(model_->get_height());
     age_length_param2_of_tagged_fish_by_year_cell_[year_ndx].resize(model_->get_height());
-
+    age_length_key_by_release_event[year_ndx].resize(model_->get_height());
     age_distribution_of_tagged_fish_by_year_cell_[year_ndx].resize(model_->get_height());
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       length_distribution_of_tagged_fish_by_year_cell_[year_ndx][row].resize(model_->get_width());
       length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row].resize(model_->get_width());
       age_length_param1_of_tagged_fish_by_year_cell_[year_ndx][row].resize(model_->get_width());
       age_length_param2_of_tagged_fish_by_year_cell_[year_ndx][row].resize(model_->get_width());
-
+      age_length_key_by_release_event[year_ndx][row].resize(model_->get_width());
       age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row].resize(model_->get_width());
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row][col].resize(model_->number_of_length_bins(),0.0);
         length_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].resize(model_->number_of_length_bins(),0.0);
         age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].resize(model_->age_spread(),0.0);
+        age_length_key_by_release_event[year_ndx][row][col].resize(model_->age_spread());
+        for(unsigned age_ndx = 0; age_ndx < model_->age_spread(); ++age_ndx)
+          age_length_key_by_release_event[year_ndx][row][col][age_ndx].resize(model_->number_of_length_bins());
       }
     }
   }
@@ -222,8 +225,8 @@ void Tagging::DoReset() {
         fill(age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].begin(),age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].end(),0.0);
         fill(length_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].begin(),length_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col].end(),0.0);
         fill(length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row][col].begin(),length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row][col].end(),0.0);
-
-
+        for(unsigned age_ndx = 0; age_ndx < model_->age_spread(); ++age_ndx)
+          fill(age_length_key_by_release_event[year_ndx][row][col][age_ndx].begin(), age_length_key_by_release_event[year_ndx][row][col][age_ndx].end(), 0.0);
       }
     }
   }
@@ -289,7 +292,7 @@ void Tagging::DoExecute() {
                   tags_to_release--;
                   age_length_param1_of_tagged_fish_by_year_cell_[year_ndx][row][col].push_back(tagged_agent.get_first_age_length_par());
                   age_length_param2_of_tagged_fish_by_year_cell_[year_ndx][row][col].push_back(tagged_agent.get_second_age_length_par());
-
+                  age_length_key_by_release_event[year_ndx][row][col][tagged_agent.get_age_index()][tagged_agent.get_length_bin_index()] += this_agent.get_scalar();
                   // Lets see if it survives handling
                   if (rng.chance() <= handling_mortality_) {
                     // It died we will never see this or know about this tagged fish so I am just going to skip the rest of the algorithm
@@ -408,6 +411,7 @@ void Tagging::DoExecute() {
                   age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col][tagged_agent.get_age_index()]++;
                   age_length_param1_of_tagged_fish_by_year_cell_[year_ndx][row][col].push_back(tagged_agent.get_first_age_length_par());
                   age_length_param2_of_tagged_fish_by_year_cell_[year_ndx][row][col].push_back(tagged_agent.get_second_age_length_par());
+                  age_length_key_by_release_event[year_ndx][row][col][tagged_agent.get_age_index()][tagged_agent.get_length_bin_index()] += cell->agents_[agent_ndx].get_scalar();
 
                   // Lets see if it survives handling
                   if (rng.chance() <= handling_mortality_) {
@@ -552,6 +556,18 @@ void  Tagging::FillReportCache(ostringstream& cache) {
           cache << age_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col][age_ndx] << " ";
         }
         cache << "\n";
+      }
+    }
+  }
+  for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    for (unsigned row = 0; row < model_->get_height(); ++row) {
+      for (unsigned col = 0; col < model_->get_width(); ++col) {
+        cache << "age_length_key-" << years_[year_ndx] << "-" << row + 1 << "-" << col + 1 << " " << REPORT_R_MATRIX << "\n";
+        for(unsigned age_ndx = 0; age_ndx < age_length_key_by_release_event[year_ndx][row][col].size(); ++age_ndx) {
+          for(unsigned len_ndx = 0; len_ndx < age_length_key_by_release_event[year_ndx][row][col][age_ndx].size(); ++len_ndx)
+            cache << age_length_key_by_release_event[year_ndx][row][col][age_ndx][len_ndx] << " ";
+          cache << "\n";
+        }
       }
     }
   }
