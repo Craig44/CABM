@@ -51,7 +51,7 @@ float DoubleNormal::get_result(float value) {
     return_value_ = pow(2.0,-((value - mu_) / sigma_r_ * (value - mu_) / sigma_r_ ));
   }
   LOG_FINEST() << "return value = " << return_value_ << " value = " << value << " sig l " << sigma_l_ << " sigma R = " << sigma_r_;
-  return utilities::doublecompare::ZeroFun(pow(return_value_,alpha_), ZERO);
+  return utilities::doublecompare::ZeroFun(pow(return_value_,alpha_), TEMP_ZERO);
 }
 
 } /* namespace niwa */

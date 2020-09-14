@@ -163,6 +163,7 @@ protected:
   void                        Iterate();
   void                        Reset();
   void                        RunBasic();
+  void                        RunMSE();
 
   // Members
   RunMode::Type               run_mode_ = RunMode::kInvalid;

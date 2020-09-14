@@ -39,6 +39,7 @@
 #include "TimeVarying/Manager.h"
 #include "Utilities/RandomNumberGenerator.h"
 #include "Utilities/To.h"
+#include <RInside.h>                    // for the embedded R via RInside
 
 // Namespaces
 namespace niwa {
@@ -386,6 +387,14 @@ void Model::Verify() {
     executor->Execute();
 }
 
+
+
+/**
+ *
+ */
+void Model::RunMSE() {
+
+}
 /**
  *
  */
@@ -405,6 +414,23 @@ void Model::RunBasic() {
    * - iterate over -i file
    * - iterate over -s values
    */
+  // set up R instance and packages
+  int argc = 1;
+  char* argv[0];
+  RInside R(argc, argv);          // create an embedded R instance
+  try {
+     std::string setup_R = "source(file.path('R','SetUpR.R'))";
+     //std::string setup_R = "suppressMessages(source(file.path('R','SetUpR.R')))";
+     R.parseEvalQ(setup_R);              // load library, no return value
+  } catch(std::exception& ex) {
+      std::cerr << "Exception caught: " << ex.what() << std::endl;
+  } catch(...) {
+      std::cerr << "Unknown exception caught" << std::endl;
+  }
+  // Run C++ algorithm up to current time-step
+  R.parseEvalQ("sim = 1");
+
+
   Addressables& addressables = *managers_->addressables();
   LOG_MEDIUM() << "Multi line value = " << adressable_values_count_;
 

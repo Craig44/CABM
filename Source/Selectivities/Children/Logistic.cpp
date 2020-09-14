@@ -32,6 +32,8 @@ Logistic::Logistic(Model* model)
   parameters_.Bind<float>(PARAM_A50, &a50_, "A50", "");
   parameters_.Bind<float>(PARAM_ATO95, &ato95_, "Ato95", "");
   parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
+  parameters_.Bind<unsigned>(PARAM_L, &low_, "Low if(age < Low) = 0", "", model_->min_age());
+  parameters_.Bind<unsigned>(PARAM_H, &high_, "High if(age > High) =alpha", "", model_->max_age());
 
   RegisterAsAddressable(PARAM_A50, &a50_);
   RegisterAsAddressable(PARAM_ATO95, &ato95_);
@@ -67,15 +69,20 @@ void Logistic::RebuildCache() {
 
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
       threshold = (a50_ - (float)age) / ato95_;
-
       if (not include_zero_age_values_ & (age == 0)) {
         values_[age - min_index_] = 0;
-      } else if (threshold > 5.0)
+      } else if (age < low_) {
         values_[age - min_index_] = 0.0;
-      else if (threshold < -5.0)
+      } else if (age >= high_) {
         values_[age - min_index_] = alpha_;
-      else
-        values_[age - min_index_] = alpha_ / (1.0 + pow(19.0, threshold));
+      } else {
+        if (threshold > 5.0)
+          values_[age - min_index_] = 0.0;
+        else if (threshold < -5.0)
+          values_[age - min_index_] = alpha_;
+        else
+          values_[age - min_index_] = alpha_ / (1.0 + pow(19.0, threshold));
+      }
     }
   } else {
     float threshold = 0.0;

@@ -45,7 +45,7 @@ void InverseLogistic::DoBuild() {
 float InverseLogistic::get_result(float value) {
   float temp = (a50_ - value) / ato95_;
   return_value_  = 1.0 - (1.0 / (1.0 + pow(19.0, temp)));
-  return utilities::doublecompare::ZeroFun(pow(return_value_,alpha_), ZERO);
+  return utilities::doublecompare::ZeroFun(pow(return_value_,alpha_), TEMP_ZERO);
 }
 
 } /* namespace niwa */

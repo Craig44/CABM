@@ -24,7 +24,7 @@
 #include "Utilities/Types.h"
 #include <boost/math/distributions/normal.hpp>
 #include <numeric>
-#define PI 3.14159265358979
+#define TEMP_PI 3.14159265358979
 
 // Namespaces
 namespace niwa {
@@ -84,7 +84,7 @@ inline float NormalCDF(float x, float mu, float sigma) {
  * dnorm: return the pdf for the normal
  */
 inline double dnorm(const double& x, const double& mu, const double& sigma) {
-  double z = 1 / (sigma * sqrt(2 * PI)) * exp(-((x - mu) * (x - mu))/(2 * sigma * sigma));
+  double z = 1 / (sigma * sqrt(2 * TEMP_PI)) * exp(-((x - mu) * (x - mu))/(2 * sigma * sigma));
   return(z);
 }
 
@@ -150,7 +150,7 @@ inline double pnorm2(const double& x, const double& mu = 0.0, const double& sigm
   double norm, ttt, p;
   double z = fabs((x - mu)/sigma);
   double tt = 1.0 / (1.0 + 0.2316419 * z);
-  norm = 1.0 / sqrt(2.0 * PI) * exp(-0.5 * z * z);
+  norm = 1.0 / sqrt(2.0 * TEMP_PI) * exp(-0.5 * z * z);
   ttt = tt;
   p = 0.319381530 * ttt;
   ttt = ttt * tt;

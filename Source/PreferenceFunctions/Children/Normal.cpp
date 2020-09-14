@@ -46,7 +46,7 @@ void Normal::DoBuild() {
 */
 float Normal::get_result(float value) {
   return_value_ = pow(2.0,-((value - mu_) / sigma_ * (value - mu_)/ sigma_));
-  return utilities::doublecompare::ZeroFun(pow(return_value_,alpha_), ZERO);
+  return utilities::doublecompare::ZeroFun(pow(return_value_,alpha_), TEMP_ZERO);
 }
 } /* namespace niwa */
 } /* namespace preference_functions */
