@@ -498,7 +498,7 @@ void  Tagging::FillReportCache(ostringstream& cache) {
       }
     }
   }
-
+ /*
   for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
@@ -522,7 +522,7 @@ void  Tagging::FillReportCache(ostringstream& cache) {
       }
     }
   }
-
+  */
   for(unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     cache << "tag_release_by_length-" << years_[year_ndx] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
     cache << "cell";

@@ -124,7 +124,7 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
         if (rng.chance() >= male_prop)
           sex = 1;
       }
-      probability_mature_at_age = selectivity_[sex]->GetResult(age);
+      probability_mature_at_age = selectivity_[sex]->GetResult(age); // if selectivity.type = logistic_producing, this won't be applied correctly
       if (rng.chance() <= probability_mature_at_age)
         mature = true;
 

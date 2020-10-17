@@ -204,7 +204,10 @@ table(out_bounds)
 diff_ = sweep(Freq_est_sig_1, MARGIN = 2, STATS = target_freq, FUN = "-")
 dim(diff_)
 round(cbind(diff_[1,],Freq_est_sig_1[1,] - target_freq),3)
+par(mfrow = c(1,2))
 boxplot(diff_, xlab = "Age", ylab = expression(hat(theta) - theta), ylim = c(-0.1,0.1), main = paste0("sigma = ", sigma))
+abline(h = 0, lty = 2, col = "red", lwd = 3)
+plot(1:A, target_freq, type = "l",lwd = 2, col = "blue", cex = 1.2, xlab = "Lengths", ylab = "Proportion", ylim = c(0,0.4))
 
 ## find the breakdown in M-H algorithm what happens with a "smoother" AF controlled by deviations added to exponential decline 
 set.seed(21)
@@ -319,45 +322,54 @@ N_age = vector()
 N_age[1] = R0
 set.seed(21)
 for(age_ndx in 2:A)
-  N_age[age_ndx] = N_age[age_ndx - 1] * exp(-M) * exp(rnorm(1,0,0.5))
+  N_age[age_ndx] = N_age[age_ndx - 1] * exp(-M)# * exp(rnorm(1,0,0.5))
+target_freq = N_age * S_age / sum(N_age * S_age)
+barplot(height = target_freq, names = ages, main = "Target Distribution", xlab = "Ages", ylab = "Frequency")
+## smaller sigma =  1
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-n=200 #sample size
-sigma=2; Sig=paste0("sigma=",sigma)
-y=rep(NA,n)
-n.sims=5000
-n.tot=n.sims*n
-y.all=as.numeric()
-
-for(sims in 1:n.sims) {
-  if(sims%%1000==0) 
-    cat(sims,"...")
-  y[1]=sample(Agents,1)
-  for(i in 2:n) {
-    y.proposed=round(rnorm(1,y[i-1],sigma))
-    if(y.proposed<1 | y.proposed>size.max) 
-      y.proposed=y[i-1]
-    ratio=Freq[y.proposed]/Freq[y[i-1]]
-    y[i]=ifelse(runif(1)<ratio,y.proposed,y[i-1])
+n = 200
+size.max = A
+sigma = 1
+## smaller sigma =  1
+n_rep = 1000
+Freq_est_sig_1 = matrix(NA, nrow = n_rep, ncol = A)
+par(mfrow = c(1,1))
+plot(1:A, target_freq, type = "l",lwd = 2, col = "blue", cex = 1.2, xlab = "Lengths", ylab = "Proportion", ylim = c(0,0.4))
+for(j in 1:n_rep) {
+  y.all=as.numeric()
+  for(sims in 1:n.sims) {
+    
+    y[1]=sample(1:A, 1)
+    for(i in 2:n) {
+      y.proposed = round(rnorm(1, y[i-1], sigma))
+      ##print(paste0("y_i + 1 = ", y.proposed, " y_i = ", y[i-1], " sigma = ", sigma))
+      if(y.proposed < 1 | y.proposed > size.max) 
+        y.proposed=y[i-1]
+      
+      ratio = target_freq[y.proposed] / target_freq[y[i-1]]
+      y[i] = ifelse(runif(1) < ratio, y.proposed, y[i-1])
+    }
+    y.all=c(y.all,y)
   }
-  y.all=c(y.all,y)
+  if(j %% 100==0) {
+    cat("\n",j,"...")
+  }
+  Freq.y=tabulate(y.all,nbins=A) / (n.sims * n)
+  #lines(0.5:(size.max)-0.5, Freq.y, col = adjustcolor(col = "red", alpha.f = 0.3), lwd =3)
+  Freq_est_sig_1[j, ] = Freq.y;
 }
+table(out_bounds)
+## calculate MSE
+diff_ = sweep(Freq_est_sig_1, MARGIN = 2, STATS = target_freq, FUN = "-")
+dim(diff_)
+round(cbind(diff_[1,],Freq_est_sig_1[1,] - target_freq),3)
+par(mfrow = c(1,2))
+boxplot(diff_, xlab = "Age", ylab = expression(hat(theta) - theta), ylim = c(-0.1,0.1), main = paste0("sigma = ", sigma))
+abline(h = 0, lty = 2, col = "red", lwd = 3)
+plot(1:A, target_freq, type = "l",lwd = 2, col = "blue", cex = 1.2, xlab = "Ages", ylab = "Proportion", ylim = c(0,0.25))
+for(i in 2:n_rep)
+  lines(1:A, Freq_est_sig_1[i,], col = adjustcolor(col = "black", alpha.f = 0.2), lwd =2)
+lines(1:A, target_freq, lwd = 2, col = "red")
 
-par(mfrow=c(2,1))
-hist(Agents,breaks=0:(size.max+1)-0.5,main=paste("Agents,",Sig))
-hist(y.all,breaks=0:(size.max+1)-0.5,main=paste("Marginal distn of samples,",Sig))
+
 

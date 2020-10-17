@@ -83,6 +83,7 @@ cyrils_pop_est<-NULL
 
 startTime<-Sys.time()
 
+## slow takes a few minutes
 for(bt in 1:boot){  
   print(bt)
   # trap silly mscalar values
@@ -382,7 +383,7 @@ dimnames(true) = dimnames(bias) = dimnames(cv) = dimnames(estimated) = list(scal
 bias
 estimated
 true
-setwd("C:/Work/Software/IBM/ValidationCode")
+#setwd("C:/Work/Software/IBM/ValidationCode")
 write.table(bias, file = "Bias.txt", quote = F)
 write.table(true, file = "true.txt", quote = F)
 write.table(estimated,file = "estimated.txt", quote = F)
