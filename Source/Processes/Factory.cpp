@@ -18,6 +18,7 @@
 #include "Processes/Manager.h"
 
 #include "Children/Nop.h"
+#include "Children/Ageing.h"
 #include "Children/Recruitment/RecruitmentBevertonHolt.h"
 #include "Children/Recruitment/RecruitmentConstant.h"
 #include "Children/Growth/GrowthVonBertalanffyWithBasic.h"
@@ -73,6 +74,8 @@ Process* Factory::Create(Model* model, const string& object_type, const string& 
           result = new Nop(model);
     else if (sub == PARAM_RECRUITMENT_BEVERTON_HOLT)
       result = new RecruitmentBevertonHolt(model);
+    else if (sub == PARAM_AGEING)
+      result = new Ageing(model);
     else if (sub == PARAM_RECRUITMENT_CONSTANT)
       result = new RecruitmentConstant(model);
     else if (sub == PARAM_GROWTH_VON_BERTALANFFY_WITH_BASIC)

@@ -177,6 +177,8 @@ void Biomass::Execute() {
       b0_value = cache_value_ + ((value_ - cache_value_) * time_step_proportion_);
       initialisation_values_[initialisation_phase].push_back(b0_value);
     }
+    LOG_FINE() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value_ << " Final value " << b0_value;
+
   } else {
     if (utilities::doublecompare::IsZero(time_step_proportion_))
       values_[model_->current_year()] = cache_value_;
@@ -185,7 +187,7 @@ void Biomass::Execute() {
     else
       values_[model_->current_year()] = cache_value_ + ((value_ - cache_value_) * time_step_proportion_);
 
-    LOG_FINEST() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value_ << " Final value ";
+    LOG_FINE() << " Pre Exploitation value " <<  cache_value_ << " Post exploitation " << value_ << " Final value " << values_[model_->current_year()];
   }
 }
 

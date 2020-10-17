@@ -39,6 +39,7 @@ public:
   // Accessors
   bool                         is_alive() const {return alive_;}
   unsigned                     get_age();
+  void                         birthday(); // For explicit ageing
   unsigned                     get_age_index();
   unsigned                     get_length_bin_index();
   virtual const bool&          get_maturity() const {return mature_ ;};
@@ -64,7 +65,6 @@ public:
   virtual const unsigned&      get_tag_col() const {return tag_col_;};
   virtual const unsigned&      get_tag_release_year() const {return tag_year_;};
   void                         shed_a_tag() {tag_ -= 1;} // anything that calls this will need to check get_number_tags() > 1, else this will cause a negative unsigned == issues
-
   float                        get_length_increment_since_tag()  {return length_ - length_at_tag_;};
   unsigned                     get_time_at_liberty(unsigned current_time_step)  {return current_time_step - tag_time_step_;};
 
@@ -99,6 +99,7 @@ protected:
   float                       fith_age_length_par_;
   float                       sixth_age_length_par_;
 
+  unsigned                    age_ = 0;
   float                       M_; // natural mortality
   unsigned                    birth_year_;
   float                       length_ = 0.0;
@@ -113,7 +114,7 @@ protected:
   unsigned                    home_row_; // Row agent born in 
   unsigned                    home_col_; // col agent born in 
   unsigned                    tag_ = 0; // number of tags, fish can be double tagged
-  unsigned					  tag_year_;
+  unsigned					          tag_year_;
   float                       length_at_tag_ = 0.0;
   unsigned                    tag_time_step_ = 0; // number of tags, fish can be double tagged
   bool                        alive_ = true;
