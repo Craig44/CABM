@@ -753,35 +753,35 @@ The preference in cell $i$ for preference variable $x$ can be described as,
 P_i^x = f(x_i; \theta)
 \end{equation}
 
-where $f(x_i; \theta)$ is a preference function (see Section~\ref{sec:preference_functions}). The overall preference in cell $i$ can be denoted as the accumulation of all these preference functions.
-
+where $f(x_i; \theta)$ is a preference function (see Section~\ref{sec:preference_functions}). The overall preference for cell $i$ is the geometric mean of all preference functions from all layers.
 \begin{equation}
    P_i = \left(\prod_{n}^{i = 1}P_i^x\right)^{1/n}
 \end{equation}
-
-where $n$ is the number of preference variables that you want to include in the movement process. Once we have the preference for all cells in the spatial domain, we need to calculate the gradient or velocity field in both the $\textbf{X}$ and $\textbf{Y}$ axis. Currently \IBM\ uses the forward, backwards, and central difference approximation. This obviously sucks as coarse resolution but as we get fine scale models the approximation more accurately will describe the change in preference in each direction. The central approximation has been used in other habitat based preference calculations \citep{phillips2018individual} and is applied like this
+%
+where $n$ is the number of preference layers that are involved in the movement process. Once we have the preference for all cells in the spatial domain, we need to calculate the gradient or velocity field in both the $\textbf{X}$ (E-W) and $\textbf{Y}$ (N-S) axis. Currently \IBM\ uses the forward, backwards, and central difference approximation. This obviously sucks as coarse resolution but as we get fine scale models the approximation more accurately will describe the change in preference in each direction. The central approximation has been used in other habitat based preference calculations \citep{phillips2018individual} and is applied like this
 
 \begin{equation}
 u_i = \frac{P_{j, i + h} - P_{j, i - h}}{2}
 \end{equation}
-
+%
 where $h$ is some distance or neighbour cell, this yields us gradient or velocity in both directions then we use a bias random walk to move individuals in space.
 
 \begin{equation}
 x_j \sim N(u_i, \sigma_i)
 \end{equation}
-
+%
 Where $u_i$ is the gradient in the $\textbf{X}$ direction, $D_{i}$ is the diffusion parameter that is scaled based on the habitat preference and $x_j$ is the future location on the X axis of the individual. $D_{i}$ inversely relates to the quality of the preference habitat and a parameter $D_{max}$.
 
 \begin{equation}
 D_i = D_{max}\left(1 - \frac{P_i}{\zeta + P_i}\right)
 \end{equation}
+%
 where $\zeta$ is an arbitrary constant controlling the curvature of the function, following \cite{Bertignac1998}.
 
 \begin{equation}
 \sigma_i = \sqrt{2 * D_i * t}
 \end{equation}
-
+%
 Where $t$ is the time steps we have applied the preference movement in annual cycle. This process works well for stationary preference see (FIgure~\ref{fig:static_pref}) The problem with this implementation is that when an individual is in a cell with low preference and no gradient signal, it will randomly jump in any direction (is this biologically sensible?). For example Tuna
 
 \begin{figure}[htp]\label{fig:pref}%

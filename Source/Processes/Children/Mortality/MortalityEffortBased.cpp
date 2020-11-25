@@ -474,7 +474,7 @@ void  MortalityEffortBased::FillReportCache(ostringstream& cache) {
     cache << "\n";
   }
 
-  /*
+
   for (auto& values : effort_by_year_and_cell_) {
     cache << "effort_by_cell_" << values.first << " " << REPORT_R_MATRIX << "\n";
     for (unsigned i = 0; i < values.second.size(); ++i) {
@@ -483,7 +483,7 @@ void  MortalityEffortBased::FillReportCache(ostringstream& cache) {
       cache << "\n";
     }
   }
-  */
+
   for (auto& values : vulnerable_by_year_and_cell_) {
     cache << "vulnerable_by_cell_" << values.first << " " << REPORT_R_MATRIX << "\n";
     for (unsigned i = 0; i < values.second.size(); ++i) {

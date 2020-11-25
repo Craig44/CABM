@@ -84,6 +84,8 @@ protected:
   vector<string>                      selectivity_label_;
   vector<Selectivity*>                selectivity_;
   bool                                selectivity_length_based_;
+  unsigned                            number_of_cells_gradient_ = 5;
+  unsigned                            cell_offset_gradient_;
 
 };
 

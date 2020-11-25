@@ -324,7 +324,7 @@ void WorldView::MergeWorldForInit() {
 */
 void WorldView::get_cell_element(unsigned& row, unsigned& col, const float lat, const float lon) {
   for (unsigned i = 1; i <= height_; ++i) {
-    if (lat < lat_bounds_[i]) {
+    if (lat > lat_bounds_[i]) {
       row = i - 1;
       break;
     }

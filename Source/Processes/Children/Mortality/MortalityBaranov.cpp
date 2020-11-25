@@ -313,7 +313,14 @@ void MortalityBaranov::DoReset() {
   removals_census_.clear();
   removals_tag_recapture_.clear();
   for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    for (unsigned col = 0; col < model_->get_width(); ++col) {
+      for (unsigned row = 0; row < model_->get_height(); ++row) {
+        for(unsigned sex_ndx = 0; sex_ndx < F_by_year_bin_[year_ndx][col][row].size(); ++sex_ndx)
+          fill(F_by_year_bin_[year_ndx][col][row][sex_ndx].begin(), F_by_year_bin_[year_ndx][col][row][sex_ndx].end(), 0.0);
+      }
+    }
     for (unsigned fishery_ndx = 0; fishery_ndx < fishery_label_.size(); ++fishery_ndx) {
+      fishery_f_to_take_[fishery_ndx][year_ndx] = 0.0;
       fishery_census_data_[fishery_ndx][year_ndx].clear();
       age_comp_by_fishery_[fishery_ndx][year_ndx].clear();
       length_comp_by_fishery_[fishery_ndx][year_ndx].clear();

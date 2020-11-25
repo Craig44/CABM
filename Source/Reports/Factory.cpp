@@ -26,6 +26,7 @@
 #include "Reports/Children/Process.h"
 #include "Reports/Children/InitialisationPartition.h"
 #include "Reports/Children/Observation.h"
+#include "Reports/Children/PreferenceFunction.h"
 #include "Reports/Children/Selectivity.h"
 #include "Reports/Children/SimulatedObservation.h"
 #include "Reports/Children/TimeVarying.h"
@@ -55,6 +56,8 @@ Report* Factory::Create(Model* model, const string& object_type, const string& s
       result = new AgeFrequencyByCell(model);
     else if (sub_type == PARAM_AGE_LENGTH_MATRIX_BY_CELL)
       result = new AgeLengthMatrixByCell(model);
+    else if (sub_type == PARAM_PREFERENCE_FUNCTION)
+      result = new PreferenceFunction(model);
     else if (sub_type == PARAM_AGEING_ERROR)
       result = new AgeingErrorMatrix(model);
     else if (sub_type == PARAM_INITIALISATION_PARTITION)

@@ -86,6 +86,10 @@ public:
   void                         set_lon(float new_lon) {lon_ = new_lon;}
   void                         apply_tagging_event(unsigned tags, unsigned row, unsigned col);
   void                         dies() {alive_ = false;}
+  void                         save_lat_hist(float new_lat) {lat_history_.push_back(new_lat);}
+  void                         save_lon_hist(float new_lon) {lon_history_.push_back(new_lon);}
+  vector<float>               lat_history_;
+  vector<float>               lon_history_;
 protected:
   // Methods
   void                        growth_init();
@@ -122,6 +126,7 @@ protected:
   unsigned                    tag_col_;				// col agent was tagged
   unsigned                    life_stage_;  // 1 = larvae, 2 = immature, 3 = mature. // TODO perhaps this could be dealt with in the WorldCell level partition the agents for each cell, then processes can call
                                             // The life history of interest.
+
 
 private:
 

@@ -300,9 +300,9 @@ void Model::Build() {
       LOG_FATAL_P(PARAM_LATITUDE_BOUNDS) << "latitude bounds must have a minimum and maximum value for each cell, e.g ncol 2 lat_bounds -45 -44 -43. You supplied '" << lat_bounds_.size() << " but we wanted " << (world_height_ + 1);
     }
     for (unsigned lat_ndx = 1; lat_ndx < lat_bounds_.size(); ++lat_ndx) {
-      lat_mid_points_.push_back((float)(lat_bounds_[lat_ndx - 1] + ((lat_bounds_[lat_ndx] - lat_bounds_[lat_ndx - 1]) / 2)));
-      if (lat_bounds_[lat_ndx] < lat_bounds_[lat_ndx - 1])
-        LOG_ERROR_P(PARAM_LATITUDE_BOUNDS) << "must be in ascending order";
+      lat_mid_points_.push_back((float)(lat_bounds_[lat_ndx - 1] - fabs((lat_bounds_[lat_ndx] - lat_bounds_[lat_ndx - 1]) / 2)));
+      if (lat_bounds_[lat_ndx] >  lat_bounds_[lat_ndx - 1])
+        LOG_ERROR_P(PARAM_LATITUDE_BOUNDS) << "must be in descending order";
     }
 
     for (unsigned lon_ndx = 1; lon_ndx < lon_bounds_.size(); ++lon_ndx) {
