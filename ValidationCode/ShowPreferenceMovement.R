@@ -5,8 +5,8 @@ library(ibm)
 library(fields)
 library(RColorBrewer)
 depth_file = extract.ibm.file("Depth.ibm")
-run = extract.run("run.out")
-#run_alt = extract.run("run_alt.out")
+#run = extract.run("run.out")
+run = extract.run("run_alt.out")
 
 y_lim = -1.0 * c(42.44, 42.56, 42.69, 42.81, 42.94, 43.07, 43.19, 43.32, 43.44, 43.57, 43.70, 43.82, 43.95, 44.08, 44.20, 44.33, 44.45, 44.58, 44.71, 44.83, 44.96)
 x_lim = c(173.37, 173.63, 173.90, 174.17, 174.43, 174.70, 174.97, 175.24, 175.51, 175.78, 176.04, 176.31, 176.58, 176.85, 177.12, 177.38, 177.65, 177.92, 178.19, 178.46, 178.73, 178.99, 179.26, 179.53, 179.80, 180.07, 180.33, 180.60, 180.87, 181.14, 181.41, 181.68, 181.94, 182.21, 182.48, 182.75, 183.02, 183.28, 183.55, 183.82, 184.09, 184.36, 184.63, 184.89, 185.16, 185.43)
@@ -25,7 +25,7 @@ depth_plot = depth
 depth_plot[depth_plot > quantile(depth, 0.8)] = quantile(depth, 0.8) + 5
 brks = c(min(depth_plot) - 2, seq(from = quantile(depth, 0.2), to = quantile(depth, 0.8), by = 20), max(depth_plot) + 5)
 ## visualise covariate in this case death
-image.plot(x_mid, y_mid, t(depth_plot[nrow(depth_plot):1,]), breaks = brks, col = tim.colors(length(brks) - 1))
+image.plot(x_mid, rev(y_mid), t(depth_plot[nrow(depth_plot):1,]), breaks = brks, col = tim.colors(length(brks) - 1))
 par(mfrow = c(2,1))
 image(t(depth[nrow(depth):1,]), xaxt = "n", yaxt = "n")
 image(xaxt = "n", yaxt = "n", t(run$depth$`1990`$values[nrow(run$depth$`1990`$values):1,]))
@@ -177,8 +177,9 @@ round(zonal - my_zonal_alt_c, 2)
 round(merid - my_merid_alt_c, 2)
 
 ## numeric layer
-image.plot(xaxt = "n", yaxt = "n", t(run$old_bio$`1990`$values[nrow(run$old_bio$`1990`$values):1,]), main = "Biomass", xlab = "x", ylab = "y")
-image.plot(xaxt = "n", yaxt = "n", t(run$young_bio$`1990`$values[nrow(run$young_bio$`1990`$values):1,]), main = "Biomass", xlab = "x", ylab = "y")
+par(mfrow = c(2,1))
+image.plot(xaxt = "n", yaxt = "n", t(run$old_bio$`1990`$values[nrow(run$old_bio$`1990`$values):1,]), main = "Mature Biomass", xlab = "x", ylab = "y")
+image.plot(xaxt = "n", yaxt = "n", t(run$young_bio$`1990`$values[nrow(run$young_bio$`1990`$values):1,]), main = "Immature Biomass", xlab = "x", ylab = "y")
 
 par(mfrow = c(1,1))
 plot(names(run$pref_fun_young$Values), run$pref_fun_young$Values, type = "l", lwd = 3, xlab = "biomass", ylab = "Preference")
@@ -201,80 +202,111 @@ abline(h = 0, lty = 2, col = "blue", lwd = 3)
 ##################################################
 ## Simulate some movements from different locations.
 ##################################################
-diffuse =  run$old_pref$d_max * (1 - (run$old_pref$initialisation_preference / (run$old_pref$zeta + run$old_pref$initialisation_preference)))
-std_dev = sqrt(2 * diffuse * run$old_pref$time_intervals)
+d_max = run$old_pref$d_max
+zeta = run$old_pref$zeta
+d_max_s = c(0.01, 0.05, 0.1, 0.15,0.2)
+zeta_s = c(0.01,0.05,0.1, 0.15,0.2)
 
-start_mat = expand.grid(x = 1:length(x_mid), y = 1:length(y_mid))
-n_steps = 50
-cols = colorRampPalette(brewer.pal(n = 7, name = "Greys"))(n_steps)
-final_loc = NULL
-start_loc = NULL
-n_sim_agents = 10; # from each starting point
-dev.off()
-image.plot(x_mid, abs(y_mid), t(run$old_pref$initialisation_preference[nrow(run$old_pref$initialisation_preference):1,]))
-plot(1,1,type = "n", ylim = c(min(y_lim), max(y_lim)), xlim = c(min(x_lim), max(x_lim)), xlab = "x", ylab = "y")
-for(k in 1:nrow(start_mat)) {
-  set.seed(123)
-  for(agent_ndx in 1:n_sim_agents) {
-    x_cell = start_mat[k,1]
-    y_cell = start_mat[k,2]
-    lat = y_mid[y_cell]
-    lon = x_mid[x_cell]
-    coords = NULL;
-    coords = rbind(c(lon, lat))
-    start_loc = rbind(start_loc, c(lon, lat))
-    #points(lon, lat, pch = 16, col = "red")
-    for(i in 2:n_steps) {
-      #points(lon, lat, pch = 16, col = "gray60")
-      #update_lon = lon + rnorm(1, zonal[y_cell, x_cell], std_dev[y_cell, x_cell])
-      #update_lat = lat + rnorm(1, merid[y_cell, x_cell], std_dev[y_cell, x_cell])
-      
-      update_lon = lon + (zonal[y_cell, x_cell] + rnorm(1) * std_dev[y_cell, x_cell])
-      update_lat = lat + (merid[y_cell, x_cell] + rnorm(1)* std_dev[y_cell, x_cell])
-      #update_lon = lon + rnorm(1, my_zonal[y_cell, x_cell], std_dev[y_cell, x_cell])
-      #update_lat = lat + rnorm(1, my_merid[y_cell, x_cell], std_dev[y_cell, x_cell])
-      old_lon = lon
-      old_lat = lat
-      # check boundaries
-      if(update_lon < max(x_lim) & update_lon > min(x_lim)) {
-        lon = update_lon
-        # update cell coordinates
-        for(j in 2:length(x_lim)) {
-          if (lon < x_lim[j]) {
-            x_cell = j - 1
-            break
+for(d_ndx in 1:length(d_max_s)) {
+  for(z_ndx in 1:length(zeta_s)) {
+    d_max = d_max_s[d_ndx]
+    zeta = zeta_s[z_ndx]
+    diffuse =  d_max * (1 - (run$old_pref$initialisation_preference / (zeta + run$old_pref$initialisation_preference)))
+    std_dev = sqrt(2 * diffuse * run$old_pref$time_intervals)
+    
+    start_mat = expand.grid(x = 1:length(x_mid), y = 1:length(y_mid))
+    n_steps = 100
+    cols = colorRampPalette(brewer.pal(n = 7, name = "Greys"))(n_steps)
+    final_loc = NULL
+    start_loc = NULL
+    n_sim_agents = 20; # from each starting point
+    dev.off()
+    image.plot(x_mid, abs(y_mid), t(run$old_pref$initialisation_preference[nrow(run$old_pref$initialisation_preference):1,]))
+    plot(1,1,type = "n", ylim = c(min(y_lim), max(y_lim)), xlim = c(min(x_lim), max(x_lim)), xlab = "x", ylab = "y")
+    coords_for_each_start = list()
+    for(k in 1:nrow(start_mat)) {
+      set.seed(123)
+      for(agent_ndx in 1:n_sim_agents) {
+        x_cell = start_mat[k,1]
+        y_cell = start_mat[k,2]
+        lat = y_mid[y_cell]
+        lon = x_mid[x_cell]
+        coords = NULL;
+        coords = rbind(coords, c(lon, lat))
+        start_loc = rbind(start_loc, c(lon, lat))
+        #points(lon, lat, pch = 16, col = "red")
+        for(i in 2:n_steps) {
+          #points(lon, lat, pch = 16, col = "gray60")
+          #update_lon = lon + rnorm(1, zonal[y_cell, x_cell], std_dev[y_cell, x_cell])
+          #update_lat = lat + rnorm(1, merid[y_cell, x_cell], std_dev[y_cell, x_cell])
+          
+          update_lon = lon + (zonal[y_cell, x_cell] + rnorm(1) * std_dev[y_cell, x_cell])
+          update_lat = lat + (merid[y_cell, x_cell] + rnorm(1)* std_dev[y_cell, x_cell])
+          #update_lon = lon + rnorm(1, my_zonal[y_cell, x_cell], std_dev[y_cell, x_cell])
+          #update_lat = lat + rnorm(1, my_merid[y_cell, x_cell], std_dev[y_cell, x_cell])
+          old_lon = lon
+          old_lat = lat
+          # check boundaries
+          if(update_lon < max(x_lim) & update_lon > min(x_lim)) {
+            lon = update_lon
+            # update cell coordinates
+            for(j in 2:length(x_lim)) {
+              if (lon < x_lim[j]) {
+                x_cell = j - 1
+                break
+              }
+            }
           }
+          if(update_lat < max(y_lim) & update_lat > min(y_lim)) {
+            lat = update_lat
+            for(j in 2:length(y_lim)) {
+              if (lat > y_lim[j]) {
+                y_cell = j - 1
+                break
+              }
+            }
+          }
+          coords = rbind(coords, c(lon, lat))
+          
+          #points(c(lon,old_lon), c(lat, old_lat), type = "o", pch = 16, col = adjustcolor(col = cols[i], alpha.f = 0.5), lwd = 3)
+          #Sys.sleep(0.3)
+        }
+        #points(lon, lat, pch = 16, col = "green")
+        final_loc = rbind(final_loc, c(lon, lat))
+        if(agent_ndx == 1) {
+          coords_for_each_start[[k]] = coords
         }
       }
-      if(update_lat < max(y_lim) & update_lat > min(y_lim)) {
-        lat = update_lat
-        for(j in 2:length(y_lim)) {
-          if (lat > y_lim[j]) {
-            y_cell = j - 1
-            break
-          }
-        }
-      }
-      #points(c(lon,old_lon), c(lat, old_lat), type = "o", pch = 16, col = adjustcolor(col = cols[i], alpha.f = 0.5), lwd = 3)
-      #Sys.sleep(0.3)
     }
-    #points(lon, lat, pch = 16, col = "green")
-    final_loc = rbind(final_loc, c(lon, lat))
+    #hist(rnorm(10000, 2, 1.3))
+    #hist(2 + rnorm(10000) * 1.3)
+    
+    png(filename = paste0("std_settings_mature_nsteps_",n_steps,"_zeta_",zeta, "_dmax_", d_max, ".png"), height = 8, width = 6, res = 250, units = "in")
+    par(mfrow = c(2,1))
+    plot(1,1,type = "n", ylim = c(min(y_lim), max(y_lim)), xlim = c(min(x_lim), max(x_lim)), xlab = "x", ylab = "y", main = paste0("zeta = ", zeta, " d_max = ", d_max))
+    image(x_mid, rev(y_mid), t(run$old_pref$initialisation_preference[nrow(run$old_pref$initialisation_preference):1,]), add = T)
+    #points(start_loc[,1], start_loc[,2], pch = 16, col = "blue")
+    
+    plot(1,1,type = "n", ylim = c(min(y_lim), max(y_lim)), xlim = c(min(x_lim), max(x_lim)), xlab = "x", ylab = "y")
+    image(x_mid, rev(y_mid), t(run$old_pref$initialisation_preference[nrow(run$old_pref$initialisation_preference):1,]), add = T)
+    points(final_loc[,1], final_loc[,2], pch = 16, col = adjustcolor(col = "purple", alpha.f = 0.2))
+    dev.off()
+    #image.plot(xaxt = "n", yaxt = "n", t(run$old_bio$`1990`$values[nrow(run$old_bio$`1990`$values):1,]), main = "Biomass", xlab = "x", ylab = "y")
   }
 }
-#hist(rnorm(10000, 2, 1.3))
-#hist(2 + rnorm(10000) * 1.3)
 
-par(mfrow = c(3,1))
+## look at the amount of movement
+diff(coords_for_each_start[[1]][,1])
+par(mfrow = c(1,1))
 plot(1,1,type = "n", ylim = c(min(y_lim), max(y_lim)), xlim = c(min(x_lim), max(x_lim)), xlab = "x", ylab = "y")
 image(x_mid, rev(y_mid), t(run$old_pref$initialisation_preference[nrow(run$old_pref$initialisation_preference):1,]), add = T)
-points(start_loc[,1], start_loc[,2], pch = 16, col = "blue")
-
-plot(1,1,type = "n", ylim = c(min(y_lim), max(y_lim)), xlim = c(min(x_lim), max(x_lim)), xlab = "x", ylab = "y")
-image(x_mid, rev(y_mid), t(run$old_pref$initialisation_preference[nrow(run$old_pref$initialisation_preference):1,]), add = T)
-points(final_loc[,1], final_loc[,2], pch = 16, col = adjustcolor(col = "purple", alpha.f = 0.2))
-
-image.plot(xaxt = "n", yaxt = "n", t(run$old_bio$`1990`$values[nrow(run$old_bio$`1990`$values):1,]), main = "Biomass", xlab = "x", ylab = "y")
+for(i in 1:length(coords_for_each_start)) {
+  points(coords_for_each_start[[i]][,1], coords_for_each_start[[i]][,2], type = "o", pch = 16, col =cols, lwd = 3)
+  points(coords_for_each_start[[i]][1,1],coords_for_each_start[[i]][1,2], col = "red", pch = 16)
+  points(coords_for_each_start[[i]][nrow(coords_for_each_start[[i]]),1], coords_for_each_start[[i]][nrow(coords_for_each_start[[i]]),2], col = "black", pch = 16)
+  Sys.sleep(0.4)
+  points(coords_for_each_start[[i]][,1], coords_for_each_start[[i]][,2], type = "o", pch = 16, col ="white", lwd = 3)
+}
 
 
 par(mfrow = c(3,1))
@@ -288,7 +320,7 @@ points(final_loc[,1], final_loc[,2], pch = 16, col = "purple")
 #########
 ## Try a different D_max
 #########
-diffuse =  0.05 * (1 - (run$old_pref$initialisation_preference / (run$old_pref$zeta + run$old_pref$initialisation_preference)))
+diffuse =  0.1 * (1 - (run$old_pref$initialisation_preference / (run$old_pref$zeta + run$old_pref$initialisation_preference)))
 std_dev = sqrt(2 * diffuse * run$old_pref$time_intervals)
 summary(std_dev)
 lat = y_mid[start_y]
