@@ -87,6 +87,8 @@ protected:
   unsigned                            number_of_cells_gradient_ = 5;
   unsigned                            cell_offset_gradient_;
 
+  bool                                print_individual_tracks_ = false;
+
 };
 
 } /* namespace processes */

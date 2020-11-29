@@ -47,7 +47,7 @@ MovementPreference::MovementPreference(Model* model) : Movement(model) {
   parameters_.Bind<string>(PARAM_PREFERENCE_LAYERS, &preference_layer_labels_, "The preference functions to apply", "", true);
   parameters_.Bind<string>(PARAM_SELECTIVITY_LABEL, &selectivity_label_, "Label for the selectivity block", "");
   //parameters_.Bind<unsigned>(PARAM_NUMBER_OF_CELLS_FOR_GRADIENT, &number_of_cells_gradient_, "Number of cells to calculate the (E-W & N-S) gradient over", "", true);
-
+  parameters_.Bind<bool>(PARAM_SAVE_AND_PRINT_AGENT_JUMPS, &print_individual_tracks_, "Save an location after each movement application for each agent, and print 30 of them in the report (Can be very slow)", "", false);
 }
 
 /*
@@ -332,9 +332,10 @@ void MovementPreference::DoExecute() {
                 if ((update_lon <= model_->max_lon()) && (update_lon >= model_->min_lon())) {
                   (*iter).set_lon(update_lon);
                 } // else they stay as it would be jumping out of bounds
-                (*iter).save_lon_hist(update_lon);
-                (*iter).save_lat_hist(update_lat);
-
+                if(print_individual_tracks_) {
+                  (*iter).save_lon_hist(update_lon);
+                  (*iter).save_lat_hist(update_lat);
+                }
                 world_->get_cell_element(destination_row, destination_col, (*iter).get_lat(), (*iter).get_lon()); // very difficult to thread this...
 
                 LOG_FINEST() << (*iter).get_lat() << " " << (*iter).get_lon() << " " << destination_row << " " << destination_col << " " << row << " " << col;
@@ -378,9 +379,10 @@ void MovementPreference::DoExecute() {
                 if ((update_lon <= model_->max_lon()) && (update_lon >= model_->min_lon())) {
                   (*iter).set_lon(update_lon);
                 } // else they stay as it would be jumping out of bounds
-                (*iter).save_lon_hist(update_lon);
-                (*iter).save_lat_hist(update_lat);
-
+                if(print_individual_tracks_) {
+                  (*iter).save_lon_hist(update_lon);
+                  (*iter).save_lat_hist(update_lat);
+                }
                 world_->get_cell_element(destination_row, destination_col, (*iter).get_lat(), (*iter).get_lon()); // very difficult to thread this...
 
                 LOG_FINEST() << (*iter).get_lat() << " " << (*iter).get_lon() << " " << destination_row << " " << destination_col << " " << row << " " << col;
@@ -706,30 +708,32 @@ void  MovementPreference::FillReportCache(ostringstream& cache) {
   }
 
   // Grab a couple of agents and track thier history
-  int n_agents = 30;
-  int agent_ndx;
-  for(unsigned row = 0; row < model_->get_height(); ++row) {
-    for(unsigned col = 0; col < model_->get_width(); ++col) {
+  if(print_individual_tracks_) {
+    int agent_ndx;
+    unsigned row = 0;
+    unsigned col = 0;
+    int n_agents = 30;
+    while(n_agents > 0) {
+      row =  model_->get_height() * rng.chance();
+      col =  model_->get_width() * rng.chance();
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
-        agent_ndx = cell->agents_.size() * rng.chance();
-        if( cell->agents_[agent_ndx].is_alive()) {
-          cache << n_agents <<"_lat: ";
-          for(auto lat : cell->agents_[agent_ndx].lat_history_)
-            cache << lat << " ";
-          cache << "\n" << n_agents <<"_lon: ";
-          for(auto lon : cell->agents_[agent_ndx].lon_history_)
-            cache << lon << " ";
-          cache << "\n";
-          n_agents--;
-          if (n_agents < 0)
-            break;
-        }
-      }
+         agent_ndx = cell->agents_.size() * rng.chance();
+         if( cell->agents_[agent_ndx].is_alive()) {
+           if (cell->agents_[agent_ndx].lat_history_.size() > 0) {
+             cache << n_agents <<"_lat: ";
+             for(auto lat : cell->agents_[agent_ndx].lat_history_)
+               cache << lat << " ";
+             cache << "\n" << n_agents <<"_lon: ";
+             for(auto lon : cell->agents_[agent_ndx].lon_history_)
+               cache << lon << " ";
+             cache << "\n";
+             n_agents--;
+           }
+         }
+       }
     }
   }
-
-
 
 
 /*  for (auto& values : moved_agents_by_year_) {

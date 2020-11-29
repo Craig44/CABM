@@ -103,7 +103,7 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
   vector<vector<float>> growth_pars;
   vector<vector<float>> female_growth_pars;
   growth_->draw_growth_param(row_, col_, number_agents_to_seed, growth_pars, 0);
-  LOG_MEDIUM() << "year in initialisation = " << model_->current_year();
+  //LOG_MEDIUM() << "year in initialisation = " << model_->current_year();
   if (sexed) {
     // This creates growth vectors that are larger than we need but it shouldn't be to expensive
     male_prop = model_->get_male_proportions(0); // 0 means in initialisation phase should be the first year
