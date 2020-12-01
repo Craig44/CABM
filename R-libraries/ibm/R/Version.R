@@ -1,4 +1,4 @@
 "Version"<-
 function() {
-return("2020-09-14(0d40595)")
+return("2020-11-26(e6bb525)")
 }
