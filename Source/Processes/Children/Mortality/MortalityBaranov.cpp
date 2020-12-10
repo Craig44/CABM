@@ -179,8 +179,11 @@ void MortalityBaranov::DoBuild() {
         LOG_FATAL_P(PARAM_METHOD_INFO)
         << ": selectivity " << meth_row[selec_index] << " does not exist. Have you defined it? located in column " << selec_index;
 
-      if (temp_selectivity->is_length_based())
+      n_bins_ = model_->age_spread();
+      if (temp_selectivity->is_length_based()) {
         selectivity_length_based_ = true;
+        n_bins_ = model_->number_of_length_bins();
+      }
 
       fishery_selectivity_[fishery_index_[meth_index]].push_back(temp_selectivity);
       fishery_selectivity_[fishery_index_[meth_index]].push_back(temp_selectivity);
@@ -247,20 +250,11 @@ void MortalityBaranov::DoBuild() {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         if (model_->get_sexed()) {
           prop_F_fishery_and_bin_[fishery_ndx][row][col].resize(2);
-          if (selectivity_length_based_) {
-            prop_F_fishery_and_bin_[fishery_ndx][row][col][0].resize(model_->number_of_length_bins(),0.0);
-            prop_F_fishery_and_bin_[fishery_ndx][row][col][1].resize(model_->number_of_length_bins(),0.0);
-           } else {
-             prop_F_fishery_and_bin_[fishery_ndx][row][col][0].resize(model_->age_spread(),0.0);
-             prop_F_fishery_and_bin_[fishery_ndx][row][col][1].resize(model_->age_spread(),0.0);
-           }
+          prop_F_fishery_and_bin_[fishery_ndx][row][col][0].resize(n_bins_,0.0);
+          prop_F_fishery_and_bin_[fishery_ndx][row][col][1].resize(n_bins_,0.0);
         } else {
           prop_F_fishery_and_bin_[fishery_ndx][row][col].resize(1);
-          if (selectivity_length_based_) {
-            prop_F_fishery_and_bin_[fishery_ndx][row][col][0].resize(model_->number_of_length_bins(),0.0);
-           } else {
-             prop_F_fishery_and_bin_[fishery_ndx][row][col][0].resize(model_->age_spread(),0.0);
-           }
+          prop_F_fishery_and_bin_[fishery_ndx][row][col][0].resize(n_bins_,0.0);
         }
       }
     }
@@ -275,20 +269,11 @@ void MortalityBaranov::DoBuild() {
        for (unsigned col = 0; col < model_->get_width(); ++col) {
          if (model_->get_sexed()) {
            F_by_year_bin_[year_ndx][row][col].resize(2);
-           if (selectivity_length_based_) {
-             F_by_year_bin_[year_ndx][row][col][0].resize(model_->number_of_length_bins(),0.0);
-             F_by_year_bin_[year_ndx][row][col][1].resize(model_->number_of_length_bins(),0.0);
-            } else {
-              F_by_year_bin_[year_ndx][row][col][0].resize(model_->age_spread(),0.0);
-              F_by_year_bin_[year_ndx][row][col][1].resize(model_->age_spread(),0.0);
-            }
+           F_by_year_bin_[year_ndx][row][col][0].resize(n_bins_,0.0);
+           F_by_year_bin_[year_ndx][row][col][1].resize(n_bins_,0.0);
          } else {
            F_by_year_bin_[year_ndx][row][col].resize(1);
-           if (selectivity_length_based_) {
-             F_by_year_bin_[year_ndx][row][col][0].resize(model_->number_of_length_bins(),0.0);
-            } else {
-              F_by_year_bin_[year_ndx][row][col][0].resize(model_->age_spread(),0.0);
-            }
+           F_by_year_bin_[year_ndx][row][col][0].resize(n_bins_,0.0);
          }
        }
      }
@@ -337,10 +322,14 @@ void MortalityBaranov::DoExecute() {
   utilities::RandomNumberGenerator &rng = utilities::RandomNumberGenerator::Instance(); // shared resource
   vector<unsigned> global_age_freq(model_->age_spread(), 0);
   auto iter = years_.begin();
+  use_HCR_vals_ = false;
   if (model_->state() != State::kInitialise) {
     if (std::find(iter, years_.end(), model_->current_year()) != years_.end()) {
       iter = find(years_.begin(), years_.end(), model_->current_year());
       unsigned year_ndx = distance(years_.begin(), iter);
+
+      if (std::find(years_.begin(), harvest_control_years_.end(), model_->current_year()) != harvest_control_years_.end())
+        use_HCR_vals_ = true;
 
       if (not selectivity_length_based_) {
         LOG_FINE() << "Age based F";
@@ -358,8 +347,13 @@ void MortalityBaranov::DoExecute() {
               LOG_FINE() << "cell: " << row << "-" << col << " what we are storing = " << f_to_take_by_fishery_.size() << " looping over " << fishery_f_layer_.size() << " fishery label = " <<  fishery_label_.size();
               LOG_FINE() << " prop_F_fishery_and_bin_.size() " << prop_F_fishery_and_bin_.size();
               for (unsigned i = 0; i < fishery_label_.size(); ++i) {
-                f_for_fishery = fishery_f_layer_[i][year_ndx]->get_value(row, col);
-                fishery_f_to_take_[i][year_ndx] += f_for_fishery;
+                if(use_HCR_vals_) {
+                  LOG_MEDIUM() << "using HCR values in year " << model_->current_year();
+                  f_for_fishery = harvest_control_Fs_[model_->current_year()][fishery_label_[i]];
+                } else {
+                  f_for_fishery = fishery_f_layer_[i][year_ndx]->get_value(row, col);
+                }
+                fishery_f_to_take_[i][year_ndx] = f_for_fishery;
                 f_taken += f_for_fishery;
                 LOG_FINE() << "in year " << model_->current_year() << " fishery " << fishery_label_[i] << "need to remove " << f_for_fishery << " cell_ndx_.size() " << cell_ndx_.size();
                 if (model_->get_sexed()) {
@@ -480,6 +474,145 @@ void MortalityBaranov::DoExecute() {
         } // row
       } else {
         LOG_FINE() << "Applying length based F";
+        LOG_FINE() << "Age based F";
+        float bipmass_of_available = 0.0; // over all cells
+
+        for (unsigned row = 0; row < model_->get_height(); ++row) {
+          for (unsigned col = 0; col < model_->get_width(); ++col) {
+            WorldCell *cell = nullptr;
+            float f_taken = 0;
+            cell = world_->get_base_square(row, col); // Shared resource...
+            // Which fisheries are we taken fes for, not all fisheries are taking f every year.
+            vector<unsigned> fisheries_to_sample_from;
+            if (cell->is_enabled()) {
+              fill(f_to_take_by_fishery_.begin(), f_to_take_by_fishery_.end(), 0.0);
+              float f_for_fishery = 0.0;
+              LOG_FINE() << "cell: " << row << "-" << col << " what we are storing = " << f_to_take_by_fishery_.size() << " looping over " << fishery_f_layer_.size() << " fishery label = " <<  fishery_label_.size();
+              LOG_FINE() << " prop_F_fishery_and_bin_.size() " << prop_F_fishery_and_bin_.size();
+              for (unsigned i = 0; i < fishery_label_.size(); ++i) {
+                if(use_HCR_vals_) {
+                  f_for_fishery = harvest_control_Fs_[model_->current_year()][fishery_label_[i]];
+                  LOG_MEDIUM() << "using HCR values in year " << model_->current_year();
+                } else {
+                  f_for_fishery = fishery_f_layer_[i][year_ndx]->get_value(row, col);
+                }
+                fishery_f_to_take_[i][year_ndx] = f_for_fishery;
+                f_taken += f_for_fishery;
+                LOG_FINE() << "in year " << model_->current_year() << " fishery " << fishery_label_[i] << "need to remove " << f_for_fishery << " cell_ndx_.size() " << cell_ndx_.size();
+                if (model_->get_sexed()) {
+                  for (unsigned len_ndx = 0; len_ndx < n_bins_; ++len_ndx) {
+                    F_by_year_bin_[year_ndx][row][col][0][len_ndx] += f_for_fishery * fishery_selectivity_[i][0]->GetResult(len_ndx);
+                    F_by_year_bin_[year_ndx][row][col][1][len_ndx] += f_for_fishery * fishery_selectivity_[i][1]->GetResult(len_ndx);
+                    prop_F_fishery_and_bin_[i][row][col][0][len_ndx] = f_for_fishery * fishery_selectivity_[i][0]->GetResult(len_ndx);
+                    prop_F_fishery_and_bin_[i][row][col][1][len_ndx] = f_for_fishery * fishery_selectivity_[i][1]->GetResult(len_ndx);
+                  }
+                } else {
+                  for (unsigned len_ndx = 0; len_ndx < n_bins_; ++len_ndx) {
+                    F_by_year_bin_[year_ndx][row][col][0][len_ndx] += f_for_fishery * fishery_selectivity_[i][0]->GetResult(len_ndx);
+                    prop_F_fishery_and_bin_[i][row][col][0][len_ndx] = f_for_fishery * fishery_selectivity_[i][0]->GetResult(len_ndx);
+                  }
+                }
+                LOG_FINE() << "appropriated F";
+
+                composition_data age_freq_for_fishery(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
+                age_comp_by_fishery_[i][year_ndx].push_back(age_freq_for_fishery);
+                composition_data length_freq_for_fishery(PARAM_LENGTH, model_->current_year(), row, col, model_->number_of_length_bins());
+                length_comp_by_fishery_[i][year_ndx].push_back(length_freq_for_fishery);
+                census_data census_fishery_specific(model_->current_year(), row, col);
+                fishery_census_data_[i][year_ndx].push_back(census_fishery_specific);
+                f_to_take_by_fishery_[i] = f_for_fishery;
+                LOG_MEDIUM() << "ndx = " << cell_ndx_[i];
+                cell_ndx_[i] = age_comp_by_fishery_[i][year_ndx].size() - 1;
+                LOG_MEDIUM() << "ndx = " << cell_ndx_[i] << " for fishery = " << fishery_label_[i];
+              }
+              // Convert prop_F_fishery_and_bin_ to a proportion of F among fisheries.
+              for (unsigned i = 0; i < fishery_label_.size(); ++i) {
+                LOG_FINE() << "fishery " << fishery_label_[i];
+                if (model_->get_sexed()) {
+                  for (unsigned len_ndx = 0; len_ndx < n_bins_; ++len_ndx) {
+                    prop_F_fishery_and_bin_[i][row][col][0][len_ndx] /= F_by_year_bin_[year_ndx][row][col][0][len_ndx];
+                    prop_F_fishery_and_bin_[i][row][col][1][len_ndx] /= F_by_year_bin_[year_ndx][row][col][1][len_ndx];
+                  }
+                } else {
+                  for (unsigned len_ndx = 0; len_ndx < n_bins_; ++len_ndx) {
+                    prop_F_fishery_and_bin_[i][row][col][0][len_ndx] /= F_by_year_bin_[year_ndx][row][col][0][len_ndx];
+                    //LOG_FINE() << "age = " << age << " prop F " << prop_F_fishery_and_bin_[i][row][col][0][age_iter];
+                  }
+                }
+              }
+              LOG_FINE() << "need to remove " << f_taken << " weight of fish across all fisheries";
+              //unsigned agent_counter = 0;
+              if (f_taken > 0) {
+                LOG_MEDIUM() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << f_taken;
+                census_data census_fishery(model_->current_year(), row, col);
+                composition_data age_freq(PARAM_AGE, model_->current_year(), row, col, model_->age_spread());
+                composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col, model_->number_of_length_bins());
+
+                /*
+                 *  Main loop
+                 *  - loop over all agents
+                 *  - apply total F over all agents chance() < exp(-F_by_year_bin_[year_ndx][row][col][0][age_iter])
+                 *  - If caught then do a multinomial draw, to see which fishery caught this agent.
+                 */
+                float temp_sum = 0.0;
+                float random_chance = 0.0;
+                for(auto& agent : cell->agents_) {
+                  if (agent.is_alive()) {
+                    bipmass_of_available = agent.get_weight() * agent.get_scalar();
+                    //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
+                    if (rng.chance() <= (1 - std::exp(- F_by_year_bin_[year_ndx][row][col][agent.get_sex()][agent.get_age_index()]))) {
+                      // caught this fish
+                      // Which fishery
+                      temp_sum = 0;
+                      random_chance = rng.chance();
+                      for (unsigned fish_ndx = 0; fish_ndx < fishery_label_.size(); ++fish_ndx) {
+                        temp_sum += prop_F_fishery_and_bin_[fish_ndx][row][col][agent.get_sex()][agent.get_age_index()];
+                        if (temp_sum > random_chance) {
+                          // caught by this fishery
+                          // check under MLS and apply some handling mortality: NOTE no checking for tags here, TO ADD
+                          if (agent.get_length() < fishery_mls_[fish_ndx]) {
+                            // released
+                            if (rng.chance() <= fishery_hand_mort_[fish_ndx])
+                              agent.dies();
+                          } else {
+                            // save obs
+                            fishery_actual_catch_taken_[fish_ndx][year_ndx] += agent.get_weight() * agent.get_scalar();
+                            age_freq.frequency_[agent.get_age_index()] += agent.get_scalar(); // This actually represents many individuals.
+                            length_freq.frequency_[agent.get_length_bin_index()] += agent.get_scalar();
+
+                            if (agent.get_sex() == 0) {
+                              age_comp_by_fishery_[fish_ndx][year_ndx][cell_ndx_[fish_ndx]].frequency_[agent.get_age_index()] += agent.get_scalar();
+                              length_comp_by_fishery_[fish_ndx][year_ndx][cell_ndx_[fish_ndx]].frequency_[agent.get_length_bin_index()] += agent.get_scalar();
+                              fishery_census_data_[fish_ndx][year_ndx][cell_ndx_[fish_ndx]].biomass_ +=agent.get_weight() * agent.get_scalar();
+                            } else {
+                              age_comp_by_fishery_[fish_ndx][year_ndx][cell_ndx_[fish_ndx]].female_frequency_[agent.get_age_index()] += agent.get_scalar();
+                              length_comp_by_fishery_[fish_ndx][year_ndx][cell_ndx_[fish_ndx]].female_frequency_[agent.get_length_bin_index()] += agent.get_scalar();
+                              fishery_census_data_[fish_ndx][year_ndx][cell_ndx_[fish_ndx]].female_biomass_ += agent.get_weight() * agent.get_scalar();
+                            }
+                            global_age_freq[agent.get_age_index()] += agent.get_scalar();
+                            fishery_census_data_[fish_ndx][year_ndx][cell_ndx_[fish_ndx]].age_ndx_.push_back(agent.get_age_index());
+                            fishery_census_data_[fish_ndx][year_ndx][cell_ndx_[fish_ndx]].sex_.push_back(agent.get_sex());
+                            fishery_census_data_[fish_ndx][year_ndx][cell_ndx_[fish_ndx]].fishery_ndx_.push_back(fish_ndx);
+                            fishery_census_data_[fish_ndx][year_ndx][cell_ndx_[fish_ndx]].length_ndx_.push_back(agent.get_length_bin_index());
+                            fishery_census_data_[fish_ndx][year_ndx][cell_ndx_[fish_ndx]].scalar_.push_back(agent.get_scalar());
+                            fishery_census_data_[fish_ndx][year_ndx][cell_ndx_[fish_ndx]].weight_.push_back(agent.get_weight());
+                            actual_catch_by_area_[year_ndx][fish_ndx][row][col] += agent.get_scalar() * agent.get_weight();
+                            agent.dies();
+                          }
+                          break;
+                        }
+                      }
+                    }
+                  }
+                }
+                removals_by_length_and_area_.push_back(length_freq);
+                removals_by_age_and_area_.push_back(age_freq);
+                removals_census_.push_back(census_fishery);
+              } //if (f_taken > 0) {
+            } // cell ->is_enabled()
+          } // col
+        } // row
+        LOG_MEDIUM() << "available biomass = " << bipmass_of_available << " (all fish alive at time of process ignoring selectivity)";
       }
     } // find(years_.begin(), years_.end(), model_->current_year()) != years_.end()
   }  //model_->state() != State::kInitialise
@@ -658,7 +791,7 @@ void MortalityBaranov::FillReportCache(ostringstream &cache) {
       }
     }
   }
-  // Print actual fes by year x fishery x area
+  // Print actual catches by year x fishery x area
   for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     cache << "actual_catches-" << years_[year_ndx] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
     cache << "cell ";
@@ -676,7 +809,7 @@ void MortalityBaranov::FillReportCache(ostringstream &cache) {
     }
   }
 
-  // Print actual fes by year x fishery x area
+  // Print actual F  by year x fishery
   if( not model_->get_sexed()) {
     for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
       cache << "F_by_bin-" << years_[year_ndx] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
@@ -703,26 +836,17 @@ void MortalityBaranov::FillReportCache(ostringstream &cache) {
     LOG_WARNING() << "need to complete fishing report for sexed models.";
   }
 
-  // Print actual fes by year x fishery x area
-  WorldCell *cell = nullptr;
-  for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
-    cache << "F-" << years_[year_ndx] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
-    cache << "cell ";
-    for (unsigned fishery_ndx = 0; fishery_ndx < fishery_label_.size(); ++fishery_ndx)
-      cache << fishery_label_[fishery_ndx] << " ";
-    cache << "\n";
-    for (unsigned row = 0; row < model_->get_height(); ++row) {
-      for (unsigned col = 0; col < model_->get_width(); ++col) {
-        cache << row + 1 << "-" << col + 1 << " ";
-        cell = world_->get_base_square(row, col); // Shared resource...
-        if (cell->is_enabled()) {
-          for (unsigned i = 0; i < fishery_label_.size(); ++i) {
-            cache << fishery_f_layer_[i][year_ndx]->get_value(row, col) << " ";
-          }
-          cache << "\n";
-        }
-      }
+  // Print actual Fs by year x fishery
+  cache << "F_by_fishery_year " << REPORT_R_DATAFRAME_ROW_LABELS <<"\nFishery_lab ";
+  for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx)
+    cache <<  years_[year_ndx] << " ";
+   cache << "\n";
+  for (unsigned fishery_ndx = 0; fishery_ndx < fishery_label_.size(); ++fishery_ndx) {
+    cache << fishery_label_[fishery_ndx] << " ";
+    for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+      cache << fishery_f_to_take_[fishery_ndx][year_ndx] << " ";
     }
+    cache << "\n";
   }
 
   if (print_census_info_) {
@@ -768,5 +892,24 @@ void MortalityBaranov::FillReportCache(ostringstream &cache) {
   }
 }
 
+/*
+ * Set F based on R code
+ */
+void MortalityBaranov::set_HCR(map<unsigned, map<string, float>> future_catches) {
+  // find
+  for (auto year_map : future_catches) {
+    if(find(years_.begin(), years_.end(), year_map.first) == years_.end())
+      LOG_FATAL() << "could not find year " << year_map.first << " for setting HCR rule in MSE mode";
+    harvest_control_years_.push_back(year_map.first);
+    for (auto fish_map : year_map.second) {
+      if (find(fishery_label_.begin(), fishery_label_.end(), fish_map.first) == fishery_label_.end())
+        LOG_FATAL() << "could not find fishery " << fish_map.first << " for setting HCR rule in MSE mode";
+      // set save the values
+      harvest_control_Fs_[year_map.first][fish_map.first] = fish_map.second;
+      LOG_MEDIUM() << "setting HCR year = " << year_map.first << " for fishery = " << fish_map.first << " value = " << fish_map.second;
+    }
+  }
+
+}
 } /* namespace processes */
 } /* namespace niwa */

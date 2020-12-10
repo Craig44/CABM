@@ -17,11 +17,20 @@ namespace reports {
  *
  */
 DerivedQuantity::DerivedQuantity(Model* model) : Report(model) {
-  run_mode_    = (RunMode::Type)(RunMode::kBasic | RunMode::kSimulation);
-  model_state_ = (State::Type)(State::kIterationComplete);
+  //run_mode_    = (RunMode::Type)(RunMode::kBasic | RunMode::kSimulation);
+  model_state_ = (State::Type)(State::kIterationComplete | State::kFinalise);
 }
 
+/**
+ * Validate inputs
+ */
+void DerivedQuantity::DoValidate() {
+  if ((model_->run_mode() == RunMode::kMSE) || (model_->run_mode() == RunMode::kBasic)|| (model_->run_mode() == RunMode::kSimulation))
+    run_mode_ = model_->run_mode();
 
+  if ((model_->run_mode() == RunMode::kMSE))
+    model_state_ = State::kInputIterationComplete;
+}
 /**
  *
  */

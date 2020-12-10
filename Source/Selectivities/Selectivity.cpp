@@ -61,7 +61,7 @@ void Selectivity::Reset() {
 }
 
 /**
- * Return the cached value for the specified age or length from
+ * Return the cached value for the specified age or length index (not the actual length or age)
  * our internal map
  *
  * @param age_or_length The age or length to get selectivity value for

@@ -53,6 +53,7 @@ void CommandLineParser::Parse(int argc, char* argv[], RunParameters& options) {
     ("simulation,s", value<unsigned>(), "Simulation mode (arg = number of candidates)")
     ("config,c", value<string>(), "Configuration file")
     ("run,r", "Basic model run mode")
+    ("mse,m", "Conduct a full MSE mode number if iterations depends in -i file.")
     ("input,i", value<string>(), "Load free parameter values from file")
     ("seed,g", value<unsigned>(), "Random number seed")
     ("q", "suppress warnings")
@@ -124,17 +125,21 @@ void CommandLineParser::Parse(int argc, char* argv[], RunParameters& options) {
   unsigned run_mode_count = 0;
   run_mode_count += parameters.count("run");
   run_mode_count += parameters.count("simulation");
+  run_mode_count += parameters.count("mse");
 
   if (run_mode_count == 0)
     LOG_ERROR() << "No valid run mode has been specified on the command line. Please specify a valid run mode (e.g -r)";
   if (run_mode_count > 1)
-    LOG_ERROR() << "Multiple run modes have been specified on the command line. Only 1 run mode is valid";
+    LOG_ERROR() << "Multiple run modes have been specified on the command line. Only 1 run mode is valid, i.e. -r -s or -m";
 
   if (parameters.count("run"))
     options.run_mode_ = RunMode::kBasic;
   else if (parameters.count("simulation")) {
      options.simulation_candidates_ = parameters["simulation"].as<unsigned>();
      options.run_mode_ = RunMode::kSimulation;
+
+   } else if (parameters.count("mse")) {
+     options.run_mode_ = RunMode::kMSE;
 
    } else {
     LOG_ERROR() << "An invalid or unknown run mode has been specified on the command line.";

@@ -308,7 +308,8 @@ void MortalityEventBiomassLengthClusters::ResetPreSimulation() {
 void MortalityEventBiomassLengthClusters::Simulate() {
   unsigned i = 0;
   LOG_MEDIUM() << "Simulating data for observation = " << label_ << " about to get fishery label = " << fishery_label_;
-  ResetPreSimulation();
+  if (model_->run_mode() != (RunMode::Type)(RunMode::kMSE))
+    ResetPreSimulation();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   vector<vector<processes::census_data>> fishery_age_data = mortality_process_->get_fishery_census_data(fishery_label_);
 
@@ -321,7 +322,16 @@ void MortalityEventBiomassLengthClusters::Simulate() {
 
   vector<unsigned> census_stratum_ndx;
 
+  vector<unsigned> sim_years;
+  if (model_->run_mode() == (RunMode::Type)(RunMode::kMSE))
+    sim_years = model_->simulation_years();
   for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    // only do this in MSE mode if we are updateing
+    if (model_->run_mode() == (RunMode::Type)(RunMode::kMSE)) {
+      if(find(sim_years.begin(), sim_years.end(), years_[year_ndx]) == sim_years.end()) {
+        continue;
+      }
+    }
     // find equivalent fishery index
     auto iter = find(fishery_years_.begin(), fishery_years_.end(), years_[year_ndx]);
     unsigned fishery_year_ndx = distance(fishery_years_.begin(), iter);

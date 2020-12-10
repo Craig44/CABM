@@ -29,7 +29,13 @@ namespace reports {
  */
 ModelAttributes::ModelAttributes(Model* model) : Report(model) {
   model_state_ = State::kIterationComplete;;
-  run_mode_    = (RunMode::Type)(RunMode::kBasic);
+  //run_mode_    = (RunMode::Type)(RunMode::kBasic);
+}
+/**
+ * Validate
+ */
+void ModelAttributes::DoValidate() {
+  run_mode_ = model_->run_mode(); // run this in all run modes
 }
 
 /**
@@ -52,6 +58,11 @@ void ModelAttributes::DoExecute() {
 
   cache_ << "model_years: ";
   for (auto year : model_->years())
+    cache_ << year << " ";
+  cache_ << "\n";
+
+  cache_ << "assessment_years: ";
+  for (auto year : model_->ass_years())
     cache_ << year << " ";
   cache_ << "\n";
 

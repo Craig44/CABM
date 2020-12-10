@@ -46,6 +46,7 @@ public:
 protected:
   // members
   Model*                      model_ = nullptr;
+  bool                        mse_run_;
 };
 } /* namespace niwa */
 #endif /* LIKELIHOOD_H_ */

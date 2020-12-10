@@ -25,7 +25,7 @@ class DerivedQuantity : public niwa::Report {
 public:
   DerivedQuantity(Model* model);
   virtual                     ~DerivedQuantity() = default;
-  void                        DoValidate() override final { };
+  void                        DoValidate() override final;
   void                        DoBuild() override final { };
   void                        DoExecute() override final;
   void                        DoReset() override final  { };
