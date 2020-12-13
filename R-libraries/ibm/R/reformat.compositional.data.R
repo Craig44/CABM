@@ -9,7 +9,7 @@
 #' @export
 #'
 
-reformat.compositional.data = function(model, report_label) {
+reformat.compositional.data = function(model, report_label, quiet = TRUE) {
   ## check report label exists
   if (!report_label %in% names(model))
     stop(Paste("In model the report label '", report_label, "' could not be found. The report labels available are ", paste(names(model),collapse = ", ")))
@@ -29,7 +29,8 @@ reformat.compositional.data = function(model, report_label) {
   lengths = unique(this_ob[,"length"])
   cells = unique(this_ob[,"cell"])
   n_sexs = ifelse(length(unique(this_ob[,"sex"])) > 1,2,1)
-  print(Paste("n_bins = " ,n_bins, " n_cells = ", n_cells,  " n years " ,n_years, " n sexes = " , n_sexs))
+  if(!quiet)
+    print(Paste("n_bins = " ,n_bins, " n_cells = ", n_cells,  " n years " ,n_years, " n sexes = " , n_sexs))
 
   final_results_by_cell = list()
   for (i in 1:n_cells) {

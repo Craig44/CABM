@@ -18,7 +18,7 @@ namespace reports {
  */
 DerivedQuantity::DerivedQuantity(Model* model) : Report(model) {
   //run_mode_    = (RunMode::Type)(RunMode::kBasic | RunMode::kSimulation);
-  model_state_ = (State::Type)(State::kIterationComplete | State::kFinalise);
+  model_state_ = (State::Type)(State::kIterationComplete);
 }
 
 /**

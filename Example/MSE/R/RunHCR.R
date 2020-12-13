@@ -159,8 +159,8 @@ if(debug)
   cat("convergence - opt - ", opt_$convergence, " - convg ", check_converg, "\n")
 
 MLE_est = est_obj$report(est_obj$env$last.par.best)
-## save MLE estimates
-save(MLE_est, file = file.path(est_out_dir, paste0("mse_year_",current_year, extension, ".RData")))
+## save MLE estimates and data
+save(MLE_est, TMB_data, file = file.path(est_out_dir, paste0("mse_year_",current_year, extension, ".RData")))
 #####################
 ## HCR
 #####################
@@ -180,7 +180,7 @@ if(is_final_year == 0) {
   proj_data$proj_method = 1 # Catch not F
   proj_data$future_vals = 0.0 # zero catch
   #proj_data$future_F = 0.0
-  ## the projection model
+  ## Build the projection model
   proj_fun = MakeADFun(proj_data, init_vals, DLL= "ASMycs_proj", random = c("ln_ycs_est"), map = map_fix_pars, silent = T, type = "Fun")
   ref_bio = matrix(NA,nrow = n_proj_sims, ncol = length(50:101) ) ## use the last projected 50 years with F = 0 as the reference Biomass
   rel_status = vector();
@@ -327,6 +327,17 @@ if(is_final_year == 0) {
       future_catch = 0.01 ## can't be zero as we have a lognormal dist in estimator
     }
   }
+  ## save projections with this catch, will be interesting to compare with actual trajectory
+  proj_fun$env$data$future_vals = future_catch
+  proj_ssbs = matrix(NA, nrow = n_proj_sims, ncol = length(proj_rep$ssb_proj))
+  for(i in 1:n_proj_sims) {
+    set.seed(trunc(runif(1,1, 1e5)))
+    proj_rep = proj_fun$report(proj_pars[i,])
+    proj_ssbs[i, ] = proj_rep$ssb_proj
+  }
+  save(proj_ssbs, future_catch, file = file.path(est_out_dir, paste0("proj_year_",current_year, extension, ".RData")))
+
+  ## create object that will be returned to the ABM C++ interface
   Fishing_ls = list();
   fishing_vector = future_catch
   names(fishing_vector) = "Fishing"

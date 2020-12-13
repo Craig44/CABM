@@ -1,4 +1,4 @@
 "IBM.binary.version"<-
 function() {
-return("2020-11-26 01:01:15 UTC (rev. e6bb525)")
+return("2020-12-01 20:56:54 UTC (rev. 6e15bb1)")
 }

@@ -59,9 +59,9 @@ function (file, path = "",fileEncoding = "") {
         report = tryCatch({
 	   make.list(report)
 	}, warning = function(warning_condition) {
-	    print(paste0("For report label ",label ," found the following warning ", warning_condition))
+	    cat(paste0("For report label ",label ," found the following warning ", warning_condition))
 	}, error = function(error_condition) {
-	    print(paste0("For report label ",label ," found the following error ", error_condition))
+	    cat(paste0("For report label ",label ," found the following error ", error_condition))
 	})
         report$type = type
         if (mult_input_run) {
