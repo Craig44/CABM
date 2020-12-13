@@ -920,6 +920,7 @@ void MortalityEventHybrid::FillReportCache(ostringstream &cache) {
   if (age_comp_by_fishery_.size() > 0) {
     vector<unsigned> temp_age_freq(model_->age_spread(), 0.0);
     if (model_->get_sexed()) {
+      LOG_FINE() << "Age comp sexed";
       for (auto &fishery : fishery_index_) {
         cache << "age_freq-male-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
         cache << "year cell ";
@@ -973,6 +974,7 @@ void MortalityEventHybrid::FillReportCache(ostringstream &cache) {
         }
       }
     } else {
+      LOG_FINE() << "Age comp non-sexed";
       for (auto &fishery : fishery_index_) {
         cache << "age_freq-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
         cache << "year cell ";
@@ -1002,8 +1004,11 @@ void MortalityEventHybrid::FillReportCache(ostringstream &cache) {
   }
   // Length comp by fishery
   if (length_comp_by_fishery_.size() > 0) {
+    LOG_FINE() << "Length comp";
     vector<unsigned> temp_len_freq(model_->length_bin_mid_points().size(), 0.0);
     if (model_->get_sexed()) {
+      LOG_FINE() << "sexed";
+
       for (auto &fishery : fishery_index_) {
         cache << "length_freq-male-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
         cache << "year cell ";
@@ -1056,6 +1061,7 @@ void MortalityEventHybrid::FillReportCache(ostringstream &cache) {
         }
       }
     } else {
+      LOG_FINE() << "Non sexed";
       for (auto &fishery : fishery_index_) {
         cache << "length_freq-" << fishery_label_[fishery] << " " << REPORT_R_DATAFRAME << "\n";
         cache << "year cell ";
@@ -1100,43 +1106,48 @@ void MortalityEventHybrid::FillReportCache(ostringstream &cache) {
       }
     }
   }
-
+  LOG_FINE() << "F_by_year_bin_";
   // Print actual F  by year x fishery
   if( not model_->get_sexed()) {
     for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
-      cache << "F_by_bin-" << years_[year_ndx] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
-      cache << "cell ";
-      if(selectivity_length_based_) {
-        for (auto len_bin : model_->length_bin_mid_points())
-          cache << len_bin << " ";
-      } else {
-        for (auto age_bin = model_->min_age(); age_bin <= model_->max_age(); ++age_bin)
-          cache << age_bin << " ";
-      }
-      cache << "\n";
-      for (unsigned row = 0; row < model_->get_height(); ++row) {
-        for (unsigned col = 0; col < model_->get_width(); ++col) {
-          cache << row + 1 << "-" << col + 1 << " ";
-          for (unsigned bin_ndx = 0; bin_ndx < F_by_year_bin_[year_ndx][row][col][0].size(); ++bin_ndx) {
-            cache <<  F_by_year_bin_[year_ndx][row][col][0][bin_ndx] << " ";
+      if(find(harvest_control_years_.begin(), harvest_control_years_.end(), years_[year_ndx]) != harvest_control_years_.end()) {
+        cache << "F_by_bin-" << years_[year_ndx] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
+        cache << "cell ";
+        if(selectivity_length_based_) {
+          for (auto len_bin : model_->length_bin_mid_points())
+            cache << len_bin << " ";
+        } else {
+          for (auto age_bin = model_->min_age(); age_bin <= model_->max_age(); ++age_bin)
+            cache << age_bin << " ";
+        }
+        cache << "\n";
+        for (unsigned row = 0; row < model_->get_height(); ++row) {
+          for (unsigned col = 0; col < model_->get_width(); ++col) {
+            cache << row + 1 << "-" << col + 1 << " ";
+            for (unsigned bin_ndx = 0; bin_ndx < F_by_year_bin_[year_ndx][row][col][0].size(); ++bin_ndx) {
+              cache <<  F_by_year_bin_[year_ndx][row][col][0][bin_ndx] << " ";
+            }
+            cache << "\n";
           }
-          cache << "\n";
         }
       }
     }
   } else {
     LOG_WARNING() << "need to complete fishing report for sexed models.";
   }
-
+  LOG_FINE() << "fishery_f_to_take_";
   // Print actual Fs by year x fishery
   cache << "F_by_fishery_year " << REPORT_R_DATAFRAME_ROW_LABELS <<"\nFishery_lab ";
-  for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx)
-    cache <<  years_[year_ndx] << " ";
+  for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    if(find(harvest_control_years_.begin(), harvest_control_years_.end(), years_[year_ndx]) != harvest_control_years_.end())
+      cache <<  years_[year_ndx] << " ";
+  }
    cache << "\n";
   for (unsigned fishery_ndx = 0; fishery_ndx < fishery_label_.size(); ++fishery_ndx) {
     cache << fishery_label_[fishery_ndx] << " ";
     for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
-      cache << fishery_f_to_take_[fishery_ndx][year_ndx] << " ";
+      if(find(harvest_control_years_.begin(), harvest_control_years_.end(), years_[year_ndx]) != harvest_control_years_.end())
+        cache << fishery_f_to_take_[fishery_ndx][year_ndx] << " ";
     }
     cache << "\n";
   }
