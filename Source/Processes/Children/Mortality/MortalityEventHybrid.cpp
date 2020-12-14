@@ -33,7 +33,9 @@ MortalityEventHybrid::MortalityEventHybrid(Model *model) :  Mortality(model) {
   parameters_.BindTable(PARAM_METHOD_INFO, method_table_, "Table of information for each fishery.", "", true, false);
   parameters_.Bind<bool>(PARAM_PRINT_CENSUS_INFO, &print_census_info_, "if you have process report for this process you can control the amount of information printed to the file.", "", true);
 }
-
+/*
+ * Deconstructor - expliclitly delete local pointers
+ */
 MortalityEventHybrid::~MortalityEventHybrid() {
   delete f_table_;
   delete method_table_;
@@ -174,8 +176,8 @@ void MortalityEventHybrid::DoBuild() {
 
 
   // Allocate memory for some of the f related maps
-  for (unsigned i = 0; i < fishery_f_layer_.size(); ++i) {
-    fishery_actual_catch_taken_[i].resize(fishery_f_layer_[i].size(), 0.0);
+  for (unsigned i = 0; i < fishery_label_.size(); ++i) {
+    fishery_actual_catch_taken_[i].resize(years_.size(), 0.0);
     fishery_f_to_take_[i].resize(years_.size(), 0.0);
   }
 
@@ -914,6 +916,7 @@ void MortalityEventHybrid::DoExecute() {
 // FillReportCache, called in the report class, it will print out additional information that is stored in
 // containers in this class.
 void MortalityEventHybrid::FillReportCache(ostringstream &cache) {
+
   LOG_FINE() << "";
   // Fishery specific info
   // age frequency by sex fishery and year
@@ -1090,7 +1093,11 @@ void MortalityEventHybrid::FillReportCache(ostringstream &cache) {
     }
   }
   // Print actual catches by year x fishery x area
+  //if(find(harvest_control_years_.begin(), harvest_control_years_.end(), years_[year_ndx]) != harvest_control_years_.end()) {
+  LOG_FINE() << "number of years = " << years_.size() << " years saved in actual catch " << actual_catch_by_area_.size() << " fisheries " << fishery_label_.size() << " fisheries saved = " << actual_catch_by_area_[0].size();
   for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    if (years_[year_ndx] > model_->current_year())
+      continue;
     cache << "actual_catches-" << years_[year_ndx] << " " << REPORT_R_DATAFRAME_ROW_LABELS << "\n";
     cache << "cell ";
     for (unsigned fishery_ndx = 0; fishery_ndx < fishery_label_.size(); ++fishery_ndx)
@@ -1105,6 +1112,7 @@ void MortalityEventHybrid::FillReportCache(ostringstream &cache) {
         cache << "\n";
       }
     }
+  //}
   }
   LOG_FINE() << "F_by_year_bin_";
   // Print actual F  by year x fishery

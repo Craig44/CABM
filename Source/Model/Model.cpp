@@ -5,7 +5,7 @@
  * @date 6/12/2012
  * @section LICENSE
  *
- * Copyright NIWA Science ©2012 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2012 - www.niwa.co.nz
  *
  * @modified 12/7/2018 by C.Marsh for IBM usage
  */
@@ -543,21 +543,27 @@ void Model::RunMSE() {
         LOG_MEDIUM() << "Calculate HCR, print simulated obs and run R-code";
         managers_->observation()->SimulateData(); // make sure we don't overwrite old observations, these are known
         //managers_->report()->PrintObservations();
+        LOG_MEDIUM() << "Finished Simulating observations";
+
         managers_->report()->Execute(State::kIterationComplete);
         managers_->report()->WaitForReportsToFinish();
 
         // Run HCR rule
         map<unsigned,map<string,float>> hcr_catches;
+        LOG_MEDIUM() << "Entering RInside section";
+
         // Run C++ algorithm up to current time-step
         // R.parseEvalQ("sim = 1");
         try {
            // Tell R which suffix to associate simualted data with
            R["extension"] = report_suffix;
            R["current_year"] = current_year_;
-           R["next_ass_year"] = ass_years_[current_mse_cycle + 1];
-           if(current_year_ == final_year_)
+           if(current_year_ == final_year_) {
              R["is_final_year"] = 1; // tell R not to do projections just estiamte and save estimated output
-
+             R["next_ass_year"] = current_year_;
+           } else {
+             R["next_ass_year"] = ass_years_[current_mse_cycle + 1];
+           }
            string run_hcr = "suppressMessages(source(file.path('..','R','RunHCR.R')))";
            //R.parseEvalQ(run_hcr);    // Run the code then get the catch for each fishery.
            // RunHCR.R needs to return a list called fishing_list
@@ -612,10 +618,12 @@ void Model::RunMSE() {
           LOG_FATAL() << "Unknown exception caught" << std::endl;
         }
         // Send off to the mortality process
-        mortality_process_for_mse->set_HCR(hcr_catches);
+        if(current_year_ != final_year_)
+          mortality_process_for_mse->set_HCR(hcr_catches);
         ++current_mse_cycle;
       }
     }
+    LOG_MEDIUM() << "Model: State change to Iteration Complete";
     managers_->report()->Execute(State::kIterationComplete);
     // Model has finished so we can run finalise.
     LOG_MEDIUM() << "Model: State change to Iteration Complete";

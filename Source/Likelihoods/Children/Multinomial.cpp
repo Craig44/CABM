@@ -5,7 +5,7 @@
  * @date 25/03/2013
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
  */
@@ -39,10 +39,10 @@ void Multinomial::SimulateObserved(map<unsigned, map<string, vector<observations
   if (model_->run_mode() == (RunMode::Type)(RunMode::kMSE)) {
     vector<unsigned> sim_years = model_->simulation_years();
     for (; iterator != comparisons.end(); ++iterator) {
-      LOG_FINE() << "Simulating values for year: " << iterator->first;
+      LOG_FINEST() << "Simulating values for year: " << iterator->first;
       if((iterator->first >= sim_years[0]) & (iterator->first <= sim_years[sim_years.size() - 1])) {
         for (auto second_iter = iterator->second.begin(); second_iter != iterator->second.end(); ++second_iter) {
-          LOG_FINE() << "Simulating values for cell: " << second_iter->first;
+          LOG_FINEST() << "Simulating values for cell: " << second_iter->first;
           for (observations::Comparison& comparison : second_iter->second) {
             float error_value = comparison.error_value_;
 
@@ -58,9 +58,9 @@ void Multinomial::SimulateObserved(map<unsigned, map<string, vector<observations
     }
   } else {
     for (; iterator != comparisons.end(); ++iterator) {
-      LOG_FINE() << "Simulating values for year: " << iterator->first;
+      LOG_FINEST() << "Simulating values for year: " << iterator->first;
       for (auto second_iter = iterator->second.begin(); second_iter != iterator->second.end(); ++second_iter) {
-        LOG_FINE() << "Simulating values for cell: " << second_iter->first;
+        LOG_FINEST() << "Simulating values for cell: " << second_iter->first;
         for (observations::Comparison& comparison : second_iter->second) {
           float error_value = comparison.error_value_;
 
