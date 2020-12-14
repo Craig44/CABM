@@ -1,4 +1,4 @@
-# cat("correctly read me =)\n") # this will be printed into the > outtxt file, which will break the R-library read functions
+#cat("correctly read me =)\n") # this will be printed into the > outtxt file, which will break the R-library read functions
 library(TMB)
 library(ibm)
 library(mvtnorm)
@@ -15,6 +15,13 @@ tmb_dir = file.path(abm_dir, "..","TMB")
 abm_sim_dir = file.path(abm_dir, "sim")
 savedobjs_dir = file.path(r_dir, "savedOBJs")
 est_out_dir = file.path(r_dir, "est_outputs", model_label)
+if(debug)
+  cat("tmb_dir ", tmb_dir, "\n")
+if(debug)
+  cat("abm_dir ", abm_dir, "\n")
+if(debug)
+  cat("r_dir ", r_dir, "\n")
+
 ## source auxillary functions
 ls_files = list.files(file.path(r_dir, "Funs"), pattern = "\\.R$")
 for(i in 1:length(ls_files))
@@ -28,7 +35,7 @@ DATA_WEIGHTING = F
 converge_tol = 0.01
 ## Assumes you have already Compiled TMB model
 #file.create("sink_info.txt",showWarnings  = F)
-#sink(compile(file = file.path(tmb_dir, "ASMycs.cpp"),trace = F, tracesweep = F),file = "sink_info.txt")
+#compile(file = file.path(tmb_dir, "ASMycs.cpp"),trace = F, tracesweep = F)
 dyn.load(dynlib(file.path(tmb_dir,"ASMycs"))) ## load tmb
 #dyn.unload(dynlib(file.path(tmb_dir, "ASMycs_proj")))
 #compile(file.path(tmb_dir,"ASMycs_proj.cpp"), flags = "",DLLFLAGS="");
@@ -36,10 +43,10 @@ dyn.load(dynlib(file.path(tmb_dir, "ASMycs_proj")))
 ## Build TMB-data and save, which will have be reloaded in each MSE step 
 ## i.e. every RunHCR.R call
 #abm = extract.run(file = "run.out", path = abm_dir)
-#save(abm, file = file.path(savedobjs_dir, "abm_output.RData"))
+#save(abm, file = file.path(savedobjs_dir, "abm_output.RData"), version = 2)
 load(file = file.path(savedobjs_dir, "abm_output.RData"))
-abm_pop = extract.ibm.file(file = "population.ibm", path = abm_dir, quiet = T)
-abm_obs = extract.ibm.file(file = "observation.ibm", path = abm_dir, quiet = T)
+abm_pop = extract.ibm.file(file = "Population.ibm", path = abm_dir, quiet = T)
+abm_obs = extract.ibm.file(file = "Observation.ibm", path = abm_dir, quiet = T)
 years = abm$model_attributes$model_years
 ## change years so it starts at the first assesment year
 years = min(years):min(as.numeric(abm_pop$model$assessment_years$value))

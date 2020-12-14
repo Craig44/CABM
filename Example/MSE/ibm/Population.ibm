@@ -25,8 +25,8 @@ ncols 1
 # --------------
 @initialisation_phase Iterative
 type iterative
-years 40
-initial_number_of_agents 500000 ## initial number of agents
+years 30
+initial_number_of_agents 90000 ## initial number of agents
 layer_label initial_values
 recruitment_layer_label recruitment_layer # stock identification, important for when you are scaling SSB = B0 for an agent model to population model
 initialisation_mortality_rate 0.19
@@ -73,6 +73,7 @@ time_step_ratio 1.0
 
 # Fishing Mortality
 @process Fishing
+#type mortality_baranov
 type mortality_event_hybrid
 print_census_info false
 table f_table
