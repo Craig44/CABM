@@ -46,7 +46,8 @@ MovementPreference::MovementPreference(Model* model) : Movement(model) {
   parameters_.Bind<string>(PARAM_PREFERENCE_FUNCTIONS, &preference_function_labels_, "The preference functions to apply", "", true);
   parameters_.Bind<string>(PARAM_PREFERENCE_LAYERS, &preference_layer_labels_, "The preference functions to apply", "", true);
   parameters_.Bind<string>(PARAM_SELECTIVITY_LABEL, &selectivity_label_, "Label for the selectivity block", "");
-
+  //parameters_.Bind<unsigned>(PARAM_NUMBER_OF_CELLS_FOR_GRADIENT, &number_of_cells_gradient_, "Number of cells to calculate the (E-W & N-S) gradient over", "", true);
+  parameters_.Bind<bool>(PARAM_SAVE_AND_PRINT_AGENT_JUMPS, &print_individual_tracks_, "Save an location after each movement application for each agent, and print 30 of them in the report (Can be very slow)", "", false);
 }
 
 /*
@@ -54,7 +55,18 @@ MovementPreference::MovementPreference(Model* model) : Movement(model) {
 */
 void MovementPreference::DoValidate() {
   LOG_TRACE();
+  // number_of_cells_gradient_ should be an odd number
+  if(number_of_cells_gradient_ <= 0)
+    LOG_ERROR_P(PARAM_NUMBER_OF_CELLS_FOR_GRADIENT) << "Needs to be bigger than zero";
+  if(number_of_cells_gradient_ > model_->get_height())
+    LOG_ERROR_P(PARAM_NUMBER_OF_CELLS_FOR_GRADIENT) << "Needs to be less than number of rows in model";
+  if(number_of_cells_gradient_ > model_->get_width())
+    LOG_ERROR_P(PARAM_NUMBER_OF_CELLS_FOR_GRADIENT) << "Needs to be less than number of cols in model";
+  if (number_of_cells_gradient_ % 2 == 0)
+    LOG_ERROR_P(PARAM_NUMBER_OF_CELLS_FOR_GRADIENT) << "is even, needs to be odd";
 
+  cell_offset_gradient_ = (number_of_cells_gradient_ - 1) / 2;
+  LOG_MEDIUM() << "cell_offset_gradient = " << cell_offset_gradient_ << " number_of_cells_gradient " << number_of_cells_gradient_;
 }
 
 /**
@@ -161,7 +173,7 @@ void MovementPreference::DoExecute() {
   unsigned current_year = model_->current_year();
 
   if (calculate_on_the_fly_ && not brownian_motion_) {
-    LOG_FINE() << "Need to do preference function calculation on the fly";
+    LOG_MEDIUM() << "Need to do preference function calculation on the fly";
     // need to do some extra calculation before moveing through the main algorithm
     // calculate preference value
     for (unsigned layer_ndx = 0; layer_ndx < non_static_layer_ndx_.size(); ++layer_ndx) {
@@ -184,45 +196,61 @@ void MovementPreference::DoExecute() {
       }
     }
     // calculate gradient
+    unsigned offset;
     if (model_->state() == State::kInitialise) {
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
           // calcualte meridional gradient
-          if (row == 0) {
-            initialisation_meridonal_gradient_[row][col] = initialisation_preference_value_[row + 1][col] - initialisation_preference_value_[row][col];
-          } else if (row == (model_->get_height() - 1)) {
-            initialisation_meridonal_gradient_[row][col] = initialisation_preference_value_[row][col] - initialisation_preference_value_[row - 1][col];
+          if (row < cell_offset_gradient_) {
+            // at the edge
+            offset = cell_offset_gradient_ - (row);
+            initialisation_meridonal_gradient_[row][col] = (initialisation_preference_value_[0][col] - initialisation_preference_value_[number_of_cells_gradient_ - offset - 1][col]) / (row + 2);
+            //std::cerr << "row = " << row << " col = " << col << " merid = " << initialisation_meridonal_gradient_[row][col] << " x1 = " << initialisation_preference_value_[0][col] << " x2 = " << initialisation_preference_value_[number_of_cells_gradient_ - offset - 1][col] << " denominator " <<(row + 2) <<"\n";
+          } else if (row >= (model_->get_height() - cell_offset_gradient_)) {
+            offset = (model_->get_height() - (row));
+            initialisation_meridonal_gradient_[row][col] = (initialisation_preference_value_[model_->get_height()  - (2 +  offset)][col] - initialisation_preference_value_[model_->get_height() - 1][col]) / (offset + 1);
+            //std::cerr << "row = " << row << " col = " << col  << " merid = " << initialisation_meridonal_gradient_[row][col] << " x1 = " << initialisation_preference_value_[model_->get_height()  - (2 +  offset)][col]  << " x2 = " << initialisation_preference_value_[model_->get_height() - 1][col] <<"\n";
           } else {
-            initialisation_meridonal_gradient_[row][col] = (initialisation_preference_value_[row + 1][col] - initialisation_preference_value_[row - 1][col]) / 2.0;
+            initialisation_meridonal_gradient_[row][col] = (initialisation_preference_value_[row - cell_offset_gradient_][col] - initialisation_preference_value_[row + cell_offset_gradient_][col]) / (number_of_cells_gradient_ - 1);
+            //std::cerr << "row = " << row << " col = " << col <<  " merid = " << initialisation_meridonal_gradient_[row][col] << " x1 = " << initialisation_preference_value_[row - cell_offset_gradient_][col]  << " x2 = " << initialisation_preference_value_[row + cell_offset_gradient_][col] <<"\n";
           }
           // calcualte zonal gradient
-          if (col == 0) {
-            initialisation_zonal_gradient_[row][col] = initialisation_preference_value_[row][col + 1] - initialisation_preference_value_[row][col];
-          } else if (col == (model_->get_width() - 1)) {
-            initialisation_zonal_gradient_[row][col] = initialisation_preference_value_[row][col] - initialisation_preference_value_[row][col - 1];
+          if (col < cell_offset_gradient_) {
+            offset = cell_offset_gradient_ - (col);
+            initialisation_zonal_gradient_[row][col] = (initialisation_preference_value_[row][number_of_cells_gradient_ - offset - 1] - initialisation_preference_value_[row][0]) / (col + 2);
+          } else if (col >= (model_->get_width() - cell_offset_gradient_)) {
+            offset = (model_->get_width() - (col));
+            initialisation_zonal_gradient_[row][col] = (initialisation_preference_value_[row][model_->get_width()  - 1] - initialisation_preference_value_[row][model_->get_width()  - (2 +  offset)]) / (offset + 1);
           } else {
-            initialisation_zonal_gradient_[row][col] = (initialisation_preference_value_[row][col + 1] - initialisation_preference_value_[row][col - 1]) / 2.0;
+            initialisation_zonal_gradient_[row][col] = (initialisation_preference_value_[row][col + cell_offset_gradient_] - initialisation_preference_value_[row][col - cell_offset_gradient_]) / (float)(number_of_cells_gradient_ - 1);
           }
         }
       }
     } else {
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
-          // calcualte meridional gradient
-          if (row == 0) {
-            meridonal_gradient_[current_year][row][col] = preference_by_year_[current_year][row + 1][col] - preference_by_year_[current_year][row][col];
-          } else if (row == (model_->get_height() - 1)) {
-            meridonal_gradient_[current_year][row][col] = preference_by_year_[current_year][row][col] - preference_by_year_[current_year][row - 1][col];
+          if (row < cell_offset_gradient_) {
+            // at the edge
+            offset = cell_offset_gradient_ - (row);
+            meridonal_gradient_[current_year][row][col] = (preference_by_year_[current_year][0][col] - preference_by_year_[current_year][number_of_cells_gradient_ - offset - 1][col]) / (row + 2);
+            //std::cerr << "row = " << row << " col = " << col << " merid = " << initialisation_meridonal_gradient_[row][col] << " x1 = " << initialisation_preference_value_[0][col] << " x2 = " << initialisation_preference_value_[number_of_cells_gradient_ - offset - 1][col] << " denominator " <<(row + 2) <<"\n";
+          } else if (row >= (model_->get_height() - cell_offset_gradient_)) {
+            offset = (model_->get_height() - (row));
+            meridonal_gradient_[current_year][row][col] = (preference_by_year_[current_year][model_->get_height()  - (2 +  offset)][col] - preference_by_year_[current_year][model_->get_height() - 1][col]) / (offset + 1);
+            //std::cerr << "row = " << row << " col = " << col  << " merid = " << initialisation_meridonal_gradient_[row][col] << " x1 = " << initialisation_preference_value_[model_->get_height()  - (2 +  offset)][col]  << " x2 = " << initialisation_preference_value_[model_->get_height() - 1][col] <<"\n";
           } else {
-            meridonal_gradient_[current_year][row][col] = (preference_by_year_[current_year][row + 1][col] - preference_by_year_[current_year][row - 1][col]) / 2.0;
+            meridonal_gradient_[current_year][row][col] = (preference_by_year_[current_year][row - cell_offset_gradient_][col] - preference_by_year_[current_year][row + cell_offset_gradient_][col]) / (number_of_cells_gradient_ - 1);
+            //std::cerr << "row = " << row << " col = " << col <<  " merid = " << initialisation_meridonal_gradient_[row][col] << " x1 = " << initialisation_preference_value_[row - cell_offset_gradient_][col]  << " x2 = " << initialisation_preference_value_[row + cell_offset_gradient_][col] <<"\n";
           }
           // calcualte zonal gradient
-          if (col == 0) {
-            zonal_gradient_[current_year][row][col] = preference_by_year_[current_year][row][col + 1] - preference_by_year_[current_year][row][col];
-          } else if (col == (model_->get_width() - 1)) {
-            zonal_gradient_[current_year][row][col] = preference_by_year_[current_year][row][col] - preference_by_year_[current_year][row][col - 1];
+          if (col < cell_offset_gradient_) {
+            offset = cell_offset_gradient_ - (col);
+            zonal_gradient_[current_year][row][col] = (preference_by_year_[current_year][row][number_of_cells_gradient_ - offset - 1] - preference_by_year_[current_year][row][0]) / (col + 2);
+          } else if (col >= (model_->get_width() - cell_offset_gradient_)) {
+            offset = (model_->get_width() - (col));
+            zonal_gradient_[current_year][row][col] = (preference_by_year_[current_year][row][model_->get_width()  - 1] - preference_by_year_[current_year][row][model_->get_width()  - (2 +  offset)]) / (offset + 1);
           } else {
-            zonal_gradient_[current_year][row][col] = (preference_by_year_[current_year][row][col + 1] - preference_by_year_[current_year][row][col - 1]) / 2.0;
+            zonal_gradient_[current_year][row][col] = (preference_by_year_[current_year][row][col + cell_offset_gradient_] - preference_by_year_[current_year][row][col - cell_offset_gradient_]) / (float)(number_of_cells_gradient_ - 1);
           }
         }
       }
@@ -276,6 +304,9 @@ void MovementPreference::DoExecute() {
         float total_v = 0;
         float total_u = 0;
         float total_jumps = 0;
+        float update_lat = 0.0;
+        float update_lon = 0.0;
+
         unsigned counter = 0;
         if (selectivity_length_based_) {
           LOG_FINE() << "Length based preference movement";
@@ -291,15 +322,20 @@ void MovementPreference::DoExecute() {
                 LOG_FINEST() << counter<< " " << (*iter).get_lat() << " distance = " << lat_distance << " lon = " << (*iter).get_lon() << " distance = " << lon_distance << " Z = " << lon_random_numbers_[cell_offset_[row][col] + counter] << " sigma = " << standard_deviation_;
                 // Check bounds and find cell destination
                 // this is crude and should be changed into the future, I am thinking some sort of buffer from the edge
+                update_lat = (*iter).get_lat() + lat_distance;
+                update_lon = (*iter).get_lon() + lon_distance;
 
-                if ((((*iter).get_lat() + lat_distance) <= model_->max_lat()) && (((*iter).get_lat() + lat_distance) >= model_->min_lat())) {
-                  (*iter).set_lat((*iter).get_lat() + lat_distance);
+                if ((update_lat <= model_->max_lat()) && (update_lat >= model_->min_lat())) {
+                  (*iter).set_lat(update_lat);
                 } // else they stay as it would be jumping out of bounds
 
-                if ((((*iter).get_lon() + lon_distance) <= model_->max_lon()) && (((*iter).get_lon() + lon_distance) >= model_->min_lon())) {
-                  (*iter).set_lon((*iter).get_lon() + lon_distance);
+                if ((update_lon <= model_->max_lon()) && (update_lon >= model_->min_lon())) {
+                  (*iter).set_lon(update_lon);
                 } // else they stay as it would be jumping out of bounds
-
+                if(print_individual_tracks_) {
+                  (*iter).save_lon_hist(update_lon);
+                  (*iter).save_lat_hist(update_lat);
+                }
                 world_->get_cell_element(destination_row, destination_col, (*iter).get_lat(), (*iter).get_lon()); // very difficult to thread this...
 
                 LOG_FINEST() << (*iter).get_lat() << " " << (*iter).get_lon() << " " << destination_row << " " << destination_col << " " << row << " " << col;
@@ -333,16 +369,20 @@ void MovementPreference::DoExecute() {
                 total_v += lat_distance;
                 total_u += lon_distance;
                 ++total_jumps;
-                LOG_FINEST() << " age = " <<(*iter).get_age() << " counter = " << counter<< " " << (*iter).get_lat() << " distance = " << lat_distance << " lon = " << (*iter).get_lon() << " distance = " << lon_distance << " Z = " << lon_random_numbers_[cell_offset_[row][col] + counter] << " sigma = " << standard_deviation_;
-                // Check bounds and find cell destination
-                if ((((*iter).get_lat() + lat_distance) <= model_->max_lat()) && (((*iter).get_lat() + lat_distance) >= model_->min_lat())) {
-                  (*iter).set_lat((*iter).get_lat() + lat_distance);
+                update_lat = (*iter).get_lat() + lat_distance;
+                update_lon = (*iter).get_lon() + lon_distance;
+
+                if ((update_lat <= model_->max_lat()) && (update_lat >= model_->min_lat())) {
+                  (*iter).set_lat(update_lat);
                 } // else they stay as it would be jumping out of bounds
 
-                if ((((*iter).get_lon() + lon_distance) <= model_->max_lon()) && (((*iter).get_lon() + lon_distance) >= model_->min_lon())) {
-                  (*iter).set_lon((*iter).get_lon() + lon_distance);
+                if ((update_lon <= model_->max_lon()) && (update_lon >= model_->min_lon())) {
+                  (*iter).set_lon(update_lon);
                 } // else they stay as it would be jumping out of bounds
-
+                if(print_individual_tracks_) {
+                  (*iter).save_lon_hist(update_lon);
+                  (*iter).save_lat_hist(update_lat);
+                }
                 world_->get_cell_element(destination_row, destination_col, (*iter).get_lat(), (*iter).get_lon()); // very difficult to thread this...
 
                 LOG_FINEST() << (*iter).get_lat() << " " << (*iter).get_lon() << " " << destination_row << " " << destination_col << " " << row << " " << col;
@@ -439,28 +479,36 @@ void  MovementPreference::calculate_gradients() {
         initialisation_preference_value_[row][col] = pow(preference[row][col], float(1.0 / preference_function_labels_.size()));
       }
     }
+    unsigned offset;
     // calculate gradient
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         // calcualte meridional gradient
-        if (row == 0) {
-          initialisation_meridonal_gradient_[row][col] = initialisation_preference_value_[row + 1][col] - initialisation_preference_value_[row][col];
-        } else if (row == (model_->get_height() - 1)) {
-          initialisation_meridonal_gradient_[row][col] = initialisation_preference_value_[row][col] - initialisation_preference_value_[row - 1][col];
+        if (row < cell_offset_gradient_) {
+          // at the edge
+          offset = cell_offset_gradient_ - (row);
+          initialisation_meridonal_gradient_[row][col] = (initialisation_preference_value_[0][col] - initialisation_preference_value_[number_of_cells_gradient_ - offset - 1][col]) / (row + 2);
+          //std::cerr << "row = " << row << " col = " << col << " merid = " << initialisation_meridonal_gradient_[row][col] << " x1 = " << initialisation_preference_value_[0][col] << " x2 = " << initialisation_preference_value_[number_of_cells_gradient_ - offset - 1][col] << " denominator " <<(row + 2) <<"\n";
+        } else if (row >= (model_->get_height() - cell_offset_gradient_)) {
+          offset = (model_->get_height() - (row));
+          initialisation_meridonal_gradient_[row][col] = (initialisation_preference_value_[model_->get_height()  - (2 +  offset)][col] - initialisation_preference_value_[model_->get_height() - 1][col]) / (offset + 1);
+          //std::cerr << "row = " << row << " col = " << col  << " merid = " << initialisation_meridonal_gradient_[row][col] << " x1 = " << initialisation_preference_value_[model_->get_height()  - (2 +  offset)][col]  << " x2 = " << initialisation_preference_value_[model_->get_height() - 1][col] <<"\n";
         } else {
-          initialisation_meridonal_gradient_[row][col] = (initialisation_preference_value_[row + 1][col] - initialisation_preference_value_[row - 1][col]) / 2.0;
+          initialisation_meridonal_gradient_[row][col] = (initialisation_preference_value_[row - cell_offset_gradient_][col] - initialisation_preference_value_[row + cell_offset_gradient_][col]) / (number_of_cells_gradient_ - 1);
+          //std::cerr << "row = " << row << " col = " << col <<  " merid = " << initialisation_meridonal_gradient_[row][col] << " x1 = " << initialisation_preference_value_[row - cell_offset_gradient_][col]  << " x2 = " << initialisation_preference_value_[row + cell_offset_gradient_][col] <<"\n";
         }
         // calcualte zonal gradient
-        if (col == 0) {
-          initialisation_zonal_gradient_[row][col] = initialisation_preference_value_[row][col + 1] - initialisation_preference_value_[row][col];
-        } else if (col == (model_->get_width() - 1)) {
-          initialisation_zonal_gradient_[row][col] = initialisation_preference_value_[row][col] - initialisation_preference_value_[row][col - 1];
+        if (col < cell_offset_gradient_) {
+          offset = cell_offset_gradient_ - (col);
+          initialisation_zonal_gradient_[row][col] = (initialisation_preference_value_[row][number_of_cells_gradient_ - offset - 1] - initialisation_preference_value_[row][0]) / (col + 2);
+        } else if (col >= (model_->get_width() - cell_offset_gradient_)) {
+          offset = (model_->get_width() - (col));
+          initialisation_zonal_gradient_[row][col] = (initialisation_preference_value_[row][model_->get_width()  - 1] - initialisation_preference_value_[row][model_->get_width()  - (2 +  offset)]) / (offset + 1);
         } else {
-          initialisation_zonal_gradient_[row][col] = (initialisation_preference_value_[row][col + 1] - initialisation_preference_value_[row][col - 1]) / 2.0;
+          initialisation_zonal_gradient_[row][col] = (initialisation_preference_value_[row][col + cell_offset_gradient_] - initialisation_preference_value_[row][col - cell_offset_gradient_]) / (float)(number_of_cells_gradient_ - 1);
         }
       }
     }
-
   } else {
     initialisation_preference_value_ = preference;
   }
@@ -535,24 +583,33 @@ void  MovementPreference::calculate_gradients() {
       }
       preference_by_year_[year] = preference;
 
+      unsigned offset;
       // calculate gradient
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
           // calcualte meridional gradient
-          if (row == 0) {
-            meredional_gradient[row][col] = preference[row + 1][col] - preference[row][col];
-          } else if (row == (model_->get_height() - 1)) {
-            meredional_gradient[row][col] = preference[row][col] - preference[row - 1][col];
+          if (row < cell_offset_gradient_) {
+            // at the edge
+            offset = cell_offset_gradient_ - (row);
+            meredional_gradient[row][col] = (preference[0][col] - preference[number_of_cells_gradient_ - offset - 1][col]) / (row + 2);
+            //std::cerr << "row = " << row << " col = " << col << " merid = " << initialisation_meridonal_gradient_[row][col] << " x1 = " << initialisation_preference_value_[0][col] << " x2 = " << initialisation_preference_value_[number_of_cells_gradient_ - offset - 1][col] << " denominator " <<(row + 2) <<"\n";
+          } else if (row >= (model_->get_height() - cell_offset_gradient_)) {
+            offset = (model_->get_height() - (row));
+            meredional_gradient[row][col] = (preference[model_->get_height()  - (2 +  offset)][col] - preference[model_->get_height() - 1][col]) / (offset + 1);
+            //std::cerr << "row = " << row << " col = " << col  << " merid = " << initialisation_meridonal_gradient_[row][col] << " x1 = " << initialisation_preference_value_[model_->get_height()  - (2 +  offset)][col]  << " x2 = " << initialisation_preference_value_[model_->get_height() - 1][col] <<"\n";
           } else {
-            meredional_gradient[row][col] = (preference[row + 1][col] - preference[row - 1][col]) / 2.0;
+            meredional_gradient[row][col] = (preference[row - cell_offset_gradient_][col] - preference[row + cell_offset_gradient_][col]) / (number_of_cells_gradient_ - 1);
+            //std::cerr << "row = " << row << " col = " << col <<  " merid = " << initialisation_meridonal_gradient_[row][col] << " x1 = " << initialisation_preference_value_[row - cell_offset_gradient_][col]  << " x2 = " << initialisation_preference_value_[row + cell_offset_gradient_][col] <<"\n";
           }
           // calcualte zonal gradient
-          if (col == 0) {
-            zonal_gradient[row][col] = preference[row][col + 1] - preference[row][col];
-          } else if (col == (model_->get_width() - 1)) {
-            zonal_gradient[row][col] = preference[row][col] - preference[row][col - 1];
+          if (col < cell_offset_gradient_) {
+            offset = cell_offset_gradient_ - (col);
+            zonal_gradient[row][col] = (preference[row][number_of_cells_gradient_ - offset - 1] - preference[row][0]) / (col + 2);
+          } else if (col >= (model_->get_width() - cell_offset_gradient_)) {
+            offset = (model_->get_width() - (col));
+            zonal_gradient[row][col] = (preference[row][model_->get_width()  - 1] - preference[row][model_->get_width()  - (2 +  offset)]) / (offset + 1);
           } else {
-            zonal_gradient[row][col] = (preference[row][col + 1] - preference[row][col - 1]) / 2.0;
+            zonal_gradient[row][col] = (preference[row][col + cell_offset_gradient_] - preference[row][col - cell_offset_gradient_]) / (float)(number_of_cells_gradient_ - 1);
           }
         }
       }
@@ -576,6 +633,8 @@ void  MovementPreference::calculate_diffusion_parameter(double& preference_value
 // containers in this class.
 void  MovementPreference::FillReportCache(ostringstream& cache) {
   LOG_TRACE();
+  utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
+
   // Print Preference by year
   cache << "standard_dev: " << standard_deviation_ << "\n";
   // Print gradient by year.
@@ -647,6 +706,36 @@ void  MovementPreference::FillReportCache(ostringstream& cache) {
       }
     }
   }
+
+  // Grab a couple of agents and track thier history
+  if(print_individual_tracks_) {
+    int agent_ndx;
+    unsigned row = 0;
+    unsigned col = 0;
+    int n_agents = 30;
+    while(n_agents > 0) {
+      row =  model_->get_height() * rng.chance();
+      col =  model_->get_width() * rng.chance();
+      WorldCell* cell = world_->get_base_square(row, col);
+      if (cell->is_enabled()) {
+         agent_ndx = cell->agents_.size() * rng.chance();
+         if( cell->agents_[agent_ndx].is_alive()) {
+           if (cell->agents_[agent_ndx].lat_history_.size() > 0) {
+             cache << n_agents <<"_lat: ";
+             for(auto lat : cell->agents_[agent_ndx].lat_history_)
+               cache << lat << " ";
+             cache << "\n" << n_agents <<"_lon: ";
+             for(auto lon : cell->agents_[agent_ndx].lon_history_)
+               cache << lon << " ";
+             cache << "\n";
+             n_agents--;
+           }
+         }
+       }
+    }
+  }
+
+
 /*  for (auto& values : moved_agents_by_year_) {
     cache << "initial_numbers_in_cell: " << values.initial_numbers_ << "\n";
     cache << values.year_ << "_" << values.origin_cell_ << "_destination " << REPORT_R_MATRIX << "\n";

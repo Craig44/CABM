@@ -42,6 +42,8 @@ private:
   float                      a50_;
   float                      ato95_;
   float                      alpha_;
+  unsigned                    low_;
+  unsigned                    high_;
 };
 
 } /* namespace selectivities */

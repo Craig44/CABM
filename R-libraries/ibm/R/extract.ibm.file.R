@@ -9,7 +9,7 @@
 #' @export
 #'
 "extract.ibm.file" <-
-    function(file, path = "", fileEncoding = "") {
+    function(file, path = "", fileEncoding = "", quiet = FALSE) {
     ## if no path specified look in current directory
     if (missing(path)) 
         path <- ""
@@ -59,7 +59,8 @@
     non_header_tables = c("obs","data","error_values","table", "layer")
     ## there are three types of tables, 1) tables with headers (Instant mortality) 2) tables with row labels (observations and error values) and 3)tables that are just a matrix (ageing error)
     ans <- list()
-    print(paste("The 'ibm' input parameter file has", length(file[substring(file, 1, 1) == "@"]), "commands, and", length(file), "lines"))
+    if(!quiet)
+      print(paste("The 'ibm' input parameter file has", length(file[substring(file, 1, 1) == "@"]), "commands, and", length(file), "lines"))
     CommandCount <- 0
     ## A global variable to tell us if we are still inputing a table
     in_table = FALSE;
@@ -90,7 +91,8 @@
               if (!is.in(Command,exception_blocks)) {
                 ## Create a label for the block
                 Command = paste(Command, "[", temp[2], "]", sep = "");
-                print(temp[2])
+                if(!quiet)
+                  print(temp[2])
              }
              next; ## if we come across a block we either give it a label and move on or just move on if it is an exception block
           }

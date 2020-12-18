@@ -18,12 +18,15 @@
 #include "Processes/Manager.h"
 
 #include "Children/Nop.h"
+#include "Children/Ageing.h"
 #include "Children/Recruitment/RecruitmentBevertonHolt.h"
 #include "Children/Recruitment/RecruitmentConstant.h"
 #include "Children/Growth/GrowthVonBertalanffyWithBasic.h"
 #include "Children/Growth/GrowthSchnuteWithBasic.h"
 #include "Children/Mortality/MortalityConstantRate.h"
+#include "Children/Mortality/MortalityCull.h"
 #include "Children/Mortality/MortalityEventBiomass.h"
+#include "Children/Mortality/MortalityEventHybrid.h"
 #include "Children/Mortality/MortalityEffortBased.h"
 #include "Children/Movement/MovementBoxTransfer.h"
 #include "Children/Movement/MovementPreference.h"
@@ -73,6 +76,8 @@ Process* Factory::Create(Model* model, const string& object_type, const string& 
           result = new Nop(model);
     else if (sub == PARAM_RECRUITMENT_BEVERTON_HOLT)
       result = new RecruitmentBevertonHolt(model);
+    else if (sub == PARAM_AGEING)
+      result = new Ageing(model);
     else if (sub == PARAM_RECRUITMENT_CONSTANT)
       result = new RecruitmentConstant(model);
     else if (sub == PARAM_GROWTH_VON_BERTALANFFY_WITH_BASIC)
@@ -87,6 +92,10 @@ Process* Factory::Create(Model* model, const string& object_type, const string& 
       result = new MortalityConstantRate(model);
     else if (sub == PARAM_MORTALITY_EVENT_BIOMASS)
       result = new MortalityEventBiomass(model);
+    else if (sub == PARAM_MORTALITY_EVENT_HYBRID)
+      result = new MortalityEventHybrid(model);
+    else if (sub == PARAM_MORTALITY_CULL)
+      result = new MortalityCull(model);
     else if (sub == PARAM_MORTALITY_EFFORT_BASED)
       result = new MortalityEffortBased(model);
     else if (sub == PARAM_MOVEMENT_BOX_TRANSFER)

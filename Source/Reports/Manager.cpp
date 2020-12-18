@@ -44,11 +44,11 @@ void Manager::Build() {
   for (auto report : objects_) {
     report->Build();
 
-    if ((RunMode::Type)(report->run_mode() & RunMode::kInvalid) == RunMode::kInvalid)
-      LOG_CODE_ERROR() << "Report: " << report->label() << " has not been properly configured to have a run mode";
+    if (report->run_mode() == RunMode::kInvalid)
+      LOG_CODE_ERROR() << "Report: " << report->label() << " has not been properly configured to have a run mode " << report->run_mode() << " cheeck = " << (RunMode::Type)(report->run_mode() & RunMode::kInvalid);
 
     if (report->model_state() != State::kExecute) {
-      LOG_FINE() << "Adding report " << report->label() << " to state reports, with model->state() = " << report->model_state();
+      LOG_FINE() << "Adding report " << report->label() << " to state reports, with report->model_state() = " << report->model_state();
       state_reports_[report->model_state()].push_back(report);
     } else {
       LOG_FINE() << "Adding report " << report->label() << " to time step reports";
@@ -60,10 +60,10 @@ void Manager::Build() {
  * locate all observation reports in the system and print them
  */
 void Manager::PrintObservations() {
-  LOG_FINE();
+  LOG_MEDIUM();
   for (auto report : objects_) {
     if (report->type() == PARAM_SIMULATED_OBSERVATION) {
-      LOG_FINE() << "executing observation report " << report->label();
+      LOG_MEDIUM() << "executing observation report " << report->label();
       report->Execute();
     }
   }
@@ -79,13 +79,14 @@ void Manager::PrintObservations() {
 void Manager::Execute(State::Type model_state) {
   LOG_TRACE();
   RunMode::Type run_mode = model_->run_mode();
-  LOG_FINE() << "Checking " << state_reports_[model_state].size() << " reports";
+  LOG_MEDIUM() << "Checking " << state_reports_[model_state].size() << " reports";
   for(auto report : state_reports_[model_state]) {
-      LOG_FINE() << "Checking report: " << report->label();
-      if ( (RunMode::Type)(report->run_mode() & run_mode) == run_mode) {
-        report->Execute();
-      } else
-        LOG_FINE() << "Skipping report: " << report->label() << " because run mode is incorrect";
+    LOG_MEDIUM() << "Checking report: " << report->label();
+    if (report->run_mode() == run_mode) {
+      report->Execute();
+    } else {
+      LOG_MEDIUM() << "Skipping report: " << report->label() << " because run mode is incorrect";
+    }
   }
 }
 
@@ -98,18 +99,18 @@ void Manager::Execute(State::Type model_state) {
  * @param time_step_label The last time step to be completed
  */
 void Manager::Execute(unsigned year, const string& time_step_label) {
-  LOG_TRACE();
-  LOG_FINEST() << "year: " << year << "; time_step_label: " << time_step_label << "; reports: " << time_step_reports_[time_step_label].size();
+  LOG_MEDIUM();
+  LOG_MEDIUM() << "year: " << year << "; time_step_label: " << time_step_label << "; reports: " << time_step_reports_[time_step_label].size();
 
   RunMode::Type run_mode = model_->run_mode();
   for(auto report : time_step_reports_[time_step_label]) {
     LOG_FINE() << "looking executing report " << report->label();
     if ( (RunMode::Type)(report->run_mode() & run_mode) != run_mode) {
-      LOG_FINEST() << "Skipping report: " << report->label() << " because run mode is not right";
+      LOG_MEDIUM() << "Skipping report: " << report->label() << " because run mode is not right";
       continue;
     }
     if (!report->HasYear(year)) {
-      LOG_FINEST() << "Skipping report: " << report->label() << " because it does not have year " << year;
+      LOG_MEDIUM() << "Skipping report: " << report->label() << " because it does not have year " << year;
       continue;
     }
 
@@ -122,14 +123,14 @@ void Manager::Execute(unsigned year, const string& time_step_label) {
  *
  */
 void Manager::Prepare() {
-  LOG_TRACE();
+  LOG_MEDIUM();
   RunMode::Type run_mode = model_->run_mode();
   for (auto report : objects_) {
     if ( (RunMode::Type)(report->run_mode() & run_mode) != run_mode) {
-      LOG_FINEST() << "Skipping report: " << report->label() << " because run mode is not right";
+      LOG_MEDIUM() << "Skipping report: " << report->label() << " because run mode is not right";
       continue;
     }
-
+    LOG_MEDIUM() << "preparing report: " << report->label();
     report->Prepare();
   }
 }
@@ -175,6 +176,7 @@ void Manager::WaitForReportsToFinish() {
 void Manager::FlushReports() {
   // WARNING: DO NOT CALL THIS ANYWHERE. IT'S THREADED
  bool do_break = run_.test_and_set();
+ //LOG_MEDIUM() << "do break = " << do_break;
  waiting_ = false;
  bool record_waiting = false;
   while(true) {
@@ -190,13 +192,17 @@ void Manager::FlushReports() {
 
     do_break = !run_.test_and_set();
     for (auto report : objects_) {
-      if (report->ready_for_writing())
+      //LOG_MEDIUM() << "preparing to flush = " << report->label();
+      if (report->ready_for_writing()) {
+        //LOG_MEDIUM() << "ready for writing";
         report->FlushCache();
+      }
     }
 
     if (record_waiting) {
       record_waiting = false;
       waiting_ = false;
+      //LOG_MEDIUM() << "record_waiting";
     }
 
     if (do_break)

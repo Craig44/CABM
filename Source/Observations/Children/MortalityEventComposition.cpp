@@ -147,8 +147,8 @@ void MortalityEventComposition::DoBuild() {
   if (!mortality_process_)
     LOG_FATAL_P(PARAM_PROCESS_LABEL)<< "could not find the process " << process_label_ << ", please make sure it exists and is of type " << PARAM_MORTALITY_EVENT_BIOMASS;
 
-  if ((mortality_process_->type() != PARAM_MORTALITY_EVENT_BIOMASS) & (mortality_process_->type() != PARAM_MORTALITY_BARANOV))
-    LOG_FATAL_P(PARAM_PROCESS_LABEL)<< " the process " << process_label_ << ",needs to be either type " << PARAM_MORTALITY_EVENT_BIOMASS << " or " << PARAM_MORTALITY_BARANOV;
+  if ((mortality_process_->type() != PARAM_MORTALITY_EVENT_BIOMASS) & (mortality_process_->type() != PARAM_MORTALITY_BARANOV) & (mortality_process_->type() != PARAM_MORTALITY_EVENT_HYBRID))
+    LOG_FATAL_P(PARAM_PROCESS_LABEL)<< " the process " << process_label_ << ",needs to be either type " << PARAM_MORTALITY_EVENT_BIOMASS << " or " << PARAM_MORTALITY_BARANOV << " or " << PARAM_MORTALITY_EVENT_HYBRID;
 
     // Build and validate layers
   layer_ = model_->managers().layer()->GetCategoricalLayer(layer_label_);
@@ -320,7 +320,9 @@ void MortalityEventComposition::ResetPreSimulation() {
  */
 void MortalityEventComposition::Simulate() {
   LOG_MEDIUM() << "Simulating data for observation = " << label_;
-  ResetPreSimulation();
+  if (model_->run_mode() != (RunMode::Type)(RunMode::kMSE))
+    ResetPreSimulation();
+
   vector<vector<processes::census_data>> fishery_age_data = mortality_process_->get_fishery_census_data(fishery_label_);
 
   if (fishery_age_data.size() == 0) {
@@ -339,7 +341,17 @@ void MortalityEventComposition::Simulate() {
   /*
    * Year loop
    */
+  vector<unsigned> sim_years;
+  if (model_->run_mode() == (RunMode::Type)(RunMode::kMSE))
+    sim_years = model_->simulation_years();
   for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    // only do this in MSE mode if we are updateing
+    if (model_->run_mode() == (RunMode::Type)(RunMode::kMSE)) {
+      if(find(sim_years.begin(), sim_years.end(), years_[year_ndx]) == sim_years.end()) {
+        continue;
+      }
+    }
+    // if we are doing HCR then we don't want NA's
     // find equivalent fishery index
     auto iter = find(fishery_years_.begin(), fishery_years_.end(), years_[year_ndx]);
     unsigned fishery_year_ndx = distance(fishery_years_.begin(), iter);
@@ -438,6 +450,7 @@ void MortalityEventComposition::Simulate() {
   unsigned counter = 0;
   for (auto& iter : comparisons_) { // cell
     for (auto& second_iter : iter.second) {  // year
+      LOG_MEDIUM() << "Calculating score for year = " << iter.first;
       total = 0.0;
       for (auto& comparison : second_iter.second) {
         total += comparison.expected_;

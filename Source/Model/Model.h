@@ -44,6 +44,7 @@ enum Type {
   kInitialise, // running through the initialisation phases
   kExecute, // execute the object
   kIterationComplete, // a single iteration of the model is complete
+  //kHCR,         // Harvest controlf rule, currently just simulated obs
   kReset, // called between iterations to ensure objects caches are reset
   kInputIterationComplete, // a single run of the mode is complete using an input file to set estimables
   kFinalise // the model is finished
@@ -114,6 +115,8 @@ public:
   void                        set_m(float value) {m_ = value; }
   float                       get_m()  {return m_; }
   void                        set_n_agents(unsigned value) {n_agents_ = value; }
+  virtual vector<unsigned>    ass_years() const { return ass_years_; }
+  vector<unsigned>            simulation_years() { return assessment_year_map_[current_mse_cycle];}
 
   virtual const unsigned      get_n_agents() const {return n_agents_; }
 
@@ -163,6 +166,7 @@ protected:
   void                        Iterate();
   void                        Reset();
   void                        RunBasic();
+  void                        RunMSE();
 
   // Members
   RunMode::Type               run_mode_ = RunMode::kInvalid;
@@ -202,6 +206,7 @@ protected:
   map<string, unsigned>       r0_;
   unsigned                    n_agents_;
   string                      natural_mortality_label_;
+  string                      mortality_label_;
   string                      growth_process_label_;
   float                       m_; // natural mortality
   map<string, float>          ssb_;
@@ -212,6 +217,11 @@ protected:
   unsigned                    max_threads_ = 1;
   unsigned                    time_step_counter_ = 1; // This will keep track of the time steps for things such as tagging it would be helpful if we have multiple time steps in years.
   bool                        re_run_initialisation_ = false; // parameters that can change this are M, B0 and growth
+  // MSE objects
+  vector<unsigned>            ass_years_;
+  unsigned                    mse_cycles = 1u;
+  unsigned                    current_mse_cycle = 0u;
+  vector<vector<unsigned>>    assessment_year_map_;
 
   Managers*                   managers_ = nullptr;
   Objects*                    objects_ = nullptr;

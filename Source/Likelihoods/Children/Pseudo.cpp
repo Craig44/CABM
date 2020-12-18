@@ -12,6 +12,7 @@
 
 // Headers
 #include "Pseudo.h"
+#include "Model/Model.h"
 
 // Namespaces
 namespace niwa {

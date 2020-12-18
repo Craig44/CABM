@@ -39,6 +39,7 @@ public:
   // Accessors
   bool                         is_alive() const {return alive_;}
   unsigned                     get_age();
+  void                         birthday(); // For explicit ageing
   unsigned                     get_age_index();
   unsigned                     get_length_bin_index();
   virtual const bool&          get_maturity() const {return mature_ ;};
@@ -64,7 +65,6 @@ public:
   virtual const unsigned&      get_tag_col() const {return tag_col_;};
   virtual const unsigned&      get_tag_release_year() const {return tag_year_;};
   void                         shed_a_tag() {tag_ -= 1;} // anything that calls this will need to check get_number_tags() > 1, else this will cause a negative unsigned == issues
-
   float                        get_length_increment_since_tag()  {return length_ - length_at_tag_;};
   unsigned                     get_time_at_liberty(unsigned current_time_step)  {return current_time_step - tag_time_step_;};
 
@@ -86,6 +86,10 @@ public:
   void                         set_lon(float new_lon) {lon_ = new_lon;}
   void                         apply_tagging_event(unsigned tags, unsigned row, unsigned col);
   void                         dies() {alive_ = false;}
+  void                         save_lat_hist(float new_lat) {lat_history_.push_back(new_lat);}
+  void                         save_lon_hist(float new_lon) {lon_history_.push_back(new_lon);}
+  vector<float>               lat_history_;
+  vector<float>               lon_history_;
 protected:
   // Methods
   void                        growth_init();
@@ -99,6 +103,7 @@ protected:
   float                       fith_age_length_par_;
   float                       sixth_age_length_par_;
 
+  unsigned                    age_ = 0;
   float                       M_; // natural mortality
   unsigned                    birth_year_;
   float                       length_ = 0.0;
@@ -113,7 +118,7 @@ protected:
   unsigned                    home_row_; // Row agent born in 
   unsigned                    home_col_; // col agent born in 
   unsigned                    tag_ = 0; // number of tags, fish can be double tagged
-  unsigned					  tag_year_;
+  unsigned					          tag_year_;
   float                       length_at_tag_ = 0.0;
   unsigned                    tag_time_step_ = 0; // number of tags, fish can be double tagged
   bool                        alive_ = true;
@@ -121,6 +126,7 @@ protected:
   unsigned                    tag_col_;				// col agent was tagged
   unsigned                    life_stage_;  // 1 = larvae, 2 = immature, 3 = mature. // TODO perhaps this could be dealt with in the WorldCell level partition the agents for each cell, then processes can call
                                             // The life history of interest.
+
 
 private:
 

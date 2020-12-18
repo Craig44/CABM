@@ -40,6 +40,7 @@ Agent::Agent(float lat, float lon, float first_age_length_par, float second_age_
     tag_(tag)
 
 {
+  age_ = std::min((model_->current_year() - birth_year_), model_->max_age());
   growth_init(); // if age = 0 will calculate length_ and weight_ based on uniform(0.000,0.4)
 }
 
@@ -68,6 +69,7 @@ Agent::Agent(float lat, float lon, float first_age_length_par, float second_age_
     tag_(tag)
 
 {
+  age_ = std::min((model_->current_year() - birth_year_), model_->max_age());
   growth_init(); // if age = 0 will calculate length_ and weight_
 }
 
@@ -79,11 +81,15 @@ Agent::Agent(Agent& agent_to_copy) {
   second_age_length_par_ = agent_to_copy.first_age_length_par();
 
 }*/
-
+// Return Age this allows for implicit ageing, which is handy as it reduces a process out of the dynamics
+void Agent::birthday() {
+    //unsigned age =  std::min((model_->current_year() - birth_year_), model_->max_age());
+    age_ = std::min(age_ + 1, model_->max_age());
+}
 // Return Age this allows for implicit ageing, which is handy as it reduces a process out of the dynamics
 unsigned Agent::get_age() {
-    unsigned age =  std::min((model_->current_year() - birth_year_), model_->max_age());
-    return age;
+    //unsigned age =  std::min((model_->current_year() - birth_year_), model_->max_age());
+    return age_;
 }
 
 // an index for which length bin the individual falls in.

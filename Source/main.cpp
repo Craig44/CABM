@@ -26,6 +26,7 @@
 // Namespaces
 using namespace niwa;
 using std::cout;
+using std::cerr;
 using std::endl;
 
 /**
@@ -65,12 +66,14 @@ int main(int argc, char * argv[]) {
       break;
 
     case RunMode::kSimulation:
+    case RunMode::kMSE:
     case RunMode::kBasic:
+      LOG_MEDIUM() << "set up global config";
       if (!model.global_configuration().disable_standard_report()) {
          standard_report.Prepare();
          model.managers().report()->set_std_header(standard_report.header());
        }
-
+      LOG_MEDIUM() << "set up config loader";
        // load our configuration file
        configuration::Loader config_loader(model);
        if (!config_loader.LoadConfigFile()) {
@@ -78,7 +81,7 @@ int main(int argc, char * argv[]) {
          return_code = -1;
          break;
        }
-
+       LOG_MEDIUM() << "set up logging";
        Logging& logging = Logging::Instance();
         config_loader.ParseFileLines();
         if (logging.errors().size() > 0) {
@@ -90,14 +93,16 @@ int main(int argc, char * argv[]) {
        // override any config file values from our command line
        model.global_configuration().ParseOptions(&model);
        utilities::RandomNumberGenerator::Instance().Reset(model.global_configuration().random_seed());
+       LOG_MEDIUM() << "RNG";
 
        // Thread off the reports
        reports::Manager* report_manager = model.managers().report();
        std::thread report_thread([&report_manager]() { report_manager->FlushReports(); });
+       LOG_MEDIUM() << "Threading";
 
        // Run the model
        model_start_return_success = model.Start(run_mode);
-
+       LOG_MEDIUM() << "Finished running the model";
 
        // finish report thread
        report_manager->StopThread();

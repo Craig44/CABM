@@ -5,6 +5,6 @@
 #'
 "convert.to.lines" <-
 function(filename, fileEncoding) {
-  scan(filename, what = "", sep = "\n", fileEncoding = fileEncoding)
+  scan(filename, what = "", sep = "\n", fileEncoding = fileEncoding, quiet = T)
 }
 

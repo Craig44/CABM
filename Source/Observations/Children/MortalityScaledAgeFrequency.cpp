@@ -291,7 +291,8 @@ void MortalityScaledAgeFrequency::Execute() {
  */
 void MortalityScaledAgeFrequency::Simulate() {
   LOG_MEDIUM() << "Simulating data for observation = " << label_;
-  ClearComparison(); // Clear comparisons
+  if (model_->run_mode() != (RunMode::Type)(RunMode::kMSE))
+    ClearComparison(); // Clear comparisons
 
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
 
@@ -303,7 +304,16 @@ void MortalityScaledAgeFrequency::Simulate() {
   if (!ageing_error_) {
     apply_ageing_error = false;
   }
+  vector<unsigned> sim_years;
+  if (model_->run_mode() == (RunMode::Type)(RunMode::kMSE))
+    sim_years = model_->simulation_years();
   for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    // only do this in MSE mode if we are updateing
+    if (model_->run_mode() == (RunMode::Type)(RunMode::kMSE)) {
+      if(find(sim_years.begin(), sim_years.end(), years_[year_ndx]) == sim_years.end()) {
+        continue;
+      }
+    }
     LOG_FINE() << "About to sort our info for year " << years_[year_ndx];
     unsigned agents_available_to_sample = 0;
     for (unsigned stratum_ndx = 0; stratum_ndx < cells_.size(); ++stratum_ndx) {

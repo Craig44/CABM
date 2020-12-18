@@ -121,7 +121,8 @@ public:
   virtual bool                        update_mortality() {return update_natural_mortality_parameters_;};
   virtual double                      SolveBaranov() { return 1.0;};
   void                                set_lambda(double lambda) {lambda_ = lambda;};
-
+  // used by MSE to set catches for future years based on external R-code
+  virtual void                        set_HCR(map<unsigned, map<string, float>> future_catches) { }; // years * fishery label * catch/Fs
 protected:
   vector<composition_data>            removals_by_age_and_area_;
   vector<composition_data>            removals_by_length_and_area_;

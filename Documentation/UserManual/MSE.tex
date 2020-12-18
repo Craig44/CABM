@@ -1,0 +1,58 @@
+\section{\I{The Management Strategy Evaluation (MSE)}\label{sec:mse-section}}
+
+\subsection{Introduction}
+A key run mode of the \IBM\ is the MSE \texttt{ibm -m} run mode. This run mode creates an interface with an \R\ console. At the end of each \subcommand{assessment\_year} the \IBM\ pauses and waits for the \R\ scripts run and return a catch to apply for the years up until the next \subcommand{assessment\_years}. Currently the only mortality process available for this run mode is \subcommand{mortality\_event\_hybrid} (Section~\ref{para:baranov_Hybrid}), which requires users to supply fishing mortality (\subcommand{mortality\_baranov}) by fisheries between \subcommand{start\_year} and \subcommand{assessment\_year} and then applies a catch based mortality (\subcommand{mortality\_event\_biomass}) over the remaining \subcommand{assessment\_year}. 
+
+\subsection{Configuration}
+This run mode expects a specific directory structure and set of files available. Assuming the \IBM\ configuration models are in the directory called \path{ibm} the program expects there to be a directory up one level titled \path{R}. If you look at the source code \texttt{Model.cpp} line: 444 \texttt{source(file.path('..','R','SetUpR.R'))}. In the \path{R} directory there must be the following \R\ files which are sourced in the \IBM\ program these files are case sensitive.
+\begin{itemize}
+	\item \path{SetUpR.R} executed once, users should load R libraries and set up global variables that you don't want to keep creating
+	\item \path{ResetHCRVals.R} executed between each \texttt{-i} 
+	\item \path{RunHCR.R} executed at the end of each year in the \subcommand{assessment\_years}
+\end{itemize}
+
+Specifying the \command{model} block as follows.
+{\small{\begin{verbatim}
+	@model
+	start_year 1975 # 
+	final_year 2036
+	assessment_years 2016 2020 2024 2028 2032 2036
+\end{verbatim}}}
+This configuration will run the basic (\texttt{ibm -r}) run mode until the year 2016. After each year in the \subcommand{assessment\_years} subcommand the Rscript \path{R\RunHCR.R} is executed where the \IBM\ expects catches to be returned for the years up until the next year in  \subcommand{assessment\_years} i.e. in 2016 it expects catches for 2017$\rightarrow$2020.
+
+
+The fishing mortality process \subcommand{mortality\_event\_hybrid} only needs the table \texttt{table f\_table} up to the first value in the \subcommand{assessment\_years}. After the first assessmnet year the catches will come from \R. However you will still need to have to specify other processes such as recruitment for all final years, the same as \command{observation} classes.
+
+
+\begin{itemize}
+  \item Set up internal \R\ console and run the \R\ script \path{R\SetUpR.R}
+  \item Run from \subcommand{start\_year} to the first year in the \subcommand{assessment\_years}.
+  \item At the end of each year in the \subcommand{assessment\_years} the \IBM\ will 
+  \begin{enumerate}
+  \item simulate data based on both users specifying the correct \command{observation} and \command{report} configurations
+  \item execute \path{R\RunHCR.R}
+  \item Run the \IBM\ forward upto and including the next year in the \subcommand{assessment\_years} 
+  \end{enumerate}
+\end{itemize}
+
+This run mode can be run in-conjunction with multiple inputs \texttt{-i} parameters to account for parameter uncertainty. There is an example model in the \path{Examples\MSE} for a complete model run.
+
+
+\textbf{Notes with regard to the} \R\ interface. The key R script is \path{R\RunHCR.R}. The structure of the return object that the \IBM\ expects is a nested list with the top level being year, second level being fishing label (which needs to match the table fishing label). Note don't change the working directory in \R\ else it will mess the path for the C++ program. To debug \R\ script you can use the \texttt{cat} command, however this will print out into the report configuration and mess up the R-library when reading in the output.
+ 
+{\small{\begin{verbatim}
+		## exert of R\RunHCR.R
+		future_catch = list() # the list that will be returned
+		## Here is code that takes simulated data and creates an 
+		## estimate of stock status, with future catches.
+		## the R knows variables passed by the C++ interface
+		## 'current_year', 'next_ass_year'
+		fishing_vector = 2000
+		names(fishing_vector) = "Fishing" # name the vector based on fisheries
+		for(year_ndx in (current_year + 1):next_ass_year)
+			Fishing_ls[[as.character(year_ndx)]] = fishing_vector
+		## return the list which the C++ will pick up.
+		Fishing_ls
+\end{verbatim}}}
+
+

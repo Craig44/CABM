@@ -5,7 +5,7 @@
  * @date 6/12/2012
  * @section LICENSE
  *
- * Copyright NIWA Science ©2012 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2012 - www.niwa.co.nz
  *
  * @modified 12/7/2018 by C.Marsh for IBM usage
  */
@@ -39,6 +39,7 @@
 #include "TimeVarying/Manager.h"
 #include "Utilities/RandomNumberGenerator.h"
 #include "Utilities/To.h"
+#include <RInside.h>                    // for the embedded R via RInside
 
 // Namespaces
 namespace niwa {
@@ -53,6 +54,8 @@ Model::Model() {
   LOG_TRACE();
   parameters_.Bind<unsigned>(PARAM_START_YEAR, &start_year_, "Define the first year of the model, immediately following initialisation", R"(Defines the first year of the model, $\ge 1$, e.g. 1990)");
   parameters_.Bind<unsigned>(PARAM_FINAL_YEAR, &final_year_, "Define the final year of the model, excluding years in the projection period", "Defines the last year of the model, i.e., the model is run from start_year to final_year");
+  parameters_.Bind<unsigned>(PARAM_ASSESSMENT_YEARS, &ass_years_, "Years to conduct HCR in, Is conducted at the end of the year, so HCR should supply catch rules for the following year", "", true);
+  //parameters_.Bind<unsigned>(PARAM_ASSESSMENT_CYCLES, &ass_cycles_, "How many assessmeents are we running in the future?", "", true);
   parameters_.Bind<unsigned>(PARAM_MIN_AGE, &min_age_, "Minimum age of individuals in the population", R"($0 \le$ age\textlow{min} $\le$ age\textlow{max})", 0);
   parameters_.Bind<unsigned>(PARAM_MAX_AGE, &max_age_, "Maximum age of individuals in the population", R"($0 \le$ age\textlow{min} $\le$ age\textlow{max})", 0);
   parameters_.Bind<bool>(PARAM_AGE_PLUS, &age_plus_, "Define the oldest age or extra length midpoint (plus group size) as a plus group", "true, false", false);
@@ -70,7 +73,8 @@ Model::Model() {
   parameters_.Bind<string>(PARAM_MATRUITY_OGIVE_LABEL, &maturity_ogives_, "Maturity ogive label for each sex (male female) order is important", "", false);
   parameters_.Bind<string>(PARAM_GROWTH_PROCESS_LABEL, &growth_process_label_, "Label for the growth process in the annual cycle", "");
   parameters_.Bind<string>(PARAM_NATURAL_MORTALITY_PROCESS_LABEL, &natural_mortality_label_, "Label for the natural mortality process in the annual cycle", "");
-  //parameters_.Bind<unsigned>(PARAM_MAX_THREADS_TO_USE, &max_threads_, "The maxiumum threads you want to give access to this program", "",1);
+  parameters_.Bind<string>(PARAM_MORTALITY_PROCESS_LABEL_FOR_MSE, &mortality_label_, "Label for the mortality process that is used in MSE methods", "", "");
+//parameters_.Bind<unsigned>(PARAM_MAX_THREADS_TO_USE, &max_threads_, "The maxiumum threads you want to give access to this program", "",1);
 
 
   //RegisterAsAddressable(PARAM_PROPORTION_MALE, &proportion_male_); // can make this time-varying
@@ -196,6 +200,9 @@ bool Model::Start(RunMode::Type run_mode) {
   case RunMode::kSimulation:
     RunBasic();
     break;
+  case RunMode::kMSE:
+    RunMSE();
+    break;
   default:
     LOG_ERROR() << "Invalid run mode has been specified. This run mode is not supported: " << run_mode_;
     break;
@@ -281,7 +288,40 @@ void Model::Validate() {
     if (!time_step_mngr.GetTimeStep(time_step))
       LOG_ERROR_P(PARAM_TIME_STEPS) << "(" << time_step << ") has not been defined. Please ensure you have defined it";
   }
-  LOG_FINE() << "Exit validation";
+
+  if(run_mode_ == RunMode::kMSE) {
+    for(auto check_years : ass_years_) {
+      if((check_years > final_year_) | (check_years < start_year_)) {
+        LOG_ERROR_P(PARAM_ASSESSMENT_YEARS) << " assessemnt years need to be between start_year and final_year found" <<  check_years;
+
+      }
+    }
+    if(ass_years_[ass_years_.size() - 1] != final_year_)
+      LOG_ERROR_P(PARAM_ASSESSMENT_YEARS) << "The last value for the assessment years should == final_year";
+
+    mse_cycles = ass_years_.size();
+    if(mse_cycles < 2) {
+      LOG_ERROR_P(PARAM_ASSESSMENT_YEARS) << "needs to be more than 2 assessment years, the last one should be the final_year";
+    }
+    assessment_year_map_.resize(ass_years_.size());
+    for(unsigned ndx = 0; ndx < mse_cycles; ++ndx) {
+      LOG_MEDIUM() << "assessment years for ndx = " << ndx;
+      vector<unsigned> this_ndx_year;
+      if(ndx == 0) {
+        for(unsigned ass_year = start_year_; ass_year <= ass_years_[ndx]; ++ass_year) {
+          this_ndx_year.push_back(ass_year);
+          LOG_MEDIUM() << ass_year;
+        }
+      } else {
+        for(unsigned ass_year = (ass_years_[ndx - 1] + 1); ass_year <= ass_years_[ndx]; ++ass_year) {
+          this_ndx_year.push_back(ass_year);
+          LOG_MEDIUM() << ass_year;
+        }
+      }
+      assessment_year_map_[ndx] = this_ndx_year;
+    }
+  }
+  LOG_MEDIUM() << "Exit Model Valudation";
 }
 
 /**
@@ -299,9 +339,9 @@ void Model::Build() {
       LOG_FATAL_P(PARAM_LATITUDE_BOUNDS) << "latitude bounds must have a minimum and maximum value for each cell, e.g ncol 2 lat_bounds -45 -44 -43. You supplied '" << lat_bounds_.size() << " but we wanted " << (world_height_ + 1);
     }
     for (unsigned lat_ndx = 1; lat_ndx < lat_bounds_.size(); ++lat_ndx) {
-      lat_mid_points_.push_back((float)(lat_bounds_[lat_ndx - 1] + ((lat_bounds_[lat_ndx] - lat_bounds_[lat_ndx - 1]) / 2)));
-      if (lat_bounds_[lat_ndx] < lat_bounds_[lat_ndx - 1])
-        LOG_ERROR_P(PARAM_LATITUDE_BOUNDS) << "must be in ascending order";
+      lat_mid_points_.push_back((float)(lat_bounds_[lat_ndx - 1] - fabs((lat_bounds_[lat_ndx] - lat_bounds_[lat_ndx - 1]) / 2)));
+      if (lat_bounds_[lat_ndx] >  lat_bounds_[lat_ndx - 1])
+        LOG_ERROR_P(PARAM_LATITUDE_BOUNDS) << "must be in descending order";
     }
 
     for (unsigned lon_ndx = 1; lon_ndx < lon_bounds_.size(); ++lon_ndx) {
@@ -311,8 +351,8 @@ void Model::Build() {
     }
     min_lon_ = lon_bounds_[0];
     max_lon_ = lon_bounds_[lon_bounds_.size() - 1];
-    min_lat_ = lat_bounds_[0];
-    max_lat_ = lat_bounds_[lat_bounds_.size() - 1];
+    max_lat_ = lat_bounds_[0];
+    min_lat_ = lat_bounds_[lat_bounds_.size() - 1];
     LOG_FINE() << "min lat = " << min_lat_ << " max lat = " << max_lat_ << " min long = " << min_lon_ << " max lon " << max_lon_;
   }
 
@@ -352,7 +392,7 @@ void Model::Build() {
     }
   }
 
-  world_view_->Build(); // This needs processes to be built, but others want world to be built by DoBuild to do checks, hmmm
+  world_view_->Build(); // This depends on earlier processes to be built, but others want world to be built by DoBuild to do checks, hmmm
   managers_->Build();
 
 
@@ -386,6 +426,210 @@ void Model::Verify() {
     executor->Execute();
 }
 
+
+
+/**
+ *
+ */
+void Model::RunMSE() {
+  LOG_MEDIUM() << "Running MSE";
+
+  // adjust final year now.
+
+  // set up R instance and packages
+  int argc = 1;
+  char* argv[0];
+  RInside R(argc, argv);          // create an embedded R instance
+  try {
+     std::string setup_R = "suppressMessages(source(file.path('..','R','SetUpR.R')))";
+     R.parseEvalQ(setup_R);    // load library, no return value
+  } catch(std::exception& ex) {
+    LOG_FATAL() << "Exception caught: " << ex.what();
+  } catch(...) {
+    LOG_FATAL() << "Unknown exception caught";
+  }
+  // Run C++ algorithm up to current time-step
+  // R.parseEvalQ("sim = 1");
+
+  // Model is about to run
+  /*
+   * - iterate over -i file and conduct HCR
+   */
+
+  Addressables& addressables = *managers_->addressables();
+  LOG_MEDIUM() << "Multi line value = " << adressable_values_count_;
+
+  // Get a hold of the mortality process
+  processes::Manager& process_manager = *managers_->process();
+  Mortality* mortality_process_for_mse = process_manager.GetMortalityProcess(mortality_label_);
+  if (!mortality_process_for_mse) {
+    LOG_FATAL_P(PARAM_MORTALITY_PROCESS_LABEL_FOR_MSE) << "Does the mortality process " << mortality_label_ << " exist? please check that it does, and is a mortality process";
+  }
+
+
+  unsigned suffix_width = (unsigned)floor(log10(adressable_values_count_) + 1); ;
+  LOG_MEDIUM() << "suffix width = " << suffix_width << " value = " <<  (adressable_values_count_);
+  unsigned suffix_counter = 0;
+  for (unsigned i = 0; i < adressable_values_count_; ++i) {
+    // Write some reports so the TMB objects can be update i.e. catch
+    current_mse_cycle = 0;
+    suffix_counter++;
+    string report_suffix = ".";
+
+    if (addressable_values_file_) {
+      addressables.LoadValues(i);
+      LOG_MEDIUM() << "about to reset";
+      Reset();
+     }
+    /**
+     * Running the model now
+     */
+    LOG_MEDIUM() << "Model: State change to Initialisation";
+    state_ = State::kInitialise;
+    current_year_ = start_year_ - 1;
+    // Iterate over all partition members and UpDate Mean Weight for the inital weight calculations
+    initialisationphases::Manager& init_phase_manager = *managers_->initialisation_phase();
+    timevarying::Manager& time_varying_manager = *managers_->time_varying();
+    if (i == 0) {
+      LOG_MEDIUM() << "first initialisation phase.";
+      init_phase_manager.Execute();
+      if (not re_run_initialisation_) {
+        LOG_MEDIUM() << "Cache initialsiation";
+        world_view_->CachedWorldForInit();
+      }
+    } else if (re_run_initialisation_) {
+      LOG_MEDIUM() << "Re-run initialisation";
+      init_phase_manager.Execute();
+    } else {
+      LOG_MEDIUM() << "resetting initial world view";
+      world_view_->MergeWorldForInit();
+    }
+
+    managers_->report()->Execute(State::kInitialise);
+
+    LOG_MEDIUM() << "Model: State change to Execute";
+
+    unsigned iteration_width = (unsigned)floor(log10((i + 1)) + 1);
+    unsigned diff = suffix_width - iteration_width;
+    LOG_FINE() << "diff = " << diff;
+    report_suffix.append(diff,'0');
+    report_suffix.append(utilities::ToInline<unsigned, string>(suffix_counter));
+    LOG_MEDIUM() << "i = " << i + 1 <<  " suffix = " << report_suffix << " what i think it should be doing " << (i + 1) << " diff = " << diff << " iteration width = " << iteration_width;
+    managers_->report()->set_report_suffix(report_suffix);
+
+    state_ = State::kExecute;
+    // Reset some R objects such as rebuild objects
+    try {
+       std::string reset_HCR_R = "suppressMessages(source(file.path('..','R','ResetHCRVals.R')))";
+       R.parseEvalQ(reset_HCR_R);    // load library, no return value
+    } catch(std::exception& ex) {
+      LOG_FATAL() << "Exception caught: " << ex.what();
+    } catch(...) {
+      LOG_FATAL() << "Unknown exception caught";
+    }
+
+    timesteps::Manager& time_step_manager = *managers_->time_step();
+    for (current_year_ = start_year_; current_year_ <= final_year_; ++current_year_) {
+      LOG_MEDIUM() << "Iteration year: " << current_year_;
+      LOG_MEDIUM() << "Update time varying params";
+      time_varying_manager.Update(current_year_);
+      LOG_MEDIUM() << "finishing update time varying now Update Category mean length and weight before beginning annual cycle";
+      world_view_->rebuild_agent_time_varying_params();
+      LOG_MEDIUM() << "rebuild agent values continue to execute the year";
+      time_step_manager.Execute(current_year_);
+      LOG_MEDIUM() << "finished year exectution";
+      // CHeck if we are doing and assessment?
+      if((find(ass_years_.begin(), ass_years_.end(), current_year_) != ass_years_.end())) {
+        LOG_MEDIUM() << "Calculate HCR, print simulated obs and run R-code";
+        managers_->observation()->SimulateData(); // make sure we don't overwrite old observations, these are known
+        //managers_->report()->PrintObservations();
+        LOG_MEDIUM() << "Finished Simulating observations";
+
+        managers_->report()->Execute(State::kIterationComplete);
+        managers_->report()->WaitForReportsToFinish();
+
+        // Run HCR rule
+        map<unsigned,map<string,float>> hcr_catches;
+        LOG_MEDIUM() << "Entering RInside section";
+
+        // Run C++ algorithm up to current time-step
+        // R.parseEvalQ("sim = 1");
+        try {
+           // Tell R which suffix to associate simualted data with
+           R["extension"] = report_suffix;
+           R["current_year"] = current_year_;
+           if(current_year_ == final_year_) {
+             R["is_final_year"] = 1; // tell R not to do projections just estiamte and save estimated output
+             R["next_ass_year"] = current_year_;
+           } else {
+             R["next_ass_year"] = ass_years_[current_mse_cycle + 1];
+           }
+           string run_hcr = "suppressMessages(source(file.path('..','R','RunHCR.R')))";
+           //R.parseEvalQ(run_hcr);    // Run the code then get the catch for each fishery.
+           // RunHCR.R needs to return a list called fishing_list
+
+           SEXP fishing_info;
+           R.parseEval(run_hcr, fishing_info); // fishing_vector
+           Rcpp::List fishing_ls(fishing_info);
+           LOG_MEDIUM() <<  "bring in catches";
+           SEXP ll = fishing_ls[0];
+           Rcpp::List this_catch(ll);
+           Rcpp::CharacterVector year_labs = this_catch.names();
+           LOG_MEDIUM() << "size = of list n years " << this_catch.size() << " size of year labs = " << year_labs.size();
+           //std::cout << "size = of list n years " << this_catch.names()<< "\n";
+           string year_label;
+           unsigned year_val;
+           float catch_vals;
+           string catch_label;
+           string fishery_label;
+           for(int k = 0; k < this_catch.size(); k++) {
+             LOG_MEDIUM() << "year lab = " << year_labs[k];
+             SEXP this_fishery_catch = this_catch[k];
+             LOG_MEDIUM() << "create SEXP variable";
+             Rcpp::NumericVector this_actual_catch(this_fishery_catch);
+             LOG_MEDIUM() << "Create this_actual_catch";
+             Rcpp::CharacterVector this_lab = this_actual_catch.names();
+             LOG_MEDIUM() << "Create fishery this_lab";
+
+             year_label = year_labs[k];
+             year_val = utilities::ToInline<string, unsigned>(year_label);
+             LOG_MEDIUM() << "diagnosis = " << year_val;
+             LOG_MEDIUM() << "year val = " << year_val;
+             for(int j = 0; j < this_actual_catch.size(); j++) {
+               fishery_label = this_lab[j];
+               catch_vals = this_actual_catch[j];
+               //map<string, float> temp_map;
+               //temp_map[catch_label] = catch_vals;
+               hcr_catches[year_val][fishery_label] = catch_vals;
+               LOG_MEDIUM() <<"k = " << k <<  " j = " << j << " " << catch_vals << " lab = " << year_label << " fishery " << fishery_label;
+             }
+           }
+           // Double check the map
+           for(auto lvl1 : hcr_catches) {
+             LOG_MEDIUM() << "year = " << lvl1.first;
+             for(auto lvl2 : lvl1.second) {
+               LOG_MEDIUM() << "fishery = " << lvl2.first << " value = " << lvl2.second;
+             }
+           }
+
+        } catch(std::exception& ex) {
+          LOG_FATAL() << "Exception caught: " << ex.what() << std::endl;
+        } catch(...) {
+          LOG_FATAL() << "Unknown exception caught" << std::endl;
+        }
+        // Send off to the mortality process
+        if(current_year_ != final_year_)
+          mortality_process_for_mse->set_HCR(hcr_catches);
+        ++current_mse_cycle;
+      }
+    }
+    LOG_MEDIUM() << "Model: State change to Iteration Complete";
+    managers_->report()->Execute(State::kIterationComplete);
+    // Model has finished so we can run finalise.
+    LOG_MEDIUM() << "Model: State change to Iteration Complete";
+    managers_->report()->Execute(State::kInputIterationComplete);
+  }
+}
 /**
  *
  */
@@ -405,6 +649,7 @@ void Model::RunBasic() {
    * - iterate over -i file
    * - iterate over -s values
    */
+
   Addressables& addressables = *managers_->addressables();
   LOG_MEDIUM() << "Multi line value = " << adressable_values_count_;
 
@@ -523,7 +768,6 @@ void Model::Iterate() {
 
   for (auto executor : executors_[State::kExecute])
     executor->Execute();
-
   current_year_ = final_year_;
 }
 
@@ -541,8 +785,6 @@ bool Model::lat_and_long_supplied() {
   else
     return false;
 }
-
-
 
 
 } /* namespace niwa */

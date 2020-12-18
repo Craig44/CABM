@@ -53,6 +53,7 @@ def start_build_system():
     Globals.cmd_path_      = system_info.find_exe_path('cmd.exe')
     Globals.compiler_path_ = system_info.find_exe_path('g++.exe')
     Globals.git_path_      = system_info.find_exe_path('git.exe')
+    Globals.r_path_        = system_info.find_exe_path('R.exe')
   else:
     Globals.compiler_path_ = system_info.find_exe_path('g++')
     Globals.git_path_      = system_info.find_exe_path('git')    
@@ -60,6 +61,8 @@ def start_build_system():
       return Globals.PrintError('unzip is not in the current path. Please ensure it has been installed')
     if system_info.find_exe_path('cmake') == '':
       return Globals.PrintError('cmake is not in the current path. Please ensure it has been intalled')    
+    if system_info.find_exe_path('R') == '':
+      return Globals.PrintError('R is not in the current path. Please ensure it has been intalled')         
   system_info.set_new_path()
 
   if Globals.compiler_path_ == "":
