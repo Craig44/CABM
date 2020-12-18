@@ -4,7 +4,7 @@
  * @date 01/06/2016
  * @section LICENSE
  *
- * Copyright NIWA Science ©2016 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2016 - www.niwa.co.nz
  *
  */
 
@@ -19,10 +19,19 @@ namespace reports {
  *
  */
 TimeVarying::TimeVarying(Model* model) : Report(model) {
-  run_mode_    = (RunMode::Type)(RunMode::kBasic | RunMode::kSimulation);
+  //run_mode_    = (RunMode::Type)(RunMode::kBasic | RunMode::kSimulation);
   model_state_ = (State::Type)(State::kIterationComplete);
 }
+/**
+ * Validate inputs
+ */
+void TimeVarying::DoValidate() {
+  if ((model_->run_mode() == RunMode::kMSE) || (model_->run_mode() == RunMode::kBasic)|| (model_->run_mode() == RunMode::kSimulation))
+    run_mode_ = model_->run_mode();
 
+  if ((model_->run_mode() == RunMode::kMSE))
+    model_state_ = State::kInputIterationComplete;
+}
 /**
  *
  */

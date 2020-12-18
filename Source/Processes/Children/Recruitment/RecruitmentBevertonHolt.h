@@ -5,7 +5,7 @@
  * @date 12/07/2018
  * @section LICENSE
  *
- * Copyright NIWA Science ©2015 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2015 - www.niwa.co.nz
  *
  * @section DESCRIPTION
  *
@@ -37,6 +37,7 @@ public:
   void                        DoReset() override final;
   void                        DoExecute() override final;
   void                        FillReportCache(ostringstream& cache) override final;
+  void                        RebuildCache() override final;
 
 protected:
   vector<float>               ycs_values_;

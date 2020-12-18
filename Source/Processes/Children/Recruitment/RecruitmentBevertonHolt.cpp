@@ -238,7 +238,15 @@ void RecruitmentBevertonHolt::FillReportCache(ostringstream& cache) {
   cache << "\ntrue_ycs: ";
   for (auto& iter : true_ycs_)
     cache << iter.second << " ";
+  cache << "\nactual_YCS: ";
+  for (auto& iter : ycs_values_by_year_)
+    cache << iter.second << " ";
+
   cache << "\n";
+}
+// Reset containers when accounting for time-varying object changes
+void RecruitmentBevertonHolt::RebuildCache() {
+  LOG_FINE();
 }
 
 } /* namespace processes */
