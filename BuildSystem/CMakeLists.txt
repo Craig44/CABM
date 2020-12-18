@@ -21,29 +21,29 @@ ENDIF ()
 # Rinside calls, now requires R.exe to be in path
 SET(NUM_TRUNC_CHARS 2)
 ## Set R cppflags variables
-message( "Starting RInside cmake component" )
+message( "Starting RInside cmake component, if this fails install the R-library install.packages(c('RInside','Rcpp'))")
 EXECUTE_PROCESS(COMMAND R CMD config --cppflags OUTPUT_VARIABLE RCPPFLAGS)
 
 EXECUTE_PROCESS(COMMAND R CMD config --cppflags OUTPUT_VARIABLE RCPPFLAGS)
 message( "RCPPFLAGS ${RCPPFLAGS}" )
 ## Remove -I 
 STRING(REGEX REPLACE "-I" "" RCPPFLAGS ${RCPPFLAGS})
-message( "RCPPFLAGS ${RCPPFLAGS}" )
+#message( "RCPPFLAGS ${RCPPFLAGS}" )
 string(REPLACE " " ";" RCPPFLAGS_LIST ${RCPPFLAGS})
-message( "RCPPFLAGS_LIST ${RCPPFLAGS_LIST}" )
+#message( "RCPPFLAGS_LIST ${RCPPFLAGS_LIST}" )
 include_directories(${RCPPFLAGS_LIST})
 #include_directories(${RCPPFLAGS})
 
 ## ldflags variables
 EXECUTE_PROCESS(COMMAND R CMD config --ldflags OUTPUT_VARIABLE RLDFLAGS)
-message( "RLDFLAGS ${RLDFLAGS}" )
+#message( "RLDFLAGS ${RLDFLAGS}" )
 ## get library path
 if (${RLDFLAGS} MATCHES "[-][L]([^ ;])+")
     string(SUBSTRING ${CMAKE_MATCH_0} ${NUM_TRUNC_CHARS} -1 RLDFLAGS_L)
     string(STRIP ${RLDFLAGS_L} RLDFLAGS_L )
     link_directories(${RLDFLAGS_L})
 endif()
-message( "RLDFLAGS_L ${RLDFLAGS_L}" )
+#message( "RLDFLAGS_L ${RLDFLAGS_L}" )
 ## get actual libraries
 if (${RLDFLAGS} MATCHES "[-][l]([^;])+")
     string(SUBSTRING ${CMAKE_MATCH_0} ${NUM_TRUNC_CHARS} -1 RLDFLAGS_l)
@@ -51,14 +51,14 @@ if (${RLDFLAGS} MATCHES "[-][l]([^;])+")
     string(STRIP ${RLDFLAGS_l} RLDFLAGS_l )
 endif()
 string(REPLACE " " ";" RLDFLAGS_l_LIST ${RLDFLAGS_l})
-message( "RCPPFLAGS_LIST ${RLDFLAGS_l_LIST}" )
-message( "RLDFLAGS_l ${RLDFLAGS_l}" )
+#message( "RCPPFLAGS_LIST ${RLDFLAGS_l_LIST}" )
+#message( "RLDFLAGS_l ${RLDFLAGS_l}" )
 
 ##Rcpp
 execute_process(COMMAND Rscript -e "Rcpp:::CxxFlags()" OUTPUT_VARIABLE RCPPINCL)
 string(SUBSTRING ${RCPPINCL} ${NUM_TRUNC_CHARS} -1 RCPPINCL)
 include_directories(${RCPPINCL})
-message( "RCPPINCL ${RCPPINCL}" )
+#message( "RCPPINCL ${RCPPINCL}" )
 execute_process(COMMAND Rscript -e "Rcpp:::LdFlags()" OUTPUT_VARIABLE RCPPLIBS)
 
 if (${RCPPLIBS} MATCHES "[-][L]([^ ;])+")
@@ -69,17 +69,17 @@ endif()
 if (${RCPPLIBS} MATCHES "[-][l][R]([^;])+")
     string(SUBSTRING ${CMAKE_MATCH_0} ${NUM_TRUNC_CHARS} -1 RCPPLIBS_l)
 endif()
-message( "RCPPLIBS ${RCPPLIBS}" )
+#message( "RCPPLIBS ${RCPPLIBS}" )
 
 ## RInside 
 execute_process(COMMAND Rscript -e "RInside:::CxxFlags()"
                 OUTPUT_VARIABLE RINSIDEINCL)
 string(SUBSTRING ${RINSIDEINCL} ${NUM_TRUNC_CHARS} -1 RINSIDEINCL)
 include_directories(${RINSIDEINCL})
-message( "RINSIDEINCL ${RINSIDEINCL}" )
+#message( "RINSIDEINCL ${RINSIDEINCL}" )
 
 STRING(REGEX REPLACE "include" "lib/x64" RINSIDE_LIB ${RINSIDEINCL})
-message( "RINSIDE_LIB ${RINSIDE_LIB}" )
+#message( "RINSIDE_LIB ${RINSIDE_LIB}" )
 link_directories(${RINSIDE_LIB})
 
 
@@ -88,14 +88,14 @@ if (${RINSIDELIBS} MATCHES "[-][L]([^ ;])+")
     string(SUBSTRING ${CMAKE_MATCH_0} ${NUM_TRUNC_CHARS} -1 RINSIDELIBS_L)
     link_directories(${RINSIDELIBS_L})
 endif()
-message( "RINSIDELIBS_L ${RINSIDELIBS_L}" )
+#message( "RINSIDELIBS_L ${RINSIDELIBS_L}" )
 
 if (${RINSIDELIBS} MATCHES "[-][l]([^;])+")
     string(SUBSTRING ${CMAKE_MATCH_0} ${NUM_TRUNC_CHARS} -1 RINSIDELIBS_l)
     STRING(REGEX REPLACE "-l" "" RINSIDELIBS_l ${RINSIDELIBS_l})
 endif()
-message( "RINSIDELIBS_l ${RINSIDELIBS_l}" )
-message( "RINSIDELIBS ${RINSIDELIBS}" )
+#message( "RINSIDELIBS_l ${RINSIDELIBS_l}" )
+#message( "RINSIDELIBS ${RINSIDELIBS}" )
 
 ## BLAS
 execute_process(COMMAND R CMD config BLAS_LIBS OUTPUT_VARIABLE RBLAS)
@@ -105,14 +105,14 @@ if (${RBLAS} MATCHES "[-][L]([^ ;])+")
     string(STRIP ${RBLAS_L} RBLAS_L )
     ##link_directories(${RLDFLAGS_L})## same link directory as RLDFLAGS
 endif()
-message( "RBLAS_L ${RBLAS_L}" )
+#message( "RBLAS_L ${RBLAS_L}" )
 ## get actual libraries
 if (${RBLAS} MATCHES "[-][l]([^;])+")
     string(SUBSTRING ${CMAKE_MATCH_0} ${NUM_TRUNC_CHARS} -1 RBLAS_l)
     STRING(REGEX REPLACE "-l" "" RBLAS_l ${RBLAS_l})
     string(STRIP ${RBLAS_l} RBLAS_l )
 endif()
-message( "RBLAS_l ${RBLAS_l}" )
+#message( "RBLAS_l ${RBLAS_l}" )
 
 ##LAPACK
 execute_process(COMMAND R CMD config LAPACK_LIBS OUTPUT_VARIABLE RLAPACK)
@@ -122,18 +122,18 @@ if (${RLAPACK} MATCHES "[-][L]([^ ;])+")
     string(STRIP ${RLAPACK_L} RLAPACK_L )
     ##link_directories(${RLAPACK_L})## same link directory as RLDFLAGS
 endif()
-message( "RLAPACK_L ${RLAPACK_L}" )
+#message( "RLAPACK_L ${RLAPACK_L}" )
 ## get actual libraries
 if (${RLAPACK} MATCHES "[-][l]([^;])+")
     string(SUBSTRING ${CMAKE_MATCH_0} ${NUM_TRUNC_CHARS} -1 RLAPACK_l)
     STRING(REGEX REPLACE "-l" "" RLAPACK_l ${RLAPACK_l})
     string(STRIP ${RLAPACK_l} RLAPACK_l )
 endif()
-message( "RLAPACK_l ${RLAPACK_l}" )
+#message( "RLAPACK_l ${RLAPACK_l}" )
 
 ## set cmake cxx flags 
 execute_process(COMMAND R CMD config CXXFLAGS OUTPUT_VARIABLE RCXXFLAGS)
-message( "RCXXFLAGS ${RCXXFLAGS}" )
+#message( "RCXXFLAGS ${RCXXFLAGS}" )
 
 #message( "CMAKE_CXX_FLAGS before changing ${CMAKE_CXX_FLAGS}" )
 #set(CMAKE_CXX_FLAGS "-s -Wall ${CMAKE_CXX_FLAGS} ${RCXXFLAGS}")
