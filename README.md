@@ -1,9 +1,8 @@
-# Agent Based Model (ABM)
+# Agent/Individual Based Model (ABM)
 
-This repository is for a generalised ABM that I am trying to generate during my PhD. An single agent may represent
-many entities that have identical attributes, the exception is tagging which represents individuals. The purpose of this is for scaling up results to population levels. 
-It will be a stochastic simulator used 
-for investigating different stock assessment methods under hypothetical scenarios. The current repository is a mixture of  ideas that need to be acknowledged. 
+This repository is for a generalised ABM that I am developing during my PhD. This apps purpose is as an operating model for testing and validating ecological 
+models. The ABM tracks agents which can represent many individuals that have identical attributes over a spatial explicit domain. The ABM allows users to specify 
+different life-histories, agent dynamics and interactions with fisheries. The current repository is a mixture of  ideas that need to be acknowledged. 
 Firstly to the Casal2 team found [here](https://github.com/NIWAFisheriesModelling/CASAL2),
 which formulated the basis of the core code for error handling, parameter structure, configuration syntax and more. I also learnt about ABM's 
 via the model found [here](https://github.com/trophia/sna1), where some idea's have been brought across. And finally to the SPM  team found [here](https://github.com/NIWAFisheriesModelling/SPM),
@@ -35,7 +34,11 @@ following steps.
 
 ### Compiling the code
 
-Open a terminal in the BuildSystem folder, to check you have the right dependencies on your program run the following command
+Since the MSE mode has been added the ABM relies on R being in the system path, to check this open a terminal and type in R. As well as R being in the path, compilation requires the following packages to be installed.
+```
+install.packages(c("RInside","Rcpp"));
+```
+Once those dependencies have been addressed open a terminal in the BuildSystem directory, to check you have the right dependencies on your program run the following command
 
 ```
 doBuild.bat check
@@ -47,7 +50,7 @@ if you have windows 10 and you are building from the power shell you may have to
 .\doBuild.sh check
 ```
 
-This will look for g++, git, and g++ version maybe some others.
+This will look for g++, git, R, and g++ version maybe some others.
 
 If the check worked okay, run the command to build the within repository libraries Python, cmake and Boost
 
