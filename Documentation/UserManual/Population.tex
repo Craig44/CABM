@@ -606,8 +606,8 @@ end_table
 \end{verbatim}}}
 
 
-\paragraph{Baranov}\label{para:baranov}\index{Processes!Mortality!Baranov}
-This process applies both natural mortality and fishing mortality
+\paragraph{ Baranov Simple}\label{para:baranov_simple}\index{Processes!Mortality!Baranov Simple}
+This process applies spatially explicit fishing mortality for only a single fishery and natural mortality. See section~\ref{para:event_mort_baranov} if you want to consider multiple fisheries.
 
 \textbf{The algorithm}
 \begin{itemize}
@@ -620,6 +620,57 @@ This process applies both natural mortality and fishing mortality
 So from the algorithm above we can see that agents are exposed to both M and F, however the negative is that this assumes only a single interaction with the fishery which is an unlikely assumption. However I added this process because it both takes M and F simultaneously and may actually be faster than an event biomass dynamic (previous paragraph~\ref{para:event_mort}).
 
 
+\paragraph{Baranov}\label{para:event_mort_baranov}\index{Processes!Mortality!Baranov}
+This is a removal event where we iterate over a range of cells and remove agents based on multiple fisheries and spatially explicit fishing mortality rates. Advantages using this mortality process over the event biomass event (previous paragraph~\ref{para:baranov}) is that it is alot faster (computationally) another benefit is that it allows for a constant exploitation pattern, even under different recruitment trends, unlike a catch based mortality event.
+
+for multiple fisheries, in any given cell we calculate the total fishing mortality as
+\begin{align}
+	F_b &= \sum_{f = 1} F_fS^f_b\\
+	p^f_b &= \frac{F_fS^f_b}{F_b}
+\end{align}
+%,
+where, \(f\) indexes the fishery, and \(S^f_b\) is the selectivity for bin \(b\) (can be either age or length) for fishery \(f\) and \(F_f\) is the fishing mortality rate in the cell we are in. \(p^f_b\) is the proportion of fishing mortality for bin \(b\) attributed ot fishery \(f\).\\
+\textbf{The algorithm follows}
+\begin{itemize}
+	\item Iterate over each agent that is alive and see if agent \(i\) is caught ($U() < 1 - e^{F_{b_i}}$) with \(b_i\) is the bin of agent \(i\)
+	\item If caught see which fishery caught it using a \(f \sim multinomial(p^f_1, \dots p^f_{n_f})\)
+	\item if we have minimum legal size (MLS) check to see if the fish will be returned this is a true or false statement, if agent length $<$ MLS return with some handling mortality probability that will be again checked with a uniform random variable
+	\item if not MLS check then we remove this agent from the population and add it to the catch (all agents are removed, this must be remembered)
+\end{itemize}
+The key here is that an agent can interact with fishery many times during the process execution, but there is no natural mortality.
+
+\pagebreak
+{\small{\begin{verbatim}
+		@process Fishing_Mortality
+		type mortality_baranov
+		print_extra_info true ## this may print too much information and slow down table f_table
+		table f_table
+		 ## these are labels for @layer that describe F over space for each fishery
+		year FishingTrwl FishingLine
+		1972 1972_Trwl 1972_Line
+		1973 1973_Trwl 1973_Line
+		1974 1974_Trwl 1974_Line
+		end_table
+		
+		## describe fishery specific parameters		
+		table method_info
+		method          male_selectivity    female_selectivity 	minimum_legel_length  handling_mortality
+		FishingTrwl     trwlFSel_m          trwlFSel_f			0			0
+		FishingLine	    Sel_Line            Sel_Line			0			0
+		end_table
+		## if single sex model only have one column called selectivity
+		table method_info
+		method        selectivity  minimum_legel_length handling_mortality
+		FishingTrwl   trwlFSel     0                    0
+		FishingLine   Sel_Line     0                    0
+		end_table
+		\end{verbatim}}}
+
+
+\paragraph{Hybrid}\label{para:baranov_Hybrid}\index{Processes!Mortality!Hybrid}
+\textbf{Note:} this process should only run for run mode \texttt{ibm -m}. This will apply Baranov mortality process (section~\ref{para:event_mort_baranov}) between \subcommand{start\_year} and the fisrt year in \subcommand{assessment\_years} subcomand then applies a catch based mortality \subcommand{mortality\_event\_biomass} (section~\ref{para:event_mort}) over the remaining assessment years.
+
+The input is identical to Baranov mortality process (section~\ref{para:event_mort_baranov}) where users should only supply layer labels in table \texttt{f\_table} catch is determined by the \R\ interaction.
 \paragraph{Effort-Based F}\label{para:effort_based_F}\index{Processes!Mortality!Effort-Based F}
 A lot of this process was inspired by \cite{truesdell2017effects}, where users can specify some theoretical fishing distribution, currently only Ideal Free Distribution is allowed (but I am hoping to add a weighted ideal free distribution with user defined weights) and a total catch. \IBM\ applies this process by calculating the vulnerable biomass over all spatial cells ($V_{row,col}$), where each individual contributing to the vulnerable biomass is done deterministically \textbf{unlike} most other systems in the model (the stochastic nature comes later Equation~\ref{eq:catch}),
 
@@ -669,20 +720,25 @@ tolerance 0.03
 step_size 0.003
 
 \end{verbatim}}}
-\paragraph{Tag Recaptures}\label{subsubsec:tag_recaptures}\index{Processes!Mortality!Tag Recaptures}
-Because the underlying model entity is an agent than often represents many individuals and a tagged entity is an individual careful consideration is needed not to introduce bias quantities. The first thing to note that users must specify a tagging event Section~\ref{subsub:tag} so that tagged fish exist in the partition. Otherwise this will be a computational burden. The algorithm for observing tag recaptures during a removal process follows;
 
-\begin{enumerate} 
-	\item Calculate proportion of tagged \textbf{individuals} from the vulnerable population, denoted \(P_t\). Note vulnerable is a stochastic evaluation see the above mortality processes e.g. \(U() \leq P_a\)\\
-	\item When in a removal process and we are scanning catch for tags, randomly draw from a Bernoulli distribution.
-	\[\text{select tagged fish }= Binomial(1,P_a) \]
-	\item In most mortality processes users must specify the proportion of the catch scanned for tags (\(P_{scan}\)). So if a tagged fish is selected. \IBM\ then does a check to see if we observed that recapture i.e. \(U() \leq P_{scan}\).
-\end{enumerate}
-
-There is two ways to get \IBM\ to report information on tag-recaptures. You can either generate a \subcommand{tag\_recapture\_by\_length} or \subcommand{tag\_recapture\_by\_age} observation class (See sections~\ref{subsubsec:tag_recap_by_age} \& \ref{subsubsec:tag_recap_by_length}), or generate a report class from the mortality process that the recaptures occurred in.
+\paragraph{Mortality Cull}
+Not really a realistic/common mortality event, but useful when looking at movement dynamics. This mortality process will kill all agents in the specified cells.
 
 
-
+{\small{\begin{verbatim}
+		@process summer_fishery
+		type mortality_effort_based
+		years 1991
+		layer_label kill_all_agents
+		
+		@layer kill_all_agents
+		type integer
+		table layer
+		0 0 0
+		1 1 1 
+		end_table
+		\end{verbatim}}}
+This process will kill all agents in the bottom cells. Any cell with a value > 0, all agents will be removed.
 \subsubsection{Movement}\index{Processes!Movement}
 \paragraph{Box Transfer}\label{subsubsec:box_transfer}\index{Processes!Movement!Box Transfer}
 The box transfer movement process is a simple movement process that is commonly applied in stock assessments. It describes a proportion of individuals moving from a cell to all other cells. This is applied by drawing from a multinomial distribution where an individual will end up. There are two types of movement that users can select for this method; \subcommand{markovian} and \subcommand{natal\_homing}. The difference is with markovian movement the \subcommand{origin\_cell} refers to the cell an individual is currently in, where as if the movement type is natal homing the \subcommand{origin\_cell} refers to the cell that the individual was born in. These are subtle in application but a quite different movement assumptions. A practical note about the two methods natal homing is difficult to thread so may be quite a lot slower (disclaimer I haven't tested it, but I have turned off threading in this process). The probability is not age or length specific and so applies equally to all individuals in a cell. An example of syntax of how you would set this process up for a 3 area model is below.
@@ -849,14 +905,41 @@ When an agent is created (either in initialisation or through a recruitment proc
 		update_growth_parameters false ## if a individual moves area 
 		#do we need to update its growth parameters.
 		\end{verbatim}}}
-
-
-
 \begin{figure}[h!]\label{fig:age_length}
 	\centering
 	\includegraphics[scale=0.6]{Figures/age-length.png}%
 	\caption{An example of the age length relationship from 1000 randomly sampled agents (black dots), red dots signify the assumed deterministic age length relationship.}
 \end{figure}
+
+
+\paragraph{Schnute with Basic}\label{subsubsec:schnute_basic}\index{Processes!Growth!Schnute with Basic}
+Following \citep{schnute1981versatile} this applies the generalised Schnute growth increment model following Equation~\ref{eq:schnute}
+The distribution relates to the parameters \(\alpha_i\) and \(\beta_i\) for each agent. \(\tau_1\) and \(\tau_2\) are the reference ages with mean length at those reference ages defined as \(y_1\) and \(y_2\) respectively.
+\begin{equation}\label{eq:schnute}
+	L_{t+1,i} = \bigg(L_{t,i}^{\beta_i} e^{-\alpha_i p_t} + \frac{\left( y_2^{\beta_i} - y_1^{\beta_i} e^{-\alpha_i(\tau_2 - \tau_1) }\right) \left(1 - e^{-\alpha_i p_t}\right)}{\left(1 - e^{-\alpha_i(\tau_2 - \tau_1)}\right)}\bigg)^{1/\beta_i}
+\end{equation}
+
+{\small{\begin{verbatim}
+# Growth
+@process Growth
+type growth_schnute_with_basic_weight
+y1 24.5
+y2 104.8
+tau1 1 
+tau2 20 
+alpha 0.131
+beta 1.70
+t0 24.5
+a 2.0e-9
+b 3.288
+cv 0.15
+update_growth_parameters false ## if an agent moves we don't update growth info
+distribution lognormal
+time_step_proportions 1.0
+\end{verbatim}}}
+
+
+
 \subsubsection{Tagging}\index{Processes!Tagging}\label{subsub:tag}
 Tagging is a process where by agents get tagged and is a tag release event. This is a simple process where a user defines a selectivity that describes the probability of being captured for tagging, and also a number of tags that are released in each spatial cell. I have usually applied tagging before a mortality process which is where tag recaptures occur (Section~\ref{sec:mortality}). Also you will need to specify mortality processes to scan for tagged fish if you want any information on recapture probabilities. This will be printed in the process information.
 
