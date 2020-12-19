@@ -1,8 +1,8 @@
-#!include "Population.ibm"
-!include "Population_single.ibm"
+!include "Population.ibm"
+#!include "Population_single.ibm"
 !include "Observations.ibm"
-#!include "Reports.ibm"
-!include "Reports_single.ibm"
+!include "Reports.ibm"
+#!include "Reports_single.ibm"
 
 # --------------
 # Include Auxillary Layers
@@ -23,6 +23,7 @@
 !include "Layers/recruitment_BP_area.ibm"
 !include "Layers/recruitment_EN_area.ibm"
 !include "Layers/recruitment_prop.ibm"
+!include "Layers/recruitment_labels.ibm"
 
 ## Movement layers
 !include "Layers/Movement/BP_home.ibm"

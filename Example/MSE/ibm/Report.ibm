@@ -84,25 +84,21 @@ type time_varying
 type simulated_observation
 observation chatTANbiomass
 file_name sim/chatTANbiomass
-write_mode overwrite
 
 @report chatTANage_sim
 type simulated_observation
 observation chatTANage
 file_name sim/chatTANage
-write_mode overwrite
 
 @report FishingAge_sim
 type simulated_observation
 observation FishingAge
 file_name sim/FishingAge
-write_mode overwrite
 
 @report FishingLength_sim
 type simulated_observation
 observation FishingLength
 file_name sim/FishingLength
-write_mode overwrite
 
 /*
 @report chatOBSest_sim

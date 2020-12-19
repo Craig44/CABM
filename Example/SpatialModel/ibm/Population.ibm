@@ -20,7 +20,7 @@ growth_process_label Growth
 natural_mortality_process_label M
 sexed false
 maturity_ogive_label mature_ogive
-latitude_bounds 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0 
+latitude_bounds -2.0 -2.1 -2.2 -2.3 -2.4 -2.5 -2.6 -2.7 -2.8 -2.9 -3.0 
 longitude_bounds 18.0 18.1 18.2 18.3 18.4 18.5 18.6 18.7 18.8 18.9 19.0
 nrows 10
 ncols 10
@@ -59,7 +59,7 @@ initial_number_of_agents 1000000 ## initial number of agents
 # -- M
 
 @time_step Summer
-processes inshore_preference_movement Maturation Growth M summer_fishery
+processes Ageing inshore_preference_movement Maturation Growth M summer_fishery
 
 @time_step Autumn
 processes Recruitment Growth Move_offshore offshore_preference_movement M
@@ -77,6 +77,8 @@ processes Growth Move_inshore inshore_preference_movement M
 @process Nop  ## no process a placeholder process (every time step needs at least one process) if I want to investigate derived quantities or observations
 type nop
 
+@process Ageing
+type ageing
 #---
 # Growth
 #---

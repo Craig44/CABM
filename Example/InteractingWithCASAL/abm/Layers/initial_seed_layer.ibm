@@ -1,7 +1,0 @@
-@layer initial_values
-type numeric
-proportions true
-## cells could be areas if we wanted densities
-table layer
-1
-end_table
