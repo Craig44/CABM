@@ -25,7 +25,7 @@ class TimeVarying : public niwa::Report {
 public:
   TimeVarying(Model* model);
   virtual                     ~TimeVarying() = default;
-  void                        DoValidate() override final { };
+  void                        DoValidate() override final;
   void                        DoBuild() override final { };
   void                        DoExecute() override final;
   void                        DoReset() override final  { };

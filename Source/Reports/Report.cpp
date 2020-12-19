@@ -159,7 +159,7 @@ void Report::FlushCache() {
   if (file_name_ != "") {
     string suffix = model_->managers().report()->report_suffix();
 
-    bool overwrite = true;
+    bool overwrite = false;
     if (first_write_ || suffix != last_suffix_)
       overwrite = overwrite_;
     LOG_MEDIUM() << "overwrite_ = " << overwrite_ << " overwrite " << overwrite <<  " suffix: " << suffix << " last_suffix_ " << last_suffix_;

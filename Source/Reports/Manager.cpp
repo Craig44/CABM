@@ -79,16 +79,16 @@ void Manager::PrintObservations() {
 void Manager::Execute(State::Type model_state) {
   LOG_TRACE();
   RunMode::Type run_mode = model_->run_mode();
-  LOG_MEDIUM() << "Checking " << state_reports_[model_state].size() << " reports";
+  LOG_FINE() << "Checking " << state_reports_[model_state].size() << " reports";
   for(auto report : state_reports_[model_state]) {
-    LOG_MEDIUM() << "Checking report: " << report->label();
-    if (report->run_mode() == run_mode) {
-      report->Execute();
-    } else {
-      LOG_MEDIUM() << "Skipping report: " << report->label() << " because run mode is incorrect";
-    }
+      LOG_FINE() << "Checking report: " << report->label();
+      if ( (RunMode::Type)(report->run_mode() & run_mode) == run_mode) {
+        report->Execute();
+      } else
+        LOG_FINE() << "Skipping report: " << report->label() << " because run mode is incorrect";
   }
 }
+
 
 /**
  * Execute any reports that have the year and
@@ -99,18 +99,18 @@ void Manager::Execute(State::Type model_state) {
  * @param time_step_label The last time step to be completed
  */
 void Manager::Execute(unsigned year, const string& time_step_label) {
-  LOG_MEDIUM();
-  LOG_MEDIUM() << "year: " << year << "; time_step_label: " << time_step_label << "; reports: " << time_step_reports_[time_step_label].size();
+  LOG_TRACE();
+  LOG_FINEST() << "year: " << year << "; time_step_label: " << time_step_label << "; reports: " << time_step_reports_[time_step_label].size();
 
   RunMode::Type run_mode = model_->run_mode();
   for(auto report : time_step_reports_[time_step_label]) {
     LOG_FINE() << "looking executing report " << report->label();
     if ( (RunMode::Type)(report->run_mode() & run_mode) != run_mode) {
-      LOG_MEDIUM() << "Skipping report: " << report->label() << " because run mode is not right";
+      LOG_FINEST() << "Skipping report: " << report->label() << " because run mode is not right";
       continue;
     }
     if (!report->HasYear(year)) {
-      LOG_MEDIUM() << "Skipping report: " << report->label() << " because it does not have year " << year;
+      LOG_FINEST() << "Skipping report: " << report->label() << " because it does not have year " << year;
       continue;
     }
 
@@ -118,6 +118,7 @@ void Manager::Execute(unsigned year, const string& time_step_label) {
   }
   LOG_TRACE();
 }
+
 
 /**
  *

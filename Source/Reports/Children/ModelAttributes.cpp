@@ -28,7 +28,7 @@ namespace reports {
  * @param model Pointer to the current model context
  */
 ModelAttributes::ModelAttributes(Model* model) : Report(model) {
-  model_state_ = State::kInputIterationComplete;;
+  model_state_ = State::kFinalise;
   //run_mode_    = (RunMode::Type)(RunMode::kBasic);
 }
 /**
