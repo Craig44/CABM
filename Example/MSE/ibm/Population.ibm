@@ -219,13 +219,14 @@ proportion_through_mortality_block 0.5
 # --------------
 # Time Varying Quantities
 # --------------
-/*
 @time_varying natMort
 type random_draw
-parameter process[Natural_Mortality].m
-years 1960:2016
-mean 0.19
-sigma 0.05
-*/
+parameter process[Recruitment].ycs_values
+distribution lognormal
+years 2015:2028
+mean 1
+sigma 0.6
+lower_bound 0.001
+upper_bound 10
 
 
