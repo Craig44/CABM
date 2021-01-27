@@ -159,7 +159,7 @@ void Report::FlushCache() {
   if (file_name_ != "") {
     string suffix = model_->managers().report()->report_suffix();
 
-    bool overwrite = false;
+    bool overwrite = true;
     if (first_write_ || suffix != last_suffix_)
       overwrite = overwrite_;
     LOG_MEDIUM() << "overwrite_ = " << overwrite_ << " overwrite " << overwrite <<  " suffix: " << suffix << " last_suffix_ " << last_suffix_;
@@ -168,9 +168,10 @@ void Report::FlushCache() {
     string file_name = file_name_ + suffix;
 
     ios_base::openmode mode = ios_base::out;
-    if (!overwrite)
+    if (!overwrite) {
+      LOG_MEDIUM() << "appending instead of overwriting";
       mode = ios_base::app;
-
+    }
     // Try to Open our File
     ofstream file;
     file.open(file_name.c_str(), mode);
