@@ -305,17 +305,17 @@ void Model::Validate() {
     }
     assessment_year_map_.resize(ass_years_.size());
     for(unsigned ndx = 0; ndx < mse_cycles; ++ndx) {
-      LOG_MEDIUM() << "assessment years for ndx = " << ndx;
+      LOG_FINE() << "assessment years for ndx = " << ndx;
       vector<unsigned> this_ndx_year;
       if(ndx == 0) {
         for(unsigned ass_year = start_year_; ass_year <= ass_years_[ndx]; ++ass_year) {
           this_ndx_year.push_back(ass_year);
-          LOG_MEDIUM() << ass_year;
+          LOG_FINE() << ass_year;
         }
       } else {
         for(unsigned ass_year = (ass_years_[ndx - 1] + 1); ass_year <= ass_years_[ndx]; ++ass_year) {
           this_ndx_year.push_back(ass_year);
-          LOG_MEDIUM() << ass_year;
+          LOG_FINE() << ass_year;
         }
       }
       assessment_year_map_[ndx] = this_ndx_year;
@@ -567,9 +567,17 @@ void Model::RunMSE() {
            string run_hcr = "suppressMessages(source(file.path('..','R','RunHCR.R')))";
            //R.parseEvalQ(run_hcr);    // Run the code then get the catch for each fishery.
            // RunHCR.R needs to return a list called fishing_list
-
            SEXP fishing_info;
            R.parseEval(run_hcr, fishing_info); // fishing_vector
+
+           // Can I get access to this variable
+           int est_model_failure = R["est_model_failure"];
+           LOG_MEDIUM() << "est_model_failure = " << est_model_failure;
+
+           if(est_model_failure == 1) {
+             LOG_MEDIUM() << "Estimation section failed so breaking out of loop current_year_ (hopefully_)";
+             break;
+           }
            Rcpp::List fishing_ls(fishing_info);
            LOG_MEDIUM() <<  "bring in catches";
            SEXP ll = fishing_ls[0];
