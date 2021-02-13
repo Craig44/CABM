@@ -28,10 +28,10 @@ ncols 1
 # --------------
 @initialisation_phase Iterative
 type iterative
-years 50
+years 30
 initial_number_of_agents 1000000 ## initial number of agents
 layer_label initial_values
-recruitment_layer_label recruitment_layer # stock identification, important for when you are scaling SSB = B0 for an agent model to population model
+recruitment_layer_label recruitment_labels # stock identification, important for when you are scaling SSB = B0 for an agent model to population model
 # --------------
 # Annual Sequence
 # --------------
@@ -49,13 +49,16 @@ recruitment_layer_label recruitment_layer # stock identification, important for 
 processes von_bert Maturation Movement_home
 
 @time_step Apr_Dec
-processes  Recruitment_EN Recruitment_HG Recruitment_BP Tagging Jump_One natural_mort fishing natural_mort
+processes Ageing Recruitment_EN Recruitment_HG Recruitment_BP Tagging Jump_One natural_mort fishing natural_mort
 
 # --------------
 # Process definitions
 # --------------
 @process Nop # A placeholder process which does nothing, mainly used for debugging things
 type nop
+
+@process Ageing
+type ageing
 
 # Tagging
 @process Tagging

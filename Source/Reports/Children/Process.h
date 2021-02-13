@@ -28,7 +28,7 @@ class Process : public Report {
 public:
   Process(Model* model);
   virtual                     ~Process() = default;
-  void                        DoValidate() override final { };
+  void                        DoValidate() override final;
   void                        DoBuild() override final;
   void                        DoExecute() override final;
   void                        DoReset() override final  { };

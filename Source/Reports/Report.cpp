@@ -35,7 +35,7 @@ std::mutex Report::lock_;
 
 
 inline bool DoesFileExist(const string& file_name) {
-  LOG_FINEST() << "Checking if file exists: " << file_name;
+  LOG_FINE() << "Checking if file exists: " << file_name;
   ifstream  file(file_name.c_str());
   if (file.fail() || !file.is_open())
     return false;
@@ -93,7 +93,7 @@ bool Report::HasYear(unsigned year) {
  * the file it wants to write to exists etc.
  */
 void Report::Prepare() {
-  LOG_FINEST() << "preparing report: " << label_;
+  LOG_FINE() << "preparing report: " << label_;
   Report::lock_.lock();
   SetUpInternalStates();
   DoPrepare();
@@ -106,7 +106,7 @@ void Report::Prepare() {
 
 void Report::Execute() {
   Report::lock_.lock();
-  LOG_FINE() << "label " << label_;
+  LOG_FINE() << "locked report and about to execute " << label_;
   DoExecute();
   Report::lock_.unlock();
 }
@@ -129,7 +129,7 @@ void Report::SetUpInternalStates() {
    * we want to loop over the existing files to see what suffix to use.
    */
   if (file_name_ != "" && write_mode_ == PARAM_INCREMENTAL_SUFFIX) {
-    LOG_FINEST() << "Finding incremental suffix for file: " << label_;
+    LOG_FINE() << "Finding incremental suffix for file: " << label_;
     if (DoesFileExist(file_name_)) {
       for (unsigned i = 0; i < 1000; ++i) {
         string trial_name = file_name_ + "." + util::ToInline<unsigned, string>(i);
@@ -159,24 +159,27 @@ void Report::FlushCache() {
   if (file_name_ != "") {
     string suffix = model_->managers().report()->report_suffix();
 
-    bool overwrite = false;
+    bool overwrite = true;
     if (first_write_ || suffix != last_suffix_)
       overwrite = overwrite_;
+    LOG_MEDIUM() << "overwrite_ = " << overwrite_ << " overwrite " << overwrite <<  " suffix: " << suffix << " last_suffix_ " << last_suffix_;
 
     last_suffix_ = suffix;
     string file_name = file_name_ + suffix;
 
     ios_base::openmode mode = ios_base::out;
-    if (!overwrite)
+    if (!overwrite) {
+      LOG_MEDIUM() << "appending instead of overwriting";
       mode = ios_base::app;
-
+    }
     // Try to Open our File
     ofstream file;
     file.open(file_name.c_str(), mode);
-    if (!file.is_open())
-      LOG_ERROR() << "Unable to open file: " << file_name;
 
-    LOG_MEDIUM() << "skip tags = " << skip_tags_;
+    if (!file.is_open())
+      LOG_ERROR() << "Unable to open file: " << file_name << " c string = " << file_name.c_str() << " suffix = " << suffix << " mode = " << mode;
+
+    LOG_MEDIUM() << "skip tags = " << skip_tags_ << " file: " << file_name << " c string = " << file_name.c_str() << " suffix = " << suffix << " mode = " << mode << " overwrite " << overwrite;
     if (!skip_tags_) {
       cache_ << CONFIG_END_REPORT << "\n";
       //cerr << "end report\n";
@@ -187,6 +190,8 @@ void Report::FlushCache() {
     first_write_ = false;
 
   } else {
+    //LOG_MEDIUM() << "not skip tags = " << label_;
+
     cout << cache_.str();
     if (!skip_tags_) {
       cout << CONFIG_END_REPORT << "\n";
@@ -202,7 +207,6 @@ void Report::FlushCache() {
   cache_.str("");
   ready_for_writing_ = false;
   Report::lock_.unlock();
-
 }
 
 } /* namespace niwa */

@@ -1,0 +1,117 @@
+# --------------
+# Define Reports
+# --------------
+
+@report Fishing
+type process
+process Fishing
+file_name sim/FishingProc
+write_mode overwrite 
+
+@report Rec
+type process
+process Recruitment
+
+## selectivities
+@report chatTANsel
+type selectivity
+selectivity chatTANsel
+
+@report FSel
+type selectivity
+selectivity FSel
+
+@report MaturationSel
+type selectivity
+selectivity MaturationSel
+# print initail state of agents
+@report init
+type initialisation_partition
+
+# print age frequency
+@report age_freq
+type age_frequency_by_cell
+time_step AnnualTimeStep
+
+# print SSB's
+@report derived_quants
+type derived_quantity
+#file_name SSB/dqs
+#write_mode overwrite
+
+@report model_attributes
+type model_attributes
+
+/*
+@report agents
+type summarise_agents
+number_of_agents 1000
+time_step AnnualTimeStep
+years 1975:2016
+*/
+## Observations
+@report chatTANbiomass
+type observation
+observation chatTANbiomass
+
+@report chatTANage
+type observation
+observation chatTANage
+
+@report FishingLength
+type observation
+observation FishingLength
+
+@report FishingAge
+type observation
+observation FishingAge
+/*
+@report chatOBSest
+type observation
+observation chatOBSest
+
+@report F_age
+type observation
+observation F_age
+*/
+## time_varying 
+@report time_vary
+type time_varying
+
+
+## Simulated Observations
+@report chatTANbiomass_sim
+type simulated_observation
+observation chatTANbiomass
+file_name sim/chatTANbiomass
+write_mode overwrite
+
+@report chatTANage_sim
+type simulated_observation
+observation chatTANage
+file_name sim/chatTANage
+write_mode overwrite
+
+@report FishingAge_sim
+type simulated_observation
+observation FishingAge
+file_name sim/FishingAge
+write_mode overwrite
+
+@report FishingLength_sim
+type simulated_observation
+observation FishingLength
+file_name sim/FishingLength
+write_mode overwrite
+
+/*
+@report chatOBSest_sim
+type simulated_observation
+observation chatOBSest
+file_name sim/LenLow/chatOBSest
+
+@report F_age_sim
+type simulated_observation
+observation F_age
+file_name sim/LenLow/F_age
+*/

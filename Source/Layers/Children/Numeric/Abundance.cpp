@@ -102,6 +102,7 @@ void Abundance::DoBuild() {
  * Return value of Abundance in this cell on the fly
  */
 float Abundance::get_value(unsigned RowIndex, unsigned ColIndex) {
+  LOG_MEDIUM() << "get_value(unsigned RowIndex, unsigned ColIndex)";
   WorldCell* cell = world_->get_base_square(RowIndex, ColIndex);
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
 
@@ -115,13 +116,29 @@ float Abundance::get_value(unsigned RowIndex, unsigned ColIndex) {
     } else {
       if (length_based_selectivity_) {
         for (Agent& agent : cell->agents_) {
-          if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index()))
-            value +=  agent.get_scalar();
+          if (agent.is_alive()) {
+            if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index()))
+              value += agent.get_scalar();
+          }
+        }
+        for (Agent& agent : cell->tagged_agents_) {
+          if (agent.is_alive()) {
+            if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index()))
+              value +=  agent.get_scalar();
+          }
         }
       } else  {
         for (Agent& agent : cell->agents_) {
-          if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index()))
-            value += agent.get_scalar();
+          if (agent.is_alive()) {
+            if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index()))
+              value +=  agent.get_scalar();
+          }
+        }
+        for (Agent& agent : cell->tagged_agents_) {
+          if (agent.is_alive()) {
+            if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index()))
+              value += agent.get_scalar();
+          }
         }
       }
     }
@@ -131,9 +148,11 @@ float Abundance::get_value(unsigned RowIndex, unsigned ColIndex) {
 }
 
 /**
- * Return value of Abundance in this cell on the fly
+ * Return value of biomass in this cell on the fly
  */
 float Abundance::get_value(unsigned RowIndex, unsigned ColIndex, unsigned year) {
+  LOG_MEDIUM() << "get_value(unsigned RowIndex, unsigned ColIndex, unsigned year)";
+
   WorldCell* cell = world_->get_base_square(RowIndex, ColIndex);
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
 
@@ -147,13 +166,29 @@ float Abundance::get_value(unsigned RowIndex, unsigned ColIndex, unsigned year) 
     } else {
       if (length_based_selectivity_) {
         for (Agent& agent : cell->agents_) {
-          if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index()))
-            value += agent.get_scalar();
+          if( agent.is_alive()) {
+            if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index()))
+              value += agent.get_scalar();
+          }
+        }
+        for (Agent& agent : cell->tagged_agents_) {
+          if( agent.is_alive()) {
+            if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_length_bin_index()))
+              value +=  agent.get_scalar();
+          }
         }
       } else  {
         for (Agent& agent : cell->agents_) {
-          if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index()))
-            value += agent.get_scalar();
+          if( agent.is_alive()) {
+            if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index()))
+              value +=  agent.get_scalar();
+          }
+        }
+        for (Agent& agent : cell->tagged_agents_) {
+          if( agent.is_alive()) {
+            if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index()))
+              value +=  agent.get_scalar();
+          }
         }
       }
     }
@@ -161,6 +196,7 @@ float Abundance::get_value(unsigned RowIndex, unsigned ColIndex, unsigned year) 
   }
   return 1.0;
 }
+
 
 } /* namespace layers */
 } /* namespace niwa */

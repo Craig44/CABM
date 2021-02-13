@@ -36,11 +36,14 @@ recruitment_layer_label recruitment_labels
 # - M
 # - Maturity
 @time_step Annual
-processes  von_bert Maturation natural_mort Recruitment_const  
+processes  Ageing von_bert Maturation natural_mort Recruitment_const  
 
 # --------------
 # Process definitions
 # --------------
+@process Ageing
+type ageing
+
 # Growth
 @process von_bert
 type growth_von_bertalanffy_with_basic_weight

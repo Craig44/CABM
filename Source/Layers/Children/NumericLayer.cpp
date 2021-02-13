@@ -28,7 +28,7 @@ NumericLayer::NumericLayer(Model* model) : Layer(model) {
 
 // Deconstructor
 NumericLayer::~NumericLayer() {
-  LOG_TRACE();
+  //LOG_TRACE();
   // Clean Our Grid
   if (grid_ != 0) {
     for (unsigned i = 0; i < height_; ++i) {

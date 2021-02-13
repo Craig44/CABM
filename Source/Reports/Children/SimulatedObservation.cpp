@@ -22,13 +22,23 @@ namespace reports {
  * default constructor
  */
 SimulatedObservation::SimulatedObservation(Model* model) : Report(model) {
-  run_mode_    = (RunMode::Type)(RunMode::kSimulation);
+  //run_mode_    = (RunMode::Type)(RunMode::kSimulation | RunMode::kMSE) ;
   model_state_ = State::kIterationComplete;
   skip_tags_   = true;
-
   parameters_.Bind<string>(PARAM_OBSERVATION, &observation_label_, "Observation label", "");
   parameters_.Bind<string>(PARAM_CELLS, &cells_, "Cells to aggregate the observaton over.", "", true);
+}
 
+/**
+ * Validate method
+ */
+void SimulatedObservation::DoValidate() {
+  if ((model_->run_mode() == RunMode::kMSE) || (model_->run_mode() == RunMode::kBasic) || (model_->run_mode() == RunMode::kSimulation)) {
+    run_mode_ = model_->run_mode();
+    //model_state_ = State::kIterationComplete;
+  }
+  //if(model_->run_mode() == RunMode::kMSE)
+  //  model_state_ = State::kHCR;
 }
 
 /**
@@ -38,13 +48,16 @@ void SimulatedObservation::DoBuild() {
   observation_ = model_->managers().observation()->GetObservation(observation_label_);
   if (!observation_)
     LOG_ERROR_P(PARAM_OBSERVATION) << "(" << observation_label_ << ") could not be found. Have you defined it?";
+
+  LOG_MEDIUM() << "write_mode = " << write_mode_;
 }
 
 /**
  * execute method
  */
+
 void SimulatedObservation::DoExecute() {
-  LOG_FINE() << "generate simulated style report";
+  LOG_MEDIUM() << "generate simulated style report: ready for writing " << ready_for_writing_;
   cache_ << CONFIG_SECTION_SYMBOL << PARAM_OBSERVATION << " " << label_ << "\n";
   map<unsigned,map<string,vector<obs::Comparison> > >& comparisons = observation_->comparisons();
 
@@ -132,9 +145,8 @@ void SimulatedObservation::DoExecute() {
     cache_ << PARAM_END_TABLE << "\n";
   }
   cache_ << "\n";
+  LOG_MEDIUM() << "ready for writing " << ready_for_writing_;
   ready_for_writing_ = true;
-
-
 }
 
 } /* namespace reports */

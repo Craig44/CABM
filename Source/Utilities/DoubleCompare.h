@@ -18,22 +18,22 @@ namespace doublecompare {
 using niwa::utilities::Double;
 
 // Defines
-#define ONE  1.0
+#define TEMP_ONE  1.0
 #define TRUE_ZERO 0.0
-#define ZERO 1e-15
+#define TEMP_ZERO 1e-15
 #define DELTA 1e-11
 
-inline bool IsZero(const float &value) { return (value < ZERO && value > -ZERO); }
+inline bool IsZero(const float &value) { return (value < TEMP_ZERO && value > -TEMP_ZERO); }
 //inline bool IsInfinite(const Double &value) { return (isinf(value));}
 inline bool IsTrueZero(const float &value) { return (value < TRUE_ZERO && value > -TRUE_ZERO); }
-inline bool IsOne(const float &value) { return ( ((value-ONE) < ZERO) && ((value-ONE) > -ZERO) ); }
-inline bool IsEqual(float A, Double B) { return ( ((A-B) < ZERO) && ((A-B) > -ZERO) ); }
+inline bool IsOne(const float &value) { return ( ((value-TEMP_ONE) < TEMP_ZERO) && ((value-TEMP_ONE) > -TEMP_ZERO) ); }
+inline bool IsEqual(float A, Double B) { return ( ((A-B) < TEMP_ZERO) && ((A-B) > -TEMP_ZERO) ); }
 
 inline niwa::utilities::Double ZeroFun(float x) {
-  if (x >= ZERO)
+  if (x >= TEMP_ZERO)
     return x;
 
-  return ZERO / (2.0 - (x / ZERO));
+  return TEMP_ZERO / (2.0 - (x / TEMP_ZERO));
 }
 
 inline niwa::utilities::Double ZeroFun(float x, float delta) {

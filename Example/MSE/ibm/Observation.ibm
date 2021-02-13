@@ -1,0 +1,126 @@
+/*
+HAK 3&4 observatiosn
+@relative_abundance chatTANbiomass
+years 1992 1993 1994 1995 1996 1997 1998 1999 2000 2001 2002 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2016
+@proportions_at chatTANage # 200-800 m depth range
+years 1990 1992 1993 1994 1995 1996 1997 1998 1999 2000 2001 2002 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2016
+@catch_at chatOBSwst # Observer catch-at-age data, all west combined Chatham Rise
+years 1992 1994 1995 1996 1997 1998 1999 2000 2001 2002 2003 2004 2005 2006 2008 2009 2010 2011 2014 2016
+@catch_at chatOBSest # Observer catch-at-age data, all east combined Chatham Rise
+years 1992 1995 1997 1998 2001 2004 2007 2015
+*/
+###############
+## Survey index
+###############
+@observation chatTANbiomass
+type biomass
+years 1975:2028#2036
+catchability 0.172379
+time_step AnnualTimeStep
+proportion_through_mortality_block 0.5 ## take snapshot at the end of fishing timestep
+simulation_likelihood lognormal 
+## same as stan simualtion
+error_value 0.05 *  54#62
+#0.15 0.15	0.17	0.1	0.23	0.13	0.17	0.18	0.12	0.09	0.13	0.15	0.16	0.17	0.18	0.19	0.12	0.13	0.21	0.25	0.15	0.15	0.15	0.15	0.14
+selectivities chatTANsel
+cell_layer cells
+cells r1-c1
+
+@observation chatTANage
+type proportions_at_age
+years 1975:2028#2036
+time_step AnnualTimeStep
+min_age 3
+max_age 25
+normalise false
+proportion_through_mortality_block 0.5 ## take snapshot at the end of fishing timestep
+simulation_likelihood multinomial #ALN_survey# logistic_normal 
+## same as stan simualtion
+selectivities chatTANsel
+cell_layer cells
+cells r1-c1
+table error_values
+!include age_N_eff.ibm
+end_table
+
+@observation FishingAge
+type mortality_event_composition
+years 1975:2028#2036
+ageing_error None
+process_label Fishing
+fishery_label Fishing
+composition_type age
+normalise false
+simulation_likelihood  multinomial #ALN_total_F #LL_logis_age
+layer_of_stratum_definitions cells
+strata_to_include r1-c1
+table error_values
+year r1-c1
+!include age_N_eff.ibm
+end_table
+
+@observation FishingLength
+type mortality_event_composition
+years 1975:2028#2036
+ageing_error None
+process_label Fishing
+fishery_label Fishing
+composition_type length
+normalise false
+simulation_likelihood  multinomial #ALN_total_F #LL_logis_age
+layer_of_stratum_definitions cells
+strata_to_include r1-c1
+table error_values
+year r1-c1
+!include age_N_eff.ibm
+end_table
+
+#### Ageing error assumptions
+@ageing_error None
+type none
+
+@ageing_error Normal
+type normal
+cv 0.1
+
+#### Logistic Normal likelihood
+@likelihood ALN_total_F
+type logistic_normal
+rho 0.0
+sigma 0.05 
+bin_labels 1:30
+arma false
+robust false
+seperate_by_sex false
+sex_lag false
+
+@likelihood ALN_survey
+type logistic_normal
+rho 0.0
+sigma 0.05
+bin_labels 1:40
+arma false
+robust false
+seperate_by_sex false
+sex_lag false
+/*
+@likelihood ALN_east
+type logistic_normal
+rho 0.34
+sigma 0.361
+bin_labels 1:30
+arma false
+robust false
+seperate_by_sex false
+sex_lag false
+
+@likelihood ALN_west
+type logistic_normal
+rho 0.1
+sigma 0.25 
+bin_labels 1:30
+arma false
+robust false
+seperate_by_sex false
+sex_lag false
+*/

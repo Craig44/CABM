@@ -28,8 +28,14 @@ namespace reports {
  * @param model Pointer to the current model context
  */
 ModelAttributes::ModelAttributes(Model* model) : Report(model) {
-  model_state_ = State::kIterationComplete;;
-  run_mode_    = (RunMode::Type)(RunMode::kBasic);
+  model_state_ = State::kFinalise;
+  //run_mode_    = (RunMode::Type)(RunMode::kBasic);
+}
+/**
+ * Validate
+ */
+void ModelAttributes::DoValidate() {
+  run_mode_ = model_->run_mode(); // run this in all run modes
 }
 
 /**
@@ -43,7 +49,7 @@ void ModelAttributes::DoBuild() {
  * Execute this report
  */
 void ModelAttributes::DoExecute() {
-  LOG_FINE() <<" printing report " << label_;
+  LOG_MEDIUM() <<" printing report " << label_;
 
   auto scalars = model_->get_scalars();
   cache_ << "*"<< type_ << "[" << label_ << "]" << "\n";
@@ -52,6 +58,11 @@ void ModelAttributes::DoExecute() {
 
   cache_ << "model_years: ";
   for (auto year : model_->years())
+    cache_ << year << " ";
+  cache_ << "\n";
+
+  cache_ << "assessment_years: ";
+  for (auto year : model_->ass_years())
     cache_ << year << " ";
   cache_ << "\n";
 
@@ -70,6 +81,37 @@ void ModelAttributes::DoExecute() {
   for (unsigned length_ndx = 0; length_ndx < length_bins.size(); ++length_ndx)
     cache_ << length_bins[length_ndx] << " ";
   cache_ << "\n";
+
+  if(model_->get_lat_mid_points().size() > 0) {
+    cache_ << "latitude_mid_points: ";
+    for (unsigned ndx = 0; ndx < model_->get_lat_mid_points().size(); ++ndx)
+      cache_ << model_->get_lat_mid_points()[ndx] << " ";
+    cache_ << "\n";
+
+    cache_ << "latitude_matrix "  << REPORT_R_MATRIX << "\n";
+    for (unsigned lat_ndx = 0; lat_ndx < model_->get_lat_mid_points().size(); ++lat_ndx) {
+      for (unsigned lon_ndx = 0; lon_ndx < model_->get_lon_mid_points().size(); ++lon_ndx) {
+        cache_ <<  model_->get_lat_mid_points()[lat_ndx] << " ";
+      }
+      cache_ << "\n";
+    }
+  }
+
+  if(model_->get_lon_mid_points().size() > 0) {
+    cache_ << "longitude_mid_points: ";
+    for (unsigned ndx = 0; ndx < model_->get_lon_mid_points().size(); ++ndx)
+      cache_ << model_->get_lon_mid_points()[ndx] << " ";
+    cache_ << "\n";
+    cache_ << "longitude_matrix "  << REPORT_R_MATRIX << "\n";
+    for (unsigned lon_ndx = 0; lon_ndx < model_->get_lon_mid_points().size(); ++lon_ndx) {
+      for (unsigned lat_ndx = 0; lat_ndx < model_->get_lat_mid_points().size(); ++lat_ndx) {
+        cache_ <<  model_->get_lon_mid_points()[lon_ndx] << " ";
+      }
+      cache_ << "\n";
+    }
+  }
+
+
   cache_ << "growth_model: ";
   switch(model_->get_growth_model()) {
 

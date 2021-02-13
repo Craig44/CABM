@@ -8,7 +8,7 @@
  *
  * @section DESCRIPTION
  *
- * This process is responsible for growing individuals length via the von-bert relationship and weight by the basic w = a * L^b method, so variaility is in the von-bert function not, a and b
+ * This process is responsible for growing individuals length via the Schnute growth relationship and weight by the basic w = a * L^b method, so variaility is in the von-bert function not, a and b
  */
 #ifndef SOURCE_PROCESSES_CHILDREN_GROWTH_SCHNUTE_WITH_BASIC_H_
 #define SOURCE_PROCESSES_CHILDREN_GROWTH_SCHUNTE_WITH_BASIC_H_

@@ -2,7 +2,7 @@
 # Define Reports
 # --------------
 # print initial state of agents
-/*
+
 @report init
 type initialisation_partition
 
@@ -36,7 +36,7 @@ selectivity Sel_LL
 @report mature_ogive
 type selectivity
 selectivity mature_ogive
-*/
+
 # print SSB's
 @report derived_quants
 type derived_quantity

@@ -1322,5 +1322,24 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
   }
 }
 
+/*
+ * Set Catch based on R code
+ */
+void MortalityEventBiomass::set_HCR(map<unsigned, map<string, float>> future_catches) {
+  // find
+  for (auto year_map : future_catches) {
+    if(find(years_.begin(), years_.end(), year_map.first) == years_.end())
+      LOG_FATAL() << "could not find year " << year_map.first << " for setting HCR rule";
+    harvest_control_years_.push_back(year_map.first);
+    for (auto fish_map : year_map.second) {
+      if (find(fishery_label_.begin(), fishery_label_.end(), fish_map.first) == fishery_label_.end())
+        LOG_FATAL() << "could not find fishery " << fish_map.first << " for setting HCR rule";
+      // set save the values
+      harvest_control_Fs_[year_map.first][fish_map.first] = fish_map.second;
+    }
+  }
+
+}
+
 } /* namespace processes */
 } /* namespace niwa */

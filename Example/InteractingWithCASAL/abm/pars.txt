@@ -1,7 +1,0 @@
-selectivity[chatTANsel].a50 
-3
-3
-3
-3
-3
-3

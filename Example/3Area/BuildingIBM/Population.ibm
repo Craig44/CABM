@@ -47,7 +47,7 @@ recruitment_layer_label recruitment_layer # stock identification, important for 
 # - 0.5M + F + 0.5M Mortality
 
 @time_step Jan_Mar 
-processes von_bert Maturation Movement_home
+processes Ageing von_bert Maturation Movement_home
 
 @time_step Apr_Dec
 processes  Recruitment_EN Recruitment_HG Recruitment_BP Jump_One natural_mort natural_mort
@@ -58,6 +58,8 @@ processes  Recruitment_EN Recruitment_HG Recruitment_BP Jump_One natural_mort na
 @process Nop # A placeholder process which does nothing, mainly used for debugging things
 type nop
 
+@process Ageing
+type ageing
 # Growth
 @process von_bert
 type growth_von_bertalanffy_with_basic_weight

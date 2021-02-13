@@ -10,6 +10,8 @@
 #include "Utilities/DoubleCompare.h"
 #include "Utilities/Math.h"
 #include "Utilities/RandomNumberGenerator.h"
+#include "Model/Model.h"
+
 
 namespace niwa {
 namespace likelihoods {
@@ -154,43 +156,87 @@ void LogisticNormal::SimulateObserved(map<unsigned, map<string, vector<observati
     vector<float> normals(covariance_matrix_.size1(), 0.0);
     float row_sum;
     // iterate over year
-    for (auto year_iterator = comparisons.begin(); year_iterator != comparisons.end(); ++year_iterator) {
-      LOG_FINE() << "Simulating values for year: " << year_iterator->first;
-      // iterate over cell
-      for (auto second_iter = year_iterator->second.begin(); second_iter != year_iterator->second.end(); ++second_iter) {
-        LOG_FINE() << "Simulating values for cell: " << second_iter->first;
-        unsigned nbins =  second_iter->second.size();
-        LOG_FINE() << "nbins = " << nbins;
-        unsigned i = 0;
-        for (unsigned k = 0; k < nbins; ++k) {
-          normals[k] = rng.normal();
-        }
-        // iter over each bin in each year
-        for (observations::Comparison& comparison : second_iter->second) {
-          row_sum = 0.0;
+    if (model_->run_mode() == RunMode::kMSE) {
+      vector<unsigned> sim_years = model_->simulation_years();
+      for (auto year_iterator = comparisons.begin(); year_iterator != comparisons.end(); ++year_iterator) {
+        LOG_FINE() << "Simulating values for year: " << year_iterator->first;
+        if((year_iterator->first >= sim_years[0]) & (year_iterator->first <= sim_years[sim_years.size() - 1])) {
+          // iterate over cell
+          for (auto second_iter = year_iterator->second.begin(); second_iter != year_iterator->second.end(); ++second_iter) {
+            LOG_FINE() << "Simulating values for cell: " << second_iter->first;
+            unsigned nbins =  second_iter->second.size();
+            LOG_FINE() << "nbins = " << nbins;
+            unsigned i = 0;
+            for (unsigned k = 0; k < nbins; ++k) {
+              normals[k] = rng.normal();
+            }
+            // iter over each bin in each year
+            for (observations::Comparison& comparison : second_iter->second) {
+              row_sum = 0.0;
 
-          for (unsigned j = 0; j < nbins; ++j)
-            row_sum += covariance_matrix_lt(i, j) * normals[j]; // Opposite row-col index for the cholesky decomposition as R code, as one is the transpose of the other.
+              for (unsigned j = 0; j < nbins; ++j)
+                row_sum += covariance_matrix_lt(i, j) * normals[j]; // Opposite row-col index for the cholesky decomposition as R code, as one is the transpose of the other.
 
-          if (comparison.expected_ == 0) {
-            LOG_WARNING() << "for likelihood = " << label_ << " year = " << year_iterator->first << " cell = " << second_iter->first << " bin number = " << i + 1 << " found an expecation = 0, changing to  0.0001";
-            comparison.expected_ = 0.0001;
+              if (comparison.expected_ == 0) {
+                LOG_WARNING() << "for likelihood = " << label_ << " year = " << year_iterator->first << " cell = " << second_iter->first << " bin number = " << i + 1 << " found an expecation = 0, changing to  0.0001";
+                comparison.expected_ = 0.0001;
+              }
+              // Skip 0 observations
+              comparison.simulated_ = exp(row_sum + log(comparison.expected_));
+              LOG_FINE() << " age = " << comparison.age_ << " simuiulated val = " << comparison.simulated_  << " expected = " << comparison.expected_  << " multivariate offset = " << row_sum << " log expectations = " << log(comparison.expected_);
+              year_totals[year_storer] += comparison.simulated_;
+
+              ++i;
+            }
+            // Re-scale
+            // Do the logistic transformation to get our desired values.
+            // Ob = exp(Xb)/sumc(exp(Xc))
+            for (observations::Comparison& comparison : second_iter->second)
+              comparison.simulated_ /= year_totals[year_storer];
+
           }
-          // Skip 0 observations
-          comparison.simulated_ = exp(row_sum + log(comparison.expected_));
-          LOG_FINE() << " age = " << comparison.age_ << " simuiulated val = " << comparison.simulated_  << " expected = " << comparison.expected_  << " multivariate offset = " << row_sum << " log expectations = " << log(comparison.expected_);
-          year_totals[year_storer] += comparison.simulated_;
-
-          ++i;
+          ++year_storer;
         }
-        // Re-scale
-        // Do the logistic transformation to get our desired values.
-        // Ob = exp(Xb)/sumc(exp(Xc))
-        for (observations::Comparison& comparison : second_iter->second)
-          comparison.simulated_ /= year_totals[year_storer];
-
       }
-      ++year_storer;
+    } else {
+      for (auto year_iterator = comparisons.begin(); year_iterator != comparisons.end(); ++year_iterator) {
+        LOG_FINE() << "Simulating values for year: " << year_iterator->first;
+        // iterate over cell
+        for (auto second_iter = year_iterator->second.begin(); second_iter != year_iterator->second.end(); ++second_iter) {
+          LOG_FINE() << "Simulating values for cell: " << second_iter->first;
+          unsigned nbins =  second_iter->second.size();
+          LOG_FINE() << "nbins = " << nbins;
+          unsigned i = 0;
+          for (unsigned k = 0; k < nbins; ++k) {
+            normals[k] = rng.normal();
+          }
+          // iter over each bin in each year
+          for (observations::Comparison& comparison : second_iter->second) {
+            row_sum = 0.0;
+
+            for (unsigned j = 0; j < nbins; ++j)
+              row_sum += covariance_matrix_lt(i, j) * normals[j]; // Opposite row-col index for the cholesky decomposition as R code, as one is the transpose of the other.
+
+            if (comparison.expected_ == 0) {
+              LOG_WARNING() << "for likelihood = " << label_ << " year = " << year_iterator->first << " cell = " << second_iter->first << " bin number = " << i + 1 << " found an expecation = 0, changing to  0.0001";
+              comparison.expected_ = 0.0001;
+            }
+            // Skip 0 observations
+            comparison.simulated_ = exp(row_sum + log(comparison.expected_));
+            LOG_FINE() << " age = " << comparison.age_ << " simuiulated val = " << comparison.simulated_  << " expected = " << comparison.expected_  << " multivariate offset = " << row_sum << " log expectations = " << log(comparison.expected_);
+            year_totals[year_storer] += comparison.simulated_;
+
+            ++i;
+          }
+          // Re-scale
+          // Do the logistic transformation to get our desired values.
+          // Ob = exp(Xb)/sumc(exp(Xc))
+          for (observations::Comparison& comparison : second_iter->second)
+            comparison.simulated_ /= year_totals[year_storer];
+
+        }
+        ++year_storer;
+      }
     }
   }
 

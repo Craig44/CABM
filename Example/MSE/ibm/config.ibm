@@ -1,0 +1,60 @@
+!include "Population.ibm"
+!include "Observation.ibm"
+!include "Report.ibm"
+
+# --------------
+# Include Layers
+# --------------
+!include "Layers/base_layer.ibm"
+!include "Layers/cell.ibm"
+
+!include "Layers/SSB_area.ibm"
+!include "Layers/initial_seed_layer.ibm"
+!include "Layers/recruitment_processes.ibm"
+
+!include "Layers/recruitment_area.ibm"
+!include "Layers/M_layer.ibm"
+
+## Catch layers
+!include Layers/FLayers/F_1975.ibm
+!include Layers/FLayers/F_1976.ibm
+!include Layers/FLayers/F_1977.ibm
+!include Layers/FLayers/F_1978.ibm
+!include Layers/FLayers/F_1979.ibm
+!include Layers/FLayers/F_1980.ibm
+!include Layers/FLayers/F_1981.ibm
+!include Layers/FLayers/F_1982.ibm
+!include Layers/FLayers/F_1983.ibm
+!include Layers/FLayers/F_1984.ibm
+!include Layers/FLayers/F_1985.ibm
+!include Layers/FLayers/F_1986.ibm
+!include Layers/FLayers/F_1987.ibm
+!include Layers/FLayers/F_1988.ibm
+!include Layers/FLayers/F_1989.ibm
+!include Layers/FLayers/F_1990.ibm
+!include Layers/FLayers/F_1991.ibm
+!include Layers/FLayers/F_1992.ibm
+!include Layers/FLayers/F_1993.ibm
+!include Layers/FLayers/F_1994.ibm
+!include Layers/FLayers/F_1995.ibm
+!include Layers/FLayers/F_1996.ibm
+!include Layers/FLayers/F_1997.ibm
+!include Layers/FLayers/F_1998.ibm
+!include Layers/FLayers/F_1999.ibm
+!include Layers/FLayers/F_2000.ibm
+!include Layers/FLayers/F_2001.ibm
+!include Layers/FLayers/F_2002.ibm
+!include Layers/FLayers/F_2003.ibm
+!include Layers/FLayers/F_2004.ibm
+!include Layers/FLayers/F_2005.ibm
+!include Layers/FLayers/F_2006.ibm
+!include Layers/FLayers/F_2007.ibm
+!include Layers/FLayers/F_2008.ibm
+!include Layers/FLayers/F_2009.ibm
+!include Layers/FLayers/F_2010.ibm
+!include Layers/FLayers/F_2011.ibm
+!include Layers/FLayers/F_2012.ibm
+!include Layers/FLayers/F_2013.ibm
+!include Layers/FLayers/F_2014.ibm
+!include Layers/FLayers/F_2015.ibm
+!include Layers/FLayers/F_2016.ibm

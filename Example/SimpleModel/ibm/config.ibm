@@ -36,8 +36,10 @@ layer_label Base
 # - M
 # - Maturity
 @time_step Annual
-processes  von_bert Maturation natural_mort fishing Recruitment_const  
+processes Ageing von_bert Maturation natural_mort fishing Recruitment_const  
 
+@process Ageing
+type ageing
 # --------------
 # Process definitions
 # --------------

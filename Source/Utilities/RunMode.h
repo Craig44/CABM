@@ -15,8 +15,9 @@ enum Type {
   kLicense      = 2,
   kVersion      = 3,
   kHelp         = 4,
+  kMSE          = 5,
   kBasic        = 8,
-  kSimulation   = 64,
+  kSimulation   = 64
 };
 }
 

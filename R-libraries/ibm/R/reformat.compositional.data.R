@@ -9,17 +9,17 @@
 #' @export
 #'
 
-reformat.compositional.data = function(model, report_label) {
+reformat.compositional.data = function(model, report_label, quiet = TRUE) {
   ## check report label exists
   if (!report_label %in% names(model))
     stop(Paste("In model the report label '", report_label, "' could not be found. The report labels available are ", paste(names(model),collapse = ", ")))
   ## get the report out
   this_ob = get(report_label, model)
   n_copies = length(names(this_ob))
-  if(n_copies > 1) {
+  if(!any(names(this_ob) %in% "type")) {
     stop("This function can only deal with one copy of the observation. This is a result of doing a multi-input run such -i. make sure the output is the result of only a single run")
   }
-  this_ob = this_ob$'1'$Values
+  this_ob = this_ob$Values
   n_years = length(unique(this_ob[,"year"])) 
   n_cells = length(unique(this_ob[,"cell"]))
   bin_labels = unique(Paste(this_ob[,"age"],"_",this_ob[,"length"]))
@@ -29,14 +29,15 @@ reformat.compositional.data = function(model, report_label) {
   lengths = unique(this_ob[,"length"])
   cells = unique(this_ob[,"cell"])
   n_sexs = ifelse(length(unique(this_ob[,"sex"])) > 1,2,1)
-  print(Paste("n_bins = " ,n_bins, " n_cells = ", n_cells,  " n years " ,n_years, " n sexes = " , n_sexs))
+  if(!quiet)
+    print(Paste("n_bins = " ,n_bins, " n_cells = ", n_cells,  " n years " ,n_years, " n sexes = " , n_sexs))
 
   final_results_by_cell = list()
   for (i in 1:n_cells) {
     sim = matrix(this_ob[cells[i] == this_ob[,"cell"],"simulated"], byrow = T, ncol = n_bins * n_sexs, nrow = n_years)
     fit = matrix(this_ob[cells[i] == this_ob[,"cell"],"expected"], byrow = T, ncol = n_bins * n_sexs, nrow = n_years)
     err = matrix(this_ob[cells[i] == this_ob[,"cell"],"error_value"], byrow = T, ncol = n_bins * n_sexs, nrow = n_years)
-    rownames(fit) = rownames(err) = rownames(obs) = years
+    rownames(fit) = rownames(err) = rownames(sim) = years
     Colnames = Paste("X_",bin_labels )
     if (n_sexs > 1) {
       Colnames = c(Paste("M_",bin_labels ), Paste("F_",bin_labels ))

@@ -30,11 +30,16 @@ namespace reports {
  */
 Process::Process(Model* model) : Report(model) {
   model_state_ = State::kIterationComplete;
-  run_mode_    = (RunMode::Type)(RunMode::kBasic | RunMode::kSimulation);
 
   parameters_.Bind<string>(PARAM_PROCESS, &process_label_, "Process label that is reported", "", "");
 }
-
+/**
+ * Validate inputs
+ */
+void Process::DoValidate() {
+  if ((model_->run_mode() == RunMode::kMSE) || (model_->run_mode() == RunMode::kBasic)|| (model_->run_mode() == RunMode::kSimulation))
+    run_mode_ = model_->run_mode();
+}
 /**
  * Build our relationships between this object and other objects
  */
@@ -43,6 +48,8 @@ void Process::DoBuild() {
   if (!process_) {
     LOG_ERROR_P(PARAM_PROCESS) << "process " << process_label_ << " could not be found. Have you defined it?";
   }
+  if ((model_->run_mode() == RunMode::kMSE) & (process_->process_type() != ProcessType::kMortality))
+    model_state_ = State::kInputIterationComplete;
 }
 
 /**

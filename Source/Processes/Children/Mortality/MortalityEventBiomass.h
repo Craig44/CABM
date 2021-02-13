@@ -39,6 +39,8 @@ public:
   virtual void                        DoExecute() override final;
   void                                draw_rate_param(unsigned row, unsigned col, unsigned number_of_draws, vector<float>& vector) override final { };
   void                                FillReportCache(ostringstream& cache) override final;
+  virtual void                        set_HCR(map<unsigned, map<string, float>> future_catches)  override final; // years * fishery label * catch
+
 
 
 
@@ -68,6 +70,10 @@ protected:
   map<unsigned, float>                removals_by_year_;
   bool                                print_census_info_ = false;
   bool                                print_tag_recap_info_ = false;
+
+  vector<unsigned>                    harvest_control_years_;
+  map<unsigned, map<string, float>>   harvest_control_Fs_;
+  bool                                use_HCR_vals_ = false;
 
   // need to be reset for any multi run format in DoReset
   vector<vector<vector<vector<float>>>> actual_catch_by_area_; // n_years * n_fishery * rows * cols

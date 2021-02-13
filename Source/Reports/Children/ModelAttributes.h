@@ -27,7 +27,7 @@ class ModelAttributes : public Report {
 public:
   ModelAttributes(Model* model);
   virtual                     ~ModelAttributes() = default;
-  void                        DoValidate() override final { };
+  void                        DoValidate() override final;
   void                        DoBuild() override final;
   void                        DoExecute() override final;
   void                        DoReset() override final  { };

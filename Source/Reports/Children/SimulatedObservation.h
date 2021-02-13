@@ -29,7 +29,7 @@ class SimulatedObservation: public Report {
 public:
   SimulatedObservation(Model* model);
   virtual                     ~SimulatedObservation() = default;
-  void                        DoValidate() override final { };
+  void                        DoValidate() override final;
   void                        DoBuild() override final;
   void                        DoExecute() override final;
 
