@@ -28,6 +28,8 @@
 #include "Children/Mortality/MortalityEventBiomass.h"
 #include "Children/Mortality/MortalityEventHybrid.h"
 #include "Children/Mortality/MortalityEffortBased.h"
+#include "Children/Mortality/MortalityEffortBasedWithCovar.h"
+
 #include "Children/Movement/MovementBoxTransfer.h"
 #include "Children/Movement/MovementPreference.h"
 #include "Children/Tagging.h"
@@ -98,6 +100,8 @@ Process* Factory::Create(Model* model, const string& object_type, const string& 
       result = new MortalityCull(model);
     else if (sub == PARAM_MORTALITY_EFFORT_BASED)
       result = new MortalityEffortBased(model);
+    else if (sub == PARAM_MORTALITY_EFFORT_WITH_COVARIATES)
+      result = new MortalityEffortBasedWithCovar(model);
     else if (sub == PARAM_MOVEMENT_BOX_TRANSFER)
       result = new MovementBoxTransfer(model);
     else if (sub == PARAM_PREFERENCE_MOVEMENT)

@@ -721,6 +721,93 @@ step_size 0.003
 
 \end{verbatim}}}
 
+
+\paragraph{Effort-Based F with covariates}\label{para:effort_based_F_w_covars}\index{Processes!Mortality!Effort-Based F with covariates}
+This process leads on from Effort-Based F above but allows for layers to control effort distribution other than vulnerable biomass. For example economic-proxy layers such as distance from the coast (Figure~\ref{fig:distance})
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=9cm]{Figures/Distance.png} 
+	\caption{A layer that represents distance from the eastern coast line}
+	\label{fig:distance}%
+\end{figure}
+Given a numeric layer, you need to assume a preference function (Section~\ref{sec:preference_functions}) which represents the likely areas for effort e.g Figure~\ref{fig:pref_distance}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=5cm]{Figures/distance_preference_function.png} 
+	\caption{Preference function}
+	\label{fig:pref_distance}%
+\end{figure}
+These effort covariates also have an associated weight (multiplier) which is defined by the subcommand \subcommand{preference\_weights}. The resulting relative spatial effort distribution denoted by \(\tilde{E}_{ij}\) is the arithmetic mean of these covariates and the underlying vulnerable biomass.
+\begin{equation}
+	\tilde{E}_{ij} = \frac{1}{n_k + 1}\sum\limits_{k = 1}^{n_k} P^k_{ij} w_k  \frac{V_{ij}}{\sum_i\sum_j V_{ij}}
+\end{equation}
+with,
+\begin{itemize}
+	\item \(V_{ij}\) being vulnerable biomass in cell \(ij\)
+	\item \(n_k\) number of covariates
+	\item \(P^k_{ij}\) preference value for covariate \(k\)  in cell \(ij\)
+	\item \(w_k \) \subcommand{preference\_weights} for covariate \(k\)
+	\item \(V_{ij}\) being vulnerable biomass in cell \(ij\)
+	\item \(V_{ij}\) being vulnerable biomass in cell \(ij\)
+\end{itemize}
+%
+What this can look like, is take the disatnce from the coast example (Taken from the Example model PreferenceMovementSpatialFishing) if in a given year the vulnerable biomass was distributed as shown Figure~\ref{fig:vulnerable}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=9cm]{Figures/vulnerable_biomass.png} 
+	\caption{Vulnerable biomass at the time of fishing}
+	\label{fig:vulnerable}%
+\end{figure}
+%
+assuming the \subcommand{preference\_weights} for distance is 0.5 the resulting relative spatial effort distribution (\(\tilde{E}_{ij}\)) would look like Figure~\ref{fig:WIFD}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=9cm]{Figures/WIFD_arithmic.png} 
+	\caption{Vulnerable biomass at the time of fishing}
+	\label{fig:WIFD}%
+\end{figure}
+%
+the \subcommand{effort\_values} supplied by the user are then distributed proportional to \(\tilde{E}_{ij}\) as in the previous effort based approach (Section~\ref{para:effort_based_F}). The algorithm then follows exactly the same as Section~\ref{para:effort_based_F}, with the minimisation. To configure this process the following syntax should work.
+
+{\small{\begin{verbatim}
+		@process summer_fishery
+		type mortality_effort_with_covariates
+		years 1991
+		catches 2234
+		selectivity trawl_selectivity
+		minimiser minimiser_for_summer_fishery
+		effort_values 0.076 0.089 0.219 0.104 ## for 4 cell model
+		preference_functions dist_pref
+		preference_layers distance_from_shore
+		preference_weights 0.5
+		
+		@minimiser minimiser_for_summer_fishery
+		type numerical_differences
+		## play with these if you have trouble minimising or starting value
+		iterations	20 
+		evaluations 30
+		tolerance 0.03
+		step_size 0.003
+		
+		## Preference Functions
+		@preference_function dist_pref
+		type double_normal
+		mu 2
+		sigma_l 2
+		sigma_r 5
+			
+		@layer distance_from_shore
+		type numeric
+		table layer
+		0 0.255102 0.5102041 0.7653061
+		0 0.255102 0.5102041 0.7653061
+		0 0.255102 0.5102041 0.7653061
+		0 0.255102 0.5102041 0.7653061
+		end_table	
+\end{verbatim}}}
+
+
 \paragraph{Mortality Cull}
 Not really a realistic/common mortality event, but useful when looking at movement dynamics. This mortality process will kill all agents in the specified cells.
 
