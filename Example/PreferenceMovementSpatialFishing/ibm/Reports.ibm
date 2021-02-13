@@ -1,0 +1,131 @@
+# --------------
+# Define Reports
+# --------------
+# print process properties
+
+################
+## General model reports
+################
+
+@report agents
+type summarise_agents
+number_of_agents 1000
+time_step Annual_time_step
+years 1990 2000
+
+# print initail state of agents
+@report init
+type initialisation_partition
+
+# print age frequency
+@report world_age_freq
+type world_age_frequency
+#years 1990:2018 ## defaults to model years
+time_step Annual_time_step
+years 1970 1990 2000 2010
+
+@report age_freq_by_cell
+type age_frequency_by_cell
+#years 1990:2018 ## defaults to model years
+time_step Annual_time_step
+years 1970 1990 2000 2010
+
+# print SSB's
+@report derived_quants
+type derived_quantity
+
+# print model attributes
+@report model_attributes
+type model_attributes
+
+################
+## Selectivities
+################
+@report maturity_ogive
+type selectivity
+selectivity mature_ogive
+
+@report deep_ogive
+type selectivity
+selectivity deep_ogive
+
+@report shallow_ogive
+type selectivity
+selectivity shallow_ogive
+
+@report twl_sel
+type selectivity
+selectivity twl_sel
+
+
+@report pref_fun_shallow
+type preference_function
+preference_function_label shallow_prefernece
+preference_values 0:1500
+
+@report pref_fun_deep
+type preference_function
+preference_function_label deep_prefernece
+preference_values 0:1500
+
+################
+## Observations
+################
+/*
+@report Fishery_AF
+type observation
+observation Fishery_AF
+
+@report ageing_error
+type ageing_error
+ageing_error Age_misclassification
+*/
+
+################
+## Processes
+################
+@report Fishing
+type process
+process Fishing
+#file_name SimIFDskewed/Fishing
+
+
+@report shallow_pref  
+type process
+process shallow_pref
+
+@report deep_pref
+type process
+process deep_pref
+
+@report Recruitment
+type process
+process Recruitment
+
+/*
+@report M_report
+type process
+process half_M
+*/
+
+################
+## Layers
+################
+## spatial explicit Biomass
+@report Depth
+type numeric_layer
+layer_label Depth
+years 1990
+time_step Annual_time_step
+
+@report shallow_bio
+type numeric_layer
+layer_label shallow_biomass_by_cell
+years 1972:2016
+time_step Annual_time_step
+
+@report deep_bio
+type numeric_layer
+layer_label deep_biomass_by_cell
+years 1972:2016
+time_step Annual_time_step

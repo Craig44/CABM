@@ -1,0 +1,25 @@
+### Observations
+## fishery age compositional data through scaled observation
+/*
+@observation Fishery_AF
+type process_removals_by_age
+years 1990:2018
+process_label Fishing
+ageing_error Age_misclassification
+cell_layer survey_areas # summer_fishery_stratum_meta
+cells  shallowNE shallowSE deepSE   deepNE   deepNW    shallowNW deepSW    shallowSW# summer_fishery_stratum_meta
+min_age 1
+max_age 20
+plus_group true
+simulation_likelihood multinomial
+sex ignore
+!include AF_error_vals.ibm
+normalise false
+
+# ageing error
+@ageing_error Age_misclassification
+type none
+#type normal
+#cv 0.1
+
+*/

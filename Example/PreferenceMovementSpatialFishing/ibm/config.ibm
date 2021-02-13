@@ -1,0 +1,17 @@
+!include "Population.ibm"
+#!include "PopulationMove.ibm"
+!include "Reports.ibm"
+!include "Observations.ibm"
+
+# --------------
+# Include Layers
+# --------------
+!include Layers/base_layer.ibm
+!include Layers/SSB_layer.ibm
+!include Layers/prop_layer.ibm
+!include Layers/recruit_dist.ibm
+!include Layers/Depth.ibm
+!include Layers/single_cell_layer.ibm
+!include Layers/distance_from_shore.ibm
+
+
