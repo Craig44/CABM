@@ -19,7 +19,8 @@ plot_spatial_catch = function(model, report_label, directory = "", file_name = "
     stop(Paste("In model the report label '", report_label, "' could not be found. The report labels available are ", paste(names(model),collapse = ", ")))
   ## get the report out
   report = get(report_label, model)
-  
+  old_dir = getwd()  
+
   if (any(names(report) %in% "type")) {
     if (report$type != "process") {
       stop(Paste("The report label ", report_label, " in model is not a 'process' plz Check you have specified the correct report_label."))     
@@ -88,6 +89,7 @@ plot_spatial_catch = function(model, report_label, directory = "", file_name = "
     ggsave(P, filename = paste0(this_year,"_", file_name,".png"), width = width, height = height)
 
   }
+  setwd(old_dir)
   return (NULL);
 }
 
