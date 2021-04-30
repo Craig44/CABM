@@ -235,6 +235,12 @@ void MortalityEffortBasedWithCovar::DoExecute() {
       // Calculate preference for time-varying layers
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         fill(vary_preference_[row].begin(), vary_preference_[row].end(), 0.0);
+        fill(removals_by_cell_[row].begin(), removals_by_cell_[row].end(), 0.0);
+        fill(vulnerable_by_cell_[row].begin(), vulnerable_by_cell_[row].end(), 0.0);
+        fill(effort_by_cell_[row].begin(), effort_by_cell_[row].end(), 0.0);
+        fill(F_by_cell_[row].begin(), F_by_cell_[row].end(), 0.0);
+
+
         for (unsigned col = 0; col < model_->get_width(); ++col) {
           WorldCell *cell = world_->get_base_square(row, col);
           if (cell->is_enabled()) {
