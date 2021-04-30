@@ -242,6 +242,9 @@ void MortalityEffortBasedWithCovar::DoExecute() {
 
 
         for (unsigned col = 0; col < model_->get_width(); ++col) {
+          effort_by_cell_[row][col] = 0.0;
+          removals_by_cell_[row][col] = 0.0;
+          vulnerable_by_cell_[row][col] = 0.0;
           WorldCell *cell = world_->get_base_square(row, col);
           if (cell->is_enabled()) {
             cell_offset_[row][col] = n_agents_;
