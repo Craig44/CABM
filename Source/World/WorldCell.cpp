@@ -199,10 +199,11 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
 
   unsigned sex;
   unsigned agent_bin = 0;
-
+  float individuals_birthed = 0.0;
   if (model_->get_growth_model() == Growth::kVonbert) {
     for (unsigned agent = 0; agent < birth_agents; ++agent) {
       total_individuals_alive_ += scalar;
+	  individuals_birthed += scalar;
       sex = 0;
       if (sexed) {
         if (rng.chance() >= male_prop)
@@ -243,6 +244,8 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
   } else if (model_->get_growth_model() == Growth::kSchnute) {
     for (unsigned agent = 0; agent < birth_agents; ++agent) {
       total_individuals_alive_ += scalar;
+	  individuals_birthed += scalar;
+
       sex = 0;
       if (sexed) {
         if (rng.chance() >= male_prop)
@@ -282,7 +285,7 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
     }
   }
 
-  LOG_FINE() << "cell: " << row_ << "-" << col_ <<  "added values = " << total_individuals_alive_ - temp << " temp = " << temp << " total_individuals_alive_ " << total_individuals_alive_;
+  LOG_FINE() << "cell: " << row_ << "-" << col_ <<  "added values = " << total_individuals_alive_ - temp << " alternative individuals birthed = " << individuals_birthed << " temp = " << temp << " total_individuals_alive_ " << total_individuals_alive_;
 }
 
 /*
@@ -883,6 +886,107 @@ void  WorldCell::get_female_frequency(vector<float>& age_freq, bool& is_age) {
      }
    }
 }
+
+/*
+ * Returns the age frequency of agents in this cell
+*/
+void  WorldCell::get_age_agent_frequency(vector<float>& age_freq, bool& is_age) {
+  age_freq.clear();
+  if (is_age) {
+    age_freq.resize(model_->age_spread(),0);
+    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
+      if ((*iter).is_alive()) {
+        age_freq[(*iter).get_age_index()]++;
+      }
+    }
+    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
+      if ((*iter).is_alive()) {
+        age_freq[(*iter).get_age_index()]++;
+      }
+    }
+  } else {
+    age_freq.resize(model_->number_of_length_bins(),0);
+    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
+      if ((*iter).is_alive()) {
+        age_freq[(*iter).get_length_bin_index()]++;
+      }
+    }
+    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
+      if ((*iter).is_alive()) {
+        age_freq[(*iter).get_length_bin_index()]++;
+      }
+    }
+  }
+
+}
+
+
+
+/*
+ * Return male age frequency
+*/
+void  WorldCell::get_male_agent_frequency(vector<float>& age_freq, bool& is_age) {
+  age_freq.clear();
+  if (is_age) {
+    age_freq.resize(model_->age_spread(),0);
+    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
+      if ((*iter).is_alive() and (*iter).get_sex() == 0) {
+        age_freq[(*iter).get_age_index()]++;
+      }
+    }
+    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
+      if ((*iter).is_alive() and (*iter).get_sex() == 0) {
+        age_freq[(*iter).get_age_index()]++;
+      }
+    }
+   } else {
+     age_freq.resize(model_->number_of_length_bins(),0);
+     for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
+       if ((*iter).is_alive() and (*iter).get_sex() == 0) {
+         age_freq[(*iter).get_length_bin_index()]++;
+       }
+     }
+     for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
+       if ((*iter).is_alive() and (*iter).get_sex() == 0) {
+         age_freq[(*iter).get_length_bin_index()]++;
+       }
+     }
+   }
+}
+
+
+/*
+ * Returns total female age frequency
+*/
+void  WorldCell::get_female_agent_frequency(vector<float>& age_freq, bool& is_age) {
+  age_freq.clear();
+  if (is_age) {
+    age_freq.resize(model_->age_spread(),0);
+    for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
+      if ((*iter).is_alive() and (*iter).get_sex() == 1) {
+        age_freq[(*iter).get_age_index()]++;
+      }
+    }
+    for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
+      if ((*iter).is_alive() and (*iter).get_sex() == 1) {
+        age_freq[(*iter).get_age_index()]++;
+      }
+    }
+   } else {
+     age_freq.resize(model_->number_of_length_bins(),0);
+     for (auto iter = agents_.begin(); iter != agents_.end(); ++iter) {
+       if ((*iter).is_alive() and (*iter).get_sex() == 1) {
+         age_freq[(*iter).get_length_bin_index()]++;
+       }
+     }
+     for (auto iter = tagged_agents_.begin(); iter != tagged_agents_.end(); ++iter) {
+       if ((*iter).is_alive() and (*iter).get_sex() == 1) {
+         age_freq[(*iter).get_length_bin_index()]++;
+       }
+     }
+   }
+}
+
 
 /*
  * calculate the number of individuals alive

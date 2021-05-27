@@ -33,6 +33,8 @@ AgeFrequencyByCell::AgeFrequencyByCell(Model* model) : Report(model) {
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "Years", "", true);
   parameters_.Bind<string>(PARAM_TIME_STEP, &time_step_, "Time Step label", "", "");
   parameters_.Bind<bool>(PARAM_DO_LENGTH_FREQUENCY, &do_length_frequency_, "Print the report as length frequency not age.", "", false);
+   parameters_.Bind<bool>(PARAM_AGENT_FREQUENCY, &agent_freq_, "Is the frequency for agents (true) or individuals (false)?", "", false);
+
 }
 
 /**
@@ -81,7 +83,12 @@ void AgeFrequencyByCell::DoExecute() {
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
           cache_ << row + 1 << "-" << col + 1;
-          cell->get_male_frequency(age_freq_male, do_age_);
+		  if(agent_freq_) {
+			  cell->get_male_agent_frequency(age_freq_male, do_age_);
+		  } else {
+			  cell->get_male_frequency(age_freq_male, do_age_);
+		  }
+          
           for(auto& age : age_freq_male)
             cache_ << " " << age;
           cache_ << "\n";
@@ -105,7 +112,11 @@ void AgeFrequencyByCell::DoExecute() {
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
           cache_ << row + 1 << "-" << col + 1;
-          cell->get_female_frequency(age_freq_female, do_age_);
+		  if(agent_freq_) {
+			cell->get_female_agent_frequency(age_freq_female, do_age_);
+          } else {
+			cell->get_female_frequency(age_freq_female, do_age_);
+		  }
           for(auto& age : age_freq_female)
             cache_ << " " << age;
           cache_ << "\n";
@@ -127,10 +138,17 @@ void AgeFrequencyByCell::DoExecute() {
     vector<float> age_freq;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
+		LOG_MEDIUM() << "row = " << row + 1 << " col = " << col + 1;
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
+		  fill(age_freq.begin(), age_freq.end(), 0.0);
           cache_ << row + 1 << "-" << col + 1;
-          cell->get_age_frequency(age_freq, do_age_);
+		  if(agent_freq_) {
+			cell->get_age_agent_frequency(age_freq, do_age_);
+		  } else {
+		    cell->get_age_frequency(age_freq, do_age_);
+		  }
+          
           for(auto& age : age_freq)
             cache_ << " " << age;
           cache_ << "\n";

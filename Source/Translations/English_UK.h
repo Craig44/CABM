@@ -123,6 +123,7 @@
 #define PARAM_AGE_WEIGHT_LABEL                    "age_weight_label"
 #define PARAM_AGEING                              "ageing"
 #define PARAM_AGEING_ALLOCATION_METHOD            "age_allocation_method"
+#define PARAM_AGENT_FREQUENCY					  "agent_frequency"
 #define PARAM_AGEING_LABEL                        "ageing_label"
 #define PARAM_AGEING_ERROR                        "ageing_error"
 #define PARAM_AGEING_ERRORS                       "ageing_errors"

@@ -40,6 +40,7 @@ private:
   bool                        first_run_ = true;
   WorldView*                  world_;
   bool                        call_number_ = true; // initialisation phase reports are called twice once in the middle of initialisation and one once it is complete.
+  bool 						  agent_freq_;
 };
 
 } /* namespace reports */

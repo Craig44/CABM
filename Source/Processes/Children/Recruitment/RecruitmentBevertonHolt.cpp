@@ -162,7 +162,8 @@ void RecruitmentBevertonHolt::DoExecute() {
     } else {
       float SSB = derived_quantity_->GetLastValueFromInitialisation(init_phase_manager.last_executed_phase());
       model_->set_ssb(label_, SSB);
-      scalar_ = b0_ / SSB;
+      //scalar_ = b0_ / SSB;
+	  //LOG_FINE() <<  "Rec = " << label_ << "scalar = " << scalar_ << " model scalar = " << model_->get_scalar(label_);
     }
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
@@ -176,7 +177,8 @@ void RecruitmentBevertonHolt::DoExecute() {
       }
     }
   } else {
-
+	LOG_FINE() <<  "Rec = " << label_ << "scalar = " << scalar_ << " model scalar = " << model_->get_scalar(label_);
+    scalar_ =  model_->get_scalar(label_);
     float SSB = derived_quantity_->GetValue(model_->current_year() - model_->min_age());
     if (model_->current_year() - model_->min_age() < model_->start_year())
       SSB *= model_->get_scalar(label_);
@@ -197,9 +199,9 @@ void RecruitmentBevertonHolt::DoExecute() {
         if (cell->is_enabled()) {
           float value = recruitment_layer_->get_value(row, col);
           unsigned new_agents = (unsigned)(amount_per * value);
-          LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " new agents = " << amount_per << " new agents = " << new_agents;
+          LOG_FINE() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " new agents = " << amount_per << " new agents = " << new_agents;
 
-            cell->birth_agents(new_agents, scalar_);
+            cell->birth_agents(new_agents,  model_->get_scalar(label_));
 
         }
       }

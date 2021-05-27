@@ -137,7 +137,7 @@ void Iterative::Execute() {
 
   for (auto iter : model_->get_b0s()) {
     unsigned value = (unsigned)(number_agents_ / number * iter.second / total_b0);
-    LOG_FINE() << "setting R0 for " << iter.first << " = " << value;
+    LOG_FINE() << "setting R0 for " << iter.first << " = " << value << " short cut N " << number;
     model_->set_r0(iter.first, value);
   }
 
@@ -193,8 +193,9 @@ void Iterative::Execute() {
   // if we cut at 50 years when we thought we might be running for 100 years then this would cause an improper age distribution, So I leave it for the user to define
   // The correct burin in time to reach equilibrium
 
-  // Set scalars which are recruitment based
+  // Set scalars which are recruitment based in order
   float ssb = 0.0, b0 = 0.0, scalar;
+  float total_ssb = 0.0, total_b0 = 0.0;
   for (auto iter : model_->get_b0s()) {
     b0 += iter.second;
     ssb += model_->get_ssb(iter.first);

@@ -64,6 +64,9 @@ public:
   void                        get_age_frequency(vector<float>& age_freq, bool& is_age);
   void                        get_female_frequency(vector<float>& age_freq, bool& is_age);
   void                        get_male_frequency(vector<float>& age_freq, bool& is_age);
+  void                        get_age_agent_frequency(vector<float>& age_freq, bool& is_age);
+  void                        get_female_agent_frequency(vector<float>& age_freq, bool& is_age);
+  void                        get_male_agent_frequency(vector<float>& age_freq, bool& is_age);
 
 
   float                       get_abundance();

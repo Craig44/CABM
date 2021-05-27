@@ -1314,6 +1314,12 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
               for (unsigned sex_ndx = 0; sex_ndx < fishery_census_data_[fish_ndx][year_ndx][cell_ndx].sex_.size(); ++sex_ndx)
                 cache << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].sex_[sex_ndx] << " ";
               cache << "\n";
+			  for (unsigned scalar_ndx = 0; scalar_ndx < fishery_census_data_[fish_ndx][year_ndx][cell_ndx].scalar_.size(); ++scalar_ndx)
+                cache << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].scalar_[scalar_ndx] << " ";
+              cache << "\n";
+			  for (unsigned weight_ndx = 0; weight_ndx < fishery_census_data_[fish_ndx][year_ndx][cell_ndx].scalar_.size(); ++weight_ndx)
+                cache << fishery_census_data_[fish_ndx][year_ndx][cell_ndx].weight_[weight_ndx] << " ";
+              cache << "\n";
             }
           }
         }

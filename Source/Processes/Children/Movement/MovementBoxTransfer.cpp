@@ -135,9 +135,10 @@ void MovementBoxTransfer::ApplyStochasticMovement(vector<Agent>& agents, Movemen
   float random_chance = 0.0;
   if (movement_type_ == MovementType::kMarkovian) {
     if (selectivity_length_based_) {
+	  // iterate over all agents
       for (auto iter = agents.begin(); iter != agents.end(); ++iter) {
         if ((*iter).is_alive()) {
-            store_infor.initial_numbers_++;
+            store_infor.initial_numbers_+= (*iter).get_scalar();
           if (rng.chance() <= selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())) {
             // Iterate over possible cells compare to chance()
             temp_sum = 0;
@@ -149,7 +150,7 @@ void MovementBoxTransfer::ApplyStochasticMovement(vector<Agent>& agents, Movemen
               temp_sum += probability_layers_[origin_element]->get_value(possible_rows_[potential_destination], possible_cols_[potential_destination]);
               if (temp_sum > random_chance) {
                 //LOG_FINEST() << counter << " removals = " << counter_junp <<   " iter distance = " << distance(origin_cell->agents_.begin(), iter) << " cum prob = " << temp_sum << " random = " << random << " current row = " << row << " current col = " << col << "destination row = " << possible_rows_[potential_destination] << " destination col = " << possible_cols_[potential_destination];
-                store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]]++;
+                store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]]+= (*iter).get_scalar();
                 // if we are moving to this cell lets not move in memory
                 if ((possible_rows_[potential_destination] == row) && (possible_cols_[potential_destination] == col)) {
                   break;
@@ -171,7 +172,7 @@ void MovementBoxTransfer::ApplyStochasticMovement(vector<Agent>& agents, Movemen
     } else {
       for (auto iter = agents.begin(); iter != agents.end(); ++iter) {
         if ((*iter).is_alive()) {
-          store_infor.initial_numbers_++;
+          store_infor.initial_numbers_+= (*iter).get_scalar();
           if (rng.chance() <= selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index())) {
             // Iterate over possible cells compare to chance()
             temp_sum = 0;
@@ -183,7 +184,7 @@ void MovementBoxTransfer::ApplyStochasticMovement(vector<Agent>& agents, Movemen
               temp_sum += probability_layers_[origin_element]->get_value(possible_rows_[potential_destination], possible_cols_[potential_destination]);
               if (temp_sum > random_chance) {
                 //LOG_FINEST() << counter << " removals = " << counter_junp <<   " iter distance = " << distance(origin_cell->agents_.begin(), iter) << " cum prob = " << temp_sum << " random = " << random << " current row = " << row << " current col = " << col << "destination row = " << possible_rows_[potential_destination] << " destination col = " << possible_cols_[potential_destination];
-                store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]]++;
+                store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]]+= (*iter).get_scalar();
                 // if we are moving to this cell lets not move in memory
                 if ((possible_rows_[potential_destination] == row) && (possible_cols_[potential_destination] == col)) {
                   break;
@@ -207,7 +208,7 @@ void MovementBoxTransfer::ApplyStochasticMovement(vector<Agent>& agents, Movemen
     if (selectivity_length_based_) {
       for (auto iter = agents.begin(); iter != agents.end(); ++iter) {
         if ((*iter).is_alive()) {
-          store_infor.initial_numbers_++;
+          store_infor.initial_numbers_ += (*iter).get_scalar();
           if (rng.chance() <= selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index())) {
             // Find home cell
             origin_element = 0;
@@ -228,7 +229,7 @@ void MovementBoxTransfer::ApplyStochasticMovement(vector<Agent>& agents, Movemen
               temp_sum += probability_layers_[origin_element]->get_value(possible_rows_[potential_destination], possible_cols_[potential_destination]);
               if (temp_sum > random_chance) {
                 //LOG_FINEST() << counter << " removals = " << counter_junp <<   " iter distance = " << distance(origin_cell->agents_.begin(), iter) << " cum prob = " << temp_sum << " random = " << random << " current row = " << row << " current col = " << col << "destination row = " << possible_rows_[potential_destination] << " destination col = " << possible_cols_[potential_destination];
-                store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]]++;
+                store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]] += (*iter).get_scalar();
                 // if we are moving to this cell lets not move in memory
                 if ((possible_rows_[potential_destination] == row) && (possible_cols_[potential_destination] == col)) {
                   break;
@@ -251,7 +252,7 @@ void MovementBoxTransfer::ApplyStochasticMovement(vector<Agent>& agents, Movemen
     } else {
       for (auto iter = agents.begin(); iter != agents.end(); ++iter) {
         if ((*iter).is_alive()) {
-          store_infor.initial_numbers_++;
+          store_infor.initial_numbers_+= (*iter).get_scalar();
           if (rng.chance() <= selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index())) {
             origin_element = 0;
             for (; origin_element < origin_rows_.size(); ++origin_element) {
@@ -270,7 +271,7 @@ void MovementBoxTransfer::ApplyStochasticMovement(vector<Agent>& agents, Movemen
               if (temp_sum > random_chance) {
                 LOG_FINEST() << "current: " << row << "-" << col << " home: "<< (*iter).get_home_row() << "-" <<  (*iter).get_home_col() << " destination: " << possible_rows_[potential_destination] << "-" <<  possible_cols_[potential_destination] << " prob = " << probability_layers_[origin_element]->get_value(possible_rows_[potential_destination], possible_cols_[potential_destination]);
                 //LOG_FINEST() << counter << " removals = " << counter_junp <<   " iter distance = " << distance(origin_cell->agents_.begin(), iter) << " cum prob = " << temp_sum << " random = " << random << " current row = " << row << " current col = " << col << "destination row = " << possible_rows_[potential_destination] << " destination col = " << possible_cols_[potential_destination];
-                store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]]++;
+                store_infor.destination_of_agents_moved_[possible_rows_[potential_destination]][possible_cols_[potential_destination]] += (*iter).get_scalar();
                 // if we are moving to this cell lets not move in memory
 
                 if ((possible_rows_[potential_destination] == row) && (possible_cols_[potential_destination] == col)) {
