@@ -133,9 +133,8 @@ void MortalityEventComposition::DoBuild() {
       if (!ageing_error_)
         LOG_ERROR_P(PARAM_AGEING_ERROR) << "(" << ageing_error_label_ << ") could not be found. Have you defined it?";
        ageing_mis_matrix_ = ageing_error_->mis_matrix();
-    }
-    if (ageing_error_label_ == PARAM_NONE) {
-      LOG_WARNING() << "You are suppling an age based observation with no ageing misclassification error";
+    } else {
+      LOG_ERROR_P(PARAM_AGEING_ERROR) << "You are suppling an age based observation with no ageing misclassification error, please define an @ageing_error block of type==none and give this observationt that label if you do not want to apply ageing error.";
     }
   }
 

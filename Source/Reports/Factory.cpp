@@ -5,7 +5,7 @@
  * @date 13/12/2012
  * @section LICENSE
  *
- * Copyright NIWA Science ©2012 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2012 - www.niwa.co.nz
  *
  * $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
  */
@@ -22,6 +22,7 @@
 #include "Reports/Children/AgeingErrorMatrix.h"
 #include "Reports/Children/AgeLengthMatrixByCell.h"
 #include "Reports/Children/AgeFrequencyByCell.h"
+#include "Reports/Children/TaggingInfo.h"
 #include "Reports/Children/Likelihood.h"
 #include "Reports/Children/Process.h"
 #include "Reports/Children/InitialisationPartition.h"
@@ -82,6 +83,8 @@ Report* Factory::Create(Model* model, const string& object_type, const string& s
       result = new Selectivity(model);
     else if (sub_type == PARAM_TIME_VARYING)
       result = new TimeVarying(model);
+    else if (sub_type == PARAM_TAGGING_INFO)
+      result = new TaggingInfo(model);
     if (result) {
       LOG_FINE() << "Creating report " << sub_type;
       model->managers().report()->AddObject(result);

@@ -84,7 +84,9 @@ void RecruitmentConstant::DoBuild() {
   }
   if ((props - 1) > 0.0001)
     LOG_FATAL_P(PARAM_RECRUITMENT_LAYER_LABEL) << "the recuitment layer does not sum to 1.0 it was " << props << ", we don't want leakage of indiviuals please sort this out";
-  model_->set_b0(label_, b0_);
+  //model_->set_b0(label_, b0_);
+  model_->set_r0(label_, r0_);
+  
 
   /**
    * Check order of sequence make sure Spawning happens before recruitment
@@ -133,7 +135,7 @@ void RecruitmentConstant::DoExecute() {
   LOG_FINE() << "Recruitment process = " << label_;
   if (first_enter_execute_) {
     LOG_FINEST() << "first enter";
-    initial_recruits_ = model_->get_r0(label_);
+    initial_recruits_ = model_->get_r0_agents(label_);
     first_enter_execute_ = false;
   }
 
@@ -143,7 +145,6 @@ void RecruitmentConstant::DoExecute() {
     float SSB = derived_quantity_->GetLastValueFromInitialisation(init_phase_manager.last_executed_phase());
     LOG_FINE() << "setting SSB value in recruitment event = " << label_ << " = " << SSB;
     model_->set_ssb(label_, SSB);
-    scalar_ = b0_ / SSB;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
@@ -160,6 +161,7 @@ void RecruitmentConstant::DoExecute() {
       recruits_by_year_[model_->current_year()] = initial_recruits_;
     }
   } else {
+    b0_ = model_->get_b0(label_); // derived quantity
     float SSB = derived_quantity_->GetValue(model_->current_year() - model_->min_age());
     ssb_by_year_[model_->current_year()] = SSB;
     float amount_per = initial_recruits_;
@@ -183,7 +185,8 @@ void RecruitmentConstant::DoExecute() {
 // containers in this class.
 void RecruitmentConstant::FillReportCache(ostringstream& cache) {
   LOG_TRACE();
-  cache << "r0: " << initial_recruits_ << "\n";
+  cache << "r0_agents: " << initial_recruits_ << "\n";
+  cache << "b0: " << b0_ << "\n";
   cache << "years: ";
   for (auto& iter : recruits_by_year_)
     cache << iter.first << " ";

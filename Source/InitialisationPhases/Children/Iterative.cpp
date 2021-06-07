@@ -116,32 +116,34 @@ void Iterative::Execute() {
   // Calculate the R0 values for the recruitment processes this is a bit crude but will do for now
   unsigned large_age = model_->max_age() * 4;
   //unsigned large_age = 200;
-  float number = 0;
+  float number = 0; // this will be approximate number of equilibrium individuals in the system
   float m = 0.2;
   if (!parameters_.Get(PARAM_INIT_MORTALITY_RATE)->has_been_defined())
     m = model_->get_m(); //TODO put this at line 122 and give it a cell row and col call and return M if spatially variable  This is important to set, otherwise age distribution will get all weird
   else
     m = shortcut_m_;
 
-  for (unsigned age = 0; age < large_age; ++age)
-    number += exp(- m * age);
-
+  // In order to seed the approximate number of agents given by number_agents_ we need to know approximately how many indiviudals are in the system.
   vector<string> recruitment_labels;
-  float total_b0 = 0.0;
-  for (auto iter : model_->get_b0s()) {
+  float total_r0 = 0.0;
+  for (auto iter : model_->get_r0s()) {
     recruitment_labels.push_back(iter.first);
-    total_b0 += iter.second;
+    total_r0 += iter.second;
+    for (unsigned age = 0; age < large_age; ++age)
+      number +=  iter.second * exp(- m * age);
+  }
+  float global_scalar = number / number_agents_;
+  LOG_FINE() << "total R0 = " << total_r0 << " number = " << number << " number of agents = " << number_agents_ << "scalar = " << global_scalar;
+
+  if (global_scalar < 1.0) {
+    LOG_WARNING() << "the scalar that compares your individual numbers to population numbers is less than 1.0 (" << global_scalar << "), this means that given your growth model and number of individuals you are modelling more individuals than could/should exist. I think you could get away with modelling less individuals.";
   }
 
-  LOG_FINE() << "total b0 = " << total_b0 << " number = " << number << " number of agents = " << number_agents_;
-
-  for (auto iter : model_->get_b0s()) {
-    unsigned value = (unsigned)(number_agents_ / number * iter.second / total_b0);
-    LOG_FINE() << "setting R0 for " << iter.first << " = " << value << " short cut N " << number;
-    model_->set_r0(iter.first, value);
+  for (auto iter : model_->get_r0s())  {
+    model_->set_scalar(iter.first, global_scalar);
+    model_->set_r0_agents(iter.first, (unsigned)(iter.second / global_scalar));
   }
-
-
+ 
   // Move on and seed our n_agents
   unsigned cells = world_->get_enabled_cells();
   vector<vector<int>> agents_per_cell(model_->get_height());
@@ -174,7 +176,7 @@ void Iterative::Execute() {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
-        cell->seed_agents(agents_per_cell[row][col], m);
+        cell->seed_agents(agents_per_cell[row][col], m, global_scalar);
         LOG_FINE() << "row " << row + 1 << " col = " << col + 1 << " seeded " << cell->agents_.size();
       }
     }
@@ -193,46 +195,17 @@ void Iterative::Execute() {
   // if we cut at 50 years when we thought we might be running for 100 years then this would cause an improper age distribution, So I leave it for the user to define
   // The correct burin in time to reach equilibrium
 
-  // Set scalars which are recruitment based in order
-  float ssb = 0.0, b0 = 0.0, scalar;
-  float total_ssb = 0.0, total_b0 = 0.0;
-  for (auto iter : model_->get_b0s()) {
-    b0 += iter.second;
-    ssb += model_->get_ssb(iter.first);
-    scalar = iter.second / model_->get_ssb(iter.first);
-    LOG_FINE() << "stock = " << iter.first << " b0 = " <<  iter.second << " ssb = " << model_->get_ssb(iter.first) << " scalar = " << scalar;
-    model_->set_scalar(iter.first, scalar);
+  // Set B0/SSBs
+  float b0 = 0.0;
+  for (auto iter : model_->get_r0s()) {
+    b0 = model_->get_ssb(iter.first);
+    model_->set_b0(iter.first, b0);
+    LOG_FINE() << "stock = " << iter.first << " b0 = " <<  iter.second;
+    //model_->set_scalar(iter.first, scalar);
   }
-  scalar = b0 / ssb;
-
-  if (scalar < 1.0) {
-    LOG_WARNING() << "the scalar that compares your individual numbers to population numbers is less than 1.0 (" << scalar << "), this means that given your growth model and number of individuals you are modelling more individuals than could/should exist. I think you could get away with modelling less individuals.";
-  }
-  LOG_FINE() << "scalar = " << scalar << " SSB = " << ssb << " B0 = " << b0;
 
 
   // Set scalar before continuing on
-  for (unsigned row = 0; row < model_->get_height(); ++row) {
-    for (unsigned col = 0; col < model_->get_width(); ++col) {
-      WorldCell* cell = world_->get_base_square(row, col);
-      // set scalar for each cell
-      if (cell->is_enabled()) {
-        if (single_recruitment_case_) {
-          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter) {
-            (*iter).set_scalar(model_->get_scalar(recruitment_label_for_single_cases_)); // set scalar based on an agents home area which is linked to the recruitment layer
-            //LOG_FINEST() << "setting scalar, home row = " << (*iter).get_home_row()  << " col = " << (*iter).get_home_col() << " scalar = " << (*iter).get_scalar();
-          }
-        } else {
-          for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++iter) {
-            (*iter).set_scalar(model_->get_scalar(recruitement_layer_->get_value((*iter).get_home_row(),(*iter).get_home_col()))); // set scalar based on an agents home area which is linked to the recruitment layer
-            //LOG_FINEST() << "setting scalar, home row = " << (*iter).get_home_row()  << " col = " << (*iter).get_home_col() << " scalar = " << (*iter).get_scalar();
-          }
-        }
-        cell->calculate_individuals_alive();
-        LOG_MEDIUM() << "cell = " << row << "-" << col << " individuals = " << cell->get_total_individuals_alive();
-      }
-    }
-  }
   LOG_MEDIUM();
 }
 

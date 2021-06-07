@@ -284,7 +284,7 @@ void Tagging::DoExecute() {
                   tagged_agent.apply_tagging_event(1, row, col); // Any tagging attribute should be bundled into this method
                   this_agent.set_scalar(this_agent.get_scalar() - 1.0);
                   tagged_agent.set_scalar(1.0);
-                  LOG_MEDIUM() << "original tag " << this_agent.get_number_tags() << " tagged version = " << tagged_agent.get_number_tags();
+                  LOG_FINE() << "original tag " << this_agent.get_number_tags() << " tagged version = " << tagged_agent.get_number_tags();
                   age_freq_[this_agent.get_age_index()]++;
                   length_freq_[this_agent.get_length_bin_index()]++;
                   length_distribution_of_tagged_fish_by_year_cell_[year_ndx][row][col][this_agent.get_length_bin_index()]++;
@@ -354,13 +354,14 @@ void Tagging::DoExecute() {
           tags_to_release = tag_layer_[year_ndx]->get_value(row, col);
           LOG_FINE() << "tags to release = " << tags_to_release;
           LOG_FINE() << "prop data = " << proportions_data_[row_ndx].size() << " length bins = " << length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row][col].size();
-
+          unsigned total_tags_to_take = 0;
           vector<unsigned> tags_by_length_bin(proportions_data_[row_ndx].size(), 0);
           for(unsigned i = 0; i < tags_by_length_bin.size(); ++i) {
             tags_by_length_bin[i] = (unsigned)(proportions_data_[row_ndx][i] * tags_to_release);
+            total_tags_to_take += tags_by_length_bin[i];
             length_observed_tag_of_tagged_fish_by_year_cell_[year_ndx][row][col][i] = tags_by_length_bin[i];
           }
-
+          LOG_FINE() << "tags going to release " << total_tags_to_take << " tags we were supposed to release = " << tags_to_release;
           if (cell->is_enabled()) {
             unsigned tag_slot = 0;
             fill(age_freq_.begin(), age_freq_.end(), 0.0);
@@ -368,7 +369,7 @@ void Tagging::DoExecute() {
 
             for(unsigned i = 0; i < tags_by_length_bin.size(); ++i) {
               if (tags_by_length_bin[i] > 0) {
-
+                // Find all agents in this length bin that are available.
                 vector<unsigned> agent_ndx_available_to_sample_;
                 unsigned agent_counter = 0;
                 for (auto& agent : cell->agents_) {
@@ -380,7 +381,7 @@ void Tagging::DoExecute() {
                 if(agent_ndx_available_to_sample_.size() <= tags_by_length_bin[i]) {
                   // jump out of this length bin
                   // push tags into next length bin if we aren't in the last bin
-                  LOG_WARNING() << "couldn't tag " << tags_by_length_bin[i] << " in length bin " << i + 1;
+                  LOG_WARNING() <<  "tagging event " << label_ << " couldn't tag " << tags_by_length_bin[i] << " in length bin " << i + 1;
                   if ((i + 1) < tags_by_length_bin.size()) {
                     tags_by_length_bin[i + 1] += tags_by_length_bin[i];
                   }
@@ -396,6 +397,7 @@ void Tagging::DoExecute() {
 
                   //LOG_MEDIUM() << "agent counter = " << agent_counter;
                   agent_ndx = agent_ndx_available_to_sample_[agent_ndx_available_to_sample_.size() * rng.chance()];
+                  // Sample with replacement
                   agent_counter--;
                   Agent tagged_agent(cell->agents_[agent_ndx]);
                   tagged_agent.apply_tagging_event(1, row, col); // Any tagging attribute should be bundled into this method

@@ -83,7 +83,7 @@ void WorldCell::Reset() {
  * This method is called in Initialisation where we seed agents over the spatial domain before we start iterating
  * each agent that is created will be call seed() this will seed an agent with an equilibrium age structure
  */
-void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z) {
+void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z, float scalar) {
   LOG_FINE();
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
 
@@ -130,11 +130,11 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
 
       if (sex == 0) {
         Agent new_agent(lat_, lon_, growth_pars[agent][0], growth_pars[agent][1], growth_pars[agent][2], mort_par[agent], (model_->current_year() - age),
-            growth_pars[agent][3], growth_pars[agent][4], model_, mature, sex, 1.0, row_, col_, 0);
+            growth_pars[agent][3], growth_pars[agent][4], model_, mature, sex, scalar, row_, col_, 0);
         agents_.push_back(new_agent);
       } else {
         Agent new_agent(lat_, lon_, female_growth_pars[agent][0], female_growth_pars[agent][1], female_growth_pars[agent][2], mort_par[agent], (model_->current_year() - age),
-            female_growth_pars[agent][3], female_growth_pars[agent][4], model_, mature, sex, 1.0, row_, col_, 0);
+            female_growth_pars[agent][3], female_growth_pars[agent][4], model_, mature, sex, scalar, row_, col_, 0);
         agents_.push_back(new_agent);
       }
     }
@@ -154,11 +154,11 @@ void WorldCell::seed_agents(unsigned number_agents_to_seed, const float& seed_z)
         mature = true;
       if (sex == 0) {
         Agent new_agent(lat_, lon_,  growth_pars[agent][0], growth_pars[agent][1],growth_pars[agent][2],growth_pars[agent][3], growth_pars[agent][4],growth_pars[agent][5], mort_par[agent], (model_->current_year() - age),
-            growth_pars[agent][6], growth_pars[agent][7], model_, false, sex, 1.0, row_, col_, 0);
+            growth_pars[agent][6], growth_pars[agent][7], model_, false, sex, scalar, row_, col_, 0);
         agents_.push_back(new_agent);
       } else {
         Agent new_agent(lat_, lon_, female_growth_pars[agent][0], female_growth_pars[agent][1], female_growth_pars[agent][2],growth_pars[agent][3], growth_pars[agent][4],growth_pars[agent][5], mort_par[agent], (model_->current_year() - age),
-            female_growth_pars[agent][6], female_growth_pars[agent][7], model_, mature, sex, 1.0, row_, col_, 0);
+            female_growth_pars[agent][6], female_growth_pars[agent][7], model_, mature, sex, scalar, row_, col_, 0);
         agents_.push_back(new_agent);
       }
       if (agent == 0)

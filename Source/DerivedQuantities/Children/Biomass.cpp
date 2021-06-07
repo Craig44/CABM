@@ -90,11 +90,14 @@ void Biomass::DoBuild() {
  * The main function for calculating biomass
  */
 void Biomass::CalcBiomass(vector<Agent>& agents, float& value) {
+    LOG_FINE();
+
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   if (not length_based_selectivity_) {
     for(auto& agent : agents) {
       if (agent.is_alive()) {
         if (rng.chance() <= selectivity_[agent.get_sex()]->GetResult(agent.get_age_index())) {
+          //LOG_FINE() << value << " weight = " << agent.get_weight()  << " length = " << agent.get_length() << " scalar = " << agent.get_scalar();
           value += agent.get_weight() * agent.get_scalar();
         }
       }

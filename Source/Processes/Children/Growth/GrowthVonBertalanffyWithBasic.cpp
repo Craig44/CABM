@@ -203,10 +203,10 @@ void GrowthVonBertalanffyWithBasic::ApplyStochasticGrowth(vector<Agent>& agents)
     if (agent.is_alive()) {
       new_length =  agent.get_length() + length_prop * (agent.get_first_age_length_par() - agent.get_length()) * (1 - exp(-agent.get_second_age_length_par()));
       weight = agent.get_first_length_weight_par() * pow(new_length, agent.get_second_length_weight_par());
-      //LOG_FINEST() << "old length = " << (*iter).get_length() << " new length = " << new_length << " weight = " << weight << " k = " << (*iter).get_second_age_length_par() << " linf = " << (*iter).get_first_age_length_par();
+      //LOG_FINE() << "old length = " << agent.get_length() << " new length = " << new_length << " weight = " << weight << " k = " << agent.get_second_age_length_par() << " linf = " << agent.get_first_age_length_par();
       agent.set_length(new_length);
       agent.set_weight(weight);
-    }
+     }
   }
 }
 
@@ -262,12 +262,21 @@ void  GrowthVonBertalanffyWithBasic::draw_growth_param(unsigned row, unsigned co
 
   vec.clear();
 	vec.resize(number_of_draws);
+  float temp_k = 0.0;
+  float temp_L_inf = 0.0;
 
   if (distribution_ == Distribution::kNormal) {
     LOG_FINE() << "kNormal: mean_linf " << mean_linf << " mean_k " << mean_k << " a " << a << " b " << b;// << " t0 " << t0_[sex];
     for (unsigned i = 0; i < number_of_draws; ++i) {
-      vec[i].push_back(rng.normal(mean_linf, cv_ * mean_linf));
-      vec[i].push_back(rng.normal(mean_k, cv_ * mean_k));
+      temp_k = rng.normal(mean_k, cv_ * mean_k);
+      if(temp_k <= 0.0)
+        temp_k = mean_k;
+      temp_L_inf = rng.normal(mean_linf, cv_ * mean_linf);
+      if(temp_L_inf <= 0.0)
+        temp_L_inf = mean_linf;
+      // Make sure K and L_inf are not negative
+      vec[i].push_back(temp_L_inf);
+      vec[i].push_back(temp_k);
       vec[i].push_back(t0);
       vec[i].push_back(a);
       vec[i].push_back(b);

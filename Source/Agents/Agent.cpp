@@ -5,7 +5,7 @@
  * @date 11/06/2018
  * @section LICENSE
  *
- * Copyright NIWA Science ©2012 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2012 - www.niwa.co.nz
  *
  */
 
@@ -127,9 +127,13 @@ void Agent::growth_init() {
   //utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   if (model_->get_growth_model() == Growth::kVonbert) {
     length_ = first_age_length_par_ * (1 - std::exp(-second_age_length_par_ * ((float)get_age() - third_age_length_par_)));
+
   } else if(model_->get_growth_model() == Growth::kSchnute)  {
     length_ = pow(pow(fourth_age_length_par_, second_age_length_par_) + (pow(fith_age_length_par_, second_age_length_par_) - pow(fourth_age_length_par_, second_age_length_par_)) * ((1.0 - std::exp(-first_age_length_par_ * ((float)get_age() -  (float)model_->min_age()))) / (1.0 - std::exp(-first_age_length_par_ *(sixth_age_length_par_ - (float)model_->min_age())))), 1 / second_age_length_par_);
   }
+  
+  if(length_ <= 0) 
+    length_ = 0.0;
 
   weight_ = first_length_weight_par_ * pow(length_, second_length_weight_par_); // Just update weight when ever we update length to save executions
   //LOG_MEDIUM() << "length = " << length_ << " weight = " << weight_ << " age = " << get_age();

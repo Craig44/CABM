@@ -669,6 +669,7 @@ void Model::RunBasic() {
   LOG_MEDIUM() << "suffix width = " << suffix_width << " value = " << (simulation_candidates) * (adressable_values_count_);
   unsigned suffix_counter = 0;
   for (unsigned i = 0; i < adressable_values_count_; ++i) {
+    std::cerr << "run = " << i + 1 << " of " << adressable_values_count_ << "\n";
     if (addressable_values_file_) {
       addressables.LoadValues(i);
       LOG_MEDIUM() << "about to reset";

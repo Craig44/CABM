@@ -102,7 +102,8 @@ void RecruitmentBevertonHolt::DoBuild() {
   }
   if ((props - 1) > 0.0001)
     LOG_FATAL_P(PARAM_RECRUITMENT_LAYER_LABEL) << "the recuitment layer does not sum to 1.0 it was " << props << ", we don't want leakage of indiviuals please sort this out";
-  model_->set_b0(label_, b0_);
+  //model_->set_b0(label_, b0_);
+  model_->set_r0(label_, r0_);
 
   /**
    * Check order of sequence make sure Spawning happens before recruitment
@@ -156,7 +157,7 @@ void RecruitmentBevertonHolt::DoExecute() {
     initialisationphases::Manager& init_phase_manager = *model_->managers().initialisation_phase();
 
     if (first_enter_execute_) {
-      initial_recruits_ = model_->get_r0(label_);
+      initial_recruits_ = model_->get_r0_agents(label_);
       first_enter_execute_ = false;
       // Don't ask for SSB on the first run,
     } else {
@@ -172,17 +173,16 @@ void RecruitmentBevertonHolt::DoExecute() {
           float value = recruitment_layer_->get_value(row, col);
           unsigned new_agents = (unsigned)(initial_recruits_ * value);
           LOG_FINE() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " initial agents = " << initial_recruits_ << " new agents = " << new_agents;
-            cell->birth_agents(new_agents, 1.0);
+            cell->birth_agents(new_agents, model_->get_scalar(label_));
         }
       }
     }
   } else {
 	LOG_FINE() <<  "Rec = " << label_ << "scalar = " << scalar_ << " model scalar = " << model_->get_scalar(label_);
     scalar_ =  model_->get_scalar(label_);
+    b0_ = model_->get_b0(label_);
     float SSB = derived_quantity_->GetValue(model_->current_year() - model_->min_age());
-    if (model_->current_year() - model_->min_age() < model_->start_year())
-      SSB *= model_->get_scalar(label_);
-
+    LOG_FINE() << "ssb = " << SSB;
     ssb_by_year_[model_->current_year()] = SSB;
     float ssb_ratio = SSB / b0_;
     float SR = ssb_ratio / (1.0 - ((5.0 * steepness_ - 1.0) / (4.0 * steepness_)) * (1.0 - ssb_ratio));
@@ -222,6 +222,7 @@ void RecruitmentBevertonHolt::DoReset() {
 void RecruitmentBevertonHolt::FillReportCache(ostringstream& cache) {
   LOG_TRACE();
   cache << "initial_recruits: " << initial_recruits_ << "\n";
+  cache << "B0: " << b0_ << "\n";
   cache << "years: ";
   for (auto& iter : recruits_by_year_)
     cache << iter.first << " ";
