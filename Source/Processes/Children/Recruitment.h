@@ -40,6 +40,7 @@ protected:
   string                      ssb_label_;
   string                      recruitment_layer_label_;
   float                       b0_;
+  float                       r0_;
   layers::NumericLayer*       recruitment_layer_ = nullptr;
   DerivedQuantity*            derived_quantity_ = nullptr;
   float                       initial_scalar_;

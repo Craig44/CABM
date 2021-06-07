@@ -84,7 +84,9 @@ void RecruitmentConstant::DoBuild() {
   }
   if ((props - 1) > 0.0001)
     LOG_FATAL_P(PARAM_RECRUITMENT_LAYER_LABEL) << "the recuitment layer does not sum to 1.0 it was " << props << ", we don't want leakage of indiviuals please sort this out";
-  model_->set_b0(label_, b0_);
+  //model_->set_b0(label_, b0_);
+  model_->set_r0(label_, r0_);
+  
 
   /**
    * Check order of sequence make sure Spawning happens before recruitment
@@ -133,7 +135,7 @@ void RecruitmentConstant::DoExecute() {
   LOG_FINE() << "Recruitment process = " << label_;
   if (first_enter_execute_) {
     LOG_FINEST() << "first enter";
-    initial_recruits_ = model_->get_r0(label_);
+    initial_recruits_ = model_->get_r0_agents(label_);
     first_enter_execute_ = false;
   }
 

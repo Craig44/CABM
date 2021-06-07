@@ -4,7 +4,7 @@
  * @date 21/01/2014
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * @section DESCRIPTION
  *
@@ -30,7 +30,7 @@ public:
   // methods
   Observation(Model* model);
   virtual                     ~Observation() = default;
-  void                        DoValidate() override final { };
+  void                        DoValidate() override final;
   void                        DoBuild() override final;
   void                        DoExecute() override final;
   void                        DoReset() override final  { };

@@ -4,7 +4,7 @@
  * @date 21/01/2014
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  */
 
@@ -25,10 +25,23 @@ namespace obs = niwa::observations;
  */
 Observation::Observation(Model* model) : Report(model) {
   LOG_TRACE();
-  run_mode_    = (RunMode::Type)(RunMode::kBasic);
-  model_state_ = (State::Type)(State::kIterationComplete);
+  model_state_ = State::kIterationComplete;
+  skip_tags_   = true;
   parameters_.Bind<string>(PARAM_OBSERVATION, &observation_label_, "Observation label", "");
   //parameters_.Bind<bool>(PARAM_SIMULATE_IN_NEW_FILE, &simulate_new_file_, "Produce sets of new files that are for each set of simulations", "", false);
+}
+
+
+/**
+ * Validate method
+ */
+void Observation::DoValidate() {
+  if ((model_->run_mode() == RunMode::kMSE) || (model_->run_mode() == RunMode::kBasic) || (model_->run_mode() == RunMode::kSimulation)) {
+    run_mode_ = model_->run_mode();
+    //model_state_ = State::kIterationComplete;
+  }
+  //if(model_->run_mode() == RunMode::kMSE)
+  //  model_state_ = State::kHCR;
 }
 
 /**
@@ -40,7 +53,7 @@ void Observation::DoBuild() {
   if (!observation_) {
     auto observations = model_->managers().observation()->objects();
     for (auto observation : observations)
-      cout << observation->label() << endl;
+      LOG_FINE() << observation->label() << endl;
     LOG_ERROR_P(PARAM_OBSERVATION) << " (" << observation_label_ << ") could not be found. Have you defined it?";
   }
 }

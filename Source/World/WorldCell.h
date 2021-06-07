@@ -58,7 +58,7 @@ public:
   const double&               get_total_individuals_alive() {return total_individuals_alive_;}
   void                        set_total_individuals_alive(double& val) {total_individuals_alive_ = val;}
 
-  void                        seed_agents(unsigned number_agents_to_seed, const float& seed_z);
+  void                        seed_agents(unsigned number_agents_to_seed, const float& seed_z, float scalar);
   void                        birth_agents(unsigned number_agents_to_birth, float scalar);
   void                        set_scalar();
   void                        get_age_frequency(vector<float>& age_freq, bool& is_age);

@@ -5,7 +5,7 @@
  * @date 16/11/2012
  * @section LICENSE
  *
- * Copyright NIWA Science ©2012 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2012 - www.niwa.co.nz
  *
  * @section DESCRIPTION
  *
@@ -105,8 +105,13 @@ public:
   // The following are recruitment specific quantities/accessors these are stock characteristics that are shared around the model
   void                        set_b0(string recruitment_label, float b0) {b0_[recruitment_label] = b0; }
   virtual const map<string, float>&          get_b0s() const {return b0_; }
+  virtual const map<string, float>&          get_r0s() const {return r0_; }
+  float                       get_b0(string recruitment_label)  {return b0_[recruitment_label]; }
   void                        set_r0(string recruitment_label, unsigned r0) {r0_[recruitment_label] = r0; }
-  unsigned                    get_r0(string recruitment_label)  {return r0_[recruitment_label]; }
+  void                        set_r0_agents(string recruitment_label, unsigned r0_agents) {r0_agents_[recruitment_label] = r0_agents; }
+  float                       get_r0(string recruitment_label)  {return r0_[recruitment_label]; }
+  unsigned                    get_r0_agents(string recruitment_label)  {return r0_agents_[recruitment_label]; }
+
   void                        set_ssb(string recruitment_label, unsigned ssb) {ssb_[recruitment_label] = ssb; }
   float                       get_ssb(string recruitment_label)  {return ssb_[recruitment_label]; }
   void                        set_scalar(string recruitment_label, float value) {scalar_[recruitment_label] = value; }
@@ -203,7 +208,8 @@ protected:
   unsigned                    world_height_;
   unsigned                    world_width_;
   map<string, float>          b0_;
-  map<string, unsigned>       r0_;
+  map<string, float>          r0_;
+  map<string, unsigned>       r0_agents_;
   unsigned                    n_agents_;
   string                      natural_mortality_label_;
   string                      mortality_label_;
