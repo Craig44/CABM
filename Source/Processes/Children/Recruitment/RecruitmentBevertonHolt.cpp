@@ -222,6 +222,7 @@ void RecruitmentBevertonHolt::DoReset() {
 void RecruitmentBevertonHolt::FillReportCache(ostringstream& cache) {
   LOG_TRACE();
   cache << "initial_recruits: " << initial_recruits_ << "\n";
+  cache << "B0: " << b0_ << "\n";
   cache << "years: ";
   for (auto& iter : recruits_by_year_)
     cache << iter.first << " ";

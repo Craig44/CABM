@@ -145,7 +145,6 @@ void RecruitmentConstant::DoExecute() {
     float SSB = derived_quantity_->GetLastValueFromInitialisation(init_phase_manager.last_executed_phase());
     LOG_FINE() << "setting SSB value in recruitment event = " << label_ << " = " << SSB;
     model_->set_ssb(label_, SSB);
-    scalar_ = b0_ / SSB;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
@@ -162,6 +161,7 @@ void RecruitmentConstant::DoExecute() {
       recruits_by_year_[model_->current_year()] = initial_recruits_;
     }
   } else {
+    b0_ = model_->get_b0(label_); // derived quantity
     float SSB = derived_quantity_->GetValue(model_->current_year() - model_->min_age());
     ssb_by_year_[model_->current_year()] = SSB;
     float amount_per = initial_recruits_;
@@ -185,7 +185,8 @@ void RecruitmentConstant::DoExecute() {
 // containers in this class.
 void RecruitmentConstant::FillReportCache(ostringstream& cache) {
   LOG_TRACE();
-  cache << "r0: " << initial_recruits_ << "\n";
+  cache << "r0_agents: " << initial_recruits_ << "\n";
+  cache << "b0: " << b0_ << "\n";
   cache << "years: ";
   for (auto& iter : recruits_by_year_)
     cache << iter.first << " ";
