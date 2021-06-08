@@ -1035,6 +1035,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
         for (unsigned year_ndx = 0; year_ndx < age_comp_by_fishery_[fishery].size(); ++year_ndx) {
           fill(temp_age_freq.begin(), temp_age_freq.end(), 0.0);
           // Print by cell
+          LOG_FINE() << "cells = " << age_comp_by_fishery_[fishery][year_ndx].size();
           for (unsigned cell_ndx = 0; cell_ndx < age_comp_by_fishery_[fishery][year_ndx].size(); ++cell_ndx) {
             cache << years_[year_ndx] << " " << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].row_ + 1 << "-" << age_comp_by_fishery_[fishery][year_ndx][cell_ndx].col_ + 1 << " ";
             if (age_comp_by_fishery_[fishery][year_ndx][cell_ndx].year_ == years_[year_ndx]) {
@@ -1045,6 +1046,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
               cache << "\n";
             }
           }
+          cache << years_[year_ndx] << " Total ";
           for (auto &age_freq : temp_age_freq)
             cache << age_freq << " ";
           cache << "\n";

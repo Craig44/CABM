@@ -152,7 +152,7 @@ void RecruitmentConstant::DoExecute() {
           float value = recruitment_layer_->get_value(row, col);
           unsigned new_agents = (unsigned)(initial_recruits_ * value);
           LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " initial agents = " << initial_recruits_ << " new agents = " << new_agents;
-          cell->birth_agents(new_agents, 1.0);
+          cell->birth_agents(new_agents,  model_->get_scalar(label_));
         }
       }
     }
@@ -161,18 +161,19 @@ void RecruitmentConstant::DoExecute() {
       recruits_by_year_[model_->current_year()] = initial_recruits_;
     }
   } else {
+    scalar_ =  model_->get_scalar(label_);
     b0_ = model_->get_b0(label_); // derived quantity
     float SSB = derived_quantity_->GetValue(model_->current_year() - model_->min_age());
     ssb_by_year_[model_->current_year()] = SSB;
     float amount_per = initial_recruits_;
-    recruits_by_year_[model_->current_year()] = amount_per;
-    LOG_FINEST() << "applying recruitment in year " << model_->current_year();
+    recruits_by_year_[model_->current_year()] = initial_recruits_;
+    LOG_FINEST() << "applying recruitment in year " << model_->current_year() << " scalar = " << scalar_;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
           float value = recruitment_layer_->get_value(row, col);
-          unsigned new_agents = (unsigned)(amount_per * value);
+          unsigned new_agents = (unsigned)(initial_recruits_ * value);
           LOG_FINEST() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " new agents = " << amount_per << " new agents = " << new_agents;
           cell->birth_agents(new_agents, scalar_);
         }

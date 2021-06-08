@@ -200,7 +200,7 @@ void Iterative::Execute() {
   for (auto iter : model_->get_r0s()) {
     b0 = model_->get_ssb(iter.first);
     model_->set_b0(iter.first, b0);
-    LOG_FINE() << "stock = " << iter.first << " b0 = " <<  iter.second;
+    LOG_FINE() << "stock = " << iter.first << " b0 = " <<  b0 << " R0 = " << iter.second;
     //model_->set_scalar(iter.first, scalar);
   }
 

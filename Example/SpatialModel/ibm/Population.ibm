@@ -30,7 +30,7 @@ ncols 10
 # --------------
 @initialisation_phase Iterative
 type iterative
-years 40
+years 60
 initial_number_of_agents 1000000 ## initial number of agents
 #recruitment_layer_label  Recruitment_label not neede only a single stock in this model
 
@@ -180,7 +180,7 @@ sigma 9.5
 @process Recruitment
 type recruitment_beverton_holt
 recruitment_layer_label recruit_layer
-b0 120000
+r0 27282628
 ssb SSB
 steepness 0.75
 ycs_values 0.46 1.72 1.09 0.73 1.41 1.4 1.35 1.26 1.17 0.83 0.72 0.69 0.58 0.76 0.43 2.85 1.68 0.46 0.69 0.66 1.32 0.82 0.99 0.84 0.84 1.83 0.76 1.99 0.36
@@ -212,6 +212,8 @@ l 1
 type logistic
 a50 4.5
 ato95 8
+h 20
+l 0
 
 @selectivity survey_selectivity
 type double_normal

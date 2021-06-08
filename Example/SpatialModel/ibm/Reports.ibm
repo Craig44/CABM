@@ -35,10 +35,10 @@ years 1990
 type initialisation_partition
 
 # print age frequency
-@report world_age_freq
-type world_age_frequency
+#@report world_age_freq
+#type world_age_frequency
 #years 1990:2018 ## defaults to model years
-time_step Summer
+#time_step Summer
 
 @report age_freq_by_cell
 type age_frequency_by_cell
@@ -97,7 +97,7 @@ ageing_error Age_misclassification
 type process
 process summer_fishery
 
-
+/*
 @report offshore_preference_movement
 type process
 process offshore_preference_movement
@@ -113,7 +113,7 @@ process Move_inshore
 @report Move_offshore
 type process
 process Move_offshore
-
+*/
 @report Rec
 type process
 process Recruitment

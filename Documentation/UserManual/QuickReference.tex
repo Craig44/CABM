@@ -45,6 +45,7 @@
 \defComLab{model}{Define an object of type \emph{model}}\par\par
 \defSub{start\_year} {Define the first year of the model, immediately following initialisation}
 \defSub{final\_year} {Define the final year of the model, excluding years in the projection period}
+\defSub{assessment\_years} {Years to conduct HCR in, Is conducted at the end of the year, so HCR should supply catch rules for the following year}
 \defSub{min\_age} {Minimum age of individuals in the population}
 \defSub{max\_age} {Maximum age of individuals in the population}
 \defSub{age\_plus} {Define the oldest age or extra length midpoint (plus group size) as a plus group}
@@ -60,6 +61,7 @@
 \defSub{sexed} {Is sex an attribute of then agents?}
 \defSub{growth\_process\_label} {Label for the growth process in the annual cycle}
 \defSub{natural\_mortality\_process\_label} {Label for the natural mortality process in the annual cycle}
+\defSub{mortality\_process\_for\_mse} {Label for the mortality process that is used in MSE methods}
 \defComLab{observation}{Define an object of type \emph{observation}}\par\par
 \defSub{label} {Label}
 \defSub{type} {Type of observation}
@@ -238,6 +240,7 @@
 \defComLab{process}{Define an object of type \emph{process}}\par\par
 \defSub{label} {The label of the process}
 \defSub{type} {The type of process}
+\par\textbf{\commandlabsubarg{process}{type}{ageing}}\par
 \par\textbf{\commandlabsubarg{process}{type}{growth\_schnute\_with\_basic}}\par
 \defSub{distribution} {the distribution to allocate the parameters to the agents}
 \defSub{update\_growth\_parameters} {If an agent/individual moves do you want it to take on the growth parameters of the new spatial cell}
@@ -278,8 +281,10 @@
 \defSub{k} {}
 \par\textbf{\commandlabsubarg{process}{type}{maturity}}\par
 \par\textbf{\commandlabsubarg{process}{type}{mortality\_baranov}}\par
+\defSub{print\_census\_info} {if you have process report for this process you can control the amount of information printed to the file.}
+\par\textbf{\commandlabsubarg{process}{type}{mortality\_baranov\_simple}}\par
 \defSub{years} {years to apply the fishery process in}
-\defSub{fishing\_mortality\_layers} {Spatial layer describing catch by cell for each year, there is a one to one link with the year specified, so make sure the order is right}
+\defSub{fishing\_mortality\_layers} {Spatial layer describing F by area for each year, there is a one to one link with the year specified, so make sure the order is right}
 \defSub{minimum\_legel\_length} {The minimum legal length for this fishery, any individual less than this will be returned using some discard mortality}
 \defSub{handling\_mortality} {if discarded due to being under the minimum legal length, what is the probability the individual will die when released}
 \defSub{print\_extra\_info} {if you have process report for this process you can control the amount of information printed to the file.}
@@ -296,6 +301,8 @@
 \defSub{update\_mortality\_parameters} {If an agent/individual moves do you want it to take on the natural mortality parameters of the new spatial cell}
 \defSub{time\_step\_ratio} {Time step ratios for the mortality rates to apply in each time step. See manual for how this is applied}
 \defSub{m} {}
+\par\textbf{\commandlabsubarg{process}{type}{mortality\_cull}}\par
+\defSub{layer\_label} {Label for the integer layer which we will kill all agents in}
 \par\textbf{\commandlabsubarg{process}{type}{mortality\_effort\_based}}\par
 \defSub{selectivity} {Selectivity label}
 \defSub{minimiser} {Label of the minimser to solve the problem}
@@ -304,9 +311,21 @@
 \defSub{effort\_values} {A vector of effort values, one for each enabled cell of the model, these should represent the variability of effort of the fishery mimicking}
 \defSub{effort\_layer\_label} {A layer label that is a numeric layer label that contains effort values for each year.}
 \defSub{starting\_value\_for\_lambda} {Total catch by year}
+\par\textbf{\commandlabsubarg{process}{type}{mortality\_effort\_based\_with\_covar}}\par
+\defSub{selectivity} {Selectivity label}
+\defSub{minimiser} {Label of the minimser to solve the problem}
+\defSub{years} {years to apply the process}
+\defSub{catches} {Total catch by year}
+\defSub{effort\_values} {A vector of effort values, one for each enabled cell of the model, these should represent the variability of effort of the fishery mimicking}
+\defSub{starting\_value\_for\_lambda} {Total catch by year}
+\defSub{preference\_functions} {The preference functions to apply to each layer}
+\defSub{preference\_layers} {The preference functions to apply}
+\defSub{preference\_weights} {The weight to each preference when calculating mean spatial effort distribution}
 \par\textbf{\commandlabsubarg{process}{type}{mortality\_event\_biomass}}\par
 \defSub{print\_census\_info} {if you have process report for this process you can control the amount of information printed to the file.}
 \defSub{print\_tag\_recapture\_info} {if you have process report for this process you can control the amount of information printed to the file.}
+\par\textbf{\commandlabsubarg{process}{type}{mortality\_event\_hybrid}}\par
+\defSub{print\_census\_info} {if you have process report for this process you can control the amount of information printed to the file.}
 \par\textbf{\commandlabsubarg{process}{type}{movement\_box\_transfer}}\par
 \defSub{origin\_cell} {The origin cell associated with each spatial layer (should have a one to one relationship with specified layers), format follows row-col (1-2}
 \defSub{probability\_layers} {Spatial layers (one layer for each origin cell) describing the probability of moving from an origin cell to all other cells in the spatial domain.}
@@ -320,22 +339,23 @@
 \defSub{preference\_functions} {The preference functions to apply}
 \defSub{preference\_layers} {The preference functions to apply}
 \defSub{selectivity\_label} {Label for the selectivity block}
+\defSub{save\_and\_print\_a\_sample\_of\_agent\_jumps} {Save an location after each movement application for each agent, and print 30 of them in the report (Can be very slow}
 \par\textbf{\commandlabsubarg{process}{type}{nop}}\par
 \par\textbf{\commandlabsubarg{process}{type}{recruitment\_beverton\_holt}}\par
-\defSub{b0} {B0}
+\defSub{r0} {R0}
 \defSub{recruitment\_layer\_label} {A label for the recruitment layer, that describes spatial distribution of recruits.}
 \defSub{ssb} {A label for the SSB derived quantity}
 \defSub{proportion\_male} {Proportion of recruits male}
-\defSub{b0} {}
+\defSub{r0} {}
 \defSub{proportion\_male} {}
 \defSub{steepness} {Steepness}
 \defSub{ycs\_values} {YCS (Year-Class-Strength) Values}
 \par\textbf{\commandlabsubarg{process}{type}{recruitment\_constant}}\par
-\defSub{b0} {B0}
+\defSub{r0} {R0}
 \defSub{recruitment\_layer\_label} {A label for the recruitment layer, that describes spatial distribution of recruits.}
 \defSub{ssb} {A label for the SSB derived quantity}
 \defSub{proportion\_male} {Proportion of recruits male}
-\defSub{b0} {}
+\defSub{r0} {}
 \defSub{proportion\_male} {}
 \par\textbf{\commandlabsubarg{process}{type}{tag\_shedding}}\par
 \defSub{selectivity\_label} {Label for the selectivity block}
@@ -344,6 +364,7 @@
 \defSub{tag\_release\_region} {The Release region for the corresponding shedding rate, in the format 1-1 for the first row and first column, and '5-2' for the fifth row and secnd column}
 \defSub{tag\_release\_year} {The Release Year for the corresponding shedding rate}
 \defSub{years} {Years to execute the tag shedding process}
+\defSub{stop\_tracking\_tags\_in\_year} {Stop Tracking tagged partition in this year, they will just die. But will stop containimation in observations.}
 \par\textbf{\commandlabsubarg{process}{type}{tagging}}\par
 \defSub{tag\_release\_layer} {Spatial layer describing catch by cell for each year, there is a one to one link with the year specified, so make sure the order is right}
 \defSub{selectivities} {selectivity used to capture agents}
@@ -358,6 +379,7 @@
 \defSub{years} {Years}
 \defSub{time\_step} {Time Step label}
 \defSub{do\_length\_frequency} {Print the report as length frequency not age.}
+\defSub{agent\_frequency} {Is the frequency for agents (true) or individuals (false)?}
 \par\textbf{\commandlabsubarg{report}{type}{age\_length\_matrix\_by\_cell}}\par
 \defSub{years} {Years}
 \defSub{time\_step} {Time Step label}
@@ -375,6 +397,9 @@
 \defSub{time\_step} {Time Step label}
 \par\textbf{\commandlabsubarg{report}{type}{observation}}\par
 \defSub{observation} {Observation label}
+\par\textbf{\commandlabsubarg{report}{type}{preference\_function}}\par
+\defSub{preference\_function\_label} {Preference Function label}
+\defSub{preference\_values} {Preference values to report the preference function}
 \par\textbf{\commandlabsubarg{report}{type}{process}}\par
 \defSub{process} {Process label that is reported}
 \par\textbf{\commandlabsubarg{report}{type}{selectivity}}\par
@@ -387,6 +412,11 @@
 \defSub{years} {Years}
 \defSub{time\_step} {Time Step label}
 \defSub{number\_of\_agents} {Number of agents to summarise}
+\par\textbf{\commandlabsubarg{report}{type}{tagging\_info}}\par
+\defSub{years} {Years}
+\defSub{time\_step} {Time Step label}
+\defSub{tag\_release\_year} {Release year}
+\defSub{release\_cell} {release cell, for example row 1 and cell 1 = '1-1'}
 \par\textbf{\commandlabsubarg{report}{type}{time\_varying}}\par
 \par\textbf{\commandlabsubarg{report}{type}{world\_age\_frequency}}\par
 \defSub{years} {Years}
@@ -433,6 +463,8 @@
 \defSub{a50} {A50}
 \defSub{ato95} {Ato95}
 \defSub{alpha} {Alpha}
+\defSub{l} {Low if(age , Low) = 0}
+\defSub{h} {High if(age , High) =alpha}
 \par\textbf{\commandlabsubarg{selectivity}{type}{logistic\_producing}}\par
 \defSub{l} {Low}
 \defSub{h} {High}
@@ -465,6 +497,8 @@
 \defSub{mean} {Mean}
 \defSub{sigma} {Standard deviation}
 \defSub{distribution} {distribution}
+\defSub{lower\_bound} {Lower bound}
+\defSub{upper\_bound} {Upper bound}
 \par\textbf{\commandlabsubarg{time\_varying}{type}{random\_walk}}\par
 \defSub{mean} {Mean}
 \defSub{sigma} {Standard deviation}

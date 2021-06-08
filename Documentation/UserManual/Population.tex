@@ -90,7 +90,7 @@ An example of syntax, to specify a model with the the above concepts is done usi
 
 
 \subsection{\I{Agents}\label{sec:individuals}}
-An agent is the core object in the state that everything manipulates or summarises. An individual has a list of predefined attributes that the user can choose to incorporate in the model or ignore, the list is below.
+An agent is the core object in the state that everything manipulates or summarises. An agent has a list of predefined attributes that the user can choose to incorporate in the model or ignore, the list is below.
 
 \begin{itemize}
 	\item age
@@ -100,13 +100,13 @@ An agent is the core object in the state that everything manipulates or summaris
 	\item maturity
 	\item current area, birth area
 	\item lat and long
-	\item \I{population scalar} how many individuals does this agent represent = 1 means an individual based model (scalar)
+	\item \I{population scalar} how many individuals does this agent represent = 1 means an individual based model (scalar). Will differ for each meta population.
 	\item natural mortality parameter
 	\item growth parameters
 	\item scalar (if > 1 then this individual represents more than one is a stock specific attribute)
 \end{itemize}
 
-An important attribute, if the model contains super individuals (agents) where a single agent represents many individuals with the same characteristics is the scalar parameter. This parameter is associated with a recruitment event as we use the scalers to scale up a $SSB$ to $B_0$ for a given recruitment event. This makes the scalar more of a meta-population parameter or a stock parameter in fisheries. The way a scalar is applied is through the subcommand \subcommand{recruitment\_layer\_label} where you link a cell to a recruitment process (for more information see Section~\ref{subsec:initialisation}). This link says that any individual that was created by that recruitment dynamic gets a stock or recruitment scalar from that cell.
+The core  model contains super individuals (agents) where a single agent represents many individuals with the same characteristics is the scalar parameter. This parameter is associated with a recruitment event as we use the scalers to scale up a $SSB$ to $B_0$ for a given recruitment event. This makes the scalar more of a meta-population parameter or a stock parameter in fisheries. The way a scalar is applied is through the subcommand \subcommand{recruitment\_layer\_label} where you link a cell to a recruitment process (for more information see Section~\ref{subsec:initialisation}). This link says that any individual that was created by that recruitment dynamic gets a stock or recruitment scalar from that cell.
 
 Maturity is an attribute that is activated by the maturity process (see Section~\ref{subsubsec:maturity}), it is tied to some specific derived quantities such as the type \subcommand{mature\_biomass}. You could also calculate the mature biomass on the fly, using the other derived quantities and selectivities, an example of this is shown in the maturity process section.
 

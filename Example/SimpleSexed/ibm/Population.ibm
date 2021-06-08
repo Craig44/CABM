@@ -31,7 +31,7 @@ recruitment_layer_label recruitment_layer # stock identification, important for 
 # Annual Sequence
 # --------------
 @time_step Dec_Aug 
-processes Maturation Natural_Mortality Fishing_Mortality
+processes Ageing Maturation Natural_Mortality Fishing_Mortality
 
 @time_step Sep_Nov 
 processes Recruitment Natural_Mortality Growth 
@@ -55,6 +55,10 @@ update_growth_parameters false ## if an agent moves we don't update growth info
 distribution lognormal
 cv 0.05
 time_step_proportions 1
+
+## Ageing
+@process Ageing
+type ageing 
 
 # Maturity
 @process Maturation
@@ -135,7 +139,7 @@ end_table
 @process Recruitment
 type recruitment_beverton_holt
 recruitment_layer_label recruitment
-b0 187644
+r0 14884329
 proportion_male 0.5 0.64 0.59 0.45 0.45 0.64 0.54 0.58 0.47 0.63 0.42 0.56 0.42 0.25 0.37 0.51 0.59 0.32 0.37 0.68 0.46 0.55 0.45 0.47 0.51 0.50 0.48 0.45 0.20 0.69 0.68 0.39 0.48 0.64 0.60 0.63 0.39 0.76 0.39 0.58 0.51 0.46 0.46 0.40 0.66 0.51 0.53 
 ssb SSB
 steepness 0.84
@@ -206,7 +210,8 @@ sigma_r 15.398
 type logistic
 a50 10.5636	
 ato95 3.11395
-
+l 0
+h 35
 # --------------
 # Derived Quantities
 # --------------

@@ -322,7 +322,7 @@ class VariableLoader:
         index += 1
         if len(pieces) > index:
             variable.default_ = pieces[index].replace(')', '').rstrip().lstrip()
-        #print "value = " + value + " description = " + variable.description_ + " default = " + variable.default_
+        print "value = " + value + " description = " + variable.description_ + " default = " + variable.default_
 
         if len(lines) == 2:
             short_line = lines[1]

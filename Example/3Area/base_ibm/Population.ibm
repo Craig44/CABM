@@ -28,7 +28,7 @@ ncols 1
 # --------------
 @initialisation_phase Iterative
 type iterative
-years 30
+years 40
 initial_number_of_agents 1000000 ## initial number of agents
 layer_label initial_values
 recruitment_layer_label recruitment_labels # stock identification, important for when you are scaling SSB = B0 for an agent model to population model
@@ -197,7 +197,7 @@ probability_layers EN_jump_one HG_jump_one BP_jump_one
 @process Recruitment_HG
 type recruitment_beverton_holt
 recruitment_layer_label recruitment_HG
-b0 127644
+r0 42764489
 ssb SSB_HG
 steepness 0.75
 ycs_values 0.9805555 0.2914848 0.6481528 0.4034729 0.9808864 0.6098410 0.3110043 0.5339825 1.3775342 0.5589029 0.8531278 1.2828560 0.5769496 1.0968170 0.7381291 0.1832230 0.5703490 0.4430337 2.4570672 0.4980334 0.6098772 1.2694970 0.6366152 0.4220754
@@ -205,7 +205,7 @@ ycs_values 0.9805555 0.2914848 0.6481528 0.4034729 0.9808864 0.6098410 0.3110043
 @process Recruitment_EN
 type recruitment_beverton_holt
 recruitment_layer_label recruitment_EN
-b0 113880
+r0 31388670
 ssb SSB_EN
 steepness 0.75
 ycs_values 3.6897515 0.4730097 1.2082113 1.0075909 1.0497424 0.2492806 1.7327765 1.1972767 0.8851567 1.2673801 0.3528800 0.9109359 0.7795144 2.1537694 0.2228453 0.1597312 0.8252556 0.7630703 1.1238620 0.3420459 1.6116646 3.2901000 0.3873122 0.6454479
@@ -213,7 +213,7 @@ ycs_values 3.6897515 0.4730097 1.2082113 1.0075909 1.0497424 0.2492806 1.7327765
 @process Recruitment_BP
 type recruitment_beverton_holt
 recruitment_layer_label recruitment_BP
-b0 38440.8
+r0 8844098.8
 ssb SSB_BP
 steepness 0.75
 ycs_values 0.9559903 0.6761429 0.3161653 2.3875995 1.6196029 1.0525369 0.8588915 2.4465935 0.6287582 0.9087567 1.0697131 0.7188717 1.0969039 1.1643940 0.9373380 0.8218429 0.3128731 0.7030560 0.3959240 2.0879529 2.5100908 1.8805860 0.8173450 2.3726866

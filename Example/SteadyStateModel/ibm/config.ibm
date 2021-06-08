@@ -1,7 +1,7 @@
 @model
 start_year 1940
 final_year 1992
-min_age 0
+min_age 1
 max_age 30
 age_plus true # other acceptable inputs for bool are '1' and 'yes'
 initialisation_phase_labels Iterative #label to an @initialisation block
@@ -22,7 +22,7 @@ ncols 1
 # --------------
 @initialisation_phase Iterative
 type iterative
-years 40
+years 90
 #convergence_years 20 40
 #lambda 1
 initial_number_of_agents 500000 ## initial number of agents
@@ -36,7 +36,7 @@ recruitment_layer_label recruitment_labels
 # - M
 # - Maturity
 @time_step Annual
-processes  Ageing von_bert Maturation natural_mort Recruitment_const  
+processes  Ageing von_bert natural_mort Recruitment_const  
 
 # --------------
 # Process definitions
@@ -50,16 +50,15 @@ type growth_von_bertalanffy_with_basic_weight
 #linf_layer_label L_inf_layer
 linf 101.8
 #k_layer_label k_layer
+t0 0
 k 0.161
-a 2.0e-6 
+a 2.0e-9 
 b 3.288
 distribution lognormal
-cv 0.2
+cv 0.01
 time_step_proportions 1
 update_growth_parameters false
 # Maturity
-@process Maturation
-type maturation
 
 # Natural Mortality
 @process natural_mort
@@ -67,7 +66,7 @@ type mortality_constant_rate
 m_multiplier_layer_label M_layer
 m 0.2
 distribution lognormal
-cv 0.15
+cv 0.0001
 selectivity_label One
 update_mortality_parameters false
 time_step_ratio 1
@@ -86,14 +85,14 @@ ssb SSB
 @process Recruitment_const
 type recruitment_constant
 recruitment_layer_label recruit_layer
-b0 29924.6 
+r0 3.27563e+06
 ssb SSB
 # --------------
 # Define selectivities
 # --------------
 @selectivity natural_mortality_by_age
 type double_exponential
-x1 0
+x1 1
 x0 6
 x2 30
 y1 0.6
@@ -108,29 +107,18 @@ c 1
 type logistic
 a50 4
 ato95 4
-
+l  1
+h 30
 # --------------
 # Derived Quantities
 # --------------
 @derived_quantity SSB
-type mature_biomass
-biomass_layer_label SSB_areas
-time_step Annual
-proportion_through_mortality_block 0.5
-
-@derived_quantity total_biomass
 type biomass
+selectivity mature_ogive
 biomass_layer_label SSB_areas
-selectivity One
 time_step Annual
-proportion_through_mortality_block 0.5
+proportion_through_mortality_block 1
 
-@derived_quantity total_abundance
-type abundance
-layer_label SSB_areas
-selectivity One
-time_step Annual
-proportion_through_mortality_block 0.5
 # --------------
 # Define Reports
 # --------------
@@ -139,15 +127,11 @@ proportion_through_mortality_block 0.5
 type process
 process natural_mort
 
-@report mature_report
-type process
-process Maturation
 
-/*
 @report Recruitment_report
 type process
-process Recruitment
-*/
+process Recruitment_const
+
 # print initail state of agents
 @report init
 type initialisation_partition

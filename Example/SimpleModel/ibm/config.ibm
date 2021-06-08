@@ -22,7 +22,7 @@ ncols 1
 # --------------
 @initialisation_phase Iterative
 type iterative
-years 40
+years 70
 #convergence_years 20 40
 #lambda 1
 initial_number_of_agents 700000 ## initial number of agents
@@ -36,7 +36,7 @@ layer_label Base
 # - M
 # - Maturity
 @time_step Annual
-processes Ageing von_bert Maturation natural_mort fishing Recruitment_const  
+processes Ageing von_bert natural_mort fishing  Recruitment_const  
 
 @process Ageing
 type ageing
@@ -58,9 +58,6 @@ cv 0.1
 time_step_proportions 1
 
 # Maturity
-@process Maturation
-type maturation
-
 # Natural Mortality
 @process natural_mort
 type mortality_constant_rate
@@ -104,7 +101,7 @@ end_table
 @process Recruitment
 type recruitment_beverton_holt
 recruitment_layer_label recruit_layer
-b0 100000
+r0 18126
 steepness 0.85
 ycs_values 1*53
 ssb SSB
@@ -114,7 +111,7 @@ ssb SSB
 @process Recruitment_const
 type recruitment_constant
 recruitment_layer_label recruit_layer
-b0 29892.9
+r0 4632169.3
 ssb SSB
 # --------------
 # Define selectivities
@@ -131,22 +128,29 @@ y2 0.4
 @selectivity One
 type constant
 c 1
+@selectivity half
+type constant
+c 0.5
 
 @selectivity mature_ogive
 type logistic
 a50 4
 ato95 4
+l 1
+h 30
 
 @selectivity trawl_selectivity
 type logistic
 a50 3.5
 ato95 8
-
+l 1
+h 30
 # --------------
 # Derived Quantities
 # --------------
 @derived_quantity SSB
-type mature_biomass
+type biomass
+selectivity mature_ogive
 biomass_layer_label SSB_areas
 time_step Annual
 proportion_through_mortality_block 1
@@ -172,10 +176,6 @@ proportion_through_mortality_block 0.5
 @report M_report
 type process
 process natural_mort
-
-@report mature_report
-type process
-process Maturation
 
 @report fishing
 type process

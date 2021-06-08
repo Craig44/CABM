@@ -2,7 +2,7 @@
 @model
 start_year 1940 
 final_year 1992
-min_age 0
+min_age 1
 max_age 30
 age_plus true
 base_weight_units tonnes
@@ -32,10 +32,10 @@ type recruitment_beverton_holt
 categories HAK4
 proportions 1 
 ssb SSB 
-b0 29892.9
+r0 4632169.3
 steepness 1
-age 0
-ycs_years 1940:1992
+age 1
+ycs_years 1939:1991
 ycs_values 1*53
 ## Ageing
 @process Ageing
@@ -56,7 +56,7 @@ selectivities trawl_selectivity
 @process M
 type mortality_constant_rate
 categories HAK4
-selectivities One
+relative_m_by_age One
 m 0.2
 ######################
 ## Derived Quantities
@@ -100,7 +100,8 @@ k 0.161
 t0 0
 linf 101.8
 time_step_proportions 0
-
+distribution lognormal
+cv_first 0.1
 
 #################
 ## Weigth at Length

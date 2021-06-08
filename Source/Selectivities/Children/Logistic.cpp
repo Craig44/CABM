@@ -32,8 +32,8 @@ Logistic::Logistic(Model* model)
   parameters_.Bind<float>(PARAM_A50, &a50_, "A50", "");
   parameters_.Bind<float>(PARAM_ATO95, &ato95_, "Ato95", "");
   parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
-  parameters_.Bind<unsigned>(PARAM_L, &low_, "Low if(age < Low) = 0", "", model_->min_age());
-  parameters_.Bind<unsigned>(PARAM_H, &high_, "High if(age > High) =alpha", "", model_->max_age());
+  parameters_.Bind<unsigned>(PARAM_L, &low_, "Low if(age < Low) = 0", "");
+  parameters_.Bind<unsigned>(PARAM_H, &high_, "High if(age > High) =alpha", "");
 
   RegisterAsAddressable(PARAM_A50, &a50_);
   RegisterAsAddressable(PARAM_ATO95, &ato95_);

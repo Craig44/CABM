@@ -1,10 +1,6 @@
 # --------------
 # Define Reports
 # --------------
-@report mature_report
-type process
-process Maturation
-
 @report Fishing_Mortality
 type process
 process Fishing_Mortality

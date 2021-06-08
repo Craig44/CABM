@@ -26,7 +26,7 @@ namespace obs = niwa::observations;
 Observation::Observation(Model* model) : Report(model) {
   LOG_TRACE();
   model_state_ = State::kIterationComplete;
-  skip_tags_   = true;
+  skip_tags_   = false;
   parameters_.Bind<string>(PARAM_OBSERVATION, &observation_label_, "Observation label", "");
   //parameters_.Bind<bool>(PARAM_SIMULATE_IN_NEW_FILE, &simulate_new_file_, "Produce sets of new files that are for each set of simulations", "", false);
 }
