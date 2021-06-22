@@ -5,7 +5,7 @@
  * @date 25/03/2013
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * @section DESCRIPTION
  *
@@ -33,6 +33,7 @@ public:
   virtual                     ~Multinomial() = default;
   void                        DoValidate() override final { };
   void                        SimulateObserved(map<unsigned, map<string, vector<observations::Comparison> > >& comparisons) override final;
+  bool                        enter_cell_ = true;
 };
 
 } /* namespace likelihoods */
