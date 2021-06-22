@@ -1,13 +1,13 @@
 \section{\I{The population section}\label{sec:population-section}}
 
 \subsection{Introduction}
-The population section\index{Population section} (Section\ref{sec:population-section}) specifies the dynamics that occur to agents in a population over time. They are labelled as population level processes such as death, birth, migration and growth but all occur at an agent level. For each process we will define the algorithm and mathematical representation and an example of the syntax for how you would incorporate in your own model. This section also discusses how to define the temporal and spatial resolution, which are completely user defined albeit some are computationally limited.
+The population section\index{Population section} (Section\ref{sec:population-section}) describes the agent specific dynamics that occur within the spatial domain over time. They are follow the conventional population level dynamic labels such as death, birth, migration and growth but all occur at an agent level. For each process we will define the algorithm and mathematical representation and an example of the syntax for how you would incorporate each dynamic into your own model. This section also discusses how to define the temporal and spatial resolution, which are completely user defined albeit some are computationally limited.
 
 The population section consists of several components, including:
 \begin{itemize}
   \item The spatial structure (Section~\ref{sec:spatial-structure});
-  \item The population structure;
-  \item Model initialisation (i.e., the state of the partition at the start of the first year)\index{Initialisation}\index{Model ! initialisation};
+  \item Annual Cycle;
+  \item Model initialisation (i.e., the state of the partition at the start of the first; year)\index{Initialisation}\index{Model ! initialisation};
   \item The years over which the model runs (i.e., the start and end years of the model)
   \item The annual cycle (time-steps and processes that are applied in each time-step)\index{Annual cycle};
   \item The specification and parameters of the population processes (i.e., processes that add, remove individuals to or from the partition, or shift numbers between ages areas);
@@ -17,8 +17,77 @@ The population section consists of several components, including:
   \item Derived quantities, required as parameters for some processes (e.g. mature biomass to resolve any density dependent processes, such as the spawner-recruit relationship in a recruitment process).
 \end{itemize}
 
+\subsection{\I{Key notation}\label{sec:key notaiton}}
+To help follow algorithms and equations in the following sections, we recommend getting familiar with this table of notations.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{p{0.2\linewidth} | p{0.7\linewidth}}
+		Index  & Description \\ 
+		\hline
+		\(\regnd\) & cell index \\
+		\(\yearnd\) & year index \\
+		\(\agent\) & agent index \\
+		\(\bm{X_\regnd}\) & Set of agents in cell \(\regnd\). \(\bm{X_c} = \{X_1, \dots, X_{nc}\}\) containing \(nc\) agents\\
+		\(X_\agent\) & A single agent, which is in itself a set, where each element of the set is an agent attribute. See the Table~\ref{tab:agent_atrtributes} for more information\\
+		\(\sum\limits_{i \in \bm{X_c}}\) & Sum over all agents in cell \(\regnd\). This notation implies individual attributes of agent \(i\) can be accessed i.e. age \(a_i\) or weight \(w_i\) as well as others (See Table~\ref{tab:agent_atrtributes})\\
+		\(\forall \ i \in \bm{X_c}\) & Iterate over all agents in cell \(\regnd\). Commonly used in algorithms.
+		
+	\end{tabular}
+	\caption{Caption}
+	\label{tab:notation}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{p{0.2\linewidth} | p{0.7\linewidth}}
+		Index  & Description (type of variable) \\ 
+		\hline
+		\(a_i\) & age (integer) \\
+		\(l_i\) & length (continuous)\\	
+		\(lb_i\) & length bin (integer)\\
+		\(mat_i\) & maturity (boolean)\\		
+		\(w_i\) & weight (continuous)\\
+		\(n_i\) & scalar, how many individuals this agent represents  (continuous)\\		
+	 	\(M_i\) & natural mortality rate (continuous)\\	
+	 	\(k_i, L_i^{\inf}\) & growth parameters (continuous)\\	
+	 	\(\regnd^b\) & birthed (natal) cell\\	
+		\(x_i, y_i\) & Cartesian coordinates such as latitude and longitude (continuous)	 		 						
+	\end{tabular}
+	\caption{Notation of agent attributes for agent \(X_\agent\)}
+	\label{tab:agent_atrtributes}
+\end{table}
+
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{p{0.25\linewidth} | p{0.5\linewidth} | p{0.2\linewidth}}
+		Index  & Distribution & support \\ 
+		\hline
+		\(\distbern(p)\) & Bernoulli Distribution with probability of success (1) = \(p\)& \(\in (0,1)\)\\
+		\(\distn(\mu, \sigma^2)\) & Normal Distribution & \(\in \mathbb{R}\)\\	
+		\(\distln(\mu, \sigma^2)\) & Log Normal Distribution & \\
+		\(\distmulti(N = 1, \bm{p})\) & Draws from a multinomial with an effective sample size of one with \(\bm{p} = (p_1, \dots, p_k)\). Returns the index of the category i.e. if \(\bm{p} = (0,0,1)\) it would always return a 3, and 2 for \(\bm{p} = (0,1,0\).& \(\in (1,\dots, k)\)
+		
+	\end{tabular}
+	\caption{Notation for distributions used by \IBM}
+		\label{tab:distributions}
+	\end{table}
+%
+Examples of the distributions in action. Often \IBM\ will iterate over agents in a cell to summarise or apply a dynamic i.e. summing the mature biomass in cell \(\regnd\) denoted as \(SSB_\regnd\)
+\begin{align*}
+    	SSB_\regnd & = \sum\limits_{i \in \bm{X_c}} w_i n_i I_i\\
+    	I_i & \sim \distbern(s(a_i))
+\end{align*}
+%,
+where \(s(a_i)\) denotes a maturity ogive (probability of this agent being mature) based on the agent's age \(a_i\). Another example using the multinomial, if a vector of movement probabilities describing an agent moving from cell \(\regnd_1\) to all other cells as denoted by \(\bm{p_{c_1}} = (p_1, \dots, p_C)\). To move an agent to a potential new cell denoted by \(c_2\) from a multinomial e.g.
+\begin{equation}
+	c_2 \sim \distmulti(N = 1, \bm{p_{c_1}})
+\end{equation}
+%
+
 \subsection{\I{Spatial structure}\label{sec:spatial-structure}}
-The spatial structure of \IBM\ is represented by an $n_{rows} \times n_{cols}$ grid, with rows $i=1 \dots n_{rows}$ and columns $j=1 \ldots n_{cols}$. Each cell of this matrix records the population structure at that point in space, where the population structure is represented by a vector of agents. Locations where agents can and cannot potentially be present using a \emph{layer}. 
+The spatial structure of \IBM\ is represented by a $n_{rows} \times n_{cols}$ grid, with rows $i=1 \dots n_{rows}$ and columns $j=1 \ldots n_{cols}$. Each cell of this grid contain a set of agents denoted by \(\bm{X_c} = \{X_1, \dots, X_{nc}\}\) where \(c\) denotes a cell containing \(nc\) agents. Although these cells are discrete individual locations can move and do store continuous Cartesian points during there existence. 
 
 \IBM\ implements a single spatial structure, a grid of \emph{square} cells (Figure \ref{fig:SquareSpatialStructure}). The spatial grid can be of an arbitrary size, but must be rectangular. 
 
@@ -42,30 +111,33 @@ Hence, the definition of the spatial structure includes;
 \end{itemize}
 
 For example, to specify a model with 3 rows and 4 columns (i.e., 12 spatial cells) with a base layer called \texttt{base}, then the syntax for \texttt{@model} would include,
+
 {\small{\begin{verbatim}
-		@model
-		nrows 3
-		ncols 4
-		layer base
-		\end{verbatim}}}
+@model
+nrows 3
+ncols 4
+layer base
+		
+@layer base
+type numeric
+table layer
+1 1 1 
+1 1 1
+1 1 1
+1 1 1 
+end_table		
+\end{verbatim}}}
 
 See Section~\ref{sec:layers} for how to define a layer using \command{layer}. Some processes reports require the user to define latitude and longitude bounds for cells. As they are cell bounds the model expects one more bound than rows or columns. The format of latitude and longitude are 0-180 and 0-360, respectively.
 
 
-\subsection{\I{Population structure}}\label{sub:sec:pop_sec}
-The basic structure of the population section of a \IBM\ model is defined in terms of an annual cycle, time steps, states, and transitions.
-
-The annual cycle defines what processes happen in each model year, and in what sequence. \IBM\ runs on an annual cycle rather than, for example, a 6-monthly cycle.
+\subsection{\I{Annual Cycle}}\label{sub:sec:annualcylc}
+The annual cycle defines the which agent dynamics occur in a year and in what order. The annual cycle is made up of discrete time-steps, where each time-step has a set of observations to generate or dynamics to apply. 
 
 Each year is split into one or more time steps, with at least one process occurring in each time step. Each time step can be thought of as representing a particular part of the calendar year, or time steps can be treated as an abstract sequence of events. In every time step, there exists a mortality block: a group of consecutive mortality-based processes, where individuals are deleted from the population (see Section~\ref{sec:mortality_block}). This is an important concept to understand as derived quantities and some observations are associated with mortality blocks.
 
 The division of the year into an arbitrary number of time steps allows the user to specify the exact order in which processes and observations occur throughout the year. The user needs to specify the time step in which each process occurs. If more than one process occurs in the same time step, the order in which to apply each process is specified in the \command{time\_step} block.
 
-The state is the current status of the population which is made of a collection of agents at any given time. The state can change one or more times in each time step of every year. The state object must contain sufficient information to figure out how the underlying population changes over time (given a model and a complete set of parameters).
-
-The state can undergo a number of possible changes, called transitions. Transitions are accomplished by processes, including: recruitment, natural mortality, anthropogenic mortality, movement, tagging events, growth, and maturation. 
-
-The key element of the state is the spatial world view, which holds all the entities, and is described earlier in Section~\ref{sec:spatial-structure}.
 
 An example of syntax, to specify a model with the the above concepts is done using the \texttt{@model} block is specified as:
 {\small{\begin{verbatim}
@@ -90,23 +162,15 @@ An example of syntax, to specify a model with the the above concepts is done usi
 
 
 \subsection{\I{Agents}\label{sec:individuals}}
-An agent is the core object in the state that everything manipulates or summarises. An agent has a list of predefined attributes that the user can choose to incorporate in the model or ignore, the list is below.
-
-\begin{itemize}
-	\item age
-	\item length
-	\item weight
-	\item sex
-	\item maturity
-	\item current area, birth area
-	\item lat and long
-	\item \I{population scalar} how many individuals does this agent represent = 1 means an individual based model (scalar). Will differ for each meta population.
-	\item natural mortality parameter
-	\item growth parameters
-	\item scalar (if > 1 then this individual represents more than one is a stock specific attribute)
-\end{itemize}
-
-The core  model contains super individuals (agents) where a single agent represents many individuals with the same characteristics is the scalar parameter. This parameter is associated with a recruitment event as we use the scalers to scale up a $SSB$ to $B_0$ for a given recruitment event. This makes the scalar more of a meta-population parameter or a stock parameter in fisheries. The way a scalar is applied is through the subcommand \subcommand{recruitment\_layer\_label} where you link a cell to a recruitment process (for more information see Section~\ref{subsec:initialisation}). This link says that any individual that was created by that recruitment dynamic gets a stock or recruitment scalar from that cell.
+An agent is the core object in the model that all other classes interact with. An agent can be thought of as a set of attributes that the user can choose to incorporate in the model or ignore, the set of attributes is listed earlier in Table~\ref{tab:agent_atrtributes}
+%
+The core model contains super individuals (agents) where a single agent represents multiple identical individuals with the same characteristics, defined by the population scalar. This scalar parameter is a function of the recruitment \(R_0\) parameters, the \subcommand{initial\_number\_of\_agents} denoted by \(n_{agents}\) and the natural mortality, as follows.
+\begin{align}
+\widetilde{N} &= \sum\limits_{rec = 1}^{n_{rec}} \sum\limits_{a = 1}^{n_{a+}} R_0^{rec} e^{-M  a}\\
+n_i &=  \frac{n_{agents}}{\widetilde{N} }\\
+\end{align}
+%
+where \(\widetilde{N}\) is the sum of the equilibrium age structure across all \(n_{rec}\) recruitment processes. This means all agents have the same number of individuals. The equilibrium age-structure is approximated up to \(n_{a+}\) which is taken as four times the \subcommand{max\_age}. After the calculation the \IBM\ runs for a number of years applying the annual cycle to set up equilibrium conditions before the model start year. 
 
 Maturity is an attribute that is activated by the maturity process (see Section~\ref{subsubsec:maturity}), it is tied to some specific derived quantities such as the type \subcommand{mature\_biomass}. You could also calculate the mature biomass on the fly, using the other derived quantities and selectivities, an example of this is shown in the maturity process section.
 
@@ -114,12 +178,7 @@ Sex is hard coded into the model and at this point the only way that sex effects
 
 Lengths in the model are all defined by the length bins in on the \command{model}, it is important to note that all calculations that are made via length are via the mid points of the bins supplied. Users supply lower and upper bins for the length classes and all calculations are based on the mid-points.
 
-The other attributes don't need any explanations are usually modified by processes, such as growth, movement and mortality. The attribute that I will dig into a little bit more is the scalar parameter which is calculated at the end of an initialisation phase, and assumes the initialisation phase has had a long in burn-in time to represent the correct age and length distribution.
-
-\begin{equation}
-	S_s = \frac{\sum_{s = 1}^{n_s}B0_s}{\sum_{s = 1}^{n_s}SSB_s}
-\end{equation}
-Where $S_s$ is the global scalar that is associated to all new individuals in the system from stock $s$, $B0_s$ is the $B_0$ parameter (user defined) for stock $s$ $SSB_s$ is the related spawning stock biomass. There are processes that do modify this, and that usually consists of processes or observations that truly involve a single entity such as tagging, when this occurs adjustments are made to this scalar.
+The other attributes don't need any explanations and are usually modified\textbackslash used by processes, such as growth, movement and mortality.
 
 \subsection{\I{Layers}\label{sec:layers}}
 Layers are a key underlying concept in \IBM. They comprise of a grid of known values, with a value for every spatial cell in the model. Layers are used by processes, observations, and outputs commands to supply spatially explicit covariates and any categorical groupings required. 
@@ -130,7 +189,7 @@ Every model must define at least one layer, the base layer $L_B$. A layer is def
 
 Within \IBM, layers are used in the following contexts:
 \begin{enumerate}
-	\item The base layer\index{Base layer}\index{Layers ! the base layer}: The base layer $L_B$ is a special layer (there must be exactly one base layer defined within the model) that defines the locations where the population can and cannot potentially be present (e.g., locations associated with the sea and not land in a marine model). Here, we define that a cell may potentially have part of the population present if every element $L_B(i,j) \ge 0$. Further, positive values of the base layer $L_B$ represent the \emph{area} represented by that spatial cell. Note, the values in the base layer must be numeric, but cannot be a meta-layer (\emph{see below}).
+	\item The base layer\index{Base layer}\index{Layers ! the base layer}: The base layer $L_B$ is a special layer (there must be exactly one base layer defined within the model) that defines the locations where agents can and cannot potentially be present (e.g., locations associated with the sea and not land in a marine model). Further, positive values of the base layer $L_B$ represent the \emph{area} represented by that spatial cell. Note, the values in the base layer must be numeric, but cannot be a meta-layer (\emph{see below}).
 	\item \I{Covariate layers}: A model may have many covariate layers, and these are used as covariates of some population or movement process (e.g., the sea floor depth may be a covariate of some movement process). The values in layers used as covariates can be either numeric or categorical.
 	\item \I{Classification layers}: A model may have many classification layers, and these are used as a classification or grouping variable for aggregating data over individual spatial cells $(i,j)$, e.g., statistical areas or management areas. Such layers are typically used to aggregate the population within cells into groups so-as to allow comparison with observations. The values in layers used as classification layers must be categorical.
 \end{enumerate}
@@ -161,10 +220,15 @@ Within \IBM, layers are used in the following contexts:
 			\end{verbatim}}}
 	
 	
-	\item{\I{Abundance layers}}: The abundance layer is the sum of the number of individuals within cell $a$ in categories $k$ and with selectivity $S_l$ at age $l$. 
-	\begin{equation}
-	N(a) = \sum\limits_{k} \sum\limits_l S_l \ \text{element}(i,j,k,l)
-	\end{equation}
+	\item{\I{Abundance layers}}: The abundance layer is the sum of the number of individuals within cell $c$ with selectivity $S(a)$ at age $a$. 
+	\begin{align}
+	N(c) &= \sum\limits_{i \in \bm{X_c}} n_i I_i\\
+	I_i &\sim Bern(S(a))
+	\end{align}
+	%
+	with, \(I_i\) being either 1 that is the agent is calculated in the abundance calculation or 0 the agent is excluded from the calculation.
+	
+	
 	\IBM\ calculates the values of the layer when running the model at the point in time where the value is required.
 	
 	For example, to specify an abundance layer of all individuals who are categorised as \texttt{mature}, use,
@@ -242,9 +306,6 @@ Within \IBM, layers are used in the following contexts:
 				\end{verbatim}}}
 	\end{enumerate}
 \end{enumerate}
-
-
-
 \subsection{\I{Time sequences}}
 
 The time sequence of the model is defined in the following parts;
@@ -252,7 +313,7 @@ The time sequence of the model is defined in the following parts;
   \item \I{Annual cycle}
   \item \I{Mortality blocks}
   \item \I{Initialisation}
-  \item \I{Model run years}\textsl{}
+  \item \I{Model run years}
 \end{itemize}
 
 \subsubsection{\I{Annual cycle}}
@@ -318,20 +379,7 @@ For an example of setting an initialisation block with multiple stocks see the 3
 
 
 \subsection{\I{Processes}}\label{sec:process}
-Processes are a set of classes that get access to agents parameters and either modifies them (growth), moves them (to anther cell), adds new agents (recruitment) or removes them (mortality). The other thing to note is that most processes are dictated by agent specific parameters such as natural mortality and growth see specific process for more information, and usually involve a Bernoulli trial to add stochastic error. An example of this is evaluating whether an agent is caught by a fishing method, lets say that a fishing method has a length based vulnerability associated with it as shown in figure~\ref{fig:capture}
-
-
-\begin{figure}[htp]\label{fig:capture}
-	\centering
-	\includegraphics[scale=0.6]{Figures/vulnerability.png}%
-	\caption{An example of a length based logistic vulnerability curve that describes the probability of capture when an interaction occurs.}
-\end{figure}
-
-
-So if we were to iterate over all the spatially available agents to this process we would calculate the probability of capture by taking the vulnerability curve and a specific agents length and compare that capture probability ($P_l$) to random number drawn from a $uniform(0,1)$ distribution denoted as$U()$, and so many of the algorithms include the term,
-
-$$ \text{if }U() <= P_l \text{ agent is captured and removed}$$
-$$ \text{else it survives the event}$$
+Processes are a set of dynamics that interact with agents. Processes generally take agent specific parameters which dictate the outcome such as natural mortality and growth see specific process for more information. The dynamics are responsible for modifying agents (growth), moving agents (to anther cell), creating agents (recruitment) or removing agents (mortality). Processes are generally stochastic, that is the outcome is the result of random variable. The exception is ageing which is deterministic. The following sections go into detail on how individual processes.
 
 \subsubsection{Ageing}\index{Processes!Ageing}
 
