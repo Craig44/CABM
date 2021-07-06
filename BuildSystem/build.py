@@ -19,27 +19,27 @@ Print the usage for this build system
 """
 def print_usage():  
   os.system( [ 'clear', 'cls' ][ os.name == 'nt' ] )
-  print '###########################################################'
-  print '# IBM Build System Usage                               #'
-  print '###########################################################'
-  print 'Usage:'
-  print 'doBuild <build_target> <build_parameter>'
-  print ''
-  print 'Valid Build Types:'
-  print '  debug - Build standalone debug executable'
-  print '  release - Build standalone release executable'
-  print '  thirdparty - Build all required third party libraries'
-  print '  thirdpartylean - Build minimal third party libraries'
-  print '  modelrunner - Run the test suite of models'
-  print '  clean - Remove any previous debug/release build information'
-  print '  cleanall - Remove all previous build information'
-  print '  check - Do a check of the build system'
-  print '  IBM - Build the syntax section of the manual from source code'
-  print ''
-  print 'Valid Build Parameters: (thirdparty only)'
-  print '  <libary name> - Target third party library to build or rebuild'
-  print ''
-  print ''
+  print('###########################################################')
+  print('# IBM Build System Usage                               #')
+  print('###########################################################')
+  print('Usage:')
+  print('doBuild <build_target> <build_parameter>')
+  print('')
+  print('Valid Build Types:')
+  print('  debug - Build standalone debug executable')
+  print('  release - Build standalone release executable')
+  print('  thirdparty - Build all required third party libraries')
+  print('  thirdpartylean - Build minimal third party libraries')
+  print('  modelrunner - Run the test suite of models')
+  print('  clean - Remove any previous debug/release build information')
+  print('  cleanall - Remove all previous build information')
+  print('  check - Do a check of the build system')
+  print('  IBM - Build the syntax section of the manual from source code')
+  print('')
+  print('Valid Build Parameters: (thirdparty only)')
+  print('  <libary name> - Target third party library to build or rebuild')
+  print('')
+  print('')
   return True
 
 
@@ -77,8 +77,8 @@ def start_build_system():
   # Check the compiler version to see if it's compatible
   pieces = Globals.compiler_version_.split('.')
   gcc_version = str(pieces[0]) + str(pieces[1])
-  if gcc_version < '48':
-  	return Globals.PrintError("G++ version " + Globals.compiler_version_ + " is not supported due to it's age")
+  if int(gcc_version) < 48:
+  	return Globals.PrintError("G++ version " + Globals.compiler_version_ + " is not supported due to it's age " + gcc_version)
 
   return True  
 
@@ -86,16 +86,16 @@ def start_build_system():
 Get the build information from the user
 """
 def start():
-  print '-- Checking for dateutil Python module'
+  print('-- Checking for dateutil Python module')
   if 'dateutil' not in sys.modules:
     return Globals.PrintError("Python requires the module dateutil for the build system to work")
-  print '-- Checking for datetime Python module'
+  print('-- Checking for datetime Python module')
   if 'datetime' not in sys.modules:
     return Globals.PrintError("Python requires the module datetime for the build system to work")
-  print '-- Checking for re Python module'
+  print('-- Checking for re Python module')
   if 're' not in sys.modules:
     return Globals.PrintError("Python requires the module re for the build system to work")
-  print '-- Checking for distutils Python module'
+  print('-- Checking for distutils Python module')
   if 'distutils' not in sys.modules:
     return Globals.PrintError("Python requires the module distutils for the build system to work")
   
@@ -120,8 +120,8 @@ def start():
     print_usage()
     return True
   if build_target == "check":
-	print "--> All checks completed successfully"
-	return True 
+    print("--> All checks completed successfully")
+    return True 
 
   if build_parameters != "": 
     build_parameters = build_parameters.lower()
@@ -129,52 +129,52 @@ def start():
   Globals.build_target_ = build_target
   Globals.build_parameters_ = build_parameters
   
-  print " -- Build target: " + Globals.build_target_
-  print " -- Build parameters: " + Globals.build_parameters_
-  print ""
+  print(" -- Build target: " + Globals.build_target_)
+  print(" -- Build parameters: " + Globals.build_parameters_)
+  print("")
   
   if build_target in Globals.allowed_build_types_:      
     if not build_parameters in Globals.allowed_build_parameters_:
       return Globals.PrintError("Build parameter " + build_parameters + " is not valid")
     
-    print "*************************************************************************"
-    print "*************************************************************************"
-    print "--> Starting " + Globals.build_target_ + " Build"
+    print("*************************************************************************")
+    print("*************************************************************************")
+    print("--> Starting " + Globals.build_target_ + " Build")
     code_builder = MainCode()
     if not code_builder.start(False):
       return False
   if build_target == "thirdparty" or build_target == "thirdpartylean":
-    print "*************************************************************************"
-    print "*************************************************************************"
-    print "--> Starting " + Globals.build_target_ + " Build"
+    print("*************************************************************************")
+    print("*************************************************************************")
+    print("--> Starting " + Globals.build_target_ + " Build")
     code_builder = ThirdPartyLibraries()
     if not code_builder.start():
       return False
   elif build_target == "clean":
-    print "*************************************************************************"
-    print "*************************************************************************"
-    print "--> Cleaning all IBM built files"
+    print("*************************************************************************")
+    print("*************************************************************************")
+    print("--> Cleaning all IBM built files")
     cleaner = Cleaner()
     if not cleaner.clean():
       return False
   elif build_target == "modelrunner":
-    print "*************************************************************************"
-    print "*************************************************************************"
-    print "--> Starting " + Globals.build_target_ + " Build"
+    print("*************************************************************************")
+    print("*************************************************************************")
+    print("--> Starting " + Globals.build_target_ + " Build")
     model_runner = ModelRunner()
     if not model_runner.start():
       return False      
   elif build_target == "documentation":
-    print "*************************************************************************"
-    print "*************************************************************************"
-    print "--> Starting " + Globals.build_target_ + " Build"
+    print("*************************************************************************")
+    print("*************************************************************************")
+    print("--> Starting " + Globals.build_target_ + " Build")
     documentation_builder = Documentation()
     if not documentation_builder.start():
       return False	  
   elif build_target == "cleanall":
-    print "*************************************************************************"
-    print "*************************************************************************"
-    print "--> Cleaning all IBM built files, including third party headers and libs"
+    print("*************************************************************************")
+    print("*************************************************************************")
+    print("--> Cleaning all IBM built files, including third party headers and libs")
     cleaner = Cleaner()
     if not cleaner.clean_all():
       return False
@@ -194,5 +194,5 @@ if not start():
   exit_code = 1
   
 system_info.reset_original_path()
-print "--> Finished "
+print("--> Finished ")
 exit(exit_code)  

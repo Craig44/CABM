@@ -26,7 +26,7 @@ class Variable:
         self.upper_bound_ = ""
 
     def Print(self):
-        print 'Variable: ' + self.name_ + '; type: ' + self.type_
+        print( 'Variable: ' + self.name_ + '; type: ' + self.type_)
         #+ '; description: ' + self.description_
         #+ '; value ' + self.value_
         #+ '; default: ' + self.default_
@@ -52,7 +52,7 @@ parent_class_ = Class() # Hold our top most parent class (e.g niwa::Process)
 class Documentation:
     # Methods
     def __init__(self):
-        print '--> Starting Documentation Builder'
+        print( '--> Starting Documentation Builder')
         type_aliases_['double']           = 'constant'
         type_aliases_['float']            = 'float'		
         type_aliases_['unsigned']         = 'non-negative integer'
@@ -95,7 +95,7 @@ class Documentation:
     to the file
     """
     def load_translations(self):
-        print '--> Loading translations'
+        print( '--> Loading translations')
         file = fileinput.FileInput('../Source/Translations/English_UK.h')
         if not file:
             return Globals.PrintError('Failed to open the English_UK.h for translation loading')
@@ -111,7 +111,7 @@ class Documentation:
             value = pieces[2].lstrip().rstrip().replace('"', '').replace('_', '\_')
             translations_[lookup] = value
 
-        print '-- Loaded ' + str(len(translations_)) + ' translation values'
+        print( '-- Loaded ' + str(len(translations_)) + ' translation values')
         return True
 
 
@@ -129,7 +129,7 @@ class ClassLoader:
         type_to_exclude_third_level_children = [ '' ]
         for folder in parent_class_folders:
             parent_class_ = Class()
-            print folder
+            print( folder)
 			# Start with Common folder, but know we also go through age and length folders
             if (os.path.exists(src_folder + folder) or folder in type_without_children_folders):
                 label_ = Variable()
@@ -140,20 +140,20 @@ class ClassLoader:
                 type_.name_ = 'type'
                 type_.type_ = 'string'                
                 parent_class_.variables_['type_'] = type_
-                print type
+                print( type)
                 if (os.path.exists(src_folder + folder + '/')): 
                 #This if statement deals with Classes that have parents in Common, it also checks if it has children in Age or Length
                     file_list = os.listdir(src_folder + folder + '/')
                     for file in file_list:
                         if file.startswith(folder[:-3]) and file.endswith('.h') and not file.endswith('-inl.h'):
-                            print '-- Loading Common -> top-level parent class from file ' + file
+                            print( '-- Loading Common -> top-level parent class from file ' + file)
                             parent_class_.name_ = file.replace('.h', '')
                             if not VariableLoader().Load('../Source/' + folder + '/' + file, parent_class_):
                                 return False
                             break;
 
                     if os.path.exists(src_folder + folder + '/Children/'):
-                        print '--> Scanning for children'
+                        print( '--> Scanning for children')
                         child_file_list = os.listdir(src_folder + folder + '/Children/')
                         # Scan First For 2nd Level Children
                         for file in child_file_list:
@@ -169,14 +169,14 @@ class ClassLoader:
                                 return False
 
                         # Scan 3rd Level Children
-                        print '--> Scanning for Third Level Children'
+                        print( '--> Scanning for Third Level Children')
                         for file in child_file_list:
                             #print file
                             if os.path.isdir(src_folder + folder + '/Children/' + file):
                                 if folder not in type_to_exclude_third_level_children:
                                     child_file_list = os.listdir(src_folder + folder + '/Children/' + file)
                                     for child_file in child_file_list:
-                                        print 'looking at child file = ' + child_file
+                                        print( 'looking at child file = ' + child_file)
                                         if not child_file.endswith('.h'):
                                             continue
                                         if file not in parent_class_.child_classes_:
@@ -185,7 +185,7 @@ class ClassLoader:
                                         sub_child_class = copy.deepcopy(parent_class_.child_classes_[file])
                                         sub_child_class.name_ = child_file.replace('.h', '')
                                         sub_child_class.parent_name_ = file
-                                        print 'child file ' + sub_child_class.name_ + " parent file = " + file
+                                        print( 'child file ' + sub_child_class.name_ + " parent file = " + file)
                                         
                                         parent_class_.child_classes_[file].child_classes_[sub_child_class.name_] = sub_child_class
                                         if not VariableLoader().Load('../Source/' + folder + '/Children/' + file + '/' + child_file, sub_child_class):
@@ -201,7 +201,7 @@ class VariableLoader:
         return self.LoadCppFile(header_file_, class_)
 
     def LoadHeaderFile(self, header_file_, class_):
-        print '--> Loading Variables for ' + class_.name_ + ' from header file ' + header_file_
+        print( '--> Loading Variables for ' + class_.name_ + ' from header file ' + header_file_)
         fi = fileinput.FileInput(header_file_)
         found_class = False
         for line in fi:
@@ -230,14 +230,14 @@ class VariableLoader:
             variable = Variable()
             variable.type_ = pieces[0]
             class_.variables_[pieces[1]] = variable            
-            print '-- Heading Variable: ' + pieces[1] + '(' + pieces[0] + ')'
+            print( '-- Heading Variable: ' + pieces[1] + '(' + pieces[0] + ')')
 
     def LoadCppFile(self, header_file_, class_):
         cpp_file = header_file_.replace('.h', '.cpp')
         constructor_line = class_.name_ + '::' + class_.name_ + '('
 
-        print '--> Loading Variables from CppFile ' + cpp_file
-        print '-- Looking for constructor line: ' + constructor_line
+        print( '--> Loading Variables from CppFile ' + cpp_file)
+        print( '-- Looking for constructor line: ' + constructor_line)
         fi = fileinput.FileInput(cpp_file)
         in_constructor = False
         finished_constructor_definition = False
@@ -267,15 +267,15 @@ class VariableLoader:
                 line = previous_line + line
             previous_line = ''
             if line.startswith('parameters_.Bind<'):
-                print '-- Bind Line ' + line
+                print( '-- Bind Line ' + line)
                 if not self.HandleParameterBindLine(line, class_):
                     return False
             if line.startswith('parameters_.BindTable('):
-                print '-- Bind Table Line ' + line
+                print( '-- Bind Table Line ' + line)
                 if not self.HandleParameterBindTable(line, class_):
                     return False            
             if line.startswith('RegisterAsAddressable('):
-                print '-- RegisterAsAddressable Line ' + line
+                print( '-- RegisterAsAddressable Line ' + line)
                 if not self.HandlRegisterAsLine(line, class_):
                     return False
         return True
@@ -322,7 +322,7 @@ class VariableLoader:
         index += 1
         if len(pieces) > index:
             variable.default_ = pieces[index].replace(')', '').rstrip().lstrip()
-        print "value = " + value + " description = " + variable.description_ + " default = " + variable.default_
+        print( "value = " + value + " description = " + variable.description_ + " default = " + variable.default_)
 
         if len(lines) == 2:
             short_line = lines[1]
@@ -377,7 +377,7 @@ class VariableLoader:
 
         # Check for the name of the variable we're binding too
         used_variable = pieces[1].rstrip().lstrip().lower()
-        print 'used_variable: ' + used_variable
+        print( 'used_variable: ' + used_variable)
         variable = Variable()
         if used_variable in class_.variables_:
             variable = class_.variables_[used_variable];
@@ -387,7 +387,7 @@ class VariableLoader:
         # Check for Name
         variable.name_ = translations_[pieces[0].rstrip().lstrip()]
 
-        print 'printing table for ' + variable.name_
+        print( 'printing table for ' + variable.name_)
         # Set the description
         index = 2;
         description = pieces[index]
@@ -395,7 +395,7 @@ class VariableLoader:
             index += 1
             description += ',' + pieces[index]
         variable.description_ = description.replace('R"(', '').replace(')"', '').replace('"', '').rstrip().lstrip()
-        print 'with description ' + variable.description_
+        print( 'with description ' + variable.description_)
         # Set the value
         index += 1
         value = pieces[index]
@@ -404,7 +404,7 @@ class VariableLoader:
             value += ',' + pieces[index]
         value = value.replace(')', '')
         variable.value_ = 'a Matrix of space seperated values'
-        print 'with value ' + variable.value_
+        print( 'with value ' + variable.value_)
 
         return True
  
@@ -429,23 +429,23 @@ class VariableLoader:
           name = pieces[0]
           variable = pieces[1].replace('&', '').replace(')', '').lstrip().rstrip()
           lookup = "all"
-	else:
+        else:
           name = pieces[0]
           variable = pieces[1].replace('&', '').replace(')', '').lstrip().rstrip()
-	  lookup = pieces[2].replace('addressable::k', '').replace(')', '').lstrip().rstrip()
+          lookup = pieces[2].replace('addressable::k', '').replace(')', '').lstrip().rstrip()
 	
 	## At some point it would be nice to add the lookup into the auto-documentation but that can wait.
-        print '--> Estimable: ' + name + ' with variable ' + variable + ' lookup = ' + lookup  + ' ' + class_.variables_[variable].name_
+        print( '--> Estimable: ' + name + ' with variable ' + variable + ' lookup = ' + lookup  + ' ' + class_.variables_[variable].name_)
         if name in translations_:    
           name = translations_[name]
-        print class_.variables_
-  	if lookup == "all":
+        print( class_.variables_)
+        if lookup == "all":
           class_.estimables_[name] = class_.variables_[variable].type_
-          print '--> Estimable: ' + name + ' as type ' + class_.estimables_[name]
+          print( '--> Estimable: ' + name + ' as type ' + class_.estimables_[name])
         else:
           class_.addressables_[name] = class_.variables_[variable].type_
           ## This will not deal with the following case. When a object is user defined in the constructor, and has an addressable not 'all'
-          print '--> Addressable: ' + name + ' as type ' + class_.addressables_[name] + ' ' + class_.variables_[variable].name_
+          print( '--> Addressable: ' + name + ' as type ' + class_.addressables_[name] + ' ' + class_.variables_[variable].name_)
           variable_temp = Variable()
           variable_temp.name_ = name
           class_.variables_[name] = variable_temp
@@ -456,14 +456,14 @@ class Printer:
     output_path_ = '../Documentation/UserManual/Syntax/'
     def Run(self):
         global parent_class_
-        print '--> Running Latex Printer'
-        print '--> Top Class ' + parent_class_.name_
+        print( '--> Running Latex Printer')
+        print( '--> Top Class ' + parent_class_.name_)
         self.current_output_file_ = self.output_path_ + parent_class_.name_
 
         if not os.path.exists('../Documentation/UserManual/Syntax/'):
             os.makedirs('../Documentation/UserManual/Syntax/')
 
-        print '-- Printing to file ' + self.current_output_file_
+        print( '-- Printing to file ' + self.current_output_file_)
         file = open(self.current_output_file_ + '.tex', 'w')
         file.write('\defComLab{' + parent_class_.name_.lower() + '}{Define an object of type \emph{' + parent_class_.name_.lower() + '}}\n')
         file.write('\n')
@@ -489,7 +489,7 @@ class Printer:
                     #self.PrintClass(file, child_class)
                     self.PrintClass(file, third_class)
             else:
-                print "Could not find any information for " + child_class_name
+                print( "Could not find any information for " + child_class_name)
                 object_name = re.sub( '(?<!^)(?=[A-Z])', ' ', child_class.name_)
                 class_name = re.sub( '(?<!^)(?=[A-Z])', '\_', child_class.name_).lower()
                 parent_class = re.sub( '(?<!^)(?=[A-Z])', '\_', parent_class_.name_).lower()
@@ -502,7 +502,7 @@ class Printer:
     def PrintClass(self, file_, class_):
         class_.estimables_ = collections.OrderedDict(sorted(class_.estimables_.items()))
         for key in class_.variable_order_:
-            print key
+            print( key)
             variable = class_.variables_[(key)]
             if variable.name_ == '':
                 continue
@@ -511,7 +511,7 @@ class Printer:
                 continue
             # And continue as normal
             file_.write('\\defSub{' + variable.name_ + '} {' + variable.description_ + '}\n')    
-            print "variable type = " + variable.type_
+            print( "variable type = " + variable.type_)
             if variable.name_ in class_.estimables_:
                 if class_.estimables_[variable.name_ ].startswith('vector<') or class_.estimables_[variable.name_ ].startswith('map<'):
                     file_.write('\\defType{estimable vector}\n')
@@ -543,16 +543,16 @@ class Printer:
 class Latex:
     def Build(self):
 
-        print '-- Building latex documentation and pdf'
+        print( '-- Building latex documentation and pdf')
         cwd = os.path.normpath(os.getcwd())
         os.chdir('../Documentation/UserManual/')
-        print '-- Building CASAL.syn'
+        print( '-- Building CASAL.syn')
         os.system('python QuickReference.py')
         
         # Build the Version.tex file
         if Globals.git_path_ != '':
-            print '-- Build version.tex with Git log information'
-            p = subprocess.Popen(['git', '--no-pager', 'log', '-n', '1', '--pretty=format:%H%n%h%n%ci' ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print( '-- Build version.tex with Git log information')
+            p = subprocess.Popen(['git', '--no-pager', 'log', '-n', '1', '--pretty=format:%H%n%h%n%ci' ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
             out, err = p.communicate()
             lines = out.split('\n')
             if len(lines) != 3:
@@ -576,7 +576,7 @@ class Latex:
             file_output.write(version)
             file_output.close()
         else:
-            print '-- Building a default version.tex because Git was not found'
+            print( '-- Building a default version.tex because Git was not found')
             version = '% WARNING: THIS FILE IS AUTOMATICALLY GENERATED BY doBuild documentation. DO NOT EDIT THIS FILE\n'
             version += '\\newcommand{\\SourceControlRevisionDoc}{000000}\n'
             version += '\\newcommand{\\SourceControlDateDoc}{0000-00-00}\n'
@@ -606,7 +606,7 @@ class Latex:
               return Globals.PrintError('bibtex failed')
             if os.system('makeindex.exe IBM') != EX_OK:
               return Globals.PrintError('makeindex failed')
-        print '-- Built the IBM usermanual'
+        print( '-- Built the IBM usermanual')
 
         #os.chdir('../GettingStartedGuide/')
         #for i in range(0,3):

@@ -14,7 +14,7 @@ class SystemInfo:
     
   # Constructor
   def __init__(self):
-    print '--> Starting SystemInfo object'
+    print('--> Starting SystemInfo object')
     Globals.operating_system_ = sys.platform
     self.original_path_    = os.getenv('PATH')
     
@@ -23,7 +23,7 @@ class SystemInfo:
     if (Globals.operating_system_.startswith("win")):
       Globals.operating_system_ = "windows"
       
-    print "-- Configuring for Operating System: " + Globals.operating_system_
+    print("-- Configuring for Operating System: " + Globals.operating_system_)
     cwd = os.path.normpath(os.getcwd())
     if (Globals.operating_system_ == "windows"):
       Globals.path_ += cwd + '\\buildtools\\windows\\unixutils;'
@@ -34,13 +34,13 @@ class SystemInfo:
       Globals.path_ += cwd + '/bin/' + Globals.operating_system_ + '/release_betadiff'
     
   def set_new_path(self):
-    print "-- Overriding the system path with new values"
+    print("-- Overriding the system path with new values")
     if Globals.operating_system_ == "windows":
       os.environ['PATH'] = Globals.path_ + "" + self.original_path_
-      print '-- New Path: ' + Globals.path_ + ":" + self.original_path_
+      print('-- New Path: ' + Globals.path_ + ":" + self.original_path_)
     else:
       os.environ['PATH'] = Globals.path_ + ":" + self.original_path_
-      print '-- New Path: ' + Globals.path_ + ":" + self.original_path_    
+      print('-- New Path: ' + Globals.path_ + ":" + self.original_path_    )
     
   def reset_original_path(self):
     os.environ['PATH'] = self.original_path_
@@ -50,10 +50,10 @@ class SystemInfo:
   path
   """
   def find_exe_path(self, exe):
-    print '-- Searching path for ' + exe
+    print('-- Searching path for ' + exe)
     if os.system('which ' + exe + ' > which.tmp 2> err.tmp') != EX_OK:
       os.system('rm -rf err.tmp')
-      print '## ' + exe + ' not found in the current path'
+      print('## ' + exe + ' not found in the current path')
       return ''
       
     # Read path back from file
@@ -62,7 +62,7 @@ class SystemInfo:
     for line in fi:
         path = line
     path = path.replace(exe + '\n', '').rstrip()
-    print '-- ' + exe + ' found @ ' + path
+    print('-- ' + exe + ' found @ ' + path)
 
     if path != "" and Globals.operating_system_ == "windows":
       Globals.path_ = path + ";" + Globals.path_
@@ -80,18 +80,19 @@ class SystemInfo:
   This method will find the GCC Version
   """
   def find_gcc_version(self):
-    p = subprocess.Popen(["g++", "-v"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(["g++", "-v"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     out, err = p.communicate()
-    lines = out.split('\n')
+    print(out.split)
+    lines = out.split("\n")
     err_lines = re.split('version', err)
     target_line = err_lines[len(err_lines) - 1].lstrip().rstrip()
-    print '--> Full Version: ' + target_line
+    print('--> Full Version: ' + target_line)
     pieces = target_line.split(' ')
     if len(pieces) < 2:
       return Globals.PrintError('STD out did not return correct GCC Version format ' + str(len(pieces)) + ': ' + target_line)
 
     Globals.compiler_version_ = pieces[0].lstrip().rstrip()
-    print '--> Compiler Version: ' + Globals.compiler_version_
+    print('--> Compiler Version: ' + Globals.compiler_version_)
     
     return True
   

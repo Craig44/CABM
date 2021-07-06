@@ -13,9 +13,9 @@ STRING(REPLACE "BuildSystem" "Source" PROJECT_HOME_DIRECTORY ${CMAKE_HOME_DIRECT
 IF (DEBUG)
  SET(COMPILE_OPTIONS " -O0 -g2 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs -fopenmp")
 ELSEIF (RELEASE)
- SET(COMPILE_OPTIONS " -O2 -g0 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs -fopenmp")
+ SET(COMPILE_OPTIONS " -O2 -g0 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs -Wno-misleading-indentation -fopenmp")
 ELSE()
- SET(COMPILE_OPTIONS " -O2 -g0 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs -fopenmp")
+ SET(COMPILE_OPTIONS " -O2 -g0 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs -Wno-misleading-indentation -fopenmp")
 ENDIF ()
 ########################################################################################
 # Rinside calls, now requires R.exe to be in path

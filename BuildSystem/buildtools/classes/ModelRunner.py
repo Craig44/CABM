@@ -20,13 +20,13 @@ class ModelRunner:
       binary_name += '.exe'
 
     if not os.path.exists('bin/' + Globals.operating_system_ + '/release/' + binary_name):
-      print 'Looking for bin/' + Globals.operating_system_ + '/release/' + binary_name
-      print 'IBM binary was not found. Can not continue'
-      print 'Please complete a release betadiff binary build before running the models'
+      print('Looking for bin/' + Globals.operating_system_ + '/release/' + binary_name)
+      print( 'IBM binary was not found. Can not continue')
+      print( 'Please complete a release betadiff binary build before running the models')
       return False
   
 
-    print ''
+    print( '')
     success_count = 0
     fail_count = 0
     dir_list = {"SimpleModel", "SteadyStateModel", "SpatialModel"}
@@ -42,17 +42,17 @@ class ModelRunner:
       result = False;
       if os.system("ibm -r --loglevel=fine -g 1 > test.log 2>&1") != EX_OK:
         elapsed = time.time() - start
-        print '[FAILED] - ' + folder + ' in ' + str(round(elapsed, 2)) + ' seconds'
+        print( '[FAILED] - ' + folder + ' in ' + str(round(elapsed, 2)) + ' seconds')
         fail_count += 1
       else:
         elapsed = time.time() - start
-        print '[OK] - ' + folder + ' in ' + str(round(elapsed, 2)) + ' seconds'
+        print( '[OK] - ' + folder + ' in ' + str(round(elapsed, 2)) + ' seconds')
         success_count += 1
       os.chdir(cwd)         
-    print ''
-    print 'Total Models: ' + str(success_count + fail_count)
-    print 'Failed Models: ' + str(fail_count)
+    print( '')
+    print( 'Total Models: ' + str(success_count + fail_count))
+    print( 'Failed Models: ' + str(fail_count))
     if fail_count > 0:
-      print 'Please check the test.log each of the failed model directories'
+      print( 'Please check the test.log each of the failed model directories')
       return False
     return True
