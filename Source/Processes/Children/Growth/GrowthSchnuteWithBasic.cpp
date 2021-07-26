@@ -35,15 +35,15 @@ GrowthSchnuteWithBasic::GrowthSchnuteWithBasic(Model* model) : Growth(model) {
   parameters_.Bind<string>(PARAM_A_LAYER_LABEL, &a_layer_label_, "Label for the numeric layer that describes mean a in the weight calcualtion through space", "", true);
   parameters_.Bind<string>(PARAM_B_LAYER_LABEL, &b_layer_label_, "Label for the numeric layer that describes mean b in the weight calcualtion through space", "", true);
 
-  parameters_.Bind<float>(PARAM_T0, &t0_, "The value for t0 default = 0", "", true);
-  parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "alpha value for schnute growth curve", "", true);
-  parameters_.Bind<float>(PARAM_BETA, &beta_, "beta value for schnute growth curve", "", true);
-  parameters_.Bind<float>(PARAM_A, &a_, "alpha value for weight at length function", "", true);
-  parameters_.Bind<float>(PARAM_B, &b_, "beta value for weight at length function", "", true);
-  parameters_.Bind<float>(PARAM_TAU1, &tau1_, "reference age for y1", "");
-  parameters_.Bind<float>(PARAM_TAU2, &tau2_, "reference age for y2", "");
-  parameters_.Bind<float>(PARAM_Y1, &y1_, "mean size at reference ages tau1", "");
-  parameters_.Bind<float>(PARAM_Y2, &y2_, "mean size at reference ages tau2", "");
+  parameters_.Bind<double>(PARAM_T0, &t0_, "The value for t0 default = 0", "", true);
+  parameters_.Bind<double>(PARAM_ALPHA, &alpha_, "alpha value for schnute growth curve", "", true);
+  parameters_.Bind<double>(PARAM_BETA, &beta_, "beta value for schnute growth curve", "", true);
+  parameters_.Bind<double>(PARAM_A, &a_, "alpha value for weight at length function", "", true);
+  parameters_.Bind<double>(PARAM_B, &b_, "beta value for weight at length function", "", true);
+  parameters_.Bind<double>(PARAM_TAU1, &tau1_, "reference age for y1", "");
+  parameters_.Bind<double>(PARAM_TAU2, &tau2_, "reference age for y2", "");
+  parameters_.Bind<double>(PARAM_Y1, &y1_, "mean size at reference ages tau1", "");
+  parameters_.Bind<double>(PARAM_Y2, &y2_, "mean size at reference ages tau2", "");
 
   RegisterAsAddressable(PARAM_ALPHA, &alpha_, addressable::kAll, addressable::kyes);
   RegisterAsAddressable(PARAM_BETA, &beta_, addressable::kAll, addressable::kyes);
@@ -115,7 +115,7 @@ void GrowthSchnuteWithBasic::DoBuild() {
       LOG_FATAL_P(PARAM_TIME_STEP_PROPORTIONS) << " length (" << time_step_proportions_.size()
           << ") does not match the number of time steps this process has been assigned to (" << active_time_steps.size() << ")";
 
-    for (float value : time_step_proportions_) {
+    for (double value : time_step_proportions_) {
       if (value < 0.0 || value > 1.0)
         LOG_ERROR_P(PARAM_TIME_STEP_PROPORTIONS) << " value (" << value << ") must be between 0.0 (exclusive) and 1.0 (inclusive)";
     }
@@ -220,10 +220,10 @@ void GrowthSchnuteWithBasic::DoBuild() {
 // The work horse of the function.
 void GrowthSchnuteWithBasic::ApplyStochasticGrowth(vector<Agent>& agents) {
   //utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-  float new_length = 0.0;
-  float weight = 0.0;
-  float length_prop = time_step_ratios_[model_->managers().time_step()->current_time_step()];
-  float alpha, beta;
+  double new_length = 0.0;
+  double weight = 0.0;
+  double length_prop = time_step_ratios_[model_->managers().time_step()->current_time_step()];
+  double alpha, beta;
   unsigned sex_ndx;
   for(auto& agent : agents) {
     if (agent.is_alive()) {
@@ -333,9 +333,9 @@ void GrowthSchnuteWithBasic::FillReportCache(ostringstream& cache) {
 
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
-        vector<float> length;
+        vector<double> length;
         cache << row << "-" << col << " " << t0_ << " " ;
-        float mean_linf = 0, mean_k = 0;//, a = 0, b = 0;
+        double mean_linf = 0, mean_k = 0;//, a = 0, b = 0;
         if (L_inf_layer_)
           mean_linf = L_inf_layer_->get_value(row, col);
         else
@@ -368,7 +368,7 @@ void GrowthSchnuteWithBasic::FillReportCache(ostringstream& cache) {
     }
   } else {
     cache << "time: ";
-    vector<float> length;
+    vector<double> length;
     length.push_back(l_inf_ * (1-exp(-k_ * (0.001 - t0_))));
     for (unsigned t = 0; t <= model_->max_age(); ++t) {
       cache << t << " ";

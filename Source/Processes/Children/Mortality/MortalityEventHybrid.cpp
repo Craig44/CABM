@@ -243,11 +243,11 @@ void MortalityEventHybrid::DoBuild() {
   unsigned hand_mort_index = std::find(meth_cols.begin(), meth_cols.end(), PARAM_HANDLING_MORTALITY) - meth_cols.begin();
   for (auto meth_row : meth_data) {
     unsigned meth_index = std::find(fishery_label_.begin(), fishery_label_.end(), meth_row[0]) - fishery_label_.begin();
-    float mls = 0;
-    float hand_mort = 0;
-    if (!utilities::To<string, float>(meth_row[mls_index], mls))
+    double mls = 0;
+    double hand_mort = 0;
+    if (!utilities::To<string, double>(meth_row[mls_index], mls))
       LOG_ERROR_P(PARAM_METHOD_INFO) << PARAM_MINIMUM_LEGAL_LENGTH << " value " << meth_row[mls_index] << " is not numeric, please sort this out.";
-    if (!utilities::To<string, float>(meth_row[hand_mort_index], hand_mort))
+    if (!utilities::To<string, double>(meth_row[hand_mort_index], hand_mort))
       LOG_ERROR_P(PARAM_METHOD_INFO) << PARAM_HANDLING_MORTALITY << " value " << meth_row[hand_mort_index] << " is not numeric, please sort this out.";
     fishery_mls_[fishery_index_[meth_index]] = mls;
     fishery_hand_mort_[fishery_index_[meth_index]] = hand_mort;
@@ -359,14 +359,14 @@ void MortalityEventHybrid::DoExecute() {
           for (unsigned row = 0; row < model_->get_height(); ++row) {
             for (unsigned col = 0; col < model_->get_width(); ++col) {
               WorldCell *cell = nullptr;
-              float f_taken = 0;
+              double f_taken = 0;
               cell = world_->get_base_square(row, col); // Shared resource...
               // Which fisheries are we taken fes for, not all fisheries are taking f every year.
               vector<unsigned> fisheries_to_sample_from;
               if (cell->is_enabled()) {
                 unsigned age_iter = 0;
                 fill(f_to_take_by_fishery_.begin(), f_to_take_by_fishery_.end(), 0.0);
-                float f_for_fishery = 0.0;
+                double f_for_fishery = 0.0;
                 LOG_FINE() << "cell: " << row << "-" << col << " what we are storing = " << f_to_take_by_fishery_.size() << " looping over " << fishery_f_layer_.size() << " fishery label = " <<  fishery_label_.size();
                 LOG_FINE() << " prop_F_fishery_and_bin_.size() " << prop_F_fishery_and_bin_.size();
                 for (unsigned i = 0; i < fishery_label_.size(); ++i) {
@@ -432,8 +432,8 @@ void MortalityEventHybrid::DoExecute() {
                    *  - apply total F over all agents chance() < exp(-F_by_year_bin_[year_ndx][row][col][0][age_iter])
                    *  - If caught then do a multinomial draw, to see which fishery caught this agent.
                    */
-                  float temp_sum = 0.0;
-                  float random_chance = 0.0;
+                  double temp_sum = 0.0;
+                  double random_chance = 0.0;
                   for(auto& agent : cell->agents_) {
                     if (agent.is_alive()) {
                       //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
@@ -491,18 +491,18 @@ void MortalityEventHybrid::DoExecute() {
           } // row
         } else {
           LOG_MEDIUM() << "Applying length based F";
-          float bipmass_of_available = 0.0; // over all cells
+          double bipmass_of_available = 0.0; // over all cells
 
           for (unsigned row = 0; row < model_->get_height(); ++row) {
             for (unsigned col = 0; col < model_->get_width(); ++col) {
               WorldCell *cell = nullptr;
-              float f_taken = 0;
+              double f_taken = 0;
               cell = world_->get_base_square(row, col); // Shared resource...
               // Which fisheries are we taken fes for, not all fisheries are taking f every year.
               vector<unsigned> fisheries_to_sample_from;
               if (cell->is_enabled()) {
                 fill(f_to_take_by_fishery_.begin(), f_to_take_by_fishery_.end(), 0.0);
-                float f_for_fishery = 0.0;
+                double f_for_fishery = 0.0;
                 LOG_FINE() << "cell: " << row << "-" << col << " what we are storing = " << f_to_take_by_fishery_.size() << " looping over " << fishery_f_layer_.size() << " fishery label = " <<  fishery_label_.size();
                 LOG_FINE() << " prop_F_fishery_and_bin_.size() " << prop_F_fishery_and_bin_.size();
                 for (unsigned i = 0; i < fishery_label_.size(); ++i) {
@@ -566,8 +566,8 @@ void MortalityEventHybrid::DoExecute() {
                    *  - apply total F over all agents chance() < exp(-F_by_year_bin_[year_ndx][row][col][0][age_iter])
                    *  - If caught then do a multinomial draw, to see which fishery caught this agent.
                    */
-                  float temp_sum = 0.0;
-                  float random_chance = 0.0;
+                  double temp_sum = 0.0;
+                  double random_chance = 0.0;
                   for(auto& agent : cell->agents_) {
                     if (agent.is_alive()) {
                       bipmass_of_available = agent.get_weight() * agent.get_scalar();
@@ -629,7 +629,7 @@ void MortalityEventHybrid::DoExecute() {
       } else {
         LOG_MEDIUM() << "Running MSE now applying mortality event.";
         // use event biomass formula...
-        float world_catch_to_take = 0;
+        double world_catch_to_take = 0;
         if (not selectivity_length_based_) {
           LOG_MEDIUM() << "Age based biomass";
           for (unsigned row = 0; row < model_->get_height(); ++row) {
@@ -637,13 +637,13 @@ void MortalityEventHybrid::DoExecute() {
               unsigned catch_attempts = 1;
               unsigned catch_max = 1;
               WorldCell *cell = nullptr;
-              float catch_taken = 0;
+              double catch_taken = 0;
               cell = world_->get_base_square(row, col); // Shared resource...
               // Which fisheries are we taken catches for, not all fisheries are taking catch every year.
               vector<unsigned> fisheries_to_sample_from;
               if (cell->is_enabled()) {
                 fill(catch_to_take_by_fishery_.begin(), catch_to_take_by_fishery_.end(), 0.0);
-                float catch_for_fishery = 0.0;
+                double catch_for_fishery = 0.0;
                 LOG_FINE() << "cell: " << row << "-" << col << " what we are storing = " << catch_to_take_by_fishery_.size();
                 for (unsigned i = 0; i < fishery_label_.size(); ++i) {
 
@@ -664,7 +664,7 @@ void MortalityEventHybrid::DoExecute() {
                   LOG_MEDIUM() << "ndx = " << cell_ndx_[i] << " for fishery = " << fishery_label_[i];
                 }
 
-                vector<float> prop_catch_by_fishery(fisheries_to_sample_from.size(), 0.0);
+                vector<double> prop_catch_by_fishery(fisheries_to_sample_from.size(), 0.0);
                 for (unsigned i = 0; i < prop_catch_by_fishery.size(); ++i) {
                   prop_catch_by_fishery[i] = catch_to_take_by_fishery_[fisheries_to_sample_from[i]] / catch_taken;
                   LOG_FINE() << "fishery ndx = " << fisheries_to_sample_from[i] << " proportion of catch = " << prop_catch_by_fishery[i];
@@ -682,7 +682,7 @@ void MortalityEventHybrid::DoExecute() {
                   catch_max = cell->agents_.size() * 2;
                   LOG_FINEST() << "individuals = " << catch_max;
                   unsigned fishery_ndx = 0;
-                  float random_fish, temp_sum;
+                  double random_fish, temp_sum;
 
 
                   // initialise agent that we will be assigning values to
@@ -778,18 +778,18 @@ void MortalityEventHybrid::DoExecute() {
           } // row
         } else {
           LOG_FINE() << "Applying length based F";
-          float world_catch_to_take = 0;
+          double world_catch_to_take = 0;
           for (unsigned row = 0; row < model_->get_height(); ++row) {
             for (unsigned col = 0; col < model_->get_width(); ++col) {
               unsigned catch_attempts = 1;
               unsigned catch_max = 1;
               WorldCell *cell = nullptr;
-              float catch_taken = 0;
+              double catch_taken = 0;
               cell = world_->get_base_square(row, col); // Shared resource...
               // Which fisheries are we taken catches for, not all fisheries are taking catch every year.
               vector<unsigned> fisheries_to_sample_from;
               if (cell->is_enabled()) {
-                float catch_for_fishery = 0.0;
+                double catch_for_fishery = 0.0;
                 for (unsigned i = 0; i < fishery_label_.size(); ++i) {
 
                   catch_for_fishery =  harvest_control_Catches_[model_->current_year()][fishery_label_[i]];
@@ -808,7 +808,7 @@ void MortalityEventHybrid::DoExecute() {
                   cell_ndx_[i] = age_comp_by_fishery_[i][year_ndx].size() - 1;
                 }
 
-                vector<float> prop_catch_by_fishery(fisheries_to_sample_from.size(), 0.0);
+                vector<double> prop_catch_by_fishery(fisheries_to_sample_from.size(), 0.0);
                 for (unsigned i = 0; i < prop_catch_by_fishery.size(); ++i) {
                   prop_catch_by_fishery[i] = catch_to_take_by_fishery_[fisheries_to_sample_from[i]] / catch_taken;
                   LOG_FINE() << "fishery ndx = " << fisheries_to_sample_from[i] << " proportion of catch = " << prop_catch_by_fishery[i];
@@ -826,7 +826,7 @@ void MortalityEventHybrid::DoExecute() {
                   catch_max = cell->agents_.size() * 50;
                   LOG_FINEST() << "individuals = " << catch_max;
                   unsigned fishery_ndx = 0;
-                  float random_fish, temp_sum;
+                  double random_fish, temp_sum;
                   // initialise agent that we will be assigning values to
                   Agent *this_agent = nullptr;
 
@@ -1206,7 +1206,7 @@ void MortalityEventHybrid::FillReportCache(ostringstream &cache) {
 /*
  * Set F based on R code
  */
-void MortalityEventHybrid::set_HCR(map<unsigned, map<string, float>> future_catches) {
+void MortalityEventHybrid::set_HCR(map<unsigned, map<string, double>> future_catches) {
   // find
   for (auto year_map : future_catches) {
     if(find(harvest_control_years_.begin(), harvest_control_years_.end(), year_map.first) == harvest_control_years_.end())

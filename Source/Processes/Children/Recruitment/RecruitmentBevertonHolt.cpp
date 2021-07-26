@@ -32,8 +32,8 @@ namespace processes {
  * Empty constructor
  */
 RecruitmentBevertonHolt::RecruitmentBevertonHolt(Model* model) : Recruitment(model) {
-  parameters_.Bind<float>(PARAM_STEEPNESS, &steepness_, "Steepness", "", 1.0);
-  parameters_.Bind<float>(PARAM_YCS_VALUES, &ycs_values_, "YCS (Year-Class-Strength) Values", "");
+  parameters_.Bind<double>(PARAM_STEEPNESS, &steepness_, "Steepness", "", 1.0);
+  parameters_.Bind<double>(PARAM_YCS_VALUES, &ycs_values_, "YCS (Year-Class-Strength) Values", "");
 
   RegisterAsAddressable(PARAM_YCS_VALUES, &ycs_values_by_year_);
 }
@@ -87,13 +87,13 @@ void RecruitmentBevertonHolt::DoBuild() {
   if (!recruitment_layer_)
     LOG_FATAL_P(PARAM_RECRUITMENT_LAYER_LABEL) << "could not find the @layer block " << recruitment_layer_label_ << ", please make sure it exists, if it does exits make sure it is of type numeric";
 
-  float props = 0.0;
+  double props = 0.0;
   // Check that recuitment layer is not in conflict with base layer
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
       LOG_FINEST() << "check this all works";
-      float value = recruitment_layer_->get_value(row, col);
+      double value = recruitment_layer_->get_value(row, col);
       LOG_FINEST() << "value = " << value;
       if (!cell->is_enabled() & (value > 0))
         LOG_FATAL_P(PARAM_RECRUITMENT_LAYER_LABEL) << "at row " << row + 1 << " and col " << col + 1 << " the base cell was disabled, but you have proportion of recruits in this cell " << value << ", this is not allowed. please check these layers or see manual";
@@ -161,7 +161,7 @@ void RecruitmentBevertonHolt::DoExecute() {
       first_enter_execute_ = false;
       // Don't ask for SSB on the first run,
     } else {
-      float SSB = derived_quantity_->GetLastValueFromInitialisation(init_phase_manager.last_executed_phase());
+      double SSB = derived_quantity_->GetLastValueFromInitialisation(init_phase_manager.last_executed_phase());
       model_->set_ssb(label_, SSB);
       //scalar_ = b0_ / SSB;
 	  //LOG_FINE() <<  "Rec = " << label_ << "scalar = " << scalar_ << " model scalar = " << model_->get_scalar(label_);
@@ -170,7 +170,7 @@ void RecruitmentBevertonHolt::DoExecute() {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
-          float value = recruitment_layer_->get_value(row, col);
+          double value = recruitment_layer_->get_value(row, col);
           unsigned new_agents = (unsigned)(initial_recruits_ * value);
           LOG_FINE() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " initial agents = " << initial_recruits_ << " new agents = " << new_agents;
             cell->birth_agents(new_agents, model_->get_scalar(label_));
@@ -181,13 +181,13 @@ void RecruitmentBevertonHolt::DoExecute() {
 	LOG_FINE() <<  "Rec = " << label_ << "scalar = " << scalar_ << " model scalar = " << model_->get_scalar(label_);
     scalar_ =  model_->get_scalar(label_);
     b0_ = model_->get_b0(label_);
-    float SSB = derived_quantity_->GetValue(model_->current_year() - model_->min_age());
+    double SSB = derived_quantity_->GetValue(model_->current_year() - model_->min_age());
     LOG_FINE() << "ssb = " << SSB;
     ssb_by_year_[model_->current_year()] = SSB;
-    float ssb_ratio = SSB / b0_;
-    float SR = ssb_ratio / (1.0 - ((5.0 * steepness_ - 1.0) / (4.0 * steepness_)) * (1.0 - ssb_ratio));
-    float true_ycs = ycs_values_by_year_[model_->current_year()] * SR;
-    float amount_per = unsigned(initial_recruits_ * true_ycs);
+    double ssb_ratio = SSB / b0_;
+    double SR = ssb_ratio / (1.0 - ((5.0 * steepness_ - 1.0) / (4.0 * steepness_)) * (1.0 - ssb_ratio));
+    double true_ycs = ycs_values_by_year_[model_->current_year()] * SR;
+    double amount_per = unsigned(initial_recruits_ * true_ycs);
     recruits_by_year_[model_->current_year()] = amount_per;
     ssb_ratio_[model_->current_year()] = ssb_ratio;
     SR_[model_->current_year()] = SR;
@@ -197,7 +197,7 @@ void RecruitmentBevertonHolt::DoExecute() {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
-          float value = recruitment_layer_->get_value(row, col);
+          double value = recruitment_layer_->get_value(row, col);
           unsigned new_agents = (unsigned)(amount_per * value);
           LOG_FINE() << "row = " << row + 1 << " col = " << col + 1 << " prop = " << value << " new agents = " << amount_per << " new agents = " << new_agents;
 

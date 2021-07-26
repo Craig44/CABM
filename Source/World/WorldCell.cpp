@@ -176,8 +176,7 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
   LOG_TRACE();
   if (birth_agents == 0)
     return;
-  LOG_FINE() << scalar << " agents = " << birth_agents;
-  float temp = total_individuals_alive_;
+  LOG_FINE() << scalar << " agents = " << birth_agents << " total_individuals_alive_ = " << total_individuals_alive_;
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   vector<float> mort_par;
   mortality_->draw_rate_param(row_, col_, birth_agents, mort_par);
@@ -199,11 +198,11 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
 
   unsigned sex;
   unsigned agent_bin = 0;
-  float individuals_birthed = 0.0;
+  double individuals_birthed = 0.0;
   if (model_->get_growth_model() == Growth::kVonbert) {
     for (unsigned agent = 0; agent < birth_agents; ++agent) {
       total_individuals_alive_ += scalar;
-	  individuals_birthed += scalar;
+	    individuals_birthed += scalar;
       sex = 0;
       if (sexed) {
         if (rng.chance() >= male_prop)
@@ -285,7 +284,7 @@ void WorldCell::birth_agents(unsigned birth_agents,float scalar) {
     }
   }
 
-  LOG_FINE() << "cell: " << row_ << "-" << col_ <<  "added values = " << total_individuals_alive_ - temp << " alternative individuals birthed = " << individuals_birthed << " temp = " << temp << " total_individuals_alive_ " << total_individuals_alive_;
+  LOG_FINE() << "cell: " << row_ << "-" << col_ <<  "added values = " << total_individuals_alive_  << " alternative individuals birthed = " << individuals_birthed << " total_individuals_alive_ " << total_individuals_alive_;
 }
 
 /*
@@ -733,8 +732,8 @@ void  WorldCell::update_growth_params() {
 /*
  * Returns the scaled up abundance for this cell
 */
-float  WorldCell::get_abundance() {
-  float abundance = 0.0;
+double  WorldCell::get_abundance() {
+  double abundance = 0.0;
   for (auto& agent : agents_) {
     if (agent.is_alive())
       abundance += agent.get_scalar();
@@ -751,8 +750,8 @@ float  WorldCell::get_abundance() {
 /*
  * Returns the scaled up biomass for this cell
 */
-float  WorldCell::get_biomass() {
-  float biomass = 0.0;
+double  WorldCell::get_biomass() {
+  double biomass = 0.0;
   for (auto& agent : agents_) {
     if (agent.is_alive())
       biomass += agent.get_weight() * agent.get_scalar();
@@ -769,8 +768,8 @@ float  WorldCell::get_biomass() {
 /*
  * Returns the scaled up mature biomass for this cell
 */
-float  WorldCell::get_mature_biomass() {
-  float biomass = 0.0;
+double  WorldCell::get_mature_biomass() {
+  double biomass = 0.0;
   for (auto& agent : agents_) {
     if (agent.is_alive() & agent.get_maturity()) {
       //LOG_FINEST() << "weight = " << agent.get_weight() << " scalar = " << agent.get_scalar();
@@ -790,7 +789,7 @@ float  WorldCell::get_mature_biomass() {
 /*
  * Returns the age frequency of agents in this cell
 */
-void  WorldCell::get_age_frequency(vector<float>& age_freq, bool& is_age) {
+void  WorldCell::get_age_frequency(vector<double>& age_freq, bool& is_age) {
   age_freq.clear();
   if (is_age) {
     age_freq.resize(model_->age_spread(),0);
@@ -825,7 +824,7 @@ void  WorldCell::get_age_frequency(vector<float>& age_freq, bool& is_age) {
 /*
  * Return male age frequency
 */
-void  WorldCell::get_male_frequency(vector<float>& age_freq, bool& is_age) {
+void  WorldCell::get_male_frequency(vector<double>& age_freq, bool& is_age) {
   age_freq.clear();
   if (is_age) {
     age_freq.resize(model_->age_spread(),0);
@@ -858,7 +857,7 @@ void  WorldCell::get_male_frequency(vector<float>& age_freq, bool& is_age) {
 /*
  * Returns total female age frequency
 */
-void  WorldCell::get_female_frequency(vector<float>& age_freq, bool& is_age) {
+void  WorldCell::get_female_frequency(vector<double>& age_freq, bool& is_age) {
   age_freq.clear();
   if (is_age) {
     age_freq.resize(model_->age_spread(),0);
@@ -890,7 +889,7 @@ void  WorldCell::get_female_frequency(vector<float>& age_freq, bool& is_age) {
 /*
  * Returns the age frequency of agents in this cell
 */
-void  WorldCell::get_age_agent_frequency(vector<float>& age_freq, bool& is_age) {
+void  WorldCell::get_age_agent_frequency(vector<double>& age_freq, bool& is_age) {
   age_freq.clear();
   if (is_age) {
     age_freq.resize(model_->age_spread(),0);
@@ -925,7 +924,7 @@ void  WorldCell::get_age_agent_frequency(vector<float>& age_freq, bool& is_age) 
 /*
  * Return male age frequency
 */
-void  WorldCell::get_male_agent_frequency(vector<float>& age_freq, bool& is_age) {
+void  WorldCell::get_male_agent_frequency(vector<double>& age_freq, bool& is_age) {
   age_freq.clear();
   if (is_age) {
     age_freq.resize(model_->age_spread(),0);
@@ -958,7 +957,7 @@ void  WorldCell::get_male_agent_frequency(vector<float>& age_freq, bool& is_age)
 /*
  * Returns total female age frequency
 */
-void  WorldCell::get_female_agent_frequency(vector<float>& age_freq, bool& is_age) {
+void  WorldCell::get_female_agent_frequency(vector<double>& age_freq, bool& is_age) {
   age_freq.clear();
   if (is_age) {
     age_freq.resize(model_->age_spread(),0);

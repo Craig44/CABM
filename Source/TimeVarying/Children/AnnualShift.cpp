@@ -5,7 +5,7 @@
  * @date 2/02/2015
  * @section LICENSE
  *
- * Copyright NIWA Science ©2014 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2014 - www.niwa.co.nz
  *
  */
 
@@ -21,10 +21,10 @@ namespace timevarying {
  * Default constructor
  */
 AnnualShift::AnnualShift(Model* model) : TimeVarying(model) {
-  parameters_.Bind<float>(PARAM_VALUES, &values_, "", "");
-  parameters_.Bind<float>(PARAM_A, &a_, "", "");
-  parameters_.Bind<float>(PARAM_B, &b_, "", "");
-  parameters_.Bind<float>(PARAM_C, &c_, "", "");
+  parameters_.Bind<double>(PARAM_VALUES, &values_, "", "");
+  parameters_.Bind<double>(PARAM_A, &a_, "", "");
+  parameters_.Bind<double>(PARAM_B, &b_, "", "");
+  parameters_.Bind<double>(PARAM_C, &c_, "", "");
   parameters_.Bind<unsigned>(PARAM_SCALING_YEARS, &scaling_years_, "" ,"", true);
 
 }
@@ -49,15 +49,15 @@ void AnnualShift::DoValidate() {
  *
  */
 void AnnualShift::DoBuild() {
-  map<unsigned, float> values = utilities::Map::create(years_, values_);
+  map<unsigned, double> values = utilities::Map::create(years_, values_);
 
-  float total = 0.0;
+  double total = 0.0;
   for (unsigned scaling_year : scaling_years_) {
     total += values[scaling_year];
   }
 
   for (unsigned year : years_) {
-    float scaled_value = values[year] - (total / scaling_years_.size());
+    double scaled_value = values[year] - (total / scaling_years_.size());
     values_by_year_[year] = a_ * scaled_value + b_ * pow(scaled_value, 2) + c_ * pow(scaled_value, 3);
   }
 }

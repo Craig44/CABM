@@ -36,13 +36,13 @@ MortalityEffortBased::MortalityEffortBased(Model* model) : Mortality(model) {
   parameters_.Bind<string>(PARAM_SELECTIVITY, &selectivity_label_, "Selectivity label", "");
   parameters_.Bind<string>(PARAM_MINIMIZER, &minimiser_label_, "Label of the minimser to solve the problem", "");
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "years to apply the process", "");
-  parameters_.Bind<float>(PARAM_CATCHES, &catches_, "Total catch by year","");
-  parameters_.Bind<float>(PARAM_EFFORT_VALUES, &effort_input_, "A vector of effort values, one for each enabled cell of the model, these should represent the variability of effort of the fishery mimicking","",true);
+  parameters_.Bind<double>(PARAM_CATCHES, &catches_, "Total catch by year","");
+  parameters_.Bind<double>(PARAM_EFFORT_VALUES, &effort_input_, "A vector of effort values, one for each enabled cell of the model, these should represent the variability of effort of the fishery mimicking","",true);
   parameters_.Bind<string>(PARAM_EFFORT_LAYER_LABEL, &effort_layer_label_, "A layer label that is a numeric layer label that contains effort values for each year.","","");
   parameters_.Bind<double>(PARAM_STARTING_VALUE_FOR_LAMBDA, &start_value_for_lambda_, "Total catch by year","", true);
 
 
-  //parameters_.Bind<float>(PARAM_CATCHABILITY, &catchability_, "An arbiturary scalar to get the effort value","");
+  //parameters_.Bind<double>(PARAM_CATCHABILITY, &catchability_, "An arbiturary scalar to get the effort value","");
 }
 
 /**

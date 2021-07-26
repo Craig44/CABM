@@ -5,7 +5,7 @@
  * @date 14/01/2013
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
  */
@@ -28,7 +28,7 @@ namespace selectivities {
 AllValues::AllValues(Model* model)
 : Selectivity(model) {
 
-  parameters_.Bind<float>(PARAM_V, &v_, "V", "");
+  parameters_.Bind<double>(PARAM_V, &v_, "V", "");
 
   //RegisterAsAddressable(PARAM_V, &v_);
 }

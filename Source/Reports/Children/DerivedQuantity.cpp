@@ -45,7 +45,7 @@ void DerivedQuantity::DoExecute() {
     cache_ << label << " " << REPORT_R_LIST <<" \n";
     cache_ << "type: " << dq->type() << " \n";
     if (not dq->is_spatial()) {
-      vector<vector<float>> init_values = dq->initialisation_values();
+      vector<vector<double>> init_values = dq->initialisation_values();
       for (unsigned i = 0; i < init_values.size(); ++i) {
         cache_ << "initialisation_phase["<< i + 1 << "]: ";
         cache_ << init_values[i].back() << " ";
@@ -53,10 +53,10 @@ void DerivedQuantity::DoExecute() {
       }
 
 
-      const map<unsigned, float> values = dq->values();
+      const map<unsigned, double> values = dq->values();
       cache_ << "values " << REPORT_R_VECTOR <<"\n";
       for (auto iter = values.begin(); iter != values.end(); ++iter) {
-          float weight = iter->second;
+          double weight = iter->second;
           cache_ << iter->first << " " << weight << "\n";
       }
       //cache_ <<"\n";

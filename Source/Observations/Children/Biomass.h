@@ -4,7 +4,7 @@
  * @date 7/01/2014
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * @section DESCRIPTION
  *
@@ -44,11 +44,11 @@ public:
 protected:
   // members
   vector<unsigned>                years_;
-  float                           catchability_value_;
-  map<unsigned, float>            error_values_by_year_;
-  map<unsigned,map<string, float>> pre_obs_values_by_year_;
-  map<unsigned,map<string, float>> obs_values_by_year_;
-  vector<float>                   error_values_;
+  double                           catchability_value_;
+  map<unsigned, double>            error_values_by_year_;
+  map<unsigned,map<string, double>> pre_obs_values_by_year_;
+  map<unsigned,map<string, double>> obs_values_by_year_;
+  vector<double>                   error_values_;
   string                          catchability_label_;
   //Catchability*                   catchability_ = nullptr;
   vector<string>                  selectivity_labels_;
@@ -59,7 +59,7 @@ protected:
   string                          layer_label_;
   WorldView*                       world_ = nullptr;
   bool                             selectivity_length_based_ = false;
-  float                           time_step_proportion_;
+  double                           time_step_proportion_;
   bool                            obs_abundance_;
 
 

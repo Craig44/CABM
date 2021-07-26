@@ -4,7 +4,7 @@
  * @date 8/01/2014
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * @section DESCRIPTION
  *
@@ -75,8 +75,9 @@ public:
    * @param value The values to use
    * @return a Map of keys and values
    */
-  static std::map<unsigned, float> create(const std::vector<unsigned>& key, const std::vector<float>& value) {
-    std::map<unsigned, float> result;
+   template<typename T>
+  static std::map<unsigned, T> create(const std::vector<unsigned>& key, const std::vector<T>& value) {
+    std::map<unsigned, T> result;
 
     for (unsigned i = 0; i < key.size(); ++i)
       result[key[i]] = value[i];
@@ -92,8 +93,9 @@ public:
    * @param value The values to use
    * @return a Map of keys and values
    */
-  static std::map<std::string, float> create(const std::vector<std::string>& key, const std::vector<float>& value) {
-    std::map<std::string, float> result;
+  template<typename T>
+  static std::map<std::string, T> create(const std::vector<std::string>& key, const std::vector<T>& value) {
+    std::map<std::string, T> result;
 
     for (unsigned i = 0; i < key.size(); ++i)
       result[key[i]] = value[i];

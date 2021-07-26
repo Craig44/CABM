@@ -5,7 +5,7 @@
  * @date 29/09/2015
  * @section LICENSE
  *
- * Copyright NIWA Science ©2014 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2014 - www.niwa.co.nz
  *
  */
 
@@ -22,8 +22,8 @@ namespace timevarying {
  * Default constructor
  */
 Exogenous::Exogenous(Model* model) : TimeVarying(model) {
-  parameters_.Bind<float>(PARAM_A, &a_, "Shift parameter", "");
-  parameters_.Bind<float>(PARAM_EXOGENOUS_VARIABLE, &exogenous_, "Values of exogeneous variable for each year", "");
+  parameters_.Bind<double>(PARAM_A, &a_, "Shift parameter", "");
+  parameters_.Bind<double>(PARAM_EXOGENOUS_VARIABLE, &exogenous_, "Values of exogeneous variable for each year", "");
 
   RegisterAsAddressable(PARAM_A, &a_);
 }
@@ -55,14 +55,14 @@ void Exogenous::DoBuild() {
 void Exogenous::DoReset() {
   // Add this to the Reset so that if a, is estimated the model can actually update the model.
   values_by_year_ = utilities::Map::create(years_, exogenous_);
-  float* value = model_->objects().GetAddressable(parameter_);
+  double* value = model_->objects().GetAddressable(parameter_);
   LOG_FINEST() << "Parameter value = " << (*value);
-  float total = 0.0;
+  double total = 0.0;
 
-  for (float value : exogenous_)
+  for (double value : exogenous_)
     total += value;
 
-  float mean = total / exogenous_.size();
+  double mean = total / exogenous_.size();
 
   for (unsigned year : years_)
     parameter_by_year_[year] = (*value) + (a_ * (values_by_year_[year] - mean));

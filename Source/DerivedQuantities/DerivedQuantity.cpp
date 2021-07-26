@@ -4,7 +4,7 @@
  * @date 4/07/2013
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  */
 
@@ -33,7 +33,7 @@ DerivedQuantity::DerivedQuantity(Model* model)
   parameters_.Bind<string>(PARAM_LABEL, &label_, "Label of the derived quantity", "");
   parameters_.Bind<string>(PARAM_TYPE, &type_, "Type of derived quantity", "");
   parameters_.Bind<string>(PARAM_TIME_STEP, &time_step_label_, "The time step in which to calculate the derived quantity after", "");
-  parameters_.Bind<float>(PARAM_PROPORTION_TRHOUGH_MORTALITY, &time_step_proportion_, "Proportion through the mortality block of the time step when calculated", "", float(0.5))->set_range(0.0, 1.0);
+  parameters_.Bind<double>(PARAM_PROPORTION_TRHOUGH_MORTALITY, &time_step_proportion_, "Proportion through the mortality block of the time step when calculated", "", double(0.5))->set_range(0.0, 1.0);
 }
 
 /**
@@ -98,7 +98,7 @@ void DerivedQuantity::Reset() {
  * @param year The year to get the derived quantity value for.
  * @return The derived quantity value
  */
-float DerivedQuantity::GetValue(unsigned year) {
+double DerivedQuantity::GetValue(unsigned year) {
   LOG_FINEST() << "get value for year: " << year;
 
   if (values_.find(year) != values_.end())
@@ -111,7 +111,7 @@ float DerivedQuantity::GetValue(unsigned year) {
   // in to the init phases.
   unsigned years_to_go_back = model_->start_year() - year;
 
-  float result = 0.0;
+  double result = 0.0;
   if (years_to_go_back == 0) {
     LOG_WARNING() << "Years to go back is 0 in derived quantity " << label_ << " when it shouldn't be";
     result = (*initialisation_values_.rbegin()->rbegin());
@@ -132,7 +132,7 @@ float DerivedQuantity::GetValue(unsigned year) {
   return result;
 }
 
-float DerivedQuantity::GetValue(unsigned year, unsigned row, unsigned col) {
+double DerivedQuantity::GetValue(unsigned year, unsigned row, unsigned col) {
   LOG_FINEST() << "get value for year: " << year;
   if (not spatial_)
     LOG_CODE_ERROR() << "not spatial_";
@@ -147,7 +147,7 @@ float DerivedQuantity::GetValue(unsigned year, unsigned row, unsigned col) {
   // in to the init phases.
   unsigned years_to_go_back = model_->start_year() - year;
 
-  float result = 0.0;
+  double result = 0.0;
   if (years_to_go_back == 0) {
     result = (*(*initialisation_values_by_space_.rbegin())[row][col].rbegin());
   } else if ((*initialisation_values_by_space_.rbegin())[row][col].size() > years_to_go_back) {
@@ -170,7 +170,7 @@ float DerivedQuantity::GetValue(unsigned year, unsigned row, unsigned col) {
  * @param phase The index of the phase
  * @return The derived quantity value
  */
-float DerivedQuantity::GetLastValueFromInitialisation(unsigned phase, unsigned row, unsigned col) {
+double DerivedQuantity::GetLastValueFromInitialisation(unsigned phase, unsigned row, unsigned col) {
   LOG_TRACE();
   if (initialisation_values_by_space_.size() <= phase)
     LOG_ERROR() << "No values have been calculated for the initialisation value in phase: " << phase;
@@ -187,7 +187,7 @@ float DerivedQuantity::GetLastValueFromInitialisation(unsigned phase, unsigned r
  * @param phase The index of the phase
  * @return The derived quantity value
  */
-float DerivedQuantity::GetLastValueFromInitialisation(unsigned phase) {
+double DerivedQuantity::GetLastValueFromInitialisation(unsigned phase) {
   LOG_TRACE();
   LOG_FINEST() << "about to check init_values";
 
@@ -211,7 +211,7 @@ float DerivedQuantity::GetLastValueFromInitialisation(unsigned phase) {
  * @param index The index of the value in the phase
  * @return derived quantity value
  */
-float DerivedQuantity::GetInitialisationValue(unsigned phase, unsigned index) {
+double DerivedQuantity::GetInitialisationValue(unsigned phase, unsigned index) {
   LOG_FINEST() << "phase = " << phase << "; index = " << index << "; initialisation_values_.size() = " << initialisation_values_.size();
   if (initialisation_values_.size() <= phase) {
     if (initialisation_values_.size() == 0)
@@ -233,7 +233,7 @@ float DerivedQuantity::GetInitialisationValue(unsigned phase, unsigned index) {
   return 0.0;
 }
 
-float DerivedQuantity::GetInitialisationValue(unsigned row, unsigned col, unsigned phase, unsigned index) {
+double DerivedQuantity::GetInitialisationValue(unsigned row, unsigned col, unsigned phase, unsigned index) {
   LOG_FINEST() << "phase = " << phase << "; index = " << index << "; initialisation_values_.size() = " << initialisation_values_by_space_.size();
   if (initialisation_values_by_space_.size() <= phase) {
     if (initialisation_values_by_space_.size() == 0)

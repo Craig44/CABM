@@ -48,37 +48,37 @@ protected:
   vector<string>                      fishery_selectivity_label_;
   vector<Selectivity*>                fishery_selectivity_;
   vector<unsigned>                    years_;
-  float                               discard_mortality_;
-  float                               mls_;
+  double                               discard_mortality_;
+  double                               mls_;
   bool                                f_selectivity_length_based_ = false;
-  map<unsigned,float>                 catch_by_year_;
+  map<unsigned,double>                 catch_by_year_;
   bool                                print_extra_info_ = false;
   // For reporting
-   map<unsigned, float>                actual_removals_by_year_;
-   map<unsigned, float>                removals_by_year_;
-   vector<vector<vector<float>>>       F_by_cell_year_;
+   map<unsigned, double>                actual_removals_by_year_;
+   map<unsigned, double>                removals_by_year_;
+   vector<vector<vector<double>>>       F_by_cell_year_;
   // For Tag-recaptures
   vector<unsigned>                    scanning_years_;
-  vector<float>                       scanning_proportion_;
-  vector<vector<float>>               scanning_prop_year_by_space_;
-  vector<float>                       scanning_random_numbers_;
+  vector<double>                       scanning_proportion_;
+  vector<vector<double>>               scanning_prop_year_by_space_;
+  vector<double>                       scanning_random_numbers_;
 
   // M variables
   vector<string>                      natural_mortality_selectivity_label_;
   string                              m_layer_label_;
   layers::NumericLayer*               m_layer_ = nullptr;
   vector<Selectivity*>                natural_mortality_selectivity_;
-  float                               cv_;
+  double                               cv_;
   string                              distribution_;
   bool                                m_selectivity_length_based_ = false;
-  float                               m_;
+  double                               m_;
 
   // Threading variables
   vector<vector<unsigned>>            cell_offset_;
   vector<vector<unsigned>>            model_length_bins_;
   vector<vector<unsigned>>            model_age_bins_;
-  vector<vector<float>>               mls_by_space_;
-  vector<vector<float>>               discard_by_space_;
+  vector<vector<double>>               mls_by_space_;
+  vector<vector<double>>               discard_by_space_;
   vector<vector<unsigned>>            current_year_by_space_;
   vector<vector<unsigned>>            current_time_step_by_space_;
   unsigned                            n_agents_;

@@ -73,7 +73,7 @@ void Observation::Reset() {
  * @param observed The value passed in from the configuration file
  * @param error_value The error value for this comparison
  */
-void Observation::SaveComparison(unsigned age, float length, string row_col, float expected, float simulated, float error_value, unsigned year){
+void Observation::SaveComparison(unsigned age, float length, string row_col, double expected, double simulated, double error_value, unsigned year){
   observations::Comparison new_comparison;
   new_comparison.age_ = age;
   new_comparison.sex_ = 0;
@@ -94,7 +94,7 @@ void Observation::SaveComparison(unsigned age, float length, string row_col, flo
  * @param observed The value passed in from the configuration file
  * @param error_value The error value for this comparison
  */
-void Observation::SaveComparison(unsigned age, unsigned sex, float length, string row_col, float expected, float simulated, float error_value, unsigned year){
+void Observation::SaveComparison(unsigned age, unsigned sex, float length, string row_col, double expected, double simulated, double error_value, unsigned year){
   observations::Comparison new_comparison;
   new_comparison.age_ = age;
   new_comparison.sex_ = sex;
@@ -118,7 +118,7 @@ void Observation::SaveComparison(unsigned age, unsigned sex, float length, strin
  * @param observed The value passed in from the configuration file
  * @param error_value The error value for this comparison
  */
-void Observation::SaveComparison(unsigned age, unsigned sex, float length, float cell_biomass, string row_col, float expected, float simulated, float error_value, unsigned year){
+void Observation::SaveComparison(unsigned age, unsigned sex, float length, double cell_biomass, string row_col, double expected, double simulated, double error_value, unsigned year){
   observations::Comparison new_comparison;
   new_comparison.age_ = age;
   new_comparison.sex_ = sex;

@@ -4,7 +4,7 @@
  * @date 4/02/2014
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * @section DESCRIPTION
  *
@@ -28,11 +28,11 @@ using utilities::Double;
 struct Comparison {
   unsigned  age_ = 0;
   unsigned  sex_ = 0;
-  float    length_ = 0;
-  float    cell_biomass_ = 0;
-  float    expected_ = 0;
-  float    simulated_ = 0;
-  float    error_value_ = 0;
+  double    length_ = 0;
+  double    cell_biomass_ = 0;
+  double    expected_ = 0;
+  double    simulated_ = 0;
+  double    error_value_ = 0;
 };
 
 } /* namespace observations */

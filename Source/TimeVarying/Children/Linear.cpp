@@ -5,7 +5,7 @@
  * @date 2/02/2016
  * @section LICENSE
  *
- * Copyright NIWA Science ©2014 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2014 - www.niwa.co.nz
  *
  */
 
@@ -24,8 +24,8 @@ namespace timevarying {
  * Default constructor
  */
 Linear::Linear(Model* model) : TimeVarying(model) {
-  parameters_.Bind<float>(PARAM_SLOPE, &slope_, "The slope of the linear trend (additive unit per year)", "");
-  parameters_.Bind<float>(PARAM_INTERCEPT, &intercept_, "The intercept of the linear trend value for the first year", "");
+  parameters_.Bind<double>(PARAM_SLOPE, &slope_, "The slope of the linear trend (additive unit per year)", "");
+  parameters_.Bind<double>(PARAM_INTERCEPT, &intercept_, "The intercept of the linear trend value for the first year", "");
 
   RegisterAsAddressable(PARAM_SLOPE, &slope_);
   RegisterAsAddressable(PARAM_INTERCEPT, &intercept_);
@@ -56,7 +56,7 @@ void Linear::DoReset() {
   unsigned diff = model_->current_year() - years_[0];
   LOG_FINE() << "diff unsigned = " << diff;
 
-  float years_since_first_year = (float)model_->current_year() - (float)years_[0];
+  double years_since_first_year = (double)model_->current_year() - (double)years_[0];
   LOG_FINE() << "diff from start of year = " << years_since_first_year;
   LOG_FINE() << " did we make it past this if statement " << current_year;
   if (current_year) {

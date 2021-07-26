@@ -37,14 +37,14 @@ MortalityEffortBasedWithCovar::MortalityEffortBasedWithCovar(Model* model) : Mor
   parameters_.Bind<string>(PARAM_SELECTIVITY, &selectivity_label_, "Selectivity label", "");
   parameters_.Bind<string>(PARAM_MINIMIZER, &minimiser_label_, "Label of the minimser to solve the problem", "");
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "years to apply the process", "");
-  parameters_.Bind<float>(PARAM_CATCHES, &catches_, "Total catch by year","");
-  parameters_.Bind<float>(PARAM_EFFORT_VALUES, &effort_input_, "A vector of effort values, one for each enabled cell of the model, these should represent the variability of effort of the fishery mimicking","");
+  parameters_.Bind<double>(PARAM_CATCHES, &catches_, "Total catch by year","");
+  parameters_.Bind<double>(PARAM_EFFORT_VALUES, &effort_input_, "A vector of effort values, one for each enabled cell of the model, these should represent the variability of effort of the fishery mimicking","");
  // parameters_.Bind<string>(PARAM_EFFORT_LAYER_LABEL, &effort_layer_label_, "A layer label that is a numeric layer label that contains effort values for each year.","","");
   parameters_.Bind<double>(PARAM_STARTING_VALUE_FOR_LAMBDA, &start_value_for_lambda_, "Total catch by year","", true);
   parameters_.Bind<string>(PARAM_PREFERENCE_FUNCTIONS, &preference_function_labels_, "The preference functions to apply to each layer", "");
   parameters_.Bind<string>(PARAM_PREFERENCE_LAYERS, &preference_layer_labels_, "The preference functions to apply", "");
-  parameters_.Bind<float>(PARAM_PREFERENCE_WEIGHTS, &preference_weights_, "The weight to each preference when calculating mean spatial effort distribution", "");
-  //parameters_.Bind<float>(PARAM_CATCHABILITY, &catchability_, "An arbiturary scalar to get the effort value","");
+  parameters_.Bind<double>(PARAM_PREFERENCE_WEIGHTS, &preference_weights_, "The weight to each preference when calculating mean spatial effort distribution", "");
+  //parameters_.Bind<double>(PARAM_CATCHABILITY, &catchability_, "An arbiturary scalar to get the effort value","");
 }
 
 /**

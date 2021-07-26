@@ -5,7 +5,7 @@
  * @date 15/01/2013
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
  */
@@ -29,8 +29,8 @@ namespace selectivities {
 KnifeEdge::KnifeEdge(Model* model)
 : Selectivity(model) {
 
-  parameters_.Bind<float>(PARAM_E, &edge_, "Edge", "");
-  parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
+  parameters_.Bind<double>(PARAM_E, &edge_, "Edge", "");
+  parameters_.Bind<double>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
 
   //RegisterAsAddressable(PARAM_ALPHA, &alpha_);
  // RegisterAsAddressable(PARAM_E, &edge_);
@@ -46,7 +46,7 @@ KnifeEdge::KnifeEdge(Model* model)
 void KnifeEdge::RebuildCache() {
   if (not length_based_) {
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
-      float temp = age * 1.0;
+      double temp = age * 1.0;
       if (not include_zero_age_values_ & (age == 0)) {
         values_[age - min_index_] = 0;
       } else if (temp >= edge_)
@@ -55,10 +55,10 @@ void KnifeEdge::RebuildCache() {
         values_[age - min_index_] = 0.0;
     }
   } else {
-    vector<float> length_bins = model_->length_bin_mid_points();
+    vector<double> length_bins = model_->length_bin_mid_points();
 
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index) {
-      float temp = (float)length_bins[length_bin_index];
+      double temp = (double)length_bins[length_bin_index];
       if (temp >= edge_)
         length_values_[length_bin_index] = alpha_;
       else

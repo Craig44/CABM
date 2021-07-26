@@ -363,7 +363,7 @@ void MortalityEventComposition::Simulate() {
       LOG_FINE() << "About to sort our info for stratum " << cells_[stratum_ndx];
       stratum_biomass_[cells_[stratum_ndx]] = 0.0;
       fill(stratum_comp_.begin(),stratum_comp_.end(), 0.0);
-      vector<float> biomass_by_cell;
+      vector<double> biomass_by_cell;
 
       for (processes::composition_data& comp_data : (*fishery_comp_data_)[fishery_year_ndx]) {
         // Find census elements that are in this stratum
@@ -385,7 +385,7 @@ void MortalityEventComposition::Simulate() {
        *
        */
       if (is_age_ & !ageing_error_) {
-        vector<float> vector_for_ageing(stratum_comp_.size(), 0.0); // = rep_vector(0.0, A);
+        vector<double> vector_for_ageing(stratum_comp_.size(), 0.0); // = rep_vector(0.0, A);
 
         if (sexed_flag_) {
           for (unsigned i = 0; i < n_unsexed_bins_; ++i) {
@@ -444,8 +444,8 @@ void MortalityEventComposition::Simulate() {
    */
   LOG_MEDIUM() << "Calculating score for observation = " << label_;
   // Convert to propotions before simulating for each year and cell sum = 1
-  float total = 0.0;
-  vector<float> total_by_cell(cells_.size() * years_.size(), 0.0);
+  double total = 0.0;
+  vector<double> total_by_cell(cells_.size() * years_.size(), 0.0);
   unsigned counter = 0;
   for (auto& iter : comparisons_) { // cell
     for (auto& second_iter : iter.second) {  // year

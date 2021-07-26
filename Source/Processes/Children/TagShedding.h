@@ -43,18 +43,18 @@ protected:
   vector<string>                      selectivity_label_;
   vector<Selectivity*>                selectivity_;
   vector<string>                      release_region_;
-  vector<float>                       shedding_rate_;
+  vector<double>                       shedding_rate_;
   vector<unsigned>                    tag_release_year_;
-  vector<float>                       time_step_proportions_;
-  vector<float>                       ratios_;
+  vector<double>                       time_step_proportions_;
+  vector<double>                       ratios_;
 
-  map<unsigned,vector<vector<float>>> shedding_rate_by_year_cell_; // year (map key), cell, row x col vector index
+  map<unsigned,vector<vector<double>>> shedding_rate_by_year_cell_; // year (map key), cell, row x col vector index
 
   vector<unsigned>                    release_row_;
   vector<unsigned>                    release_col_;
   vector<unsigned>                    stop_tracking_tags_in_year_;
 
-  map<unsigned, float>                time_step_ratios_;
+  map<unsigned, double>                time_step_ratios_;
   unsigned                            agents_removed_ = 0;
   bool 								                selectivity_length_based_;
   // For reporting

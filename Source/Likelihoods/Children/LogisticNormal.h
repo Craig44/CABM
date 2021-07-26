@@ -30,9 +30,9 @@ public:
 
 protected:
   // Estimable parameters
-  float                       sigma_;
+  double                       sigma_;
   vector<unsigned>            bins_;
-  vector<float>               rho_;
+  vector<double>               rho_;
   bool                        arma_;
   bool                        robust_;
   unsigned                    n_bins_;
@@ -42,16 +42,16 @@ protected:
   unsigned                    unique_bins_;
 
   // Covariance containers
-  ublas::matrix<float>       covariance_matrix_;
-  ublas::matrix<float>       covariance_matrix_lt;
+  ublas::matrix<double>       covariance_matrix_;
+  ublas::matrix<double>       covariance_matrix_lt;
   parameters::Table*         covariance_table_ = nullptr;
   // Methods
   void                       calculate_covariance();
-  vector<float>              GetRho(vector<float>& Phi, unsigned nBin, bool ARMA);
-  vector<float>              RecursiveFilter(vector<float>& ar_coef, unsigned nBins, vector<float>& initial_vals);
+  vector<double>              GetRho(vector<double>& Phi, unsigned nBin, bool ARMA);
+  vector<double>              RecursiveFilter(vector<double>& ar_coef, unsigned nBins, vector<double>& initial_vals);
   bool                       DoCholeskyDecmposition();
-  bool                       InvertMatrix(const ublas::matrix<float>& input, ublas::matrix<float>& inverse);
-  float                      det_fast(const ublas::matrix<float>& matrix);
+  bool                       InvertMatrix(const ublas::matrix<double>& input, ublas::matrix<double>& inverse);
+  double                      det_fast(const ublas::matrix<double>& matrix);
 };
 
 } /* namespace likelihoods */

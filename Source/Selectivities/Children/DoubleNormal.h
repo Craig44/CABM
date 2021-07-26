@@ -1,11 +1,11 @@
 /**
- * @file floatNormal.h
+ * @file doubleNormal.h
  * @author  Scott Rasmussen (scott.rasmussen@zaita.com)
  * @version 1.0
  * @date 14/01/2013
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * @section DESCRIPTION
  *
@@ -39,10 +39,10 @@ protected:
 
 private:
   // Members
-  float                      mu_;
-  float                      sigma_l_;
-  float                      sigma_r_;
-  float                      alpha_;
+  double                      mu_;
+  double                      sigma_l_;
+  double                      sigma_r_;
+  double                      alpha_;
 };
 
 } /* namespace selectivities */

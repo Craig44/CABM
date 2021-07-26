@@ -34,7 +34,7 @@ public:
   void                        Execute() override final;
   void                        DoValidate() override final;
   void                        DoBuild() override final;
-  void                        CalcAbundance(vector<Agent>& agents, float& value);
+  void                        CalcAbundance(vector<Agent>& agents, double& value);
 
 protected:
   string                      abundance_layer_label_;

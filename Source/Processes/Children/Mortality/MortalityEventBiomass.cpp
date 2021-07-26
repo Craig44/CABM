@@ -146,6 +146,7 @@ void MortalityEventBiomass::DoBuild() {
   cell_ndx_.resize(fishery_label_.size());
   only_mature_partition_.resize(fishery_label_.size());
   auto model_years = model_->years();
+
   // load objects
   vector<vector<string>> &catch_values_data = catch_table_->data();
 
@@ -264,11 +265,11 @@ void MortalityEventBiomass::DoBuild() {
   unsigned hand_mort_index = std::find(meth_cols.begin(), meth_cols.end(), PARAM_HANDLING_MORTALITY) - meth_cols.begin();
   for (auto meth_row : meth_data) {
     unsigned meth_index = std::find(fishery_label_.begin(), fishery_label_.end(), meth_row[0]) - fishery_label_.begin();
-    float mls = 0;
-    float hand_mort = 0;
-    if (!utilities::To<string, float>(meth_row[mls_index], mls))
+    double mls = 0;
+    double hand_mort = 0;
+    if (!utilities::To<string, double>(meth_row[mls_index], mls))
       LOG_ERROR_P(PARAM_METHOD_INFO) << PARAM_MINIMUM_LEGAL_LENGTH << " value " << meth_row[mls_index] << " is not numeric, please sort this out.";
-    if (!utilities::To<string, float>(meth_row[hand_mort_index], hand_mort))
+    if (!utilities::To<string, double>(meth_row[hand_mort_index], hand_mort))
       LOG_ERROR_P(PARAM_METHOD_INFO) << PARAM_HANDLING_MORTALITY << " value " << meth_row[hand_mort_index] << " is not numeric, please sort this out.";
     fishery_mls_[fishery_index_[meth_index]] = mls;
     fishery_hand_mort_[fishery_index_[meth_index]] = hand_mort;
@@ -300,9 +301,9 @@ void MortalityEventBiomass::DoBuild() {
         << "year " << year << " is not found in the catch table, there needs to be a year for every catch year.";
       scanning_years_.push_back(year);
 
-      float prop = 0;
+      double prop = 0;
       for (unsigned i = 1; i < scan_row.size(); ++i) {
-        if (!utilities::To<string, float>(scan_row[i], prop))
+        if (!utilities::To<string, double>(scan_row[i], prop))
           LOG_FATAL_P(PARAM_SCANNING)
           << "proportion value " << scan_row[i] << " is not numeric.";
         if (prop < 0 || prop > 1) {
@@ -324,7 +325,6 @@ void MortalityEventBiomass::DoBuild() {
   LOG_FINE() << "finished building Tables";
 
   catch_to_take_by_fishery_.resize(fishery_index_.size(), 0.0);
-
   actual_catch_by_area_.resize(years_.size());
   for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
     actual_catch_by_area_[year_ndx].resize(fishery_label_.size());
@@ -346,6 +346,7 @@ void MortalityEventBiomass::DoReset() {
   removals_census_.clear();
   removals_tag_recapture_.clear();
   for (unsigned year_ndx = 0; year_ndx < years_.size(); ++year_ndx) {
+    
     for (unsigned fishery_ndx = 0; fishery_ndx < fishery_label_.size(); ++fishery_ndx) {
       fishery_census_data_[fishery_ndx][year_ndx].clear();
       age_comp_by_fishery_[fishery_ndx][year_ndx].clear();
@@ -393,7 +394,7 @@ void MortalityEventBiomass::DoExecute() {
       }
 
       LOG_FINE() << "about to kick into the gear, are we scanning (1 = yes) " << scanning_;
-      float world_catch_to_take = 0;
+      double world_catch_to_take = 0;
       if (not selectivity_length_based_) {
         LOG_FINE() << "Age based F";
         for (unsigned row = 0; row < model_->get_height(); ++row) {
@@ -401,13 +402,13 @@ void MortalityEventBiomass::DoExecute() {
             unsigned catch_attempts = 1;
             unsigned catch_max = 1;
             WorldCell *cell = nullptr;
-            float catch_taken = 0;
+            double catch_taken = 0;
             cell = world_->get_base_square(row, col); // Shared resource...
             // Which fisheries are we taken catches for, not all fisheries are taking catch every year.
             vector<unsigned> fisheries_to_sample_from;
             if (cell->is_enabled()) {
               fill(catch_to_take_by_fishery_.begin(), catch_to_take_by_fishery_.end(), 0.0);
-              float catch_for_fishery = 0.0;
+              double catch_for_fishery = 0.0;
               LOG_FINE() << "cell: " << row << "-" << col << " what we are storing = " << catch_to_take_by_fishery_.size() << " looping over " << fishery_catch_layer_.size();
               for (unsigned i = 0; i < fishery_catch_layer_.size(); ++i) {
                 catch_for_fishery = fishery_catch_layer_[i][catch_ndx]->get_value(row, col);
@@ -424,11 +425,12 @@ void MortalityEventBiomass::DoExecute() {
                 if (catch_for_fishery > 0.0)
                   fisheries_to_sample_from.push_back(i);
 
+
                 cell_ndx_[i] = age_comp_by_fishery_[i][catch_ndx].size() - 1;
                 LOG_MEDIUM() << "ndx = " << cell_ndx_[i] << " for fishery = " << fishery_label_[i];
               }
 
-              vector<float> prop_catch_by_fishery(fisheries_to_sample_from.size(), 0.0);
+              vector<double> prop_catch_by_fishery(fisheries_to_sample_from.size(), 0.0);
               for (unsigned i = 0; i < prop_catch_by_fishery.size(); ++i) {
                 prop_catch_by_fishery[i] = catch_to_take_by_fishery_[fisheries_to_sample_from[i]] / catch_taken;
                 LOG_FINE() << "fishery ndx = " << fisheries_to_sample_from[i] << " proportion of catch = " << prop_catch_by_fishery[i];
@@ -450,7 +452,7 @@ void MortalityEventBiomass::DoExecute() {
                 catch_max = cell->agents_.size() * 2;
                 LOG_FINEST() << "individuals = " << catch_max;
                 unsigned fishery_ndx = 0;
-                float random_fish, temp_sum;
+                double random_fish, temp_sum;
                 double vulnerable_total_in_cell = 0.0; // an approximation. assumes catches proportion for entire population, it's also stochastic with selectivity
                 double tagged_fish = 0;
                 double tagged_fish_vulnerable = 0;
@@ -533,7 +535,7 @@ void MortalityEventBiomass::DoExecute() {
                 unsigned agent_counter = 0;
 
                 bool already_checked_selec = false;
-
+                unsigned sample_agent_ndx = 0;
                 // initialise agent that we will be assigning values to
                 Agent *this_agent = nullptr;
 
@@ -565,7 +567,7 @@ void MortalityEventBiomass::DoExecute() {
                     // Kick out of this cell
                     break;
                   }
-                  already_checked_selec = false;
+                  already_checked_selec = false;   // this is only used in tagging.
                   // randomly select a fishery based on proportion of catch to take
                   temp_sum = 0.0;
                   random_fish = rng.chance();
@@ -578,7 +580,9 @@ void MortalityEventBiomass::DoExecute() {
                   }
                   if (catch_to_take_by_fishery_[fishery_ndx] > 0) {
                     // randomly find agent
-                    this_agent = &cell->agents_[rng.chance() * cell->agents_.size()];
+                    sample_agent_ndx = rng.chance() * cell->agents_.size();
+                    this_agent = &cell->agents_[sample_agent_ndx];
+
                     // if scanning for tag-recoveries check that
                     if (scanning_this_year_[fishery_ndx]) {
                       agent_has_tag = (unsigned) rng.binomial(prob_of_tagged_fish, 1);
@@ -617,6 +621,7 @@ void MortalityEventBiomass::DoExecute() {
                     // Do the Moratlity check and remove from partition aka die
                     if ((*this_agent).is_alive()) {
                       if ((rng.chance() <= fishery_selectivity_[fishery_ndx][(*this_agent).get_sex()]->GetResult((*this_agent).get_age_index())) | already_checked_selec) {
+
                         if (only_mature_partition_[fishery_ndx]) { // for most models this will be false
                           if (not (*this_agent).get_maturity()) {
                             continue;
@@ -710,24 +715,26 @@ void MortalityEventBiomass::DoExecute() {
                   removals_tag_recapture_.push_back(tag_recapture_info);
                 }
                 LOG_MEDIUM() << "row = " << row + 1 << " col = " << col + 1 << " tags drawn = " << tag_recapture_info.tag_draws_ << " tags saved " << tag_recapture_info.length_ndx_.size();
+                LOG_MEDIUM() << "catch attempts for agents counter =  " << catch_attempts;
+
               } //if (catch_taken > 0) {
             } // cell ->is_enabled()
           } // col
         } // row
       } else {
         LOG_FINE() << "Applying length based F";
-        float world_catch_to_take = 0;
+        double world_catch_to_take = 0;
         for (unsigned row = 0; row < model_->get_height(); ++row) {
           for (unsigned col = 0; col < model_->get_width(); ++col) {
             unsigned catch_attempts = 1;
             unsigned catch_max = 1;
             WorldCell *cell = nullptr;
-            float catch_taken = 0;
+            double catch_taken = 0;
             cell = world_->get_base_square(row, col); // Shared resource...
             // Which fisheries are we taken catches for, not all fisheries are taking catch every year.
             vector<unsigned> fisheries_to_sample_from;
             if (cell->is_enabled()) {
-              float catch_for_fishery = 0.0;
+              double catch_for_fishery = 0.0;
               for (unsigned i = 0; i < fishery_catch_layer_.size(); ++i) {
                 LOG_FINE() << "in year " << model_->current_year() << " fishery " << fishery_label_[i];
                 catch_for_fishery = fishery_catch_layer_[i][catch_ndx]->get_value(row, col);
@@ -745,9 +752,10 @@ void MortalityEventBiomass::DoExecute() {
                   fisheries_to_sample_from.push_back(i);
 
                 cell_ndx_[i] = age_comp_by_fishery_[i][catch_ndx].size() - 1;
+
               }
 
-              vector<float> prop_catch_by_fishery(fisheries_to_sample_from.size(), 0.0);
+              vector<double> prop_catch_by_fishery(fisheries_to_sample_from.size(), 0.0);
               for (unsigned i = 0; i < prop_catch_by_fishery.size(); ++i) {
                 prop_catch_by_fishery[i] = catch_to_take_by_fishery_[fisheries_to_sample_from[i]] / catch_taken;
                 LOG_FINE() << "fishery ndx = " << fisheries_to_sample_from[i] << " proportion of catch = " << prop_catch_by_fishery[i];
@@ -769,7 +777,7 @@ void MortalityEventBiomass::DoExecute() {
                 LOG_FINEST() << "individuals = " << catch_max;
                 unsigned fishery_ndx = 0;
 
-                float random_fish, temp_sum;
+                double random_fish, temp_sum;
                 double vulnerable_total_in_cell = 0.0; // an approximation. assumes catches proportion for entire population, it's also stochastic with selectivity
                 double tagged_fish = 0;
                 double tagged_fish_vulnerable = 0;
@@ -1295,6 +1303,8 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
         cache << "\n";
       }
     }
+     
+  
 
     // Print Census information (warning this will print alot of information
 
@@ -1333,7 +1343,7 @@ void MortalityEventBiomass::FillReportCache(ostringstream &cache) {
 /*
  * Set Catch based on R code
  */
-void MortalityEventBiomass::set_HCR(map<unsigned, map<string, float>> future_catches) {
+void MortalityEventBiomass::set_HCR(map<unsigned, map<string, double>> future_catches) {
   // find
   for (auto year_map : future_catches) {
     if(find(years_.begin(), years_.end(), year_map.first) == years_.end())

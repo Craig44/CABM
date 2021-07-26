@@ -40,14 +40,14 @@ public:
   void                        RebuildCache() override final;
 
 protected:
-  vector<float>               ycs_values_;
-  float                       steepness_;
+  vector<double>               ycs_values_;
+  double                       steepness_;
 
   // Reporting containers that will be printed in FillReportCache() method
-  map<unsigned, float>        ycs_values_by_year_;
-  map<unsigned, float>        ssb_ratio_;
-  map<unsigned, float>        SR_;
-  map<unsigned, float>        true_ycs_;
+  map<unsigned, double>        ycs_values_by_year_;
+  map<unsigned, double>        ssb_ratio_;
+  map<unsigned, double>        SR_;
+  map<unsigned, double>        true_ycs_;
 };
 
 } /* namespace processes */

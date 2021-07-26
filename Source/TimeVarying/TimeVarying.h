@@ -5,7 +5,7 @@
  * @date 27/01/2015
  * @section LICENSE
  *
- * Copyright NIWA Science ©2014 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2014 - www.niwa.co.nz
  *
  * @section DESCRIPTION
  *
@@ -25,7 +25,7 @@ namespace niwa {
  *
  */
 class TimeVarying : public niwa::base::Object {
-  typedef void (TimeVarying::*UpdateFunction)(float);
+  typedef void (TimeVarying::*UpdateFunction)(double);
 public:
   // methods
   TimeVarying() = delete;
@@ -37,16 +37,16 @@ public:
   void                        Update(unsigned current_year);
 
   //accessors
-  map<unsigned, float>&      get_parameter_by_year() { return parameter_by_year_; }
+  map<unsigned, double>&      get_parameter_by_year() { return parameter_by_year_; }
 
 protected:
   // methods
   void                        RestoreOriginalValue();
 
   // settors
-  void                        set_single_value(float value);
-  void                        set_vector_value(float value);
-  void                        set_map_value(float value);
+  void                        set_single_value(double value);
+  void                        set_vector_value(double value);
+  void                        set_map_value(double value);
 
   // pure virtual methods
   virtual void                DoValidate() = 0;
@@ -63,11 +63,11 @@ protected:
   string                      type_ = "";
   vector<unsigned>            years_;
   string                      parameter_;
-  float                       original_value_ = 0;
-  map<unsigned, float>*       addressable_map_ = 0;
-  vector<float>*              addressable_vector_ = 0;
-  float*                      addressable_ = 0;
-  map<unsigned, float>        parameter_by_year_;
+  double                       original_value_ = 0;
+  map<unsigned, double>*       addressable_map_ = 0;
+  vector<double>*              addressable_vector_ = 0;
+  double*                      addressable_ = 0;
+  map<unsigned, double>        parameter_by_year_;
 };
 
 typedef std::shared_ptr<TimeVarying> TimeVaryingPtr;

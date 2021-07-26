@@ -53,15 +53,15 @@ protected:
   vector<string>                      b_layer_label_;
   vector<niwa::layers::NumericLayer*> a_layer_;
   vector<niwa::layers::NumericLayer*> b_layer_;
-  vector<float>                       tau1_;
-  vector<float>                       tau2_;
-  vector<float>                       y1_;
-  vector<float>                       y2_;
-  vector<float>                       beta_;
-  vector<float>                       alpha_;
-  vector<float>                       a_;
-  vector<float>                       b_;
-  vector<float>                       t0_;
+  vector<double>                       tau1_;
+  vector<double>                       tau2_;
+  vector<double>                       y1_;
+  vector<double>                       y2_;
+  vector<double>                       beta_;
+  vector<double>                       alpha_;
+  vector<double>                       a_;
+  vector<double>                       b_;
+  vector<double>                       t0_;
 };
 
 } /* namespace processes */

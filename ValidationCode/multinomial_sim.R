@@ -73,4 +73,34 @@ ggplot(full_df, aes(x = age, y = qs , col = model, linetype = model)) +
   facet_wrap(~prob)
 
 
+####################################
+## Compare simulating from full age-structure vs truncated age-structure
+######################################
+set.seed(123)
+full_age =  expect$expected[1:30]
+trunc_age = full_age[5:15]
+trunc_age[length(trunc_age)] = sum(full_age[15:(length(full_age))])
+
+Rs_sim_full = rmultinom(n = 1000, size = 500, prob = full_age)
+Rs_sim_trunc = rmultinom(n = 1000, size = 500, prob = trunc_age)
+
+## manually truncate full age after simulation
+Rs_sim_full_trunc = Rs_sim_full[5:15, ]
+Rs_sim_full_trunc[nrow(Rs_sim_full_trunc), ] = colSums(Rs_sim_full[15:nrow(Rs_sim_full), ])
+Rs_sim_full_trunc <- sweep(Rs_sim_full_trunc, 2, apply(Rs_sim_full_trunc, 2, sum), "/")
+Rs_sim_trunc <- sweep(Rs_sim_trunc, 2, apply(Rs_sim_trunc, 2, sum), "/")
+
+dim(Rs_sim_full_trunc)
+dim(Rs_sim_trunc)
+
+trunc_quants = apply(Rs_sim_trunc, 1, FUN = function(x){quantile(x, probs = c(0.025, 0.5, 0.975))})
+full_trunc_quants = apply(Rs_sim_full_trunc, 1, FUN = function(x){quantile(x, probs = c(0.025, 0.5, 0.975))})
+
+plot(5:15, trunc_quants["50%",], lty = 2, lwd = 3, type = "o")
+lines(5:15, full_trunc_quants["50%",], lty = 2, type = "o", col = "red", lwd = 4)
+lines(5:15, trunc_quants["2.5%",], lty = 3, type = "o", col = "black", lwd = 4)
+lines(5:15, full_trunc_quants["2.5%",], lty = 3, type = "o", col = "red", lwd = 4)
+lines(5:15, trunc_quants["97.5%",], lty = 4, type = "o", col = "black", lwd = 4)
+lines(5:15, full_trunc_quants["97.5%",], lty = 4, type = "o", col = "red", lwd = 4)
+
 

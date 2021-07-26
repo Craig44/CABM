@@ -171,7 +171,7 @@ void ProcessRemovalsByLength::Simulate() {
    */
   vector<processes::composition_data>& length_frequency = mortality_process_->get_removals_by_length();
   LOG_FINEST() << "number of years for this observation = " << length_frequency.size();
-  vector<float> length_mid_points = model_->length_bin_mid_points();
+  vector<double> length_mid_points = model_->length_bin_mid_points();
   // iterate over all the years that we want
   for (unsigned year : years_) {
     for (string cell : cells_) {

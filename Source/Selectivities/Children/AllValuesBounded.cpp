@@ -5,7 +5,7 @@
  * @date 14/01/2013
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
  */
@@ -30,7 +30,7 @@ AllValuesBounded::AllValuesBounded(Model* model)
 
   parameters_.Bind<unsigned>(PARAM_L, &low_, "L", "");
   parameters_.Bind<unsigned>(PARAM_H, &high_, "H", "");
-  parameters_.Bind<float>(PARAM_V, &v_, "V", "");
+  parameters_.Bind<double>(PARAM_V, &v_, "V", "");
 
   //RegisterAsAddressable(PARAM_V, &v_);
 }
@@ -68,7 +68,7 @@ void AllValuesBounded::DoValidate() {
     }
 
   } else {
-    vector<float> length_bins = model_->length_bin_mid_points();
+    vector<double> length_bins = model_->length_bin_mid_points();
     unsigned bins = 0;
     for (unsigned i = 0; i < length_bins.size(); ++i) {
       if (length_bins[i] >= low_ && length_bins[i] <= high_)
@@ -118,7 +118,7 @@ void AllValuesBounded::RebuildCache() {
       values_[age - min_index_] = *v_.rbegin();
 
   } else {
-    vector<float> length_bins = model_->length_bin_mid_points();
+    vector<double> length_bins = model_->length_bin_mid_points();
     unsigned v_index = 0;
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index)
       if (length_bins[length_bin_index] < low_)

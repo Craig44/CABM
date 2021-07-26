@@ -5,7 +5,7 @@
  * @date 29/09/2015
  * @section LICENSE
  *
- * Copyright NIWA Science ©2014 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2014 - www.niwa.co.nz
  *
  * @section DESCRIPTION
  * This class allows a parameter to vary by year, based on a known exogenous variable and a shift parameter that
@@ -35,9 +35,9 @@ public:
 
 private:
   // members
-  vector<float>              exogenous_;
-  float                      a_;
-  map<unsigned, float>       values_by_year_;
+  vector<double>              exogenous_;
+  double                      a_;
+  map<unsigned, double>       values_by_year_;
 };
 
 } /* namespace timevarying */

@@ -38,7 +38,7 @@ Tagging::Tagging(Model* model) : Process(model) {
 
   parameters_.Bind<string>(PARAM_TAGGING_LAYERS, &tag_layer_label_, "Spatial layer describing catch by cell for each year, there is a one to one link with the year specified, so make sure the order is right", "", true);
   parameters_.Bind<string>(PARAM_SELECTIVITIES, &selectivity_labels_, "selectivity used to capture agents", "", "");
-  parameters_.Bind<float>(PARAM_HANDLING_MORTALITY, &handling_mortality_, "What is the handling mortality assumed for tagged fish, sometimes called initial mortality", "", 0);
+  parameters_.Bind<double>(PARAM_HANDLING_MORTALITY, &handling_mortality_, "What is the handling mortality assumed for tagged fish, sometimes called initial mortality", "", 0);
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "Years to execute the transition in", "");
   parameters_.BindTable(PARAM_PROPORTIONS, proportions_table_, "Table of proportions to move", "" , true, true);
 
@@ -124,7 +124,7 @@ void Tagging::DoBuild() {
     unsigned row_counter = 0;
     unsigned year = 0;
     string cell = "";
-    float proportion = 0.0;
+    double proportion = 0.0;
     for (auto iter : data) {
       ++row_counter;
       if (!utilities::To<unsigned>(iter[0], year))
@@ -156,10 +156,10 @@ void Tagging::DoBuild() {
         LOG_ERROR_P(PARAM_PROPORTIONS) << "The cell col " << cell_ndx << " at row " << row_counter << " is less than equal to 0, must be greater than 0";
 
 
-      vector<float> proportions;
-      float total_proportion = 0.0;
+      vector<double> proportions;
+      double total_proportion = 0.0;
       for (unsigned i = 2; i < iter.size(); ++i) {
-        if (!utilities::To<float>(iter[i], proportion))
+        if (!utilities::To<double>(iter[i], proportion))
           LOG_ERROR_P(PARAM_PROPORTIONS) << " value (" << iter[i] << ") could not be converted to a double. Please ensure it's a numeric value";
         LOG_FINE() << "i = " << i << " prop = " << proportion;
         proportions.push_back(proportion);
@@ -392,7 +392,7 @@ void Tagging::DoExecute() {
                 agent_counter = tags_by_length_bin[i];
 
                 unsigned agent_ndx = 0;
-                float updated_scalar = 0.0;
+                double updated_scalar = 0.0;
                 while(agent_counter > 0) {
 
                   //LOG_MEDIUM() << "agent counter = " << agent_counter;

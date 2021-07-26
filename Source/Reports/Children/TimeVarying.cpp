@@ -46,7 +46,7 @@ void TimeVarying::DoExecute() {
     LOG_FINEST() << "Reporting for @time_varying block " << label;
     cache_ << label << " " << REPORT_R_DATAFRAME << "\n";
 
-    map<unsigned, float>& parameter_by_year = time_var->get_parameter_by_year();
+    map<unsigned, double>& parameter_by_year = time_var->get_parameter_by_year();
     cache_ << "year" << " Value \n";
     for (auto param : parameter_by_year) {
       cache_ << param.first << "  " << AS_DOUBLE(param.second) << "\n";

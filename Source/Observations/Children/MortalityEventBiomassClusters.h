@@ -66,7 +66,7 @@ protected:
   unsigned                        age_spread_;
 
   bool                            sexed_flag_;
-  vector<float>                   length_bins_;
+  vector<double>                   length_bins_;
   vector<float>                   age_bins_;
 
   // cluster info
@@ -117,7 +117,7 @@ protected:
 
   map<unsigned,map<string,vector<vector<float>>>>     age_length_key_by_year_stratum_;
   map<unsigned,map<string,vector<float>>>             lf_by_year_stratum_;
-  vector<float>                                       model_length_mid_points_;
+  vector<double>                                       model_length_mid_points_;
 
   // Storing cluster based information
   vector<vector<vector<vector<unsigned>>>>    cluster_census_; // n_years x n_stratum x n_clusters x n_individuals (contains ages or lengths)

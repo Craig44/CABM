@@ -34,8 +34,8 @@ namespace processes {
 TagShedding::TagShedding(Model *model) :
     Process(model) {
   parameters_.Bind<string>(PARAM_SELECTIVITY_LABEL, &selectivity_label_, "Label for the selectivity block", "");
-  parameters_.Bind<float>(PARAM_TIME_STEP_RATIO, &ratios_, "Time step ratios for the Shedding rates to apply in each time step. See manual for how this is applied", "");
-  parameters_.Bind<float>(PARAM_SHEDDING_RATE, &shedding_rate_, "Shedding rate per Tag release event", "");
+  parameters_.Bind<double>(PARAM_TIME_STEP_RATIO, &ratios_, "Time step ratios for the Shedding rates to apply in each time step. See manual for how this is applied", "");
+  parameters_.Bind<double>(PARAM_SHEDDING_RATE, &shedding_rate_, "Shedding rate per Tag release event", "");
   parameters_.Bind<string>(PARAM_RELEASE_REGION, &release_region_,
       "The Release region for the corresponding shedding rate, in the format 1-1 for the first row and first column, and '5-2' for the fifth row and secnd column", "");
   parameters_.Bind<unsigned>(PARAM_RELEASE_YEAR, &tag_release_year_, "The Release Year for the corresponding shedding rate", "");
@@ -120,7 +120,7 @@ void TagShedding::DoBuild() {
     if (ratios_.size() != active_time_steps.size())
       LOG_ERROR_P(PARAM_TIME_STEP_RATIO) << " length (" << ratios_.size() << ") does not match the number of time steps this process has been assigned to (" << active_time_steps.size() << ")";
 
-    for (float value : ratios_) {
+    for (double value : ratios_) {
       if (value < 0.0 || value > 1.0)
         LOG_ERROR_P(PARAM_TIME_STEP_RATIO) << " value (" << value << ") must be between 0.0 (exclusive) and 1.0 (inclusive)";
     }
@@ -128,7 +128,7 @@ void TagShedding::DoBuild() {
     for (unsigned i = 0; i < ratios_.size(); ++i)
       time_step_ratios_[active_time_steps[i]] = ratios_[i];
   }
-  vector<vector<float>> temp_empty_matrix;
+  vector<vector<double>> temp_empty_matrix;
   temp_empty_matrix.resize(model_->get_height());
   for (unsigned row_ndx = 0; row_ndx < model_->get_height(); ++row_ndx) {
     temp_empty_matrix[row_ndx].resize(model_->get_width(), 0.0);
@@ -184,7 +184,7 @@ void TagShedding::DoExecute() {
   if ((model_->state() != State::kInitialise) & check.first) {
     utilities::RandomNumberGenerator &rng = utilities::RandomNumberGenerator::Instance();
     unsigned time_step = model_->managers().time_step()->current_time_step();
-    float ratio = time_step_ratios_[time_step];
+    double ratio = time_step_ratios_[time_step];
     LOG_MEDIUM() << "time_step = " << time_step << " ratio = " << ratio;
     /*
      * Are we removing this cohort of tagged agents

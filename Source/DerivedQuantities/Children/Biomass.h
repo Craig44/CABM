@@ -34,7 +34,7 @@ public:
   void                        Execute() override final;
   void                        DoValidate() override final;
   void                        DoBuild() override final;
-  void                        CalcBiomass(vector<Agent>& agents, float& value);
+  void                        CalcBiomass(vector<Agent>& agents, double& value);
 
 protected:
   string                      biomass_layer_label_;

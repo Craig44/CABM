@@ -5,7 +5,7 @@
  * @date 2/02/2016
  * @section LICENSE
  *
- * Copyright NIWA Science ©2014 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2014 - www.niwa.co.nz
  *
  */
 
@@ -24,11 +24,11 @@ namespace timevarying {
  * Default constructor
  */
 RandomWalk::RandomWalk(Model* model) : TimeVarying(model) {
-  parameters_.Bind<float>(PARAM_MEAN, &mu_, "Mean", "", 0);
-  parameters_.Bind<float>(PARAM_SIGMA, &sigma_, "Standard deviation", "", 1);
-  parameters_.Bind<float>(PARAM_UPPER_BOUND, &upper_bound_, "Upper bound for the random walk", "", 1);
-  parameters_.Bind<float>(PARAM_UPPER_BOUND, &lower_bound_, "Lower bound for the random walk", "", 1);
-  parameters_.Bind<float>(PARAM_RHO, &rho_, "Auto Correlation parameter", "", 1);
+  parameters_.Bind<double>(PARAM_MEAN, &mu_, "Mean", "", 0);
+  parameters_.Bind<double>(PARAM_SIGMA, &sigma_, "Standard deviation", "", 1);
+  parameters_.Bind<double>(PARAM_UPPER_BOUND, &upper_bound_, "Upper bound for the random walk", "", 1);
+  parameters_.Bind<double>(PARAM_UPPER_BOUND, &lower_bound_, "Lower bound for the random walk", "", 1);
+  parameters_.Bind<double>(PARAM_RHO, &rho_, "Auto Correlation parameter", "", 1);
   parameters_.Bind<string>(PARAM_DISTRIBUTION, &distribution_, "distribution", "", PARAM_NORMAL);
 
   RegisterAsAddressable(PARAM_MEAN, &mu_);
@@ -57,8 +57,8 @@ void RandomWalk::DoBuild() {
 void RandomWalk::DoUpdate() {
   LOG_FINEST() << "value = " << *addressable_;
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
-  float value = *addressable_;
-  float deviate = rng.normal((mu_), (sigma_));
+  double value = *addressable_;
+  double deviate = rng.normal((mu_), (sigma_));
   value += value * rho_ + deviate;
 
 

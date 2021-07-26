@@ -55,8 +55,8 @@ public:
   void                        Reset();
 
   // Accessors
-  float                      get_abundance(void) {return 1.0; };
-  float                      get_biomass(void) {return 1.0; };
+  double                      get_abundance(void) {return 1.0; };
+  double                      get_biomass(void) {return 1.0; };
   //unsigned                    get_height() { return height_; }  // these can be called off the model
   //unsigned                    get_width() { return width_; }  // these can be called off the model
 
@@ -71,8 +71,8 @@ public:
   void                        MergeWorldForInit();
   void                        MergeCachedGrid();
   void                        MergeCachedGrid(bool update_lat_long);
-  void                        get_world_age_frequency(vector<float>& world_age_freq);
-  void                        get_cell_element(unsigned& row, unsigned& col, const float lat, const float lon);
+  void                        get_world_age_frequency(vector<double>& world_age_freq);
+  void                        get_cell_element(unsigned& row, unsigned& col, const double lat, const double lon);
   // Used by methods to tell the world that time varying parameters need to be changed, usually in the RebuildCache() function of a process
   void                        rebuild_growth_params() {update_growth_params_ = true;}
   void                        rebuild_mort_params() {update_mortality_params_ = true;}
@@ -90,10 +90,10 @@ protected:
   unsigned                    enabled_cells_;
   vector<unsigned>            enabled_rows_;
   vector<unsigned>            enabled_cols_;
-  vector<float>               lat_midpoint_by_cell_;
-  vector<float>               lon_midpoint_by_cell_;
-  vector<float>               lat_bounds_;
-  vector<float>               lon_bounds_;
+  vector<double>               lat_midpoint_by_cell_;
+  vector<double>               lon_midpoint_by_cell_;
+  vector<double>               lat_bounds_;
+  vector<double>               lon_bounds_;
   bool                        update_growth_params_ = false;
   bool                        update_mortality_params_ = false;
 

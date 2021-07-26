@@ -21,7 +21,7 @@ namespace selectivities {
 Constant::Constant(Model* model)
 : Selectivity(model) {
 
-  parameters_.Bind<float>(PARAM_C, &c_, "C", "");
+  parameters_.Bind<double>(PARAM_C, &c_, "C", "");
 
  // RegisterAsAddressable(PARAM_C, &c_);
 }
@@ -33,7 +33,7 @@ Constant::Constant(Model* model)
  * @param age_or_length unsused in this selectivity
  * @return the constant value
  */
-float Constant::GetResult(unsigned age_or_length) {
+double Constant::GetResult(unsigned age_or_length) {
   return c_;
 }
 

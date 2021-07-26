@@ -38,12 +38,12 @@ namespace utils = niwa::utilities;
  * Default constructor
  */
 Biomass::Biomass(Model* model) : Observation(model) {
-  parameters_.Bind<float>(PARAM_CATCHABILITY, &catchability_value_, "The Catchability multiplier", ""); // TODO not sure if neccessary
+  parameters_.Bind<double>(PARAM_CATCHABILITY, &catchability_value_, "The Catchability multiplier", ""); // TODO not sure if neccessary
   parameters_.Bind<string>(PARAM_TIME_STEP, &time_step_label_, "The label of time-step that the observation occurs in", "");
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "The years of the observed values", "");
-  parameters_.Bind<float>(PARAM_ERROR_VALUE, &error_values_, "The error values of the observed values (note the units depend on the likelihood)", "");
+  parameters_.Bind<double>(PARAM_ERROR_VALUE, &error_values_, "The error values of the observed values (note the units depend on the likelihood)", "");
   parameters_.Bind<string>(PARAM_SELECTIVITIES, &selectivity_labels_, "Labels of the selectivities", "", true);
-  parameters_.Bind<float>(PARAM_PROPORTION_TRHOUGH_MORTALITY, &time_step_proportion_, "Proportion through the mortality block of the time step to infer observation with", "", float(0.5))->set_range(0.0, 1.0);
+  parameters_.Bind<double>(PARAM_PROPORTION_TRHOUGH_MORTALITY, &time_step_proportion_, "Proportion through the mortality block of the time step to infer observation with", "", double(0.5))->set_range(0.0, 1.0);
   parameters_.Bind<string>(PARAM_LAYER_OF_CELLS, &layer_label_, "The layer that indicates what area to summarise observations over.", "");
   parameters_.Bind<string>(PARAM_CELLS, &cells_, "The cells we want to generate observations for from the layer of cells supplied", "");
   parameters_.Bind<string>(PARAM_SIMULATION_LIKELIHOOD, &simulation_likelihood_label_, "Simulation likelihood to use", "");
@@ -198,7 +198,7 @@ void Biomass::PreExecute() {
             if (cell->is_enabled()) {
               LOG_FINEST() << "about to convert " << cell->agents_.size() << " through the maturity process";
               //unsigned counter = 1;
-              float probability;
+              double probability;
               if (obs_abundance_) {
                 for (Agent& agent : cell->agents_) {
                   if (agent.is_alive()) {
@@ -231,7 +231,7 @@ void Biomass::PreExecute() {
             if (cell->is_enabled()) {
               LOG_FINEST() << "about to convert " << cell->agents_.size() << " through the maturity process";
               //unsigned counter = 1;
-              float probability;
+              double probability;
               if (obs_abundance_) {
                 for (Agent& agent : cell->agents_) {
                   if (agent.is_alive()) {
@@ -280,7 +280,7 @@ void Biomass::Execute() {
             if (cell->is_enabled()) {
               LOG_MEDIUM() << "about to convert " << cell->agents_.size() << " through the maturity process";
               //unsigned counter = 1;
-              float probability;
+              double probability;
               if (obs_abundance_) {
                 for (Agent& agent : cell->agents_) {
                   if (agent.is_alive()) {
@@ -313,7 +313,7 @@ void Biomass::Execute() {
             if (cell->is_enabled()) {
               LOG_FINEST() << "about to convert " << cell->agents_.size() << " through the maturity process";
               //unsigned counter = 1;
-              float probability;
+              double probability;
               if (obs_abundance_) {
                 for (Agent& agent : cell->agents_) {
                   if (agent.is_alive()) {
@@ -347,7 +347,7 @@ void Biomass::Execute() {
           SaveComparison(0, 0, second_iter.first, obs_values_by_year_[year][second_iter.first] * catchability_value_, 0.0, error_values_by_year_[year], year);
         } else {
           LOG_FINE() << label_ << " Biomass obs mort between 0.0 - 1.0";
-          float value = 0.0;
+          double value = 0.0;
           value = pre_obs_values_by_year_[year][second_iter.first] + ((obs_values_by_year_[year][second_iter.first] - pre_obs_values_by_year_[year][second_iter.first]) * time_step_proportion_);
           SaveComparison(0, 0, second_iter.first, value * catchability_value_, 0.0, error_values_by_year_[year], year);
         }

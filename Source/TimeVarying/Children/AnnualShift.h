@@ -5,7 +5,7 @@
  * @date 2/02/2015
  * @section LICENSE
  *
- * Copyright NIWA Science ©2014 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2014 - www.niwa.co.nz
  *
  * @section DESCRIPTION
  *
@@ -35,12 +35,12 @@ public:
 
 private:
   // members
-  vector<float>              values_;
-  float                      a_;
-  float                      b_;
-  float                      c_;
+  vector<double>              values_;
+  double                      a_;
+  double                      b_;
+  double                      c_;
   vector<unsigned>            scaling_years_;
-  map<unsigned, float>       values_by_year_;
+  map<unsigned, double>       values_by_year_;
 };
 
 } /* namespace timevarying */

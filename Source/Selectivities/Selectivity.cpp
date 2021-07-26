@@ -5,7 +5,7 @@
  * @date 11/01/2013
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
  */
@@ -45,7 +45,7 @@ void Selectivity::Validate() {
   if (not length_based_) {
     values_.assign(model_->age_spread(), 0.0);
   } else {
-    vector<float> lengths = model_->length_bin_mid_points();
+    vector<double> lengths = model_->length_bin_mid_points();
     length_values_.assign(lengths.size(), 0.0);
     LOG_FINE() << "number of bins = " << length_values_.size();
   }
@@ -68,7 +68,7 @@ void Selectivity::Reset() {
  * @return The value stored in the map or 0.0 as default
  */
 
-float Selectivity::GetResult(unsigned age_or_length) {
+double Selectivity::GetResult(unsigned age_or_length) {
   if (not length_based_)
     return values_[age_or_length];
   else

@@ -31,7 +31,6 @@ namespace niwa {
 class Model;
 class TimeVarying;
 namespace estimates { class Creator; }
-using niwa::utilities::Double;
 using std::string;
 using utilities::OrderedMap;
 
@@ -45,11 +44,11 @@ public:
   addressable::Type           GetAddressableType(const string& parameter_absolute_name);
   addressable::rerun_initialisation  GetAddressableInit(const string& parameter_absolute_name);
 
-  Double*                     GetAddressable(const string& addressable_absolute_name);
-  vector<Double*>*            GetAddressables(const string& addressable_absolute_name);
-  map<unsigned, Double>*      GetAddressableUMap(const string& addressable_absolute_name);
-  OrderedMap<string, Double>* GetAddressableSMap(const string& addressable_absolute_name);
-  vector<Double>*             GetAddressableVector(const string& addressable_absolute_name);
+  double*                     GetAddressable(const string& addressable_absolute_name);
+  vector<double*>*            GetAddressables(const string& addressable_absolute_name);
+  map<unsigned, double>*      GetAddressableUMap(const string& addressable_absolute_name);
+  OrderedMap<string, double>* GetAddressableSMap(const string& addressable_absolute_name);
+  vector<double>*             GetAddressableVector(const string& addressable_absolute_name);
 
 private:
   // methods

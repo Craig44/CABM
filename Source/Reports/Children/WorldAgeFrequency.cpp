@@ -65,7 +65,7 @@ void WorldAgeFrequency::DoExecute() {
     cache_ << i << " ";
   cache_ << "\n";
 
-  vector<float> age_freq;
+  vector<double> age_freq;
   world_->get_world_age_frequency(age_freq);
   LOG_FINEST() << "size of age freq = " << age_freq.size();
 

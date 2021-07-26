@@ -72,7 +72,7 @@ void ModelAttributes::DoExecute() {
   cache_ << "\n";
 
   cache_ << "length_mid_points: ";
-  vector<float> length_mid_point = model_->length_bin_mid_points();
+  vector<double> length_mid_point = model_->length_bin_mid_points();
   for (unsigned length_ndx = 0; length_ndx < length_mid_point.size(); ++length_ndx)
     cache_ << length_mid_point[length_ndx] << " ";
   cache_ << "\n";

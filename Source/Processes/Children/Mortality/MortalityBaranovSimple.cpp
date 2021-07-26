@@ -31,22 +31,22 @@ MortalityBaranovSimple::MortalityBaranovSimple(Model* model) : Mortality(model) 
   parameters_.Bind<string>(PARAM_FISHERY_SELECTIVITY, &fishery_selectivity_label_, "Selectivity label for the fishery process", "");
   parameters_.Bind<unsigned>(PARAM_YEARS, &years_, "years to apply the fishery process in", "");
   parameters_.Bind<string>(PARAM_FISHING_MORTALITY_LAYERS, &f_layer_label_, "Spatial layer describing F by area for each year, there is a one to one link with the year specified, so make sure the order is right", "");
-  parameters_.Bind<float>(PARAM_MINIMUM_LEGAL_LENGTH, &mls_, "The minimum legal length for this fishery, any individual less than this will be returned using some discard mortality", "", 0);
-  parameters_.Bind<float>(PARAM_HANDLING_MORTALITY, &discard_mortality_, "if discarded due to being under the minimum legal length, what is the probability the individual will die when released", "", 0.0);
+  parameters_.Bind<double>(PARAM_MINIMUM_LEGAL_LENGTH, &mls_, "The minimum legal length for this fishery, any individual less than this will be returned using some discard mortality", "", 0);
+  parameters_.Bind<double>(PARAM_HANDLING_MORTALITY, &discard_mortality_, "if discarded due to being under the minimum legal length, what is the probability the individual will die when released", "", 0.0);
   parameters_.Bind<bool>(PARAM_PRINT_EXTRA_INFO, &print_extra_info_, "if you have process report for this process you can control the amount of information printed to the file.", "", true);
   // Tag-recapture inputs
   parameters_.Bind<unsigned>(PARAM_SCANNING_YEARS, &scanning_years_, "Years to scan for tags in the fishery", "", true);
-  parameters_.Bind<float>(PARAM_SCANNING_PROPROTION, &scanning_proportion_, "The proportion of catch scanned in each year", "", true);
+  parameters_.Bind<double>(PARAM_SCANNING_PROPROTION, &scanning_proportion_, "The proportion of catch scanned in each year", "", true);
 
   // Tagging information TODO if the fishery release or recaptures tagged fish add this functionality
 
   // M information
   parameters_.Bind<string>(PARAM_DISTRIBUTION, &distribution_, "the distribution to allocate the parameters to the agents", PARAM_NORMAL)->set_allowed_values({PARAM_NORMAL, PARAM_LOGNORMAL});
-  parameters_.Bind<float>(PARAM_CV, &cv_, "The cv of the distribution for the M distribution", "");
+  parameters_.Bind<double>(PARAM_CV, &cv_, "The cv of the distribution for the M distribution", "");
   parameters_.Bind<string>(PARAM_M_MULTIPLIER_LAYER_LABEL, &m_layer_label_, "Label for the numeric layer that describes a multiplier of M through space", "", ""); // TODO perhaps as a multiplier, 1.2 * 0.2 = 0.24
   parameters_.Bind<bool>(PARAM_UPDATE_MORTALITY_PARAMETERS, &update_natural_mortality_parameters_, "If an agent/individual moves do you want it to take on the natural mortality parameters of the new spatial cell", "");
   parameters_.Bind<string>(PARAM_NATURAL_MORTALITY_SELECTIVITY, &natural_mortality_selectivity_label_, "Selectivity label for the natural mortality process", "");
-  parameters_.Bind<float>(PARAM_M, &m_, "Natural mortality for the model", "");
+  parameters_.Bind<double>(PARAM_M, &m_, "Natural mortality for the model", "");
 
   RegisterAsAddressable(PARAM_M, &m_);
 
@@ -102,7 +102,7 @@ void MortalityBaranovSimple::DoBuild() {
     // Do the multiplication
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
-        float multiplier = m_layer_->get_value(row, col);
+        double multiplier = m_layer_->get_value(row, col);
         LOG_FINEST() << "multiplier = " << multiplier << " m value = " << m_;
         m_layer_->set_value(row, col, multiplier * m_);
         LOG_FINEST() << "check we set the right value = " << m_layer_->get_value(row, col);
@@ -314,8 +314,8 @@ void MortalityBaranovSimple::DoExecute() {
         }
       }
     }
-    float total_catch = 0;
-    float actual_catch_taken = 0;
+    double total_catch = 0;
+    double actual_catch_taken = 0;
     // There are 4 combos that we will split out M age - F age, M age - F length, M-length F age, M length - F length
     if (m_selectivity_length_based_ & f_selectivity_length_based_) {
       LOG_FINE() << "both M and F are length based";
@@ -328,17 +328,17 @@ void MortalityBaranovSimple::DoExecute() {
             census_data census_fishery(current_year_by_space_[row][col], row, col);
             tag_recapture tag_recapture_info(current_year_by_space_[row][col], row, col, current_time_step_by_space_[row][col]);
 
-            float catch_by_cell = 0;
+            double catch_by_cell = 0;
             unsigned counter = 0;
             unsigned initial_size = cell->agents_.size();
             LOG_FINEST() << initial_size << " initial agents";
-            float f_in_this_cell = f_layer_[year_ndx]->get_value(row, col);
+            double f_in_this_cell = f_layer_[year_ndx]->get_value(row, col);
             LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << f_in_this_cell;
 
             F_by_cell_year_[row][col][year_ndx] = f_in_this_cell;
 
-            float f_l = 0;
-            float m_l = 0;
+            double f_l = 0;
+            double m_l = 0;
             for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter,++iter) {
               if ((*iter).is_alive()) {
                 m_l = (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index());
@@ -401,16 +401,16 @@ void MortalityBaranovSimple::DoExecute() {
             census_data census_fishery(current_year_by_space_[row][col], row, col);
             tag_recapture tag_recapture_info(current_year_by_space_[row][col], row, col, current_time_step_by_space_[row][col]);
 
-            float catch_by_cell = 0;
+            double catch_by_cell = 0;
             unsigned counter = 0;
             unsigned initial_size = cell->agents_.size();
             LOG_FINEST() << initial_size << " initial agents";
-            float f_in_this_cell = f_layer_[year_ndx]->get_value(row, col);
+            double f_in_this_cell = f_layer_[year_ndx]->get_value(row, col);
             LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << f_in_this_cell;
             F_by_cell_year_[row][col][year_ndx] = f_in_this_cell;
 
-            float f_l = 0;
-            float m_a = 0;
+            double f_l = 0;
+            double m_a = 0;
             for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter,++iter) {
               if ((*iter).is_alive()) {
                 m_a = (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index());
@@ -473,16 +473,16 @@ void MortalityBaranovSimple::DoExecute() {
             census_data census_fishery(current_year_by_space_[row][col], row, col);
             tag_recapture tag_recapture_info(current_year_by_space_[row][col], row, col, current_time_step_by_space_[row][col]);
 
-            float catch_by_cell = 0;
+            double catch_by_cell = 0;
             unsigned counter = 0;
             unsigned initial_size = cell->agents_.size();
             LOG_FINEST() << initial_size << " initial agents";
-            float f_in_this_cell = f_layer_[year_ndx]->get_value(row, col);
+            double f_in_this_cell = f_layer_[year_ndx]->get_value(row, col);
             LOG_FINEST() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << f_in_this_cell;
             F_by_cell_year_[row][col][year_ndx] = f_in_this_cell;
 
-            float f_a = 0;
-            float m_l = 0;
+            double f_a = 0;
+            double m_l = 0;
             for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter,++iter) {
               if ((*iter).is_alive()) {
                 m_l = (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_length_bin_index());
@@ -545,16 +545,16 @@ void MortalityBaranovSimple::DoExecute() {
             census_data census_fishery(current_year_by_space_[row][col], row, col);
             tag_recapture tag_recapture_info(current_year_by_space_[row][col], row, col, current_time_step_by_space_[row][col]);
 
-            float catch_by_cell = 0;
+            double catch_by_cell = 0;
             unsigned counter = 0;
             unsigned initial_size = cell->agents_.size();
             LOG_FINEST() << initial_size << " initial agents";
-            float f_in_this_cell = f_layer_[year_ndx]->get_value(row, col);
+            double f_in_this_cell = f_layer_[year_ndx]->get_value(row, col);
             LOG_FINE() << "We are fishing in cell " << row + 1 << " " << col + 1 << " value = " << f_in_this_cell;
             F_by_cell_year_[row][col][year_ndx] = f_in_this_cell;
 
-            float f_a = 0;
-            float m_a = 0;
+            double f_a = 0;
+            double m_a = 0;
             for (auto iter = cell->agents_.begin(); iter != cell->agents_.end(); ++counter,++iter) {
               if ((*iter).is_alive()) {
                 m_a = (*iter).get_m() * natural_mortality_selectivity_[(*iter).get_sex()]->GetResult((*iter).get_age_index());
@@ -629,15 +629,17 @@ void  MortalityBaranovSimple::draw_rate_param(unsigned row, unsigned col, unsign
   vector.resize(number_of_draws);
 
   //LOG_FINEST() << "mean M = " << mean_m;
+  float value = 0.0;
   if (distribution_ == PARAM_NORMAL) {
     for (unsigned i = 0; i < number_of_draws; ++i) {
-      float value = rng.normal(mean_m, cv_ * mean_m);
+      value = rng.normal(mean_m, cv_ * mean_m);
       //LOG_FINEST() << "value of M = " << value;
       vector[i] = value;
     }
   } else {
+    float value = 0.0;
     for (unsigned i = 0; i < number_of_draws; ++i) {
-      float value = rng.lognormal(mean_m, cv_);
+      value = rng.lognormal(mean_m, cv_);
       //LOG_FINEST() << "value of M = " << value;
       vector[i] = value;
     }

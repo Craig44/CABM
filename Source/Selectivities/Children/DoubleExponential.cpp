@@ -1,11 +1,11 @@
 /**
- * @file floatExponential.cpp
+ * @file doubleExponential.cpp
  * @author  Scott Rasmussen (scott.rasmussen@zaita.com)
  * @version 1.0
  * @date 14/01/2013
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
  */
@@ -29,13 +29,13 @@ namespace selectivities {
 DoubleExponential::DoubleExponential(Model* model)
 : Selectivity(model) {
 
-  parameters_.Bind<float>(PARAM_X0, &x0_, "X0", "");
-  parameters_.Bind<float>(PARAM_X1, &x1_, "X1", "");
-  parameters_.Bind<float>(PARAM_X2, &x2_, "X2", "");
-  parameters_.Bind<float>(PARAM_Y0, &y0_, "Y0", "");
-  parameters_.Bind<float>(PARAM_Y1, &y1_, "Y1", "");
-  parameters_.Bind<float>(PARAM_Y2, &y2_, "Y2", "");
-  parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
+  parameters_.Bind<double>(PARAM_X0, &x0_, "X0", "");
+  parameters_.Bind<double>(PARAM_X1, &x1_, "X1", "");
+  parameters_.Bind<double>(PARAM_X2, &x2_, "X2", "");
+  parameters_.Bind<double>(PARAM_Y0, &y0_, "Y0", "");
+  parameters_.Bind<double>(PARAM_Y1, &y1_, "Y1", "");
+  parameters_.Bind<double>(PARAM_Y2, &y2_, "Y2", "");
+  parameters_.Bind<double>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
 
   RegisterAsAddressable(PARAM_X0, &x0_);
   RegisterAsAddressable(PARAM_Y0, &y0_);
@@ -83,21 +83,21 @@ void DoubleExponential::RebuildCache() {
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
       if (not include_zero_age_values_ & (age == 0)) {
         values_[age - min_index_] = 0;
-      } else if ((float)age <= x0_) {
-        values_[age - min_index_] = alpha_ * y0_ * pow((y1_ / y0_), ((float)age - x0_)/(x1_ - x0_));
-      } else if ((float)age > x0_ && (float)age <= x2_) {
-        values_[age - min_index_] = alpha_ * y0_ * pow((y2_ / y0_), ((float)age - x0_)/(x2_ - x0_));
+      } else if ((double)age <= x0_) {
+        values_[age - min_index_] = alpha_ * y0_ * pow((y1_ / y0_), ((double)age - x0_)/(x1_ - x0_));
+      } else if ((double)age > x0_ && (double)age <= x2_) {
+        values_[age - min_index_] = alpha_ * y0_ * pow((y2_ / y0_), ((double)age - x0_)/(x2_ - x0_));
       } else {
         values_[age - min_index_] = y2_;
       }
     }
   } else {
-    vector<float> length_bins = model_->length_bin_mid_points();
+    vector<double> length_bins = model_->length_bin_mid_points();
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index) {
-      if ((float)length_bins[length_bin_index] <= x0_) {
-        length_values_[length_bin_index] = alpha_ * y0_ * pow((y1_ / y0_), ((float)length_bins[length_bin_index] - x0_)/(x1_ - x0_));
-      } else if ((float)length_bins[length_bin_index] > x0_ && (float)length_bins[length_bin_index] <= x2_) {
-        length_values_[length_bin_index] = alpha_ * y0_ * pow((y2_ / y0_), ((float)length_bins[length_bin_index] - x0_)/(x2_ - x0_));
+      if ((double)length_bins[length_bin_index] <= x0_) {
+        length_values_[length_bin_index] = alpha_ * y0_ * pow((y1_ / y0_), ((double)length_bins[length_bin_index] - x0_)/(x1_ - x0_));
+      } else if ((double)length_bins[length_bin_index] > x0_ && (double)length_bins[length_bin_index] <= x2_) {
+        length_values_[length_bin_index] = alpha_ * y0_ * pow((y2_ / y0_), ((double)length_bins[length_bin_index] - x0_)/(x2_ - x0_));
       } else {
         length_values_[length_bin_index] = y2_;
       }

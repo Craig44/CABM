@@ -29,12 +29,12 @@ namespace processes {
  */
 MortalityConstantRate::MortalityConstantRate(Model* model) : Mortality(model) {
   parameters_.Bind<string>(PARAM_DISTRIBUTION, &distribution_, "the distribution to allocate the parameters to the agents","", PARAM_NORMAL)->set_allowed_values({PARAM_NORMAL, PARAM_LOGNORMAL});
-  parameters_.Bind<float>(PARAM_CV, &cv_, "The cv of the distribution", "");
+  parameters_.Bind<double>(PARAM_CV, &cv_, "The cv of the distribution", "");
   parameters_.Bind<string>(PARAM_M_MULTIPLIER_LAYER_LABEL, &m_layer_label_, "Label for the numeric layer that describes a multiplier of M through space", "", ""); // TODO perhaps as a multiplier, 1.2 * 0.2 = 0.24
   parameters_.Bind<string>(PARAM_SELECTIVITY_LABEL, &selectivity_label_, "Label for the selectivity block", "");
-  parameters_.Bind<float>(PARAM_M, &m_, "Natural mortality for the model", "");
+  parameters_.Bind<double>(PARAM_M, &m_, "Natural mortality for the model", "");
   parameters_.Bind<bool>(PARAM_UPDATE_MORTALITY_PARAMETERS, &update_natural_mortality_parameters_, "If an agent/individual moves do you want it to take on the natural mortality parameters of the new spatial cell", "");
-  parameters_.Bind<float>(PARAM_TIME_STEP_RATIO, &ratios_, "Time step ratios for the mortality rates to apply in each time step. See manual for how this is applied", "");
+  parameters_.Bind<double>(PARAM_TIME_STEP_RATIO, &ratios_, "Time step ratios for the mortality rates to apply in each time step. See manual for how this is applied", "");
 
   RegisterAsAddressable(PARAM_M, &m_, addressable::kAll, addressable::kno);
 
@@ -53,7 +53,7 @@ void MortalityConstantRate::DoBuild() {
     // Do the multiplication
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
-        float multiplier = m_layer_->get_value(row, col);
+        double multiplier = m_layer_->get_value(row, col);
         LOG_FINEST() << "multiplier = " << multiplier << " m value = " << m_ <<  " check we set the right value = " << m_layer_->get_value(row, col, multiplier * m_);
       }
     }
@@ -108,7 +108,7 @@ void MortalityConstantRate::DoBuild() {
       LOG_ERROR_P(PARAM_TIME_STEP_RATIO) << " length (" << ratios_.size()
           << ") does not match the number of time steps this process has been assigned to (" << active_time_steps.size() << ")";
 
-    for (float value : ratios_) {
+    for (double value : ratios_) {
       if (value < 0.0 || value > 1.0)
         LOG_ERROR_P(PARAM_TIME_STEP_RATIO) << " value (" << value << ") must be between 0.0 (exclusive) and 1.0 (inclusive)";
     }
@@ -146,7 +146,7 @@ void MortalityConstantRate::DoReset() {
 void MortalityConstantRate::ApplyStochasticMortality(vector<Agent>& agents) {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   unsigned time_step = model_->managers().time_step()->current_time_step();
-  float ratio = time_step_ratios_[time_step];
+  double ratio = time_step_ratios_[time_step];
 
   LOG_FINE() << "year = " << model_->current_year() << " time step = " << time_step << " ratio = " << ratio;
   if (selectivity_length_based_) {
@@ -209,15 +209,16 @@ void  MortalityConstantRate::draw_rate_param(unsigned row, unsigned col, unsigne
   vector.resize(number_of_draws);
 
   //LOG_FINEST() << "mean M = " << mean_m;
+  float value = 0.0;
   if (distribution_ == PARAM_NORMAL) {
     for (unsigned i = 0; i < number_of_draws; ++i) {
-      float value = rng.normal(mean_m, cv_ * mean_m);
+      value = rng.normal(mean_m, cv_ * mean_m);
       //LOG_FINEST() << "value of M = " << value;
       vector[i] = value;
     }
   } else {
     for (unsigned i = 0; i < number_of_draws; ++i) {
-      float value = rng.lognormal(mean_m, cv_);
+      value = rng.lognormal(mean_m, cv_);
       //LOG_FINEST() << "value of M = " << value;
       vector[i] = value;
     }

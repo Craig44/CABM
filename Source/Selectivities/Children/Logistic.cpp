@@ -5,7 +5,7 @@
  * @date 15/01/2013
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
  */
@@ -29,9 +29,9 @@ namespace selectivities {
 Logistic::Logistic(Model* model)
 : Selectivity(model) {
 
-  parameters_.Bind<float>(PARAM_A50, &a50_, "A50", "");
-  parameters_.Bind<float>(PARAM_ATO95, &ato95_, "Ato95", "");
-  parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
+  parameters_.Bind<double>(PARAM_A50, &a50_, "A50", "");
+  parameters_.Bind<double>(PARAM_ATO95, &ato95_, "Ato95", "");
+  parameters_.Bind<double>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
   parameters_.Bind<unsigned>(PARAM_L, &low_, "Low if(age < Low) = 0", "");
   parameters_.Bind<unsigned>(PARAM_H, &high_, "High if(age > High) =alpha", "");
 
@@ -65,10 +65,10 @@ void Logistic::DoValidate() {
  */
 void Logistic::RebuildCache() {
   if (not length_based_) {
-    float threshold = 0.0;
+    double threshold = 0.0;
 
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
-      threshold = (a50_ - (float)age) / ato95_;
+      threshold = (a50_ - (double)age) / ato95_;
       if (not include_zero_age_values_ & (age == 0)) {
         values_[age - min_index_] = 0;
       } else if (age < low_) {
@@ -85,12 +85,12 @@ void Logistic::RebuildCache() {
       }
     }
   } else {
-    float threshold = 0.0;
-    vector<float> length_bins = model_->length_bin_mid_points();
+    double threshold = 0.0;
+    vector<double> length_bins = model_->length_bin_mid_points();
 
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index) {
-      float temp = (float)length_bins[length_bin_index];
-      threshold = (float)(a50_ - temp) / ato95_;
+      double temp = (double)length_bins[length_bin_index];
+      threshold = (double)(a50_ - temp) / ato95_;
       if (threshold > 5.0)
         length_values_[length_bin_index] = 0.0;
       else if (threshold < -5.0)

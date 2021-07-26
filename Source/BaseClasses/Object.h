@@ -77,13 +77,13 @@ public:
   bool                            HasAddressableUsage(const string& label, const addressable::Usage&) const;
   bool                            IsAddressableAVector(const string& label) const;
   unsigned                        GetAddressableSize(const string& label) const;
-  float*                          GetAddressable(const string& label);
-  virtual float*                  GetAddressable(const string& label, const string& index);
-  vector<float*>*                 GetAddressables(const string& absolute_label, const vector<string> indexes);
-  map<unsigned, float>*           GetAddressableUMap(const string& label);
-  map<unsigned, float>*           GetAddressableUMap(const string& label, bool& create_missing);
-  OrderedMap<string, float>*      GetAddressableSMap(const string& label);
-  vector<float>*                  GetAddressableVector(const string& label);
+  double*                          GetAddressable(const string& label);
+  virtual double*                  GetAddressable(const string& label, const string& index);
+  vector<double*>*                 GetAddressables(const string& absolute_label, const vector<string> indexes);
+  map<unsigned, double>*           GetAddressableUMap(const string& label);
+  map<unsigned, double>*           GetAddressableUMap(const string& label, bool& create_missing);
+  OrderedMap<string, double>*      GetAddressableSMap(const string& label);
+  vector<double>*                  GetAddressableVector(const string& label);
   addressable::Type               GetAddressableType(const string& label) const;
   addressable::Usage              GetAddressableUsage(const string& label) const;
   addressable::rerun_initialisation GetAddressableInit(const string& label) const;
@@ -110,30 +110,30 @@ public:
 
 protected:
   // Methods
-  void                        RegisterAsAddressable(const string& label, float* variable, addressable::Usage usage = addressable::kAll, addressable::rerun_initialisation re_run_init = addressable::kno);
-  void                        RegisterAsAddressable(const string& label, vector<float>* variables, addressable::Usage usage = addressable::kAll, addressable::rerun_initialisation re_run_init = addressable::kno);
-  void                        RegisterAsAddressable(const string& label, OrderedMap<string, float>* variables, addressable::Usage usage = addressable::kAll, addressable::rerun_initialisation re_run_init = addressable::kno);
-  void                        RegisterAsAddressable(const string& label, map<unsigned, float>* variables, addressable::Usage usage = addressable::kAll, addressable::rerun_initialisation re_run_init = addressable::kno);
-  void                        RegisterAsAddressable(map<string, vector<float>>* variables);
+  void                        RegisterAsAddressable(const string& label, double* variable, addressable::Usage usage = addressable::kAll, addressable::rerun_initialisation re_run_init = addressable::kno);
+  void                        RegisterAsAddressable(const string& label, vector<double>* variables, addressable::Usage usage = addressable::kAll, addressable::rerun_initialisation re_run_init = addressable::kno);
+  void                        RegisterAsAddressable(const string& label, OrderedMap<string, double>* variables, addressable::Usage usage = addressable::kAll, addressable::rerun_initialisation re_run_init = addressable::kno);
+  void                        RegisterAsAddressable(const string& label, map<unsigned, double>* variables, addressable::Usage usage = addressable::kAll, addressable::rerun_initialisation re_run_init = addressable::kno);
+  void                        RegisterAsAddressable(map<string, vector<double>>* variables);
 
   // Members
   string                          block_type_           = "";
   string                          label_                = "";
   string                          type_                 = "";
   ParameterList                   parameters_;
-  map<string, float*>             addressables_;
+  map<string, double*>             addressables_;
   map<string, bool>               create_missing_addressables_;
-  map<string, vector<float>* >    addressable_vectors_;
-  map<string, vector<float*> >    addressable_custom_vectors_;
+  map<string, vector<double>* >    addressable_vectors_;
+  map<string, vector<double*> >    addressable_custom_vectors_;
   map<string, addressable::Type>  addressable_types_;
   map<string, addressable::Usage> addressable_usage_;
   map<string, addressable::rerun_initialisation> addressable_initphase_;
 
   vector<Object*>                 rebuild_cache_subscribers_;
 
-  map<string, map<unsigned, float>* >      addressable_u_maps_;
-  map<string, OrderedMap<string, float>* > addressable_s_maps_;
-  vector<map<string, vector<float>>* >     unnamed_addressable_s_map_vector_;
+  map<string, map<unsigned, double>* >      addressable_u_maps_;
+  map<string, OrderedMap<string, double>* > addressable_s_maps_;
+  vector<map<string, vector<double>>* >     unnamed_addressable_s_map_vector_;
 
   DISALLOW_COPY_AND_ASSIGN(Object);
 };

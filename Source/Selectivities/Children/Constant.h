@@ -5,7 +5,7 @@
  * @date 11/01/2013
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * @section DESCRIPTION
  *
@@ -32,14 +32,14 @@ public:
   explicit Constant(Model* model);
   virtual                     ~Constant() = default;
   void                        DoValidate() override final { };
-  float                      GetResult(unsigned age_or_length) override final;
+  double                      GetResult(unsigned age_or_length) override final;
 
 protected:
   //Methods
 
 private:
   // Members
-  float                      c_;
+  double                      c_;
 };
 
 } /* namespace selectivities */

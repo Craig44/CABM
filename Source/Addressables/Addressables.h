@@ -51,17 +51,17 @@ public:
   // methods
   Addressables(Model* model) : model_(model) { };
   virtual                       ~Addressables() = default;
-  void                          AddValue(const string& addressable_label, float value);
+  void                          AddValue(const string& addressable_label, double value);
   vector<string>                GetAddressables() const;
   unsigned                      GetValueCount() const;
-  map<string, float>            GetValues(unsigned index) const;
+  map<string, double>            GetValues(unsigned index) const;
   void                          LoadValues(unsigned index);
 
 private:
   // members
   Model*                        model_ = nullptr;
-  map<string, vector<float>>    addressable_value_;
-  map<string, float*>           addressables_;
+  map<string, vector<double>>    addressable_value_;
+  map<string, double*>           addressables_;
 
 };
 } /* namespace niwa */

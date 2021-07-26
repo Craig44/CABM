@@ -5,7 +5,7 @@
  * @date 12/10/2015
  * @section LICENSE
  *
- * Copyright NIWA Science ©2015 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2015 - www.niwa.co.nz
  *
  */
 #include "Selectivity.h"
@@ -58,7 +58,7 @@ void Selectivity::DoExecute() {
     ready_for_writing_ = true;
   } else {
     LOG_FINE() << "Printing length based selectivity";
-    vector<float> length_mid_points = model_->length_bin_mid_points();
+    vector<double> length_mid_points = model_->length_bin_mid_points();
     for (unsigned length_ndx = 0; length_ndx <  length_mid_points.size(); ++length_ndx) {
       LOG_FINE() << "length ndx = " << length_ndx;
       LOG_FINE()  << " mid point = " << length_mid_points[length_ndx];

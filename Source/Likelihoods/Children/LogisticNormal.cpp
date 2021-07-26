@@ -25,9 +25,9 @@ LogisticNormal::LogisticNormal(Model* model)  : Likelihood(model) {
   parameters_.Bind<string>(PARAM_LABEL, &label_, "Label for Logisitic Normal Likelihood", "");
   parameters_.Bind<string>(PARAM_TYPE, &type_, "Type of likelihood", "");
   covariance_table_ = new parameters::Table(PARAM_COVARIANCE_MATRIX);
-  parameters_.Bind<float>(PARAM_RHO, &rho_, "The auto-correlation parameter $\rho$", "");
+  parameters_.Bind<double>(PARAM_RHO, &rho_, "The auto-correlation parameter $\rho$", "");
   parameters_.BindTable(PARAM_COVARIANCE_MATRIX, covariance_table_, "User defined Covariance matrix", "",false,true);
-  parameters_.Bind<float>(PARAM_SIGMA, &sigma_, "Sigma parameter in the likelihood", "");
+  parameters_.Bind<double>(PARAM_SIGMA, &sigma_, "Sigma parameter in the likelihood", "");
   parameters_.Bind<bool>(PARAM_ARMA, &arma_, "Defines if two rho parameters supplied then covar is assumed to have the correlation matrix of an ARMA(1,1) process", "");
   parameters_.Bind<unsigned>(PARAM_BIN_LABELS, &bins_, "If no covariance matrix parameter then list a vector of bin labels that the covariance matrix will be built for, can be ages or lengths.", "",false);
   parameters_.Bind<bool>(PARAM_SEXED, &sexed_, "Will the observation be split by sex?", "",false);
@@ -69,14 +69,14 @@ void LogisticNormal::DoValidate() {
     unsigned col_iter = 0;
     for (vector<string>& covariance_values_data_line : covariance_values_data) {
       unsigned bin = 0;
-      vector<float> temp;
+      vector<double> temp;
       if (!utilities::To<unsigned>(covariance_values_data_line[0], bin)) {
         LOG_ERROR_P(PARAM_COVARIANCE_MATRIX) << " value " << covariance_values_data_line[0] << " could not be converted in to an unsigned integer. It should be the year for this line";
       } else {
         for (unsigned i = 1; i < covariance_values_data_line.size(); ++i) {
-          float value = 0;
-          if (!utilities::To<float>(covariance_values_data_line[i], value)) {
-            LOG_ERROR_P(PARAM_SCANNED) << " value (" << covariance_values_data_line[i] << ") could not be converted to a float";
+          double value = 0;
+          if (!utilities::To<double>(covariance_values_data_line[i], value)) {
+            LOG_ERROR_P(PARAM_SCANNED) << " value (" << covariance_values_data_line[i] << ") could not be converted to a double";
           }
           covariance_matrix_(i - 1, col_iter) = value;
         }
@@ -120,7 +120,7 @@ void LogisticNormal::DoValidate() {
 void LogisticNormal::SimulateObserved(map<unsigned, map<string, vector<observations::Comparison> > >& comparisons) {
   LOG_FINE();
   // Generate a multivariate variable  X
-  vector<float> year_totals(comparisons.size(), 0.0);
+  vector<double> year_totals(comparisons.size(), 0.0);
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   unsigned year_storer = 0;
 
@@ -153,8 +153,8 @@ void LogisticNormal::SimulateObserved(map<unsigned, map<string, vector<observati
       LOG_FATAL() << "Cholesky decomposition failed. Cannot continue Simulating from a logisitic-normal likelihood";
     // Calculate multivariate normal distribution
     year_storer = 0;
-    vector<float> normals(covariance_matrix_.size1(), 0.0);
-    float row_sum;
+    vector<double> normals(covariance_matrix_.size1(), 0.0);
+    double row_sum;
     // iterate over year
     if (model_->run_mode() == RunMode::kMSE) {
       vector<unsigned> sim_years = model_->simulation_years();
@@ -250,9 +250,9 @@ void LogisticNormal::SimulateObserved(map<unsigned, map<string, vector<observati
 void LogisticNormal::calculate_covariance() {
   LOG_TRACE();
   unsigned n_phi = rho_.size();
-  vector<float> rhovec;
-  vector<vector<float>> covar;
-  covar.resize(n_bins_, vector<float>(n_bins_, 0.0));
+  vector<double> rhovec;
+  vector<vector<double>> covar;
+  covar.resize(n_bins_, vector<double>(n_bins_, 0.0));
 
   LOG_FINEST() << "covariance rows = " << covar.size() << " cols = " << covar[0].size();
   // initialise covar as the identity matrix
@@ -339,7 +339,7 @@ void LogisticNormal::calculate_covariance() {
       }
     }
     // I am struggling to intialise this matrix with ints. so do the way I know will work
-    ublas::matrix<float> temp_covar(covar.size(),covar.size(),0.0);
+    ublas::matrix<double> temp_covar(covar.size(),covar.size(),0.0);
     for(unsigned i = 0; i < covar.size(); ++i){
       for(unsigned j = 0; j < covar[i].size(); ++j) {
         temp_covar(i,j) = covar[i][j] ;
@@ -352,10 +352,10 @@ void LogisticNormal::calculate_covariance() {
 
 // Calculate correlation structure for multivariate logistic normal
 //
-vector<float> LogisticNormal::GetRho(vector<float>& Phi, unsigned nBin, bool ARMA) {
+vector<double> LogisticNormal::GetRho(vector<double>& Phi, unsigned nBin, bool ARMA) {
   LOG_TRACE();
   // declare all variables that will be used in this function
-  vector<float> rhovec(nBin, 0.0);
+  vector<double> rhovec(nBin, 0.0);
   if (Phi.size() == 1) {
     LOG_FINEST() <<  "Found single Rho parameter = " <<Phi[0] << " number of bins = " << nBin;
     //calculation of AR(1) acf for  LN2
@@ -363,9 +363,9 @@ vector<float> LogisticNormal::GetRho(vector<float>& Phi, unsigned nBin, bool ARM
       rhovec[i - 1] = pow(Phi[0],i);
     LOG_FINEST() << "Finished building rho vec";
   } else {
-    vector<float> ar, ma,final_acf,Cor;
-    vector<vector<float> > A, ind;
-    vector<float> psi, theta, Acf;
+    vector<double> ar, ma,final_acf,Cor;
+    vector<vector<double> > A, ind;
+    vector<double> psi, theta, Acf;
     // we are doing ARMAacf function
     unsigned p, q, r;
     if (ARMA) {
@@ -388,8 +388,8 @@ vector<float> LogisticNormal::GetRho(vector<float>& Phi, unsigned nBin, bool ARM
         }
         LOG_FINEST() << "Structureing A";
 
-        A.resize(p + 1, vector<float>(2 * p + 1, 0.0));
-        ind.resize(2 * p + 1, vector<float>(p + 1, 0.0));
+        A.resize(p + 1, vector<double>(2 * p + 1, 0.0));
+        ind.resize(2 * p + 1, vector<double>(p + 1, 0.0));
         for (int i = 0; i < (int)ind.size(); ++i) {
           for (int j = 0; j < (int)ind[i].size(); ++j) {
             ind[i][0] = i + 1;
@@ -403,10 +403,10 @@ vector<float> LogisticNormal::GetRho(vector<float>& Phi, unsigned nBin, bool ARM
            A[i][i + 2] = -ar[1];
         }
         LOG_FINEST() << "Populate A. the second ar value" << ar[1];
-        ublas::matrix<float> A_eig1(3,3,0.0);
-        ublas::matrix<float> A_eig_inv(3,3,0.0);
+        ublas::matrix<double> A_eig1(3,3,0.0);
+        ublas::matrix<double> A_eig_inv(3,3,0.0);
 
-        vector<float> rhs(3,0.0);
+        vector<double> rhs(3,0.0);
         // initialise rhs, which will be used to solve the following problem, that is Ax = b where b = rhs, so x = A^-1 b
         rhs[0] = 1.0;
         rhs[1] = 0.0;
@@ -422,20 +422,20 @@ vector<float> LogisticNormal::GetRho(vector<float>& Phi, unsigned nBin, bool ARM
             theta.push_back(0.0);
           // Calculate rhs
           for (unsigned i = 0; i <= q; ++i) {
-            float x1, x2;
+            double x1, x2;
             x1 = psi[0] * theta[i];
             x2 = psi[1] * theta[i + q];
-            float val = 0.0;
-            vector<float> vec_vals = { x1, x2 };
-            if (!utilities::To<float, float>(math::Sum(vec_vals), val))
-              LOG_CODE_ERROR() << " val " << math::Sum(vec_vals) << " could not be converted in to a float";
+            double val = 0.0;
+            vector<double> vec_vals = { x1, x2 };
+            if (!utilities::To<double, double>(math::Sum(vec_vals), val))
+              LOG_CODE_ERROR() << " val " << math::Sum(vec_vals) << " could not be converted in to a double";
             rhs[i] = val;
           }
           rhs[2] = 0.0;
         }
         LOG_FINEST() << "Calculate seq parameter";
         // Use the eigen library yo solve the inverse of for A with known vector B
-        //vector<float> Ind;
+        //vector<double> Ind;
         vector<unsigned> seq;
         for (unsigned i = 0; i <= p; ++i) {
           seq.push_back(p - i);
@@ -443,14 +443,14 @@ vector<float> LogisticNormal::GetRho(vector<float>& Phi, unsigned nBin, bool ARM
         for (unsigned i = 0; i <= p; ++i) {
           for (unsigned j = 0; j <= p; ++j) {
             //LOG_FINEST() << ": i = " << i << " j = " << j << " i index = " << seq[i] << " j index = " << seq[j] << " mat value = " << A[seq[i]][seq[j]];
-            float val = 0.0;
+            double val = 0.0;
             if (j == 2) {
-              if (!utilities::To<float, float>(A[i][j], val))
-                LOG_CODE_ERROR() << "variable = " << val << " could not be converted in to a float";
+              if (!utilities::To<double, double>(A[i][j], val))
+                LOG_CODE_ERROR() << "variable = " << val << " could not be converted in to a double";
               A_eig1(i,j) = val;
             } else {
-              if (!utilities::To<float, float>(A[i][j] + A[i][2 * p  - j], val))
-                LOG_CODE_ERROR() << "variable = " << val << " could not be converted in to a float";
+              if (!utilities::To<double, double>(A[i][j] + A[i][2 * p  - j], val))
+                LOG_CODE_ERROR() << "variable = " << val << " could not be converted in to a double";
               A_eig1(i,j) = val;
             }
           }
@@ -472,7 +472,7 @@ vector<float> LogisticNormal::GetRho(vector<float>& Phi, unsigned nBin, bool ARM
           LOG_FATAL() << "could not invert convariance matrix matrix, if it is a user supplied covariance, check the matrix is invertable, else it is a code error";
         }
         // Matrix multiplication to solve for x
-        vector<float> result(A_eig1.size1(),0.0);
+        vector<double> result(A_eig1.size1(),0.0);
 
         for (unsigned i = 0; i < A_eig_inv.size1(); i++) {
          for (unsigned k = 0; k < A_eig_inv.size2(); k++) {
@@ -496,9 +496,9 @@ vector<float> LogisticNormal::GetRho(vector<float>& Phi, unsigned nBin, bool ARM
         Cor.insert(Cor.begin(), final_acf[1]);
         Cor.insert(Cor.begin(), final_acf[0]);
         // Print results to screen
-        vector<float>::const_iterator first = Cor.begin();
-        vector<float>::const_iterator last = Cor.begin() + nBin;
-        vector<float> corvec(first, last);
+        vector<double>::const_iterator first = Cor.begin();
+        vector<double>::const_iterator last = Cor.begin() + nBin;
+        vector<double> corvec(first, last);
         rhovec = corvec;
         LOG_FINEST() << " Print rhovec";
         for (auto num : rhovec)
@@ -511,9 +511,9 @@ vector<float> LogisticNormal::GetRho(vector<float>& Phi, unsigned nBin, bool ARM
 return rhovec;
 }
 
-vector<float> LogisticNormal::RecursiveFilter(vector<float>& ar_coef, unsigned nBins, vector<float>& initial_vals) {
+vector<double> LogisticNormal::RecursiveFilter(vector<double>& ar_coef, unsigned nBins, vector<double>& initial_vals) {
   LOG_TRACE();
-  vector<float> store_vec(nBins + 1,0.0);
+  vector<double> store_vec(nBins + 1,0.0);
 
   if (ar_coef.size() > 2) {
     LOG_CODE_ERROR() <<  "RecursiveFilter(): has not been coded for more than 2 AR coeffiecients, ar_coef.size() > 2" << endl;
@@ -559,7 +559,7 @@ bool LogisticNormal::DoCholeskyDecmposition() {
 
     if (covariance_matrix_(0,0) < 0)
       return false;
-    float sum = 0.0;
+    double sum = 0.0;
 
     covariance_matrix_lt(0,0) = sqrt(covariance_matrix_(0,0));
 
@@ -594,10 +594,10 @@ bool LogisticNormal::DoCholeskyDecmposition() {
 /*
  * Invert a square boost matrix
 */
-bool LogisticNormal::InvertMatrix(const ublas::matrix<float>& input, ublas::matrix<float>& inverse) {
+bool LogisticNormal::InvertMatrix(const ublas::matrix<double>& input, ublas::matrix<double>& inverse) {
   typedef ublas::permutation_matrix<std::size_t> pmatrix;
   // create a working copy of the input
-  ublas::matrix<float> A(input);
+  ublas::matrix<double> A(input);
 
   // create a permutation matrix for the LU-factorization
   pmatrix pm(A.size1());
@@ -608,7 +608,7 @@ bool LogisticNormal::InvertMatrix(const ublas::matrix<float>& input, ublas::matr
     return false;
 
   // create identity matrix of "inverse"
-  inverse.assign(ublas::identity_matrix<float> (A.size1()));
+  inverse.assign(ublas::identity_matrix<double> (A.size1()));
 
   // backsubstitute to get the inverse
   ublas::lu_substitute(A, pm, inverse);
@@ -618,21 +618,21 @@ bool LogisticNormal::InvertMatrix(const ublas::matrix<float>& input, ublas::matr
 /*
  * Calcuate the determinant of a square boost matrix
 */
-float LogisticNormal::det_fast(const ublas::matrix<float>& matrix) {
+double LogisticNormal::det_fast(const ublas::matrix<double>& matrix) {
   // create a working copy of the input
- ublas::matrix<float> mLu(matrix);
+ ublas::matrix<double> mLu(matrix);
  ublas::permutation_matrix<size_t> pivots(matrix.size1());
 
  auto isSingular = ublas::lu_factorize(mLu, pivots);
 
    if (isSingular)
-       return static_cast<float>(0);
+       return static_cast<double>(0);
 
-   float det = static_cast<float>(1);
+   double det = static_cast<double>(1);
    for (size_t i = 0; i < pivots.size(); ++i)
    {
        if (pivots(i) != i)
-           det *= static_cast<float>(-1);
+           det *= static_cast<double>(-1);
 
        det *= mLu(i, i);
    }

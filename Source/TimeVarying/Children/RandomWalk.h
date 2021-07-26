@@ -5,7 +5,7 @@
  * @date 2/02/2016
  * @section LICENSE
  *
- * Copyright NIWA Science ©2014 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2014 - www.niwa.co.nz
  *
  * @section DESCRIPTION
  *
@@ -36,15 +36,15 @@ public:
 
 private:
   // members
-  float                      mu_ = 0.0;
-  float                      sigma_ = 1.0;
-  float                      rho_ = 1.0;
-  float                      intercept_;
+  double                      mu_ = 0.0;
+  double                      sigma_ = 1.0;
+  double                      rho_ = 1.0;
+  double                      intercept_;
   string                      distribution_;
-  map<unsigned, float>       values_by_year_;
+  map<unsigned, double>       values_by_year_;
   bool                        has_at_estimate_;
-  float                      lower_bound_;
-  float                      upper_bound_;
+  double                      lower_bound_;
+  double                      upper_bound_;
 
 };
 

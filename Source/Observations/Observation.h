@@ -62,9 +62,9 @@ public:
 
 protected:
   // methods
-  void                        SaveComparison(unsigned age, float length, string row_col, float expected, float simulated, float error_value, unsigned year);
-  void                        SaveComparison(unsigned age, unsigned sex, float length, string row_col, float expected, float simulated, float error_value, unsigned year);
-  void                        SaveComparison(unsigned age, unsigned sex, float length, float cell_biomass, string row_col, float expected, float simulated, float error_value, unsigned year);
+  void                        SaveComparison(unsigned age, float length, string row_col, double expected, double simulated, double error_value, unsigned year);
+  void                        SaveComparison(unsigned age, unsigned sex, float length, string row_col, double expected, double simulated, double error_value, unsigned year);
+  void                        SaveComparison(unsigned age, unsigned sex, float length, double cell_biomass, string row_col, double expected, double simulated, double error_value, unsigned year);
   void                        ClearComparison() {LOG_FINE() << "clear comparison"; comparisons_.clear();} // Used by observations the repeat SaveComparisons() in the DoSimulate() function i.e. MortalityScaledAgeFrequencey
   // members
   Model*                      model_ = nullptr;

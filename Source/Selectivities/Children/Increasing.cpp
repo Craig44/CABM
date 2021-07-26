@@ -5,7 +5,7 @@
  * @date 14/01/2013
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
  */
@@ -30,8 +30,8 @@ Increasing::Increasing(Model* model)
 
   parameters_.Bind<unsigned>(PARAM_L, &low_, "Low", "");
   parameters_.Bind<unsigned>(PARAM_H, &high_, "High", "");
-  parameters_.Bind<float>(PARAM_V, &v_, "V", "");
-  parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
+  parameters_.Bind<double>(PARAM_V, &v_, "V", "");
+  parameters_.Bind<double>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
 
   //RegisterAsAddressable(PARAM_V, &v_);
 }
@@ -68,7 +68,7 @@ void Increasing::DoValidate() {
           << "Expected: " << (high_ - low_ + 1) << " but got " << v_.size();
     }
   } else {
-    vector<float> length_bins = model_->length_bin_mid_points();
+    vector<double> length_bins = model_->length_bin_mid_points();
     if (low_ < length_bins[0] || low_ > length_bins[length_bins.size()-1])
       LOG_ERROR_P(PARAM_L) << ": 'l' (" << low_ << ") must be between the model min length (" << length_bins[0] << ") and max length (" << length_bins[length_bins.size()-1] << ")";
     unsigned bins = 0;
@@ -105,7 +105,7 @@ void Increasing::RebuildCache() {
         values_[age - min_index_] = *v_.rbegin();
 
       } else {
-        float value = *v_.begin();
+        double value = *v_.begin();
         for (unsigned i = low_ + 1; i < age; ++i) {
           if (i > high_ || value >= alpha_)
             break;
@@ -116,7 +116,7 @@ void Increasing::RebuildCache() {
       }
     }
   } else {
-    vector<float> length_bins = model_->length_bin_mid_points();
+    vector<double> length_bins = model_->length_bin_mid_points();
     unsigned mark = 0;
     unsigned start_element = 0;
     while (mark == 0) {
@@ -126,7 +126,7 @@ void Increasing::RebuildCache() {
       }
     }
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index) {
-      float temp = (float)length_bins[length_bin_index];
+      double temp = (double)length_bins[length_bin_index];
       if (temp < low_) {
         length_values_[length_bin_index] = 0.0;
 
@@ -134,7 +134,7 @@ void Increasing::RebuildCache() {
         length_values_[length_bin_index] = *v_.rbegin();
 
       } else {
-        float value = *v_.begin();
+        double value = *v_.begin();
         for (unsigned i = start_element + 1; i < length_bin_index; ++i) {
           if (length_bins[i] > high_ || value >= alpha_)
             break;

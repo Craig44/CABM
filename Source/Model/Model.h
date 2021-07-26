@@ -103,22 +103,22 @@ public:
   virtual unsigned            age_spread() const { return (max_age_ - min_age_) + 1; }
   virtual bool                age_plus() const { return age_plus_; }
   // The following are recruitment specific quantities/accessors these are stock characteristics that are shared around the model
-  void                        set_b0(string recruitment_label, float b0) {b0_[recruitment_label] = b0; }
-  virtual const map<string, float>&          get_b0s() const {return b0_; }
-  virtual const map<string, float>&          get_r0s() const {return r0_; }
-  float                       get_b0(string recruitment_label)  {return b0_[recruitment_label]; }
+  void                        set_b0(string recruitment_label, double b0) {b0_[recruitment_label] = b0; }
+  virtual const map<string, double>&          get_b0s() const {return b0_; }
+  virtual const map<string, double>&          get_r0s() const {return r0_; }
+  double                       get_b0(string recruitment_label)  {return b0_[recruitment_label]; }
   void                        set_r0(string recruitment_label, unsigned r0) {r0_[recruitment_label] = r0; }
   void                        set_r0_agents(string recruitment_label, unsigned r0_agents) {r0_agents_[recruitment_label] = r0_agents; }
-  float                       get_r0(string recruitment_label)  {return r0_[recruitment_label]; }
+  double                       get_r0(string recruitment_label)  {return r0_[recruitment_label]; }
   unsigned                    get_r0_agents(string recruitment_label)  {return r0_agents_[recruitment_label]; }
 
   void                        set_ssb(string recruitment_label, unsigned ssb) {ssb_[recruitment_label] = ssb; }
-  float                       get_ssb(string recruitment_label)  {return ssb_[recruitment_label]; }
-  void                        set_scalar(string recruitment_label, float value) {scalar_[recruitment_label] = value; }
-  virtual const map<string, float>&   get_scalars() {return scalar_; }
-  float                       get_scalar(string recruitment_label)  {return scalar_[recruitment_label]; }
-  void                        set_m(float value) {m_ = value; }
-  float                       get_m()  {return m_; }
+  double                       get_ssb(string recruitment_label)  {return ssb_[recruitment_label]; }
+  void                        set_scalar(string recruitment_label, double value) {scalar_[recruitment_label] = value; }
+  virtual const map<string, double>&   get_scalars() {return scalar_; }
+  double                       get_scalar(string recruitment_label)  {return scalar_[recruitment_label]; }
+  void                        set_m(double value) {m_ = value; }
+  double                       get_m()  {return m_; }
   void                        set_n_agents(unsigned value) {n_agents_ = value; }
   virtual vector<unsigned>    ass_years() const { return ass_years_; }
   vector<unsigned>            simulation_years() { return assessment_year_map_[current_mse_cycle];}
@@ -128,29 +128,29 @@ public:
   virtual const vector<string>& time_steps() const { return time_steps_; }
   const vector<string>&       initialisation_phases() const { return initialisation_phases_; }
   virtual const vector<unsigned>&  length_bins() const { return length_bins_; }
-  virtual const vector<float>&     length_bin_mid_points() const { return length_bin_mid_points_; }
+  virtual const vector<double>&     length_bin_mid_points() const { return length_bin_mid_points_; }
   unsigned                    number_of_length_bins() {return length_bin_number_;}
 
   virtual bool                length_plus() const { return length_plus_; }
   string&                     get_base_layer_label() {return base_layer_;}
-  vector<float>               get_lat_mid_points() {return lat_mid_points_;}
-  vector<float>               get_lon_mid_points() {return lon_mid_points_;}
-  vector<float>               get_lat_bounds() {return lat_bounds_;}
-  vector<float>               get_lon_bounds() {return lon_bounds_;}
+  vector<double>               get_lat_mid_points() {return lat_mid_points_;}
+  vector<double>               get_lon_mid_points() {return lon_mid_points_;}
+  vector<double>               get_lat_bounds() {return lat_bounds_;}
+  vector<double>               get_lon_bounds() {return lon_bounds_;}
   unsigned                    get_height() {return world_height_;}
   unsigned                    get_width() {return world_width_;}
   string                      get_mortality_process() {return natural_mortality_label_;}
   string                      get_growth_process() {return growth_process_label_;}
   vector<string>              get_maturity_ogive() {return maturity_ogives_;};
   bool                        get_sexed() const {return sex_;};
-  float                       get_male_proportions(unsigned year)  {return proportion_male_[year];};
-  void                        set_male_proportions(map<unsigned, float> male_props)  {proportion_male_ = male_props;};
+  double                       get_male_proportions(unsigned year)  {return proportion_male_[year];};
+  void                        set_male_proportions(map<unsigned, double> male_props)  {proportion_male_ = male_props;};
   unsigned                    get_max_threads() const {return max_threads_;}
   bool                        lat_and_long_supplied();
-  virtual const float&        min_lat() const {return min_lat_;}
-  virtual const float&        max_lat() const {return max_lat_;}
-  virtual const float&        min_lon() const {return min_lon_;}
-  virtual const float&        max_lon() const {return max_lon_;}
+  virtual const double&        min_lat() const {return min_lat_;}
+  virtual const double&        max_lat() const {return max_lat_;}
+  virtual const double&        min_lon() const {return min_lon_;}
+  virtual const double&        max_lon() const {return max_lon_;}
   void                        increment_time_step() {++time_step_counter_;}
   virtual const unsigned      get_time_step_counter() const {return time_step_counter_;}
   void                        re_run_initialisation() {re_run_initialisation_ = true;}
@@ -190,35 +190,35 @@ protected:
   vector<string>              time_steps_;
   vector<unsigned>            length_bins_;
   bool                        length_plus_ = true;
-  vector<float>               length_bin_mid_points_;
+  vector<double>               length_bin_mid_points_;
   unsigned                    length_bin_number_;
   bool                        addressable_values_file_ = false;
   unsigned                    adressable_values_count_ = 1;
   bool                        sexed_ = false;
   string                      base_layer_;
-  vector<float>               lat_bounds_;
-  vector<float>               lon_bounds_;
-  vector<float>               lat_mid_points_;
-  vector<float>               lon_mid_points_;
+  vector<double>               lat_bounds_;
+  vector<double>               lon_bounds_;
+  vector<double>               lat_mid_points_;
+  vector<double>               lon_mid_points_;
   // store these instead of doint std::min() they may be needed often
-  float                       min_lat_;
-  float                       max_lat_;
-  float                       min_lon_;
-  float                       max_lon_;
+  double                       min_lat_;
+  double                       max_lat_;
+  double                       min_lon_;
+  double                       max_lon_;
   unsigned                    world_height_;
   unsigned                    world_width_;
-  map<string, float>          b0_;
-  map<string, float>          r0_;
+  map<string, double>          b0_;
+  map<string, double>          r0_;
   map<string, unsigned>       r0_agents_;
   unsigned                    n_agents_;
   string                      natural_mortality_label_;
   string                      mortality_label_;
   string                      growth_process_label_;
-  float                       m_; // natural mortality
-  map<string, float>          ssb_;
-  map<string, float>          scalar_;
+  double                       m_; // natural mortality
+  map<string, double>          ssb_;
+  map<string, double>          scalar_;
   bool                        sex_;
-  map<unsigned, float>        proportion_male_;
+  map<unsigned, double>        proportion_male_;
   vector<string>              maturity_ogives_;
   unsigned                    max_threads_ = 1;
   unsigned                    time_step_counter_ = 1; // This will keep track of the time steps for things such as tagging it would be helpful if we have multiple time steps in years.

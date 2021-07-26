@@ -5,7 +5,7 @@
  * @date 18/09/2012
  * @section LICENSE
  *
- * Copyright NIWA Science ©2012 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2012 - www.niwa.co.nz
  *
  * $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
  */
@@ -114,7 +114,7 @@ unsigned Object::GetAddressableSize(const string& label) const {
  * @param label The label of the addressable to find
  * @return A pointer to the addressable to be used by the Estimate object
  */
-float* Object::GetAddressable(const string& label) {
+double* Object::GetAddressable(const string& label) {
   for(auto addressables : addressable_types_)
     LOG_FINEST() << addressables.first;
 
@@ -123,7 +123,7 @@ float* Object::GetAddressable(const string& label) {
   return addressables_[label];
 }
 
-float* Object::GetAddressable(const string& label, const string& index) {
+double* Object::GetAddressable(const string& label, const string& index) {
   if (addressable_types_.find(label) == addressable_types_.end())
     LOG_CODE_ERROR() << "addressable_types_.find(" << label << ") == addressable_types_.end()";
 
@@ -171,9 +171,9 @@ float* Object::GetAddressable(const string& label, const string& index) {
  *
  * @param The absolute label for this (e.g ycs_years{1973:2014}
  * @param A vector of the indexes to find (already exploded with utilities::string::explode()
- * @return a Pointer to a vector of float pointers
+ * @return a Pointer to a vector of double pointers
  */
-vector<float*>* Object::GetAddressables(const string& absolute_label, const vector<string> indexes) {
+vector<double*>* Object::GetAddressables(const string& absolute_label, const vector<string> indexes) {
   if (addressable_custom_vectors_.find(absolute_label) != addressable_custom_vectors_.end())
     return &addressable_custom_vectors_[absolute_label];
 
@@ -194,12 +194,12 @@ vector<float*>* Object::GetAddressables(const string& absolute_label, const vect
  * @param label The label of the addressable to find
  * @return a pointer to the map to use
  */
-map<unsigned, float>* Object::GetAddressableUMap(const string& label) {
+map<unsigned, double>* Object::GetAddressableUMap(const string& label) {
   bool dummy =  false;
   return GetAddressableUMap(label, dummy);
 }
 
-map<unsigned, float>* Object::GetAddressableUMap(const string& label, bool& create_missing) {
+map<unsigned, double>* Object::GetAddressableUMap(const string& label, bool& create_missing) {
   LOG_FINE() << "label " << label << " size = " << addressable_u_maps_.size();
   if (addressable_types_.find(label) == addressable_types_.end())
     LOG_CODE_ERROR() << "addressable_types_.find(" << label << ") == addressable_types_.end()";
@@ -213,12 +213,12 @@ map<unsigned, float>* Object::GetAddressableUMap(const string& label, bool& crea
 }
 
 /**
- * Get the addressable as that is a string/float map
+ * Get the addressable as that is a string/double map
  *
  * @param label of the addressable
  * @return An ordered map of addressables
  */
-OrderedMap<string, float>* Object::GetAddressableSMap(const string& label) {
+OrderedMap<string, double>* Object::GetAddressableSMap(const string& label) {
   if (addressable_types_.find(label) == addressable_types_.end())
     LOG_CODE_ERROR() << "addressable_types_.find(" << label << ") == addressable_types_.end()";
   if (addressable_types_[label] != addressable::kStringMap)
@@ -233,7 +233,7 @@ OrderedMap<string, float>* Object::GetAddressableSMap(const string& label) {
  * @param label The label of the addressable we want
  * @return vector pointer of addressables
  */
-vector<float>* Object::GetAddressableVector(const string& label) {
+vector<double>* Object::GetAddressableVector(const string& label) {
   LOG_FINEST() << "finding object with label " << label;
   if (addressable_types_.find(label) == addressable_types_.end()) {
     /**
@@ -300,7 +300,7 @@ addressable::rerun_initialisation Object::GetAddressableInit(const string& label
  * @param label The label to register the addressable under
  * @param variable The variable to register as an addressable
  */
-void Object::RegisterAsAddressable(const string& label, float* variable, addressable::Usage usage, addressable::rerun_initialisation re_run_init) {
+void Object::RegisterAsAddressable(const string& label, double* variable, addressable::Usage usage, addressable::rerun_initialisation re_run_init) {
   addressables_[label]      = variable;
   addressable_types_[label] = addressable::kSingle;
   addressable_usage_[label] = usage;
@@ -315,7 +315,7 @@ void Object::RegisterAsAddressable(const string& label, float* variable, address
  * @param label The label to register the addressable under
  * @param variables Vector containing all the elements to register
  */
-void Object::RegisterAsAddressable(const string& label, vector<float>* variables, addressable::Usage usage, addressable::rerun_initialisation re_run_init) {
+void Object::RegisterAsAddressable(const string& label, vector<double>* variables, addressable::Usage usage, addressable::rerun_initialisation re_run_init) {
   addressable_vectors_[label] = variables;
   addressable_types_[label]   = addressable::kVector;
   addressable_usage_[label] = usage;
@@ -329,15 +329,15 @@ void Object::RegisterAsAddressable(const string& label, vector<float>* variables
  * process_label.variable(map.string)
  *
  * @param label The label for the process
- * @param variables Map containing index and float values to store
+ * @param variables Map containing index and double values to store
  */
-void Object::RegisterAsAddressable(const string& label, OrderedMap<string, float>* variables, addressable::Usage usage, addressable::rerun_initialisation re_run_init) {
+void Object::RegisterAsAddressable(const string& label, OrderedMap<string, double>* variables, addressable::Usage usage, addressable::rerun_initialisation re_run_init) {
   addressable_s_maps_[label]  = variables;
   addressable_types_[label]   = addressable::kStringMap;
   addressable_usage_[label] = usage;
   addressable_initphase_[label] = re_run_init;
 }
-void Object::RegisterAsAddressable(const string& label, map<unsigned, float>* variables, addressable::Usage usage, addressable::rerun_initialisation re_run_init) {
+void Object::RegisterAsAddressable(const string& label, map<unsigned, double>* variables, addressable::Usage usage, addressable::rerun_initialisation re_run_init) {
   LOG_FINE() << "addressable Umap = " << label;
   addressable_u_maps_[label]  = variables;
   addressable_types_[label]   = addressable::kUnsignedMap;
@@ -348,7 +348,7 @@ void Object::RegisterAsAddressable(const string& label, map<unsigned, float>* va
 /**
  *
  */
-void Object::RegisterAsAddressable(map<string, vector<float>>* variables) {
+void Object::RegisterAsAddressable(map<string, vector<double>>* variables) {
   unnamed_addressable_s_map_vector_.push_back(variables);
 }
 

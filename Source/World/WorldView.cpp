@@ -110,7 +110,7 @@ void WorldView::Build() {
     LOG_MEDIUM() << "size of lats = " << lat_midpoint_by_cell_.size() << " size of longs = " << lon_midpoint_by_cell_.size() << " heigght = " << height_ << " width = " << width_;
   }
 
-  float lat, lon;
+  double lat, lon;
   for (unsigned i = 0; i < height_; ++i) {
     for (unsigned j = 0; j < width_; ++j) {
       if (model_->lat_and_long_supplied()) {
@@ -216,8 +216,8 @@ void WorldView::MergeCachedGrid(bool update_lat_long) {
   for (unsigned i = 0; i < height_; ++i) {  // Can't thread this, each cell has a pointer to growth and mortality for update agent, so there is a hidden shared resouce....
     for (unsigned j = 0; j < width_; ++j) {
       if (base_grid_[i][j].is_enabled()) {
-        float lat_mid = base_grid_[i][j].get_lat();
-        float lon_mid = base_grid_[i][j].get_lon();
+        double lat_mid = base_grid_[i][j].get_lat();
+        double lon_mid = base_grid_[i][j].get_lon();
         LOG_FINE() << "agents to merge into row " << i << " col = " << j  << " = " << cached_grid_[i][j].agents_.size();
         // Are we updateing agents parameters
         cached_grid_[i][j].update_agent_parameters();
@@ -322,7 +322,7 @@ void WorldView::MergeWorldForInit() {
  * a SegFault
  *
 */
-void WorldView::get_cell_element(unsigned& row, unsigned& col, const float lat, const float lon) {
+void WorldView::get_cell_element(unsigned& row, unsigned& col, const double lat, const double lon) {
   for (unsigned i = 1; i <= height_; ++i) {
     if (lat > lat_bounds_[i]) {
       row = i - 1;
@@ -342,12 +342,12 @@ void WorldView::get_cell_element(unsigned& row, unsigned& col, const float lat, 
  * This method gets the age frequencey of the world, this is called in intialisation to see if we have meet an equilibrium state
  *
 */
-void WorldView::get_world_age_frequency(vector<float>& world_age_freq) {
+void WorldView::get_world_age_frequency(vector<double>& world_age_freq) {
   LOG_TRACE();
   bool do_age = true;
   world_age_freq.clear();
   world_age_freq.resize(model_->age_spread());
-  vector<float> temp;
+  vector<double> temp;
   for (unsigned i = 0; i < height_; ++i) {
     for (unsigned j = 0; j < width_; ++j) {
       if (base_grid_[i][j].is_enabled()) {

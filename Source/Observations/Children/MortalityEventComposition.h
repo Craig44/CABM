@@ -84,12 +84,12 @@ protected:
   // TODO change from string -> unsigned int for a little speed up
   map<string,vector<unsigned>>    stratum_rows_;
   map<string,vector<unsigned>>    stratum_cols_;
-  map<string,float>               stratum_area_;
-  vector<float>                   stratum_comp_;
-  map<string,float>               stratum_biomass_;
+  map<string,double>              stratum_area_;
+  vector<double>                  stratum_comp_;
+  map<string,double>              stratum_biomass_;
   WorldView*                      world_ = nullptr;
   vector<unsigned>                fishery_years_;
-  map<string,vector<float>>       stratum_age_frequency_;
+  map<string,vector<double>>       stratum_age_frequency_;
   vector<vector<float>>           ageing_mis_matrix_;
   parameters::Table*              error_values_table_ = nullptr;
 

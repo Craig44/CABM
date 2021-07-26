@@ -85,7 +85,7 @@ void BiomassByCell::DoBuild() {
 /**
  * The main function for calculating biomass
  */
-void BiomassByCell::CalcBiomass(vector<Agent>& agents, float& value) {
+void BiomassByCell::CalcBiomass(vector<Agent>& agents, double& value) {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   if (not length_based_selectivity_) {
     for(auto& agent : agents) {
@@ -144,7 +144,7 @@ void BiomassByCell::Execute() {
 
   if (model_->state() == State::kInitialise) {
     unsigned initialisation_phase = model_->managers().initialisation_phase()->current_initialisation_phase();
-    float value;
+    double value;
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         if (initialisation_values_by_space_.size() <= initialisation_phase) {
@@ -172,7 +172,7 @@ void BiomassByCell::Execute() {
     else if (utilities::doublecompare::IsOne(time_step_proportion_))
       values_by_space_[model_->current_year()] = value_in_space_;
     else {
-      vector<vector<float>> temp(model_->get_height());
+      vector<vector<double>> temp(model_->get_height());
       for (unsigned row = 0; row < model_->get_height(); ++row) {
         temp[row].resize(model_->get_width());
         for (unsigned col = 0; col < model_->get_width(); ++col) {

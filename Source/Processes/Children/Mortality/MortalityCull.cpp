@@ -70,7 +70,7 @@ void MortalityCull::DoExecute() {
         // get the ratio to apply first
         WorldCell* cell = world_->get_base_square(row, col);
         if (cell->is_enabled()) {
-          float agents_removed = 0.0;
+          double agents_removed = 0.0;
           if(layer_->get_value(row, col) > 0) {
             for(auto& agent : cell->agents_) {
               if (agent.is_alive()) {

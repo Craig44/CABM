@@ -38,11 +38,11 @@ public:
   bool                                update_growth() {return update_growth_parameters_;};
 
 protected:
-  vector<float>			  time_step_proportions_;
-  float					      cv_;
+  vector<double>			  time_step_proportions_;
+  double					      cv_;
   string					    distribution_label_;
   bool                update_growth_parameters_;
-  map<unsigned, float>   time_step_ratios_;
+  map<unsigned, double>   time_step_ratios_;
   Distribution        distribution_ = Distribution::kNone;
 };
 

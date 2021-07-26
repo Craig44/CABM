@@ -5,7 +5,7 @@
  * @date 15/01/2013
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
  */
@@ -29,9 +29,9 @@ namespace selectivities {
 InverseLogistic::InverseLogistic(Model* model)
 : Selectivity(model) {
 
-  parameters_.Bind<float>(PARAM_A50, &a50_, "A50", "");
-  parameters_.Bind<float>(PARAM_ATO95, &ato95_, "aTo95", "");
-  parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
+  parameters_.Bind<double>(PARAM_A50, &a50_, "A50", "");
+  parameters_.Bind<double>(PARAM_ATO95, &ato95_, "aTo95", "");
+  parameters_.Bind<double>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
 
   RegisterAsAddressable(PARAM_A50, &a50_);
   RegisterAsAddressable(PARAM_ATO95, &ato95_);
@@ -63,11 +63,11 @@ void InverseLogistic::DoValidate() {
  */
 void InverseLogistic::RebuildCache() {
   if (not length_based_) {
-    float threshold = 0.0;
+    double threshold = 0.0;
 
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
-      float temp = (float)age;
-      threshold = (float)(a50_ - temp) / ato95_;
+      double temp = (double)age;
+      threshold = (double)(a50_ - temp) / ato95_;
 
       if (not include_zero_age_values_ & (age == 0)) {
         values_[age - min_index_] = 0;
@@ -79,12 +79,12 @@ void InverseLogistic::RebuildCache() {
         values_[age - min_index_] = alpha_ - (alpha_ / (1.0 + pow(19.0, threshold)));
     }
   } else {
-    float threshold = 0.0;
-    vector<float> length_bins = model_->length_bin_mid_points();
+    double threshold = 0.0;
+    vector<double> length_bins = model_->length_bin_mid_points();
 
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index) {
-      float temp = (float)length_bins[length_bin_index];
-      threshold = (float)(a50_ - temp) / ato95_;
+      double temp = (double)length_bins[length_bin_index];
+      threshold = (double)(a50_ - temp) / ato95_;
       if (threshold > 5.0)
         length_values_[length_bin_index] = alpha_;
       else if (threshold < -5.0)

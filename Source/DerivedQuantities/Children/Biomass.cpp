@@ -89,7 +89,7 @@ void Biomass::DoBuild() {
 /**
  * The main function for calculating biomass
  */
-void Biomass::CalcBiomass(vector<Agent>& agents, float& value) {
+void Biomass::CalcBiomass(vector<Agent>& agents, double& value) {
     LOG_FINE();
 
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
@@ -168,7 +168,7 @@ void Biomass::Execute() {
     if (initialisation_values_.size() <= initialisation_phase)
       initialisation_values_.resize(initialisation_phase + 1);
 
-    float b0_value = 0;
+    double b0_value = 0;
 
     if (utilities::doublecompare::IsZero(time_step_proportion_)) {
       b0_value = cache_value_;

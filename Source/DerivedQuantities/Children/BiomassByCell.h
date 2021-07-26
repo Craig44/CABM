@@ -31,15 +31,15 @@ public:
   void                        Execute() override final;
   void                        DoValidate() override final;
   void                        DoBuild() override final;
-  void                        CalcBiomass(vector<Agent>& agents, float& value);
+  void                        CalcBiomass(vector<Agent>& agents, double& value);
 
 protected:
   // Variables
   vector<string>                      selectivity_label_;
   vector<Selectivity*>                selectivity_;
   bool                        length_based_selectivity_ = false;
-  vector<vector<float>>       cache_in_space_;
-  vector<vector<float>>       value_in_space_;
+  vector<vector<double>>       cache_in_space_;
+  vector<vector<double>>       value_in_space_;
 
 
 };

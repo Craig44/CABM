@@ -33,13 +33,13 @@ GrowthVonBertalanffyWithBasic::GrowthVonBertalanffyWithBasic(Model* model) : Gro
   parameters_.Bind<string>(PARAM_K_LAYER_LABEL, &k_layer_label_, "Label for the numeric layer that describes mean k by area", "", true);
   parameters_.Bind<string>(PARAM_T0_LAYER_LABEL, &t0_layer_label_, "Label for the numeric layer that describes mean t0 by area", "", true);
 
-  parameters_.Bind<float>(PARAM_T0, &t0_, "The value for t0 default = 0", "", true);
+  parameters_.Bind<double>(PARAM_T0, &t0_, "The value for t0 default = 0", "", true);
   parameters_.Bind<string>(PARAM_A_LAYER_LABEL, &a_layer_label_, "Label for the numeric layer that describes mean a in the weight calcualtion through space", "", true);
   parameters_.Bind<string>(PARAM_B_LAYER_LABEL, &b_layer_label_, "Label for the numeric layer that describes mean b in the weight calcualtion through space", "", true);
-  parameters_.Bind<float>(PARAM_LINF, &l_inf_, "Value of mean L inf multiplied by the layer value if supplied", "", true);
-  parameters_.Bind<float>(PARAM_K, &k_, "Value of mean k multiplied by the layer value if supplied", "", true);
-  parameters_.Bind<float>(PARAM_A, &a_, "alpha value for weight at length function", "", true);
-  parameters_.Bind<float>(PARAM_B, &b_, "beta value for weight at length function", "", true);
+  parameters_.Bind<double>(PARAM_LINF, &l_inf_, "Value of mean L inf multiplied by the layer value if supplied", "", true);
+  parameters_.Bind<double>(PARAM_K, &k_, "Value of mean k multiplied by the layer value if supplied", "", true);
+  parameters_.Bind<double>(PARAM_A, &a_, "alpha value for weight at length function", "", true);
+  parameters_.Bind<double>(PARAM_B, &b_, "beta value for weight at length function", "", true);
 
   RegisterAsAddressable(PARAM_LINF, &l_inf_, addressable::kAll, addressable::kyes);
   RegisterAsAddressable(PARAM_K, &k_, addressable::kAll, addressable::kyes);
@@ -102,7 +102,7 @@ void GrowthVonBertalanffyWithBasic::DoBuild() {
       LOG_FATAL_P(PARAM_TIME_STEP_PROPORTIONS) << " length (" << time_step_proportions_.size()
           << ") does not match the number of time steps this process has been assigned to (" << active_time_steps.size() << ")";
 
-    for (float value : time_step_proportions_) {
+    for (double value : time_step_proportions_) {
       if (value < 0.0 || value > 1.0)
         LOG_ERROR_P(PARAM_TIME_STEP_PROPORTIONS) << " value (" << value << ") must be between 0.0 (exclusive) and 1.0 (inclusive)";
     }
@@ -196,9 +196,9 @@ void GrowthVonBertalanffyWithBasic::DoBuild() {
 
 // The work horse of the function.
 void GrowthVonBertalanffyWithBasic::ApplyStochasticGrowth(vector<Agent>& agents) {
-  float new_length = 0.0;
-  float weight = 0.0;
-  float length_prop = time_step_ratios_[model_->managers().time_step()->current_time_step()];
+  double new_length = 0.0;
+  double weight = 0.0;
+  double length_prop = time_step_ratios_[model_->managers().time_step()->current_time_step()];
   for(auto& agent : agents) {
     if (agent.is_alive()) {
       new_length =  agent.get_length() + length_prop * (agent.get_first_age_length_par() - agent.get_length()) * (1 - exp(-agent.get_second_age_length_par()));
@@ -308,9 +308,9 @@ void GrowthVonBertalanffyWithBasic::FillReportCache(ostringstream& cache) {
 
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
-        vector<float> length;
+        vector<double> length;
         cache << row << "-" << col << " " << t0_ << " " ;
-        float mean_linf = 0, mean_k = 0;//, a = 0, b = 0;
+        double mean_linf = 0, mean_k = 0;//, a = 0, b = 0;
         if (L_inf_layer_)
           mean_linf = L_inf_layer_->get_value(row, col);
         else
@@ -343,7 +343,7 @@ void GrowthVonBertalanffyWithBasic::FillReportCache(ostringstream& cache) {
     }
   } else {
     cache << "time: ";
-    vector<float> length;
+    vector<double> length;
     length.push_back(l_inf_ * (1-exp(-k_ * (0.001 - t0_))));
     for (unsigned t = 0; t <= model_->max_age(); ++t) {
       cache << t << " ";

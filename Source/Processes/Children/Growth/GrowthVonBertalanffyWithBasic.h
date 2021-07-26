@@ -53,11 +53,11 @@ protected:
   vector<string>                      b_layer_label_;
   vector<niwa::layers::NumericLayer*> a_layer_;
   vector<niwa::layers::NumericLayer*> b_layer_;
-  vector<float>                       l_inf_;
-  vector<float>                       k_;
-  vector<float>                       a_;
-  vector<float>                       b_;
-  vector<float>                       t0_;
+  vector<double>                       l_inf_;
+  vector<double>                       k_;
+  vector<double>                       a_;
+  vector<double>                       b_;
+  vector<double>                       t0_;
 };
 
 } /* namespace processes */

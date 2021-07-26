@@ -89,7 +89,7 @@ void Abundance::DoBuild() {
  * Calculate the cached value to use
  * for any interpolation
  */
-void Abundance::CalcAbundance(vector<Agent>& agents, float& value) {
+void Abundance::CalcAbundance(vector<Agent>& agents, double& value) {
   utilities::RandomNumberGenerator& rng = utilities::RandomNumberGenerator::Instance();
   if (not length_based_selectivity_) {
     for(auto& agent : agents) {
@@ -166,7 +166,7 @@ void Abundance::Execute() {
     if (initialisation_values_.size() <= initialisation_phase)
       initialisation_values_.resize(initialisation_phase + 1);
 
-    float b0_value = 0;
+    double b0_value = 0;
 
     if (utilities::doublecompare::IsZero(time_step_proportion_)) {
       b0_value = cache_value_;

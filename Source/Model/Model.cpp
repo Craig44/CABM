@@ -64,12 +64,12 @@ Model::Model() {
   parameters_.Bind<unsigned>(PARAM_LENGTH_BINS, &length_bins_, "", "", false);
   parameters_.Bind<bool>(PARAM_LENGTH_PLUS, &length_plus_, "Is the last bin a plus group", "", false);
   parameters_.Bind<string>(PARAM_BASE_LAYER_LABEL, &base_layer_, "Label for the base layer", "");
-  parameters_.Bind<float>(PARAM_LATITUDE_BOUNDS, &lat_bounds_, "Latitude bounds for the spatial domain, should include lower and upper bound, so there should be rows + 1 values", "", true);
-  parameters_.Bind<float>(PARAM_LONGITUDE_BOUNDS, &lon_bounds_, "Longitude bounds for the spatial domain, should include lower and upper bound, so there should be columns + 1 values", "", true);
+  parameters_.Bind<double>(PARAM_LATITUDE_BOUNDS, &lat_bounds_, "Latitude bounds for the spatial domain, should include lower and upper bound, so there should be rows + 1 values", "", true);
+  parameters_.Bind<double>(PARAM_LONGITUDE_BOUNDS, &lon_bounds_, "Longitude bounds for the spatial domain, should include lower and upper bound, so there should be columns + 1 values", "", true);
   parameters_.Bind<unsigned>(PARAM_NROWS, &world_height_, "number of rows in spatial domain", "")->set_lower_bound(1,true);
   parameters_.Bind<unsigned>(PARAM_NCOLS, &world_width_, "number of columns in spatial domain", "")->set_lower_bound(1,true);
   parameters_.Bind<bool>(PARAM_SEXED, &sex_, "Is sex an attribute of then agents?", "", false);
-  //parameters_.Bind<float>(PARAM_PROPORTION_MALE, &proportion_male_, "what proportion of the generated agents should be male?", "", 1.0)->set_range(0.0, 1.0, true, true); //TODO move to recruitment so it can be time-varying.
+  //parameters_.Bind<double>(PARAM_PROPORTION_MALE, &proportion_male_, "what proportion of the generated agents should be male?", "", 1.0)->set_range(0.0, 1.0, true, true); //TODO move to recruitment so it can be time-varying.
   parameters_.Bind<string>(PARAM_MATRUITY_OGIVE_LABEL, &maturity_ogives_, "Maturity ogive label for each sex (male female) order is important", "", false);
   parameters_.Bind<string>(PARAM_GROWTH_PROCESS_LABEL, &growth_process_label_, "Label for the growth process in the annual cycle", "");
   parameters_.Bind<string>(PARAM_NATURAL_MORTALITY_PROCESS_LABEL, &natural_mortality_label_, "Label for the natural mortality process in the annual cycle", "");
@@ -260,7 +260,7 @@ void Model::Validate() {
 
   // Calculate length bin midpoints
   for (unsigned length_ndx = 1; length_ndx < length_bins_.size(); ++length_ndx) {
-    length_bin_mid_points_.push_back((length_bins_[length_ndx - 1] + ((float)length_bins_[length_ndx] - (float)length_bins_[length_ndx - 1]) / 2));
+    length_bin_mid_points_.push_back((length_bins_[length_ndx - 1] + ((double)length_bins_[length_ndx] - (double)length_bins_[length_ndx - 1]) / 2));
     LOG_FINE() << "upper = " << length_bins_[length_ndx] << " lower = " << length_bins_[length_ndx - 1] << " mid = " << length_bin_mid_points_[length_ndx - 1];
   }
   length_bin_number_ = length_bin_mid_points_.size();
@@ -339,13 +339,13 @@ void Model::Build() {
       LOG_FATAL_P(PARAM_LATITUDE_BOUNDS) << "latitude bounds must have a minimum and maximum value for each cell, e.g ncol 2 lat_bounds -45 -44 -43. You supplied '" << lat_bounds_.size() << " but we wanted " << (world_height_ + 1);
     }
     for (unsigned lat_ndx = 1; lat_ndx < lat_bounds_.size(); ++lat_ndx) {
-      lat_mid_points_.push_back((float)(lat_bounds_[lat_ndx - 1] - fabs((lat_bounds_[lat_ndx] - lat_bounds_[lat_ndx - 1]) / 2)));
+      lat_mid_points_.push_back((double)(lat_bounds_[lat_ndx - 1] - fabs((lat_bounds_[lat_ndx] - lat_bounds_[lat_ndx - 1]) / 2)));
       if (lat_bounds_[lat_ndx] >  lat_bounds_[lat_ndx - 1])
         LOG_ERROR_P(PARAM_LATITUDE_BOUNDS) << "must be in descending order";
     }
 
     for (unsigned lon_ndx = 1; lon_ndx < lon_bounds_.size(); ++lon_ndx) {
-      lon_mid_points_.push_back((float)(lon_bounds_[lon_ndx - 1] + ((lon_bounds_[lon_ndx] - lon_bounds_[lon_ndx - 1]) / 2)));
+      lon_mid_points_.push_back((double)(lon_bounds_[lon_ndx - 1] + ((lon_bounds_[lon_ndx] - lon_bounds_[lon_ndx - 1]) / 2)));
       if (lon_bounds_[lon_ndx] < lon_bounds_[lon_ndx - 1])
          LOG_ERROR_P(PARAM_LONGITUDE_BOUNDS) << "must be in ascending order";
     }
@@ -549,7 +549,7 @@ void Model::RunMSE() {
         managers_->report()->WaitForReportsToFinish();
 
         // Run HCR rule
-        map<unsigned,map<string,float>> hcr_catches;
+        map<unsigned,map<string,double>> hcr_catches;
         LOG_MEDIUM() << "Entering RInside section";
 
         // Run C++ algorithm up to current time-step
@@ -587,7 +587,7 @@ void Model::RunMSE() {
            //std::cout << "size = of list n years " << this_catch.names()<< "\n";
            string year_label;
            unsigned year_val;
-           float catch_vals;
+           double catch_vals;
            string catch_label;
            string fishery_label;
            for(int k = 0; k < this_catch.size(); k++) {
@@ -606,7 +606,7 @@ void Model::RunMSE() {
              for(int j = 0; j < this_actual_catch.size(); j++) {
                fishery_label = this_lab[j];
                catch_vals = this_actual_catch[j];
-               //map<string, float> temp_map;
+               //map<string, double> temp_map;
                //temp_map[catch_label] = catch_vals;
                hcr_catches[year_val][fishery_label] = catch_vals;
                LOG_MEDIUM() <<"k = " << k <<  " j = " << j << " " << catch_vals << " lab = " << year_label << " fishery " << fishery_label;
@@ -662,9 +662,7 @@ void Model::RunBasic() {
   LOG_MEDIUM() << "Multi line value = " << adressable_values_count_;
 
   int simulation_candidates = global_configuration_->simulation_candidates();
-  if (simulation_candidates < 1) {
-    LOG_FATAL() << "The number of simulations specified at the command line parser must be at least one";
-  }
+
   unsigned suffix_width = (unsigned)(floor(log10((double) (simulation_candidates) * (adressable_values_count_))) + 1);
   LOG_MEDIUM() << "suffix width = " << suffix_width << " value = " << (simulation_candidates) * (adressable_values_count_);
   unsigned suffix_counter = 0;

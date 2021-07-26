@@ -5,7 +5,7 @@
  * @date 20/01/2015
  * @section LICENSE
  *
- * Copyright NIWA Science ©2014 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2014 - www.niwa.co.nz
  *
  */
 
@@ -23,7 +23,7 @@ namespace niwa {
 /**
  *
  */
-void Addressables::AddValue(const string& addressable_label, float value) {
+void Addressables::AddValue(const string& addressable_label, double value) {
   addressable_value_[addressable_label].push_back(value);
 }
 
@@ -51,8 +51,8 @@ unsigned Addressables::GetValueCount() const {
 /**
  *
  */
-map<string, float> Addressables::GetValues(unsigned index) const {
-  map<string, float> result;
+map<string, double> Addressables::GetValues(unsigned index) const {
+  map<string, double> result;
   for (auto iter : addressable_value_)
     result[iter.first] = iter.second[index];
   return result;
@@ -80,7 +80,7 @@ void Addressables::LoadValues(unsigned index) {
         model_->re_run_initialisation();
       }
 
-      float* ptr = model_->objects().GetAddressable(iter.first);
+      double* ptr = model_->objects().GetAddressable(iter.first);
 
       addressables_[iter.first] = ptr;
     }

@@ -5,7 +5,7 @@
  * @date 14/01/2013
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * @section DESCRIPTION
  *
@@ -41,8 +41,8 @@ private:
   // Members
   unsigned                    low_;
   unsigned                    high_;
-  vector<float>              v_;
-  float                      alpha_;
+  vector<double>              v_;
+  double                      alpha_;
 };
 
 } /* namespace selectivities */

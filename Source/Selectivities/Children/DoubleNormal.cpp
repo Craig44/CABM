@@ -5,7 +5,7 @@
  * @date 14/01/2013
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
  */
@@ -29,10 +29,10 @@ namespace selectivities {
 DoubleNormal::DoubleNormal(Model* model)
 : Selectivity(model) {
 
-  parameters_.Bind<float>(PARAM_MU, &mu_, "Mu", "");
-  parameters_.Bind<float>(PARAM_SIGMA_L, &sigma_l_, "Sigma L", "");
-  parameters_.Bind<float>(PARAM_SIGMA_R, &sigma_r_, "Sigma R", "");
-  parameters_.Bind<float>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
+  parameters_.Bind<double>(PARAM_MU, &mu_, "Mu", "");
+  parameters_.Bind<double>(PARAM_SIGMA_L, &sigma_l_, "Sigma L", "");
+  parameters_.Bind<double>(PARAM_SIGMA_R, &sigma_r_, "Sigma R", "");
+  parameters_.Bind<double>(PARAM_ALPHA, &alpha_, "Alpha", "", 1.0);
 
   RegisterAsAddressable(PARAM_MU, &mu_);
   RegisterAsAddressable(PARAM_SIGMA_L, &sigma_l_);
@@ -69,7 +69,7 @@ void DoubleNormal::RebuildCache() {
   LOG_FINE() << "Rebuild Double Normal, length based = " << length_based_;
   if (not length_based_) {
     for (unsigned age = model_->min_age(); age <= model_->max_age(); ++age) {
-      float temp = (float)age;
+      double temp = (double)age;
       if (not include_zero_age_values_ & (age == 0)) {
         values_[age - min_index_] = 0;
       } else if (temp < mu_)
@@ -78,9 +78,9 @@ void DoubleNormal::RebuildCache() {
         values_[age - min_index_] = pow(2.0, -((temp - mu_) / sigma_r_ * (temp - mu_) / sigma_r_)) * alpha_;
     }
   } else {
-    vector<float> length_bins = model_->length_bin_mid_points();
+    vector<double> length_bins = model_->length_bin_mid_points();
     for (unsigned length_bin_index = 0; length_bin_index < length_bins.size(); ++length_bin_index) {
-      float temp = length_bins[length_bin_index];
+      double temp = length_bins[length_bin_index];
       if (temp < mu_)
         length_values_[length_bin_index] = pow(2.0, -((temp - mu_) / sigma_l_ * (temp - mu_) / sigma_l_)) * alpha_;
       else

@@ -110,7 +110,7 @@ void MatureBiomass::Execute() {
       initialisation_values_.resize(initialisation_phase + 1);
     }
 
-    float b0_value = 0;
+    double b0_value = 0;
 
     if (utilities::doublecompare::IsZero(time_step_proportion_)) {
       b0_value = cache_value_;

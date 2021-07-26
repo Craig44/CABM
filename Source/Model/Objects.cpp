@@ -133,7 +133,7 @@ addressable::rerun_initialisation Objects::GetAddressableInit(const string& para
  * @param addressable_absolute_name The absolute parameter name e.g. process[recruitment].r0
  * @return Pointer to the addressable
  */
-Double* Objects::GetAddressable(const string& addressable_absolute_name) {
+double* Objects::GetAddressable(const string& addressable_absolute_name) {
   base::Object* target = FindObject(addressable_absolute_name);
   std::pair<string, string> parameter_index = ExplodeParameterAndIndex(addressable_absolute_name);
   if (parameter_index.second != "")
@@ -148,7 +148,7 @@ Double* Objects::GetAddressable(const string& addressable_absolute_name) {
  * @param addressable_absolute_name The absolute parameter name e.g. process[recruitment].r0
  * @return Pointer to a vector or addressable pointers
  */
-vector<Double*>* Objects::GetAddressables(const string& addressable_absolute_name) {
+vector<double*>* Objects::GetAddressables(const string& addressable_absolute_name) {
   std::pair<string, string> parameter_index = ExplodeParameterAndIndex(addressable_absolute_name);
   if (parameter_index.second == "") {
     LOG_CODE_ERROR() << addressable_absolute_name << " is not a multiple type of addressable lookup";
@@ -169,7 +169,7 @@ vector<Double*>* Objects::GetAddressables(const string& addressable_absolute_nam
  * @param error The variable to populate with the error message if one occurs
  * @return Pointer to the addressable or nullptr if none exists
  */
-map<unsigned, Double>* Objects::GetAddressableUMap(const string& parameter_absolute_name) {
+map<unsigned, double>* Objects::GetAddressableUMap(const string& parameter_absolute_name) {
   LOG_FINE() << "parameter_absolute_name " << parameter_absolute_name;
   base::Object* target = FindObject(parameter_absolute_name);
   std::pair<string, string> parameter_index = ExplodeParameterAndIndex(parameter_absolute_name);
@@ -184,7 +184,7 @@ map<unsigned, Double>* Objects::GetAddressableUMap(const string& parameter_absol
  * @param parameter_absolute_name The absolute parameter name e.g. process[recruitment].r0
  * @return Pointer to the addressable
  */
-OrderedMap<string, Double>* Objects::GetAddressableSMap(const string& parameter_absolute_name) {
+OrderedMap<string, double>* Objects::GetAddressableSMap(const string& parameter_absolute_name) {
   base::Object* target = FindObject(parameter_absolute_name);
   std::pair<string, string> parameter_index = ExplodeParameterAndIndex(parameter_absolute_name);
   return target->GetAddressableSMap(parameter_index.first);
@@ -197,7 +197,7 @@ OrderedMap<string, Double>* Objects::GetAddressableSMap(const string& parameter_
  * @param parameter_absolute_name The absolute parameter name e.g. process[recruitment].r0
  * @return Pointer to the addressable
  */
-vector<Double>* Objects::GetAddressableVector(const string& parameter_absolute_name) {
+vector<double>* Objects::GetAddressableVector(const string& parameter_absolute_name) {
   base::Object* target = FindObject(parameter_absolute_name);
   std::pair<string, string> parameter_index = ExplodeParameterAndIndex(parameter_absolute_name);
   return target->GetAddressableVector(parameter_index.first);

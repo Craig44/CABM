@@ -221,11 +221,11 @@ void MortalityBaranov::DoBuild() {
   unsigned hand_mort_index = std::find(meth_cols.begin(), meth_cols.end(), PARAM_HANDLING_MORTALITY) - meth_cols.begin();
   for (auto meth_row : meth_data) {
     unsigned meth_index = std::find(fishery_label_.begin(), fishery_label_.end(), meth_row[0]) - fishery_label_.begin();
-    float mls = 0;
-    float hand_mort = 0;
-    if (!utilities::To<string, float>(meth_row[mls_index], mls))
+    double mls = 0;
+    double hand_mort = 0;
+    if (!utilities::To<string, double>(meth_row[mls_index], mls))
       LOG_ERROR_P(PARAM_METHOD_INFO) << PARAM_MINIMUM_LEGAL_LENGTH << " value " << meth_row[mls_index] << " is not numeric, please sort this out.";
-    if (!utilities::To<string, float>(meth_row[hand_mort_index], hand_mort))
+    if (!utilities::To<string, double>(meth_row[hand_mort_index], hand_mort))
       LOG_ERROR_P(PARAM_METHOD_INFO) << PARAM_HANDLING_MORTALITY << " value " << meth_row[hand_mort_index] << " is not numeric, please sort this out.";
     fishery_mls_[fishery_index_[meth_index]] = mls;
     fishery_hand_mort_[fishery_index_[meth_index]] = hand_mort;
@@ -336,14 +336,14 @@ void MortalityBaranov::DoExecute() {
         for (unsigned row = 0; row < model_->get_height(); ++row) {
           for (unsigned col = 0; col < model_->get_width(); ++col) {
             WorldCell *cell = nullptr;
-            float f_taken = 0;
+            double f_taken = 0;
             cell = world_->get_base_square(row, col); // Shared resource...
             // Which fisheries are we taken fes for, not all fisheries are taking f every year.
             vector<unsigned> fisheries_to_sample_from;
             if (cell->is_enabled()) {
               unsigned age_iter = 0;
               fill(f_to_take_by_fishery_.begin(), f_to_take_by_fishery_.end(), 0.0);
-              float f_for_fishery = 0.0;
+              double f_for_fishery = 0.0;
               LOG_FINE() << "cell: " << row << "-" << col << " what we are storing = " << f_to_take_by_fishery_.size() << " looping over " << fishery_f_layer_.size() << " fishery label = " <<  fishery_label_.size();
               LOG_FINE() << " prop_F_fishery_and_bin_.size() " << prop_F_fishery_and_bin_.size();
               for (unsigned i = 0; i < fishery_label_.size(); ++i) {
@@ -415,8 +415,8 @@ void MortalityBaranov::DoExecute() {
                  *  - apply total F over all agents chance() < exp(-F_by_year_bin_[year_ndx][row][col][0][age_iter])
                  *  - If caught then do a multinomial draw, to see which fishery caught this agent.
                  */
-                float temp_sum = 0.0;
-                float random_chance = 0.0;
+                double temp_sum = 0.0;
+                double random_chance = 0.0;
                 for(auto& agent : cell->agents_) {
                   if (agent.is_alive()) {
                     //LOG_FINEST() << "selectivity = " << selectivity_at_age << " m = " << (*iter).get_m();
@@ -475,18 +475,18 @@ void MortalityBaranov::DoExecute() {
       } else {
         LOG_FINE() << "Applying length based F";
         LOG_FINE() << "Age based F";
-        float bipmass_of_available = 0.0; // over all cells
+        double bipmass_of_available = 0.0; // over all cells
 
         for (unsigned row = 0; row < model_->get_height(); ++row) {
           for (unsigned col = 0; col < model_->get_width(); ++col) {
             WorldCell *cell = nullptr;
-            float f_taken = 0;
+            double f_taken = 0;
             cell = world_->get_base_square(row, col); // Shared resource...
             // Which fisheries are we taken fes for, not all fisheries are taking f every year.
             vector<unsigned> fisheries_to_sample_from;
             if (cell->is_enabled()) {
               fill(f_to_take_by_fishery_.begin(), f_to_take_by_fishery_.end(), 0.0);
-              float f_for_fishery = 0.0;
+              double f_for_fishery = 0.0;
               LOG_FINE() << "cell: " << row << "-" << col << " what we are storing = " << f_to_take_by_fishery_.size() << " looping over " << fishery_f_layer_.size() << " fishery label = " <<  fishery_label_.size();
               LOG_FINE() << " prop_F_fishery_and_bin_.size() " << prop_F_fishery_and_bin_.size();
               for (unsigned i = 0; i < fishery_label_.size(); ++i) {
@@ -554,8 +554,8 @@ void MortalityBaranov::DoExecute() {
                  *  - apply total F over all agents chance() < exp(-F_by_year_bin_[year_ndx][row][col][0][age_iter])
                  *  - If caught then do a multinomial draw, to see which fishery caught this agent.
                  */
-                float temp_sum = 0.0;
-                float random_chance = 0.0;
+                double temp_sum = 0.0;
+                double random_chance = 0.0;
                 for(auto& agent : cell->agents_) {
                   if (agent.is_alive()) {
                     bipmass_of_available = agent.get_weight() * agent.get_scalar();
@@ -895,7 +895,7 @@ void MortalityBaranov::FillReportCache(ostringstream &cache) {
 /*
  * Set F based on R code
  */
-void MortalityBaranov::set_HCR(map<unsigned, map<string, float>> future_catches) {
+void MortalityBaranov::set_HCR(map<unsigned, map<string, double>> future_catches) {
   // find
   for (auto year_map : future_catches) {
     if(find(years_.begin(), years_.end(), year_map.first) == years_.end())

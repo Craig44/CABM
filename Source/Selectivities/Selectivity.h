@@ -33,7 +33,7 @@ public:
   void                        Validate();
   virtual void                Build() { RebuildCache(); };
   void                        Reset();
-  virtual float               GetResult(unsigned age_or_length); // Age and or Length INDEX !! not the actual value
+  virtual double               GetResult(unsigned age_or_length); // Age and or Length INDEX !! not the actual value
   bool                        is_length_based() {return length_based_;}
   bool                        include_zero_age_values_;
 
@@ -43,9 +43,9 @@ protected:
   // Members
   Model*                      model_ = nullptr;
   bool                        length_based_;
-//  map<unsigned, float>       values_;
-  vector<float>               values_;
-  vector<float>               length_values_;
+//  map<unsigned, double>       values_;
+  vector<double>               values_;
+  vector<double>               length_values_;
   unsigned                    min_index_;
 };
 } /* namespace niwa */

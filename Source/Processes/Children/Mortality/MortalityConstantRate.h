@@ -48,17 +48,17 @@ protected:
   layers::NumericLayer*               m_layer_ = nullptr;
   vector<string>                      selectivity_label_;
   vector<Selectivity*>                selectivity_;
-  float                               m_;
-  vector<float>                       time_step_proportions_;
-  float                               cv_;
+  double                               m_;
+  vector<double>                       time_step_proportions_;
+  double                               cv_;
   string                              distribution_;
   bool                                selectivity_length_based_;
   // objects for thread safety of rng
-  vector<float>                       random_numbers_;
+  vector<double>                       random_numbers_;
   unsigned                            n_agents_;
   vector<vector<unsigned>>            cell_offset_;
-  vector<float>                       ratios_;
-  map<unsigned, float>                time_step_ratios_;
+  vector<double>                       ratios_;
+  map<unsigned, double>                time_step_ratios_;
   unsigned                            agents_removed_ = 0;
 
 

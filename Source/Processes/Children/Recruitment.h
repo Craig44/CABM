@@ -39,20 +39,20 @@ public:
 protected:
   string                      ssb_label_;
   string                      recruitment_layer_label_;
-  float                       b0_;
-  float                       r0_;
+  double                       b0_;
+  double                       r0_;
   layers::NumericLayer*       recruitment_layer_ = nullptr;
   DerivedQuantity*            derived_quantity_ = nullptr;
-  float                       initial_scalar_;
+  double                       initial_scalar_;
 
   // Reporting containers that will be printed in FillReportCache() method
-  map<unsigned, float>        recruits_by_year_;
+  map<unsigned, double>        recruits_by_year_;
   unsigned                    initial_recruits_;
   bool                        first_enter_execute_ = true;
-  map<unsigned, float>        ssb_by_year_;
-  float                       scalar_;
-  vector<float>               prop_male_;
-  map<unsigned, float>        prop_male_by_year_;
+  map<unsigned, double>        ssb_by_year_;
+  double                       scalar_;
+  vector<double>               prop_male_;
+  map<unsigned, double>        prop_male_by_year_;
 
 
 };

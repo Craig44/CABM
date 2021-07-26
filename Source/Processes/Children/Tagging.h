@@ -44,9 +44,9 @@ protected:
   bool                                selectivity_length_based_ = false;
   bool                                apply_using_proportions_ = false;
   // objects for thread safety of rng
-  vector<float>                       random_numbers_;
-  vector<float>                       selectivity_random_numbers_;
-  vector<float>                       handling_mortality_random_numbers_;
+  vector<double>                       random_numbers_;
+  vector<double>                       selectivity_random_numbers_;
+  vector<double>                       handling_mortality_random_numbers_;
   unsigned                            n_agents_;
 
   vector<unsigned>                    age_freq_;
@@ -55,22 +55,22 @@ protected:
   vector<string>                      tag_layer_label_;
   vector<layers::IntLayer*>           tag_layer_;
   vector<unsigned>                    scanning_years_;
-  vector<float>                       scanning_proportion_;
-  float                               handling_mortality_;
+  vector<double>                       scanning_proportion_;
+  double                               handling_mortality_;
   // Reporting
   map<unsigned,vector<unsigned>>      age_distribution_of_tagged_fish_by_year_;
   map<unsigned,vector<unsigned>>      length_distribution_of_tagged_fish_by_year_;
 
-  vector<vector<vector<vector<float>>>>       age_length_param1_of_tagged_fish_by_year_cell_; // year * row * col * agents
-  vector<vector<vector<vector<float>>>>       age_length_param2_of_tagged_fish_by_year_cell_; // year * row * col * agents
-  vector<vector<vector<vector<vector<float>>>>>  age_length_key_by_release_event; // year * row * col * age * length
+  vector<vector<vector<vector<double>>>>       age_length_param1_of_tagged_fish_by_year_cell_; // year * row * col * agents
+  vector<vector<vector<vector<double>>>>       age_length_param2_of_tagged_fish_by_year_cell_; // year * row * col * agents
+  vector<vector<vector<vector<vector<double>>>>>  age_length_key_by_release_event; // year * row * col * age * length
 
   vector<vector<vector<vector<unsigned>>>>    length_observed_tag_of_tagged_fish_by_year_cell_; // year * row * col * length_bins
   vector<vector<vector<vector<unsigned>>>>    length_distribution_of_tagged_fish_by_year_cell_; // year * row * col * length_bins
   vector<vector<vector<vector<unsigned>>>>    age_distribution_of_tagged_fish_by_year_cell_; // year * row * col * age_bins
 
   parameters::Table*                  proportions_table_ = nullptr;
-  vector<vector<float>>               proportions_data_; // n_rows x n_length_bins
+  vector<vector<double>>               proportions_data_; // n_rows x n_length_bins
   vector<unsigned>                    table_rows_;
   vector<unsigned>                    table_cols_;
   vector<unsigned>                    table_years_;
