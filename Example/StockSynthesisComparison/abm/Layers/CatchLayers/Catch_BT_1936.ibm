@@ -1,0 +1,5 @@
+@layer catch_BT_1936
+type numeric
+table layer
+123.6
+end_table

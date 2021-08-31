@@ -1,0 +1,201 @@
+############### 
+## Observation Configuration file
+###############
+# --------------
+# Define Observations
+# --------------
+@observation BT_CPUE
+type biomass
+years 1931:2021
+time_step Annual
+proportion_through_mortality_block 0.5 ## take snapshot at the end of fishing timestep
+simulation_likelihood lognormal
+error_value 0.01 * 91
+selectivities sel_BT
+cell_layer area_definition
+cells 1_1
+catchability 0.2
+
+@observation BPT_CPUE
+type biomass
+years 1931:2021
+time_step Annual
+proportion_through_mortality_block 0.5 ## take snapshot at the end of fishing timestep
+simulation_likelihood lognormal
+error_value 0.01 * 91
+selectivities sel_BPT
+cell_layer area_definition
+cells 1_1
+catchability 0.2
+
+@observation JPL_CPUE
+type biomass
+years 1931:2021
+time_step Annual
+proportion_through_mortality_block 0.5 ## take snapshot at the end of fishing timestep
+simulation_likelihood lognormal
+error_value 0.01 * 91
+selectivities sel_JPL
+cell_layer area_definition
+cells 1_1
+catchability 0.2
+
+@observation RECI_CPUE
+type biomass
+years 1931:2021
+time_step Annual
+proportion_through_mortality_block 0.5 ## take snapshot at the end of fishing timestep
+simulation_likelihood lognormal
+error_value 0.01 * 91
+selectivities sel_RECI
+cell_layer area_definition
+cells 1_1
+catchability 0.2
+
+@observation RECO_CPUE
+type biomass
+years 1931:2021
+time_step Annual
+proportion_through_mortality_block 0.5 ## take snapshot at the end of fishing timestep
+simulation_likelihood lognormal
+error_value 0.01 * 91
+selectivities sel_RECO
+cell_layer area_definition
+cells 1_1
+catchability 0.2
+
+@observation trawl_2yr
+type biomass
+years 1931:2021
+time_step Annual
+abundance true
+proportion_through_mortality_block 0.5 ## take snapshot at the end of fishing timestep
+simulation_likelihood lognormal
+error_value 0.01 * 91
+selectivities sel_trawl_2yr
+cell_layer area_definition
+cells 1_1
+catchability 0.2
+
+@observation trawl_3yr
+type biomass
+years 1931:2021
+time_step Annual
+abundance true
+proportion_through_mortality_block 0.5 ## take snapshot at the end of fishing timestep
+simulation_likelihood lognormal
+error_value 0.01 * 91
+selectivities sel_trawl_3yr
+cell_layer area_definition
+cells 1_1
+catchability 0.2
+
+
+@observation trawl_4yr
+type biomass
+years 1931:2021
+time_step Annual
+abundance true
+proportion_through_mortality_block 0.5 ## take snapshot at the end of fishing timestep
+simulation_likelihood lognormal
+error_value 0.01 * 91
+selectivities sel_trawl_4yr
+cell_layer area_definition
+cells 1_1
+catchability 0.2
+
+
+@observation trawl_5yr
+type biomass
+years 1931:2021
+time_step Annual
+abundance true
+proportion_through_mortality_block 0.5 ## take snapshot at the end of fishing timestep
+simulation_likelihood lognormal
+error_value 0.01 * 91
+selectivities sel_trawl_5yr
+cell_layer area_definition
+cells 1_1
+catchability 0.2
+
+
+@observation trawl_6_14
+type biomass
+years 1931:2021
+time_step Annual
+abundance true
+proportion_through_mortality_block 0.5 ## take snapshot at the end of fishing timestep
+simulation_likelihood lognormal
+error_value 0.01 * 91
+selectivities sel_trawl_6_14
+cell_layer area_definition
+cells 1_1
+catchability 0.2
+
+
+@observation BT_Age
+#type process_removals_by_age
+type mortality_event_composition
+simulation_likelihood multinomial
+composition_type age
+fishery_label BT
+process_label fishing
+years 1931:2021
+layer_of_stratum_definitions area_definition
+table error_values
+year 1_1
+!include "Layers/age_error_vals.ibm"
+end_table
+ageing_error AgeingError
+
+@observation BPT_Age
+type mortality_event_composition
+simulation_likelihood multinomial
+composition_type age
+fishery_label BPT
+process_label fishing
+years 1972:2012
+layer_of_stratum_definitions area_definition
+table error_values
+year 1_1
+!include "Layers/BPT_age_error_vals.ibm"
+end_table
+ageing_error AgeingError
+
+@observation RECI_Age
+type mortality_event_composition
+simulation_likelihood multinomial
+composition_type length
+fishery_label RECI
+process_label fishing
+years 1931:2021
+layer_of_stratum_definitions area_definition
+table error_values
+year 1_1
+!include "Layers/age_error_vals.ibm"
+end_table
+#ageing_error AgeingError
+
+@observation RECO_Age
+type mortality_event_composition
+simulation_likelihood multinomial
+composition_type length
+fishery_label RECO
+process_label fishing
+years 1931:2021
+layer_of_stratum_definitions area_definition
+table error_values
+year 1_1
+!include "Layers/age_error_vals.ibm"
+end_table
+#ageing_error AgeingError
+
+
+
+@ageing_error AgeingError
+type none
+
+
+
+
+

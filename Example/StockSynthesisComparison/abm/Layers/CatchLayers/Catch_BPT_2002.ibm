@@ -1,0 +1,5 @@
+@layer catch_BPT_2002
+type numeric
+table layer
+345.5
+end_table

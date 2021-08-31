@@ -1,0 +1,175 @@
+############### 
+## Report Configuration file
+###############
+
+# --------------
+# Define Reports
+# --------------
+@report mature_ogive
+type selectivity 
+selectivity mature_ogive
+
+@report sel_BT
+type selectivity 
+selectivity sel_BT
+
+@report sel_BPT
+type selectivity 
+selectivity sel_BPT
+
+@report sel_JPL
+type selectivity 
+selectivity sel_JPL
+
+@report sel_RECO
+type selectivity 
+selectivity sel_RECO
+
+@report sel_RECI
+type selectivity 
+selectivity sel_RECI
+
+@report sel_trawl_2yr
+type selectivity 
+selectivity sel_trawl_2yr
+
+@report sel_trawl_3yr
+type selectivity 
+selectivity sel_trawl_3yr
+
+@report sel_trawl_4yr
+type selectivity 
+selectivity sel_trawl_4yr
+
+@report sel_trawl_5yr
+type selectivity 
+selectivity sel_trawl_5yr
+
+@report sel_trawl_6_14
+type selectivity 
+selectivity sel_trawl_6_14
+
+# print process properties
+@report M_report
+type process
+process natural_mort
+
+@report mature_report
+type process
+process Maturation
+
+@report fishing
+type process
+process fishing
+
+
+@report Rec
+type process
+process Recruitment
+
+# print initail state of agents
+@report init
+type initialisation_partition
+
+# print age frequency
+@report total_age_freq
+type world_age_frequency
+#years 1990:2018 ## defaults to model years
+time_step Annual
+
+@report age_freq_ssb
+type world_age_frequency
+#years 1990:2018 ## defaults to model years
+time_step calc_ssb
+
+@report age_freq_growth
+type world_age_frequency
+#years 1990:2018 ## defaults to model years
+time_step remaining_growth
+
+# print SSB's
+@report derived_quants
+type derived_quantity
+
+# print SSB's
+@report model_attributes
+type model_attributes
+
+# summarises a random selection of agents at each time step of each year, useful when debugging new processes
+@report agents_step1
+type summarise_agents
+number_of_agents 500
+time_step calc_ssb
+years 1930 1931  1990 2000 2010 2020
+
+@report agents_step2
+type summarise_agents
+number_of_agents 500
+time_step Annual
+years 1930 1931 1990 2000 2010 2020
+
+@report agents_step3
+type summarise_agents
+number_of_agents 500
+time_step remaining_growth
+years 1930 1931  1990 2000 2010 2020
+
+###############
+## Observations
+###############
+
+@report BT_CPUE
+type observation
+observation BT_CPUE
+
+@report BPT_CPUE
+type observation
+observation BPT_CPUE
+
+@report JPL_CPUE
+type observation
+observation JPL_CPUE
+
+@report RECI_CPUE
+type observation
+observation RECI_CPUE
+
+@report RECO_CPUE
+type observation
+observation RECO_CPUE
+
+@report BT_Age
+type observation
+observation BT_Age
+
+@report BPT_Age
+type observation
+observation BPT_Age
+
+@report RECI_Age
+type observation
+observation RECI_Age
+
+@report RECO_Age
+type observation
+observation RECO_Age
+
+@report trawl_2yr
+type observation
+observation trawl_2yr
+
+@report trawl_3yr
+type observation
+observation trawl_3yr
+
+@report trawl_4yr
+type observation
+observation trawl_4yr
+
+@report trawl_5yr
+type observation
+observation trawl_5yr
+
+@report trawl_6_14
+type observation
+observation trawl_6_14

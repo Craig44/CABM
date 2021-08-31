@@ -1,0 +1,5 @@
+@layer catch_RECO_2011
+type numeric
+table layer
+400
+end_table

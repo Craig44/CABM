@@ -1,0 +1,238 @@
+############### 
+## Population Configuration file
+###############
+@model
+start_year 1931
+final_year 2021
+min_age 1
+max_age 80
+age_plus true # other acceptable inputs for bool are '1' and 'yes'
+initialisation_phase_labels Iterative #label to an @initialisation block
+time_steps calc_ssb Annual remaining_growth # just one time step for now
+length_bins 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80  # assumed cm's
+length_plus true
+base_layer_label Base #
+growth_process_label von_bert
+natural_mortality_process_label natural_mort
+#sexed false
+maturity_ogive_label mature_ogive
+## a single area model
+nrows 1
+ncols 1 
+# --------------
+# Init Phase
+# --------------
+@initialisation_phase Iterative
+type iterative
+years 60
+initial_number_of_agents 1000000 ## initial number of agents
+layer_label Base
+# --------------
+#  Annual cycle
+# --------------
+# ----
+#  Time Step 1
+# ----
+# - Recruitment (based on previous year SSB)
+# - SSB
+# ----
+#  Time Step 2
+# ----
+# - Growth 50%
+# - M 50%
+# - F
+# - M 50%
+# ----
+#  Time Step 3
+# ----
+# - Growth 50%
+# - Ageing
+
+@time_step calc_ssb
+processes  Recruitment
+
+@time_step Annual
+processes  von_bert natural_mort  fishing   natural_mort
+
+@time_step remaining_growth
+processes  von_bert Ageing
+
+# --------------
+# Process definitions
+# --------------
+@process Ageing
+type ageing
+
+## null process
+@process Nop
+type Nop
+
+# Growth
+@process von_bert
+type growth_von_bertalanffy_with_basic_weight
+linf 57.4842
+t0 -1
+k 0.146478
+a 4.467e-08 
+b 2.793
+update_growth_parameters false
+distribution normal
+cv 0.08
+time_step_proportions 0.5 0.5
+
+# Maturity
+@process Maturation
+type maturation
+
+# Natural Mortality
+@process natural_mort
+type mortality_constant_rate
+update_mortality_parameters false
+m_multiplier_layer_label M_layer
+m 0.075
+distribution normal
+cv 1e-7
+selectivity_label half_one
+time_step_ratio 1
+
+# Fishing Mortality
+@process fishing
+type mortality_event_biomass
+print_census_info F
+print_tag_recapture_info false
+table catch
+!include "Layers/catch.ibm"
+end_table
+
+table method_info
+method 	selectivity	minimum_legel_length	handling_mortality
+BT		sel_BT		0			0
+BPT		sel_BPT		0			0
+JPL		sel_JPL		0			0
+RECO	sel_RECO	0			0
+RECI	sel_RECI	0			0
+end_table
+
+# Recruitment Beverton Holt
+@process Recruitment
+type recruitment_beverton_holt
+recruitment_layer_label recruit_layer
+R0 5028314 #4.783363e+006 ## take R0 from SS and multiple by 1000
+steepness 1
+ycs_values 	1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0.832 0.703 0.838 0.685 0.648 0.655 0.668 0.592 0.761 0.589 0.824 0.977 0.699 0.71 0.873 1.062 0.576 0.784 0.805 0.698 0.583 0.645 0.772 0.424 1.022 1.534 1.142 0.684 0.166 0.684 0.176 0.802 0.367 0.806 0.522 0.877 1.294 0.262 1.497 0.729 0.707 0.677 0.965 0.973 0.906 1.425 2.557 1.342 1.522 1.759 1.578 1.039 1.159 0.978 1.606 1.519 3.96 1.959 2.132 1.626 1 1 1 
+#ycs_values  	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1	1
+ssb SSB
+
+# --------------
+# Define selectivities
+# --------------
+@selectivity half_one
+type constant
+c 0.5
+
+@selectivity One
+type constant
+c 1
+
+
+@selectivity sel_BT
+type all_values
+length_based F
+v 	 0.000608409	0.0222307	0.25511	0.861598	0.99982	0.995978	0.941795	0.842913	0.731372	0.634872	0.566756	0.526474	0.506237	0.497531	0.494307	0.493275	0.49299	0.492921	0.492907	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904
+
+@selectivity sel_BPT
+type all_values
+length_based F
+v 	 0.000608409	0.0222307	0.25511	0.861598	0.99982	0.995978	0.941795	0.842913	0.731372	0.634872	0.566756	0.526474	0.506237	0.497531	0.494307	0.493275	0.49299	0.492921	0.492907	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904	0.492904
+
+/*
+@selectivity sel_RECO
+type all_values
+length_based T
+v 1.07455e-06 2.98485e-06 5.8503e-06 9.67091e-06 1.44467e-05 2.01776e-05 2.68636e-05 3.45049e-05 4.31012e-05 5.26527e-05 6.31594e-05 7.46212e-05 8.70382e-05 0.00010041 0.000114738 0.00013002 0.000146258 0.00016345 0.000181598 0.000200701 0.000220759 0.000241773 0.000263741 0.000286665 0.000310544 0.000335378 0.115879 0.27586 0.471348 0.677903 0.858556 0.973916 0.999951 0.99996 0.999106 0.997138 0.994058 0.989868 0.984574 0.97818 0.970693 0.962121 0.952473 0.941758 0.929987 0.917172 0.903326 0.888463 0.872598 0.855746 0.837926 0.819153 0.799447 0.778827 0.757314 0.734928 0.711691 0.687625 0.662754 0.637101 0.610691 0.583548 0.555698 0.527167 0.497981 0.468166 0.43775 0.40676 0.375224 0.34317 0.310625 0.277618 0.244178 0.210332 0.176109 0.141538 0.106647 0.0714645 0.0360183 
+
+@selectivity sel_RECI
+type all_values
+length_based T
+v 1.11881e-06 3.10779e-06 6.09128e-06 1.00693e-05 1.50417e-05 2.10087e-05 2.79701e-05 3.59261e-05 4.48765e-05 5.48215e-05 6.57609e-05 7.76948e-05 9.06233e-05 0.000104546 0.000119464 0.000135375 0.000152282 0.000170183 0.000189078 0.000208968 0.000229852 0.000251731 0.000274605 0.000298472 0.000323335 0.000349192 0.944275 0.999911 0.997204 0.984374 0.961512 0.929329 0.8888 0.841121 0.787649 0.72984 0.669179 0.607123 0.545045 0.484181 0.425603 0.370187 0.318611 0.271345 0.228667 0.190682 0.157341 0.128469 0.103796 0.0829843 0.0656516 0.0513967 0.0398173 0.0305258 0.0231598 0.01739 0.0129239 0.00950734 0.0069242 0.00499373 0.00356762 0.00252614 0.00177422 0.00123749 0.000858687 0.000594352 0.000411958 0.000287508 0.00020354 0.000147513 0.000110544 8.64187e-05 7.08488e-05 6.09106e-05 5.46367e-05 5.07194e-05 4.83002e-05 4.68225e-05 4.59298e-05 
+*/
+
+@selectivity sel_RECO
+type logistic
+a50  3.4
+ato95 1.2 
+l 1
+h 80 
+@selectivity sel_RECI
+type logistic
+a50   2.7
+ato95 2.2 
+l 1
+h 80 
+
+@selectivity sel_JPL
+type knife_edge
+length_based F
+e 5
+
+@selectivity mature_ogive
+type knife_edge
+length_based F
+e 3
+
+@selectivity sel_trawl_2yr
+type all_values_bounded
+l 1
+h 3
+v 0 1 0
+
+@selectivity sel_trawl_3yr
+type all_values_bounded
+l 2
+h 4
+v 0 1 0
+
+@selectivity sel_trawl_4yr
+type all_values_bounded
+l 3
+h 5
+v 0 1 0
+
+@selectivity sel_trawl_5yr
+type all_values_bounded
+l 4
+h 6
+v 0 1 0
+
+@selectivity sel_trawl_6_14
+type all_values_bounded
+l 5
+h 15
+v 0 1 1 1 1 1 1 1 1 1 0
+
+
+# --------------
+# Derived Quantities
+# --------------
+@derived_quantity SSB
+type biomass
+selectivity mature_ogive
+biomass_layer_label SSB_areas
+time_step calc_ssb
+proportion_through_mortality_block 1.0
+
+/*
+@derived_quantity total_biomass
+type biomass
+biomass_layer_label SSB_areas
+selectivity One
+time_step Annual
+proportion_through_mortality_block 0.5
+
+@derived_quantity total_abundance
+type abundance
+layer_label SSB_areas
+selectivity One
+time_step Annual
+proportion_through_mortality_block 0.5
+*/

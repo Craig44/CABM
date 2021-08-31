@@ -1,0 +1,21 @@
+# --------------
+# Include Layers
+# --------------
+!include Population.ibm
+!include Observation.ibm
+!include Report.ibm
+#!include ReportSim.ibm
+
+!include "Layers/base_layer.ibm"
+!include "Layers/area_labels.ibm"
+!include "Layers/lat.ibm"
+!include "Layers/long.ibm"
+!include "Layers/SSB_area.ibm"
+#!include "Layers/L_inf_layer.ibm"
+#!include "Layers/k_layer.ibm"
+!include "Layers/M_layer.ibm"
+!include "Layers/recruitment_areas.ibm"
+## Catch layers
+!include "Layers/catchFiles.ibm"
+#!include "Layers/FLayers.ibm"
+

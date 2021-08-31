@@ -1,0 +1,5 @@
+@layer area_definition
+type categorical
+table layer
+1_1
+end_table

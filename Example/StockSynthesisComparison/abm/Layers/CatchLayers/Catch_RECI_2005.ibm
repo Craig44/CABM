@@ -1,0 +1,5 @@
+@layer catch_RECI_2005
+type numeric
+table layer
+64
+end_table

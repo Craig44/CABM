@@ -1,10 +1,10 @@
 // This file is automatically built by the build system. Do not modify this file
 #ifndef VERSION_H_
 #define VERSION_H_
-#define SOURCE_CONTROL_REVISION 593e0ffc7f503774dca85f5ff37b9e26f68cfa3c
-#define SOURCE_CONTROL_DATE "2021-06-07"
+#define SOURCE_CONTROL_REVISION 3a462a2b6b83e259aad0745afc45dfc944be4c5a
+#define SOURCE_CONTROL_DATE "2021-07-26"
 #define SOURCE_CONTROL_YEAR "2021"
-#define SOURCE_CONTROL_MONTH "June"
-#define SOURCE_CONTROL_TIME "23:36:14"
-#define SOURCE_CONTROL_VERSION "2021-06-07 23:36:14 UTC (rev. 593e0ff)"
+#define SOURCE_CONTROL_MONTH "July"
+#define SOURCE_CONTROL_TIME "20:42:59"
+#define SOURCE_CONTROL_VERSION "2021-07-26 20:42:59 UTC (rev. 3a462a2)"
 #endif

@@ -190,7 +190,7 @@ void MortalityEventBiomass::DoBuild() {
   if (!model_->get_sexed()) {
     // find the column header selectivity
     unsigned selec_index = std::find(meth_cols.begin(), meth_cols.end(), PARAM_SELECTIVITY) - meth_cols.begin();
-
+    unsigned meth_counter = 0;
     for (auto meth_row : meth_data) {
 
       unsigned meth_index = std::find(fishery_label_.begin(), fishery_label_.end(), meth_row[0]) - fishery_label_.begin();
@@ -213,9 +213,18 @@ void MortalityEventBiomass::DoBuild() {
       if (!temp_selectivity)
         LOG_FATAL_P(PARAM_METHOD_INFO)
         << ": selectivity " << meth_row[selec_index] << " does not exist. Have you defined it? located in column " << selec_index;
+      if(meth_counter > 0) {
+        if(selectivity_length_based_ != temp_selectivity->is_length_based())
+               LOG_FATAL_P(PARAM_METHOD_INFO)
+        << ": selectivity " << meth_row[selec_index] << " is not compatible with previous selectivities. the selectivities need to be either all age or all length for this process right now. ";
+        
+      }
+      meth_counter++;
+      LOG_FINE() << meth_row[selec_index] << " length based slelectivity = " << temp_selectivity->is_length_based() << " prveious value = " << selectivity_length_based_ << " meth counter = " << meth_counter;
 
       if (temp_selectivity->is_length_based())
         selectivity_length_based_ = true;
+
 
       fishery_selectivity_[fishery_index_[meth_index]].push_back(temp_selectivity);
       fishery_selectivity_[fishery_index_[meth_index]].push_back(temp_selectivity);
@@ -224,6 +233,8 @@ void MortalityEventBiomass::DoBuild() {
   } else {
     unsigned male_selec_index = std::find(meth_cols.begin(), meth_cols.end(), PARAM_MALE_SELECTIVITY) - meth_cols.begin();
     unsigned female_selec_index = std::find(meth_cols.begin(), meth_cols.end(), PARAM_FEMALE_SELECTIVITY) - meth_cols.begin();
+    unsigned meth_counter = 0;
+
     for (auto meth_row : meth_data) {
       unsigned meth_index = std::find(fishery_label_.begin(), fishery_label_.end(), meth_row[0]) - fishery_label_.begin();
       fishery_selectivity_label_[fishery_index_[meth_index]].push_back(meth_row[male_selec_index]);
@@ -256,6 +267,12 @@ void MortalityEventBiomass::DoBuild() {
       if (female_temp_selectivity->is_length_based() && male_temp_selectivity->is_length_based())
         selectivity_length_based_ = true;
 
+      if(meth_counter > 0) {
+        if(selectivity_length_based_ != female_temp_selectivity->is_length_based())
+               LOG_FATAL_P(PARAM_METHOD_INFO)
+        << ": female_selectivity " << meth_row[female_selec_index] << " is not compatible with previous selectivities. the selectivities need to be either all age or all length for this process right now. ";
+        meth_counter++;
+      }
       fishery_selectivity_[fishery_index_[meth_index]].push_back(male_temp_selectivity);
       fishery_selectivity_[fishery_index_[meth_index]].push_back(female_temp_selectivity);
     }
