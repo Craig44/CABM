@@ -12,7 +12,7 @@ library(reshape2)
 library(stockassessmenthelper) # devtools::install_github("Craig44/stockassessmenthelper", build_vignettes  = TRUE)
 ss_col ="red"
 abm_col = "black"
-abm_dir = file.path("..","abm")
+abm_dir = file.path("..","abm_w_length_age_sel")
 ss_dir = file.path("..","SS")
 fig_path = file.path("..","Figures")
 #abm = extract.run(file = "run.out", path = abm_dir)
@@ -116,7 +116,6 @@ init_length_at_age[1] = lmin + 0
 ####################
 ##
 len_sel = ss_run$sizeselex
-len_sel_est = ss_est$sizeselex
 
 ndx = len_sel$Fleet %in% which (ss_run$FleetNames %in% c("FISHERY_Rec1","FISHERY_Rec2")) & len_sel$Yr == 1931
 len_of_interest = len_sel %>% filter(ndx, Factor == "Lsel")

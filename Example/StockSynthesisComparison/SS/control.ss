@@ -217,8 +217,8 @@
  0 0 0 0 # 1 FISHERY_BT
  0 0 0 0 # 2 FISHERY_BPT
  0 0 0 0 # 3 FISHERY_JP  approx LL select 5-30 = 1.0
- 0 0 0 0 # 4 FISHERY_Rec1
- 0 0 0 0 # 5 FISHERY_Rec2
+ 24 0 0 0 # 4 FISHERY_Rec1
+ 24 0 0 0 # 5 FISHERY_Rec2
  15 0 0 1 # 6 CPUE_BT
  15 0 0 2 # 7 CPUE_BPT
  0 0 0 0 # 8 TrawSurveyTotal
@@ -250,8 +250,8 @@
  20 0 0 0 # 1 FISHERY_BT
  15 0 0 1 # 2 FISHERY_BPT
  11 0 0 0 # 3 FISHERY_JP approx LL select 5-30 = 1.0
- 12 0 0 0 # 4 FISHERY_Rec1
- 12 0 0 0 # 5 FISHERY_Rec2
+ 0 0 0 0 # 4 FISHERY_Rec1
+ 0 0 0 0 # 5 FISHERY_Rec2
  15 0 0 1 # 6 CPUE_BT
  15 0 0 1 # 7 CPUE_BPT
  20 0 0 0 # 8 TrawSurveyTotal
@@ -299,19 +299,19 @@
 
 ## FIXED PARAMETERS
 # 3   FISHERY_Rec1 Outside Harbours
-#            25            45       33.2189            32             5             0          -3          0          0          0          0          0          0          0  #  SizeSel_P1_FISHERY_BT(1)
-#           -12             0      -8                  -8             0             0          -5          0          0          0          0          0          0          0  #  SizeSel_P2_FISHERY_BT(1)
-#           -10             9       3.1213              3             2             0          -4          0          0          0          0          0          0          0  #  SizeSel_P3_FISHERY_BT(1)
-#            -2            12       8.67436             8             3             0          -4          0          0          0          0          0          0          0  #  SizeSel_P4_FISHERY_BT(1)
-#           -10             9      -8                  -8          1000             0          -5          0          0          0          0          0          0          0  #  SizeSel_P5_FISHERY_BT(1)
-#           -16            10      -7.99597            -8             3             0          -5          0          0          0          0          0          0          0  #  SizeSel_P6_FISHERY_BT(1)
+            25            45       33.2189            32             5             0          -3          0          0          0          0          0          0          0  #  SizeSel_P1_FISHERY_BT(1)
+           -12             0      -8                  -8             0             0          -5          0          0          0          0          0          0          0  #  SizeSel_P2_FISHERY_BT(1)
+           -10             9       3.1213              3             2             0          -4          0          0          0          0          0          0          0  #  SizeSel_P3_FISHERY_BT(1)
+            -2            12       8.67436             8             3             0          -4          0          0          0          0          0          0          0  #  SizeSel_P4_FISHERY_BT(1)
+           -10             9      -8                  -8          1000             0          -5          0          0          0          0          0          0          0  #  SizeSel_P5_FISHERY_BT(1)
+           -16            10      -7.99597            -8             3             0          -5          0          0          0          0          0          0          0  #  SizeSel_P6_FISHERY_BT(1)
 # 4   FISHERY_Rec2 Inside Harbours
-#            25            45       27.7695            28             3             0          -3          0          0          0          0          0          0          0  #  SizeSel_P1_FISHERY_BT(1)
-#           -12             0      -10                -10             0             0          -5          0          0          0          0          0          0          0  #  SizeSel_P2_FISHERY_BT(1)
-#           -10             9        1.1773             1             1             0          -4          0          0          0          0          0          0          0  #  SizeSel_P3_FISHERY_BT(1)
-#            -2            12        5.2451             5.3           1             0          -4          0          0          0          0          0          0          0  #  SizeSel_P4_FISHERY_BT(1)
-#           -10             9       -8                 -8          1000             0          -5          0          0          0          0          0          0          0  #  SizeSel_P5_FISHERY_BT(1)
-#           -16            10      -10                 -8            10             0          -5          0          0          0          0          0          0          0  #  SizeSel_P6_FISHERY_BT(1)
+            25            45       27.7695            28             3             0          -3          0          0          0          0          0          0          0  #  SizeSel_P1_FISHERY_BT(1)
+           -12             0      -10                -10             0             0          -5          0          0          0          0          0          0          0  #  SizeSel_P2_FISHERY_BT(1)
+           -10             9        1.1773             1             1             0          -4          0          0          0          0          0          0          0  #  SizeSel_P3_FISHERY_BT(1)
+            -2            12        5.2451             5.3           1             0          -4          0          0          0          0          0          0          0  #  SizeSel_P4_FISHERY_BT(1)
+           -10             9       -8                 -8          1000             0          -5          0          0          0          0          0          0          0  #  SizeSel_P5_FISHERY_BT(1)
+           -16            10      -10                 -8            10             0          -5          0          0          0          0          0          0          0  #  SizeSel_P6_FISHERY_BT(1)
 
 # Trawl survey
 #            13            45            20            20             3             0          3          0          0          0          0          0          0          0  #  SizeSel_P1_FISHERY_BT(1)
@@ -346,11 +346,11 @@
              0             5            100            100           0.5             0         -1          0          0          0          0          0          0          0  #  AgeSel_P2_Survey_Tag(4)
 # 3   FISHERY_Rec1 Outside Harbours
 #_          LO            HI          INIT         PRIOR         PR_SD       PR_type      PHASE    env-var    use_dev   dev_mnyr   dev_mxyr     dev_PH      Block    Blk_Fxn  #  parm_name
-             0.1           20             3.4            5           0.5             0         -1          0          0          0          0          0          0          0  #  AgeSel_P1_Survey_Tag(4)
-             0.1           20            1.2            100           0.5             0         -1          0          0          0          0          0          0          0  #  AgeSel_P2_Survey_Tag(4)
+#             0.1           20             3.4            5           0.5             0         -1          0          0          0          0          0          0          0  #  AgeSel_P1_Survey_Tag(4)
+#             0.1           20            1.2            100           0.5             0         -1          0          0          0          0          0          0          0  #  AgeSel_P2_Survey_Tag(4)
 # 4   FISHERY_Rec2 Inside Harbours
-             0.1           20             2.7            5           0.5             0         -1          0          0          0          0          0          0          0  #  AgeSel_P1_Survey_Tag(4)
-             0.1           20            2.2            100           0.5             0         -1          0          0          0          0          0          0          0  #  AgeSel_P2_Survey_Tag(4)
+#             0.1           20             2.7            5           0.5             0         -1          0          0          0          0          0          0          0  #  AgeSel_P1_Survey_Tag(4)
+#             0.1           20            2.2            100           0.5             0         -1          0          0          0          0          0          0          0  #  AgeSel_P2_Survey_Tag(4)
 # 5   CPUE_BT AgeSelex
 # 6   CPUE_BPT AgeSelex
 # Trawl Survey - all 
