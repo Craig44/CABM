@@ -55,7 +55,7 @@ protected:
   vector<vector<Selectivity*>>         fishery_selectivity_; // n_fishery * n_sex
   vector<double>                       fishery_mls_; // fishery specific
   vector<double>                       fishery_hand_mort_; // fishery specific
-  bool                                 selectivity_length_based_ = false;
+  vector<bool>                         selectivity_length_based_by_fishery_;
   vector<double>                       catch_to_take_by_fishery_;
   vector<double>                       vulnerable_biomass_;
 
