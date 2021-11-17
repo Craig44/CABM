@@ -178,7 +178,7 @@ void RecruitmentBevertonHolt::DoExecute() {
       }
     }
   } else {
-	LOG_FINE() <<  "Rec = " << label_ << "scalar = " << scalar_ << " model scalar = " << model_->get_scalar(label_);
+	LOG_FINE() <<  "Rec = " << label_ << "scalar = " << scalar_ << " model scalar = " << model_->get_scalar(label_) << " init_recruit = " << initial_recruits_;
     scalar_ =  model_->get_scalar(label_);
     b0_ = model_->get_b0(label_);
     double SSB = derived_quantity_->GetValue(model_->current_year() - model_->min_age());
@@ -187,6 +187,8 @@ void RecruitmentBevertonHolt::DoExecute() {
     double ssb_ratio = SSB / b0_;
     double SR = ssb_ratio / (1.0 - ((5.0 * steepness_ - 1.0) / (4.0 * steepness_)) * (1.0 - ssb_ratio));
     double true_ycs = ycs_values_by_year_[model_->current_year()] * SR;
+
+
     double amount_per = unsigned(initial_recruits_ * true_ycs);
     recruits_by_year_[model_->current_year()] = amount_per;
     ssb_ratio_[model_->current_year()] = ssb_ratio;
@@ -215,6 +217,7 @@ void RecruitmentBevertonHolt::DoReset() {
   LOG_FINE();
   if(model_->is_initialisation_being_re_run())
     first_enter_execute_ = true;
+
 
 }
 // FillReportCache, called in the report class, it will print out additional information that is stored in
@@ -250,6 +253,10 @@ void RecruitmentBevertonHolt::FillReportCache(ostringstream& cache) {
 // Reset containers when accounting for time-varying object changes
 void RecruitmentBevertonHolt::RebuildCache() {
   LOG_FINE();
+  // if r0 changes update the agents to seed
+  LOG_FINE() << "r0 = " << r0_ << " init recruits before = " << initial_recruits_;
+  initial_recruits_ = r0_ / model_->get_scalar(label_);
+  LOG_FINE() << "r0 = " << r0_ << " init recruits after = " << initial_recruits_;
 }
 
 } /* namespace processes */
