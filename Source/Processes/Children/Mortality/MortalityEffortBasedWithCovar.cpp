@@ -288,6 +288,8 @@ void MortalityEffortBasedWithCovar::DoExecute() {
 
           if (cell->is_enabled()) {
             LOG_MEDIUM() << "checking cell in row " << row + 1 << " col = " << col + 1;
+            // still calculate vulnerable biomass even if area is closed
+            /*
             if(closure_layer_) {
               LOG_FINE() << "checking if area closed this year";
               if(closure_layer_->get_value(row, col,  model_->current_year()) <= 0) {
@@ -295,6 +297,7 @@ void MortalityEffortBasedWithCovar::DoExecute() {
                 continue;
               }
             }
+            */
             // iterate through and calcualte vulnerable biomass in each cell exactly, nothing random here
             unsigned counter = 0;
             if (selectivity_length_based_) {
