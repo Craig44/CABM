@@ -185,6 +185,7 @@
 #define PARAM_CELL                                "cell"
 #define PARAM_CELLS                               "cells"
 #define PARAM_CLASS_MINIMUMS                      "class_minimums"
+#define PARAM_CLOSURE_LAYER                       "closure_layer"
 #define PARAM_CLUSTER_ATTRIBUTE                   "cluster_attribute"
 #define PARAM_CLUSTER_DISTRIBUTION                "cluster_distribution"
 #define PARAM_CLUSTER_CORRELATION_LAMBDA          "cluster_correlation_lambda"
