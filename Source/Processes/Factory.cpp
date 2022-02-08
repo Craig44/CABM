@@ -5,7 +5,7 @@
  * @date 13/12/2012
  * @section LICENSE
  *
- * Copyright NIWA Science ©2012 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2012 - www.niwa.co.nz
  *
  * $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
  */
@@ -25,6 +25,7 @@
 #include "Children/Growth/GrowthSchnuteWithBasic.h"
 #include "Children/Mortality/MortalityConstantRate.h"
 #include "Children/Mortality/MortalityCull.h"
+#include "Children/Mortality/MortalityExploitation.h"
 #include "Children/Mortality/MortalityEventBiomass.h"
 #include "Children/Mortality/MortalityEventHybrid.h"
 #include "Children/Mortality/MortalityEffortBased.h"
@@ -88,6 +89,8 @@ Process* Factory::Create(Model* model, const string& object_type, const string& 
       result = new GrowthSchnuteWithBasic(model);
     else if (sub == PARAM_MORTALITY_BARANOV)
       result = new MortalityBaranov(model);
+    else if (sub == PARAM_MORTALITY_EXPLOITATION)
+      result = new MortalityExploitation(model);
     else if (sub == PARAM_MORTALITY_BARANOV_SIMPLE)
       result = new MortalityBaranovSimple(model);
     else if (sub == PARAM_MORTALITY_CONSTANT_RATE)
