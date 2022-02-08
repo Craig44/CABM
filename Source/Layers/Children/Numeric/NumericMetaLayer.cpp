@@ -32,10 +32,12 @@ NumericMetaLayer::NumericMetaLayer(Model* model) : NumericLayer(model) {
 //**********************************************************************
 void NumericMetaLayer::DoValidate() {
   LOG_FINE();
+  // check user supplied all years
   for (auto year : years_) {
     if (find(model_->years().begin(), model_->years().end(), year) == model_->years().end())
       LOG_ERROR_P(PARAM_YEARS) << "the year " << year << " could not be found in model years, for obvious reasons the year must exist between start and final year in the @model block";
   }
+
 }
 
 //**********************************************************************
@@ -44,10 +46,7 @@ void NumericMetaLayer::DoValidate() {
 //**********************************************************************
 void NumericMetaLayer::DoBuild() {
   LOG_TRACE();
-  for (auto year : model_->years()) {
-    if (find(years_.begin(), years_.end(), year) == years_.end())
-      LOG_ERROR_P(PARAM_YEARS) << "the model year " << year << " could not be found in your years parameter, there must be a year for every model year unfortunatley, feel free to change this if you want.";
-  }
+
   NumericLayer* layer = nullptr;
   for (unsigned i = 0; i < years_.size(); ++i) {
     layer = model_->managers().layer()->GetNumericLayer(layer_names_[i]);
@@ -75,7 +74,7 @@ void NumericMetaLayer::DoBuild() {
 //**********************************************************************
 float NumericMetaLayer::get_value(unsigned RowIndex, unsigned ColIndex) {
   float value = 0.0;
-  if (model_->state() == State::kInitialise)
+  if (model_->state() == State::kInitialise || (find(years_.begin(),years_.end(),model_->current_year()) == years_.end()))
     return default_layer_->get_value(RowIndex, ColIndex);
   value = years_layer_[model_->current_year()]->get_value(RowIndex, ColIndex);
   return value;

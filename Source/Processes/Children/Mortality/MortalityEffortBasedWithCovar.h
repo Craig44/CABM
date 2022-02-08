@@ -61,11 +61,14 @@ protected:
 
   vector<string>                      preference_function_labels_;
   vector<string>                      preference_layer_labels_;
-  vector<double>                       preference_weights_;
+  string                              closure_layer_label_ = "";
+  vector<double>                      preference_weights_;
   bool                                calculate_on_the_fly_ = false;
   vector<unsigned>                    non_static_layer_ndx_;
   vector<PreferenceFunction*>         preference_functions_;
   vector<layers::NumericLayer*>       preference_layers_;
+  layers::NumericLayer*               closure_layer_ = nullptr;
+
   vector<vector<double>>              base_preference_;
   vector<vector<double>>              vary_preference_;
   vector<vector<double>>              temp_preference_;

@@ -44,6 +44,7 @@ MortalityEffortBasedWithCovar::MortalityEffortBasedWithCovar(Model* model) : Mor
   parameters_.Bind<string>(PARAM_PREFERENCE_FUNCTIONS, &preference_function_labels_, "The preference functions to apply to each layer", "");
   parameters_.Bind<string>(PARAM_PREFERENCE_LAYERS, &preference_layer_labels_, "The preference functions to apply", "");
   parameters_.Bind<double>(PARAM_PREFERENCE_WEIGHTS, &preference_weights_, "The weight to each preference when calculating mean spatial effort distribution", "");
+  parameters_.Bind<string>(PARAM_CLOSURE_LAYER, &closure_layer_label_, "Layer label for closed areas", "", "");
   //parameters_.Bind<double>(PARAM_CATCHABILITY, &catchability_, "An arbiturary scalar to get the effort value","");
 }
 
@@ -193,6 +194,14 @@ void MortalityEffortBasedWithCovar::DoBuild() {
   age_freq_census_.resize(model_->age_spread());
 
 
+  // Get closure label
+  if(closure_layer_label_ != "") {
+    closure_layer_ = model_->managers().layer()->GetNumericLayer(closure_layer_label_);
+    if (!closure_layer_) {
+      LOG_FATAL_P(PARAM_CLOSURE_LAYER) << "could not find the layer '" << closure_layer_label_ << "', please make sure it exists, and if it does exist make sure it is of type 'numeric''";
+    }
+  }
+
 }
 
 /**
@@ -279,6 +288,16 @@ void MortalityEffortBasedWithCovar::DoExecute() {
 
           if (cell->is_enabled()) {
             LOG_MEDIUM() << "checking cell in row " << row + 1 << " col = " << col + 1;
+            // still calculate vulnerable biomass even if area is closed
+            /*
+            if(closure_layer_) {
+              LOG_FINE() << "checking if area closed this year";
+              if(closure_layer_->get_value(row, col,  model_->current_year()) <= 0) {
+                LOG_FINE() << "area closed don't calculate vulnerable biomass";
+                continue;
+              }
+            }
+            */
             // iterate through and calcualte vulnerable biomass in each cell exactly, nothing random here
             unsigned counter = 0;
             if (selectivity_length_based_) {
@@ -349,6 +368,12 @@ void MortalityEffortBasedWithCovar::DoExecute() {
           WorldCell* cell = world_->get_base_square(row, col);
           if (cell->is_enabled()) {
             effort_by_cell_[row][col] = effort_organised_vector_format_[cell_counter];
+            if(closure_layer_) {
+              LOG_FINE() << "checking if area closed this year, if so. setting effort = 0";
+              if(closure_layer_->get_value(row, col,  model_->current_year()) <= 0) {
+                effort_by_cell_[row][col] = 0;
+              }
+            }
             cell_counter++;
           }
         }
@@ -369,6 +394,13 @@ void MortalityEffortBasedWithCovar::DoExecute() {
         for (unsigned col = 0; col < model_->get_width(); ++col) {
           WorldCell* cell = world_->get_base_square(row, col);
           if (cell->is_enabled()) {
+            if(closure_layer_) {
+              LOG_FINE() << "checking if area closed this year";
+              if(closure_layer_->get_value(row, col,  model_->current_year()) <= 0) {
+                LOG_FINE() << "area closed don't calculate vulnerable biomass";
+                continue;
+              }
+            }
             LOG_FINE() << "checking cell in row " << row + 1 << " col = " << col + 1;
             composition_data age_freq(PARAM_AGE, model_->current_year(), row, col,  model_->age_spread());
             composition_data length_freq(PARAM_LENGTH, model_->current_year(), row, col,  model_->length_bin_mid_points().size());
@@ -458,6 +490,13 @@ double MortalityEffortBasedWithCovar::SolveBaranov() {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
       WorldCell* cell = world_->get_base_square(row, col);
       if (cell->is_enabled()) {
+        if(closure_layer_) {
+          LOG_FINE() << "checking if area closed this year";
+          if(closure_layer_->get_value(row, col,  model_->current_year()) <= 0) {
+            LOG_FINE() << "area closed don't calculate vulnerable biomass";
+            continue;
+          }
+        }
         unsigned counter = 0;
         double F_this_cell = lambda_ * effort_by_cell_[row][col];
         if (selectivity_length_based_) {
