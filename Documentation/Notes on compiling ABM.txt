@@ -1,0 +1,3 @@
+1. to compile ABM, go to the ABM/BuildSystem folder and run doBuild.bat script to compile. doBuild help will give doBuild commands. 
+2. when you have conflict, for example, you change the folder name for ABM, you can run doBuild cleanall to delete all the old files. 
+3. after cleaned, run doBuild thirdparty and then doBuild release
