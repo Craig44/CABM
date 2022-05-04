@@ -1,3 +1,5 @@
 1. to compile ABM, go to the ABM/BuildSystem folder and run doBuild.bat script to compile. doBuild help will give doBuild commands. 
 2. when you have conflict, for example, you change the folder name for ABM, you can run doBuild cleanall to delete all the old files. 
 3. after cleaned, run doBuild thirdparty and then doBuild release
+4. if doBuild release the first time, you may have conflict with Rtools\sh, rename your Rtools folder names temperarily and recompile. you will need Rtools back to your path once you have got past any conflicts. 
+5. once you start recompiling, you may get error "sh is not recognized as an internal ...", you need to add Rtools back in. 
