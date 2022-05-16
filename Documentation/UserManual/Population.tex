@@ -668,6 +668,46 @@ This process applies spatially explicit fishing mortality for only a single fish
 So from the algorithm above we can see that agents are exposed to both M and F, however the negative is that this assumes only a single interaction with the fishery which is an unlikely assumption. However I added this process because it both takes M and F simultaneously and may actually be faster than an event biomass dynamic (previous paragraph~\ref{para:event_mort}).
 
 
+\paragraph{Exploitation}\label{para:event_mort_exploitation}\index{Processes!Mortality!Exploitation}
+This is a removal event where we iterate over a range of cells and remove agents based on multiple fisheries and spatially explicit fishing mortality rates. Advantages using this mortality process over the event biomass event (previous paragraph~\ref{para:baranov}) is that it is alot faster (computationally) another benefit is that it allows for a constant exploitation pattern, even under different recruitment trends, unlike a catch based mortality event.
+
+for multiple fisheries, in any given cell we calculate the total exploitation rate as
+\begin{align}
+U_b &= \sum_{f = 1} U_fS^f_b\\
+p^f_b &= \frac{U_fS^f_b}{F_b}
+\end{align}
+%,
+where, \(f\) indexes the fishery, and \(S^f_b\) is the selectivity for bin \(b\) (can be either age or length) for fishery \(f\) and \(U_f\) is the fishing exploitation rate in the cell we are in. \(p^f_b\) is the proportion of fishing mortality for bin \(b\) attributed ot fishery \(f\).\\
+\textbf{The algorithm follows}
+\begin{itemize}
+	\item Iterate over each agent that is alive and see if agent \(i\) is caught ($U() < 1 - e^{F_{b_i}}$) with \(b_i\) is the bin of agent \(i\)
+	\item If caught see which fishery caught it using a \(f \sim multinomial(p^f_1, \dots p^f_{n_f})\)
+	\item if we have minimum legal size (MLS) check to see if the fish will be returned this is a true or false statement, if agent length $<$ MLS return with some handling mortality probability that will be again checked with a uniform random variable
+	\item if not MLS check then we remove this agent from the population and add it to the catch (all agents are removed, this must be remembered)
+\end{itemize}
+The key here is that an agent can interact with fishery many times during the process execution, but there is no natural mortality.
+
+\pagebreak
+{\small{\begin{verbatim}
+		@process Fishing_Mortality
+		type mortality_exploitation
+		print_extra_info true ## this may print too much information and slow down table f_table
+		table u_table
+		## these are labels for @layer that describe U over space for each fishery
+		year FishingTrwl FishingLine
+		1972 1972_Trwl 1972_Line
+		1973 1973_Trwl 1973_Line
+		1974 1974_Trwl 1974_Line
+		end_table
+		
+		## describe fishery specific parameters		
+		table method_info
+		method          male_selectivity    female_selectivity 	minimum_legel_length  handling_mortality
+		FishingTrwl     trwlFSel_m          trwlFSel_f			0			0
+		FishingLine	    Sel_Line            Sel_Line			0			0
+		end_table
+		\end{verbatim}}}
+
 \paragraph{Baranov}\label{para:event_mort_baranov}\index{Processes!Mortality!Baranov}
 This is a removal event where we iterate over a range of cells and remove agents based on multiple fisheries and spatially explicit fishing mortality rates. Advantages using this mortality process over the event biomass event (previous paragraph~\ref{para:baranov}) is that it is alot faster (computationally) another benefit is that it allows for a constant exploitation pattern, even under different recruitment trends, unlike a catch based mortality event.
 
@@ -1338,7 +1378,7 @@ f(x) = \alpha / [1+19^{(a_{50}-x)/a_{to95}}]
 
 The logistic preference function has parameters $a_{50}$ and $a_{to95}$. $\alpha$ is a scaling parameter, with default value of $\alpha = 1$. The logistic selectivity takes values $0.5 \alpha$ at $x=a_{50}$ and $0.95 \alpha$ at $x=a_{50}+a_{to95}$. 
 
-\subsubsection[Normal]{\argument{double\_normal}}\index{Preference Functions!Normal}
+\subsubsection[Normal]{\argument{normal}}\index{Preference Functions!Normal}
 
 \begin{equation}
 f(x) = 

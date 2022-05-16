@@ -129,24 +129,6 @@
 \defSub{sex} {You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female}
 \defSub{layer\_of\_stratum\_definitions} {The layer that indicates what the stratum boundaries are.}
 \defSub{strata\_to\_include} {The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer}
-\par\textbf{\commandlabsubarg{observation}{type}{mortality\_event\_biomass\_clusters\_second\_cut}}\par
-\defSub{years} {The years of the observed values}
-\defSub{ageing\_error} {Label of ageing error to use}
-\defSub{process\_label} {Label of of removal process}
-\defSub{fishery\_label} {Label of of removal process}
-\defSub{min\_age} {Minimum age}
-\defSub{max\_age} {Maximum age}
-\defSub{cluster\_cv} {CV for randomly selecting clusters}
-\defSub{cluster\_attribute} {What attribute do you want to link clusters by, either age or length}
-\defSub{cluster\_correlation\_lambda} {The probability of being associated to a cluster based on distrance from attribute}
-\defSub{age\_samples\_per\_cluster} {Number of age samples available to be aged per cluster}
-\defSub{length\_samples\_per\_cluster} {Number of age samples available to be aged per cluster}
-\defSub{minimum\_cluster\_weight\_to\_sample} {The minimum weight (tonnes) threshold to consider sampling, should be well in the distribution of cluster sizes}
-\defSub{final\_age\_protocol} {What method do you want to use to calculate final age composition}
-\defSub{age\_allocation\_method} {The method used to allocate aged individuals across the length distribution}
-\defSub{sex} {You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female}
-\defSub{layer\_of\_stratum\_definitions} {The layer that indicates what the stratum boundaries are.}
-\defSub{strata\_to\_include} {The cells which represent individual stratum to be included in the analysis, default is all cells are used from the layer}
 \par\textbf{\commandlabsubarg{observation}{type}{mortality\_event\_biomass\_length\_clusters}}\par
 \defSub{years} {The years of the observed values}
 \defSub{process\_label} {Label of of removal process}
@@ -321,10 +303,13 @@
 \defSub{preference\_functions} {The preference functions to apply to each layer}
 \defSub{preference\_layers} {The preference functions to apply}
 \defSub{preference\_weights} {The weight to each preference when calculating mean spatial effort distribution}
+\defSub{closure\_layer} {Layer label for closed areas}
 \par\textbf{\commandlabsubarg{process}{type}{mortality\_event\_biomass}}\par
 \defSub{print\_census\_info} {if you have process report for this process you can control the amount of information printed to the file.}
 \defSub{print\_tag\_recapture\_info} {if you have process report for this process you can control the amount of information printed to the file.}
 \par\textbf{\commandlabsubarg{process}{type}{mortality\_event\_hybrid}}\par
+\defSub{print\_census\_info} {if you have process report for this process you can control the amount of information printed to the file.}
+\par\textbf{\commandlabsubarg{process}{type}{mortality\_exploitation}}\par
 \defSub{print\_census\_info} {if you have process report for this process you can control the amount of information printed to the file.}
 \par\textbf{\commandlabsubarg{process}{type}{movement\_box\_transfer}}\par
 \defSub{origin\_cell} {The origin cell associated with each spatial layer (should have a one to one relationship with specified layers), format follows row-col (1-2}
