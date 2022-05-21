@@ -16,75 +16,75 @@ The population section consists of several components, including:
   \item Parameter values and their definitions; and
   \item Derived quantities, required as parameters for some processes (e.g. mature biomass to resolve any density dependent processes, such as the spawner-recruit relationship in a recruitment process).
 \end{itemize}
-
-\subsection{\I{Key notation}\label{sec:key notaiton}}
-To help follow algorithms and equations in the following sections, we recommend getting familiar with this table of notations.
-
-\begin{table}[H]
-	\centering
-	\begin{tabular}{p{0.2\linewidth} | p{0.7\linewidth}}
-		Index  & Description \\ 
-		\hline
-		\(\regnd\) & cell index \\
-		\(\yearnd\) & year index \\
-		\(\agent\) & agent index \\
-		\(\bm{X_\regnd}\) & Set of agents in cell \(\regnd\). \(\bm{X_c} = \{X_1, \dots, X_{nc}\}\) containing \(nc\) agents\\
-		\(X_\agent\) & A single agent, which is in itself a set, where each element of the set is an agent attribute. See the Table~\ref{tab:agent_atrtributes} for more information\\
-		\(\sum\limits_{i \in \bm{X_c}}\) & Sum over all agents in cell \(\regnd\). This notation implies individual attributes of agent \(i\) can be accessed i.e. age \(a_i\) or weight \(w_i\) as well as others (See Table~\ref{tab:agent_atrtributes})\\
-		\(\forall \ i \in \bm{X_c}\) & Iterate over all agents in cell \(\regnd\). Commonly used in algorithms.
-		
-	\end{tabular}
-	\caption{Caption}
-	\label{tab:notation}
-\end{table}
-
-\begin{table}[H]
-	\centering
-	\begin{tabular}{p{0.2\linewidth} | p{0.7\linewidth}}
-		Index  & Description (type of variable) \\ 
-		\hline
-		\(a_i\) & age (integer) \\
-		\(l_i\) & length (continuous)\\	
-		\(lb_i\) & length bin (integer)\\
-		\(mat_i\) & maturity (boolean)\\		
-		\(w_i\) & weight (continuous)\\
-		\(n_i\) & scalar, how many individuals this agent represents  (continuous)\\		
-	 	\(M_i\) & natural mortality rate (continuous)\\	
-	 	\(k_i, L_i^{\inf}\) & growth parameters (continuous)\\	
-	 	\(\regnd^b\) & birthed (natal) cell\\	
-		\(x_i, y_i\) & Cartesian coordinates such as latitude and longitude (continuous)	 		 						
-	\end{tabular}
-	\caption{Notation of agent attributes for agent \(X_\agent\)}
-	\label{tab:agent_atrtributes}
-\end{table}
-
-
-\begin{table}[H]
-	\centering
-	\begin{tabular}{p{0.25\linewidth} | p{0.5\linewidth} | p{0.2\linewidth}}
-		Index  & Distribution & support \\ 
-		\hline
-		\(\distbern(p)\) & Bernoulli Distribution with probability of success (1) = \(p\)& \(\in (0,1)\)\\
-		\(\distn(\mu, \sigma^2)\) & Normal Distribution & \(\in \mathbb{R}\)\\	
-		\(\distln(\mu, \sigma^2)\) & Log Normal Distribution & \\
-		\(\distmulti(N = 1, \bm{p})\) & Draws from a multinomial with an effective sample size of one with \(\bm{p} = (p_1, \dots, p_k)\). Returns the index of the category i.e. if \(\bm{p} = (0,0,1)\) it would always return a 3, and 2 for \(\bm{p} = (0,1,0\).& \(\in (1,\dots, k)\)
-		
-	\end{tabular}
-	\caption{Notation for distributions used by \IBM}
-		\label{tab:distributions}
-	\end{table}
 %
-Examples of the distributions in action. Often \IBM\ will iterate over agents in a cell to summarise or apply a dynamic i.e. summing the mature biomass in cell \(\regnd\) denoted as \(SSB_\regnd\)
-\begin{align*}
-    	SSB_\regnd & = \sum\limits_{i \in \bm{X_c}} w_i n_i I_i\\
-    	I_i & \sim \distbern(s(a_i))
-\end{align*}
-%,
-where \(s(a_i)\) denotes a maturity ogive (probability of this agent being mature) based on the agent's age \(a_i\). Another example using the multinomial, if a vector of movement probabilities describing an agent moving from cell \(\regnd_1\) to all other cells as denoted by \(\bm{p_{c_1}} = (p_1, \dots, p_C)\). To move an agent to a potential new cell denoted by \(c_2\) from a multinomial e.g.
-\begin{equation}
-	c_2 \sim \distmulti(N = 1, \bm{p_{c_1}})
-\end{equation}
+%\subsection{\I{Key notation}\label{sec:key notaiton}}
+%To help follow algorithms and equations in the following sections, we recommend getting familiar with this table of notations.
 %
+%\begin{table}[H]
+%	\centering
+%	\begin{tabular}{p{0.2\linewidth} | p{0.7\linewidth}}
+%		Index  & Description \\ 
+%		\hline
+%		\(\regnd\) & cell index \\
+%		\(\yearnd\) & year index \\
+%		\(\agent\) & agent index \\
+%		\(\bm{X_\regnd}\) & Set of agents in cell \(\regnd\). \(\bm{X_c} = \{X_1, \dots, X_{nc}\}\) containing \(nc\) agents\\
+%		\(X_\agent\) & A single agent, which is in itself a set, where each element of the set is an agent attribute. See the Table~\ref{tab:agent_atrtributes} for more information\\
+%		\(\sum\limits_{i \in \bm{X_c}}\) & Sum over all agents in cell \(\regnd\). This notation implies individual attributes of agent \(i\) can be accessed i.e. age \(a_i\) or weight \(w_i\) as well as others (See Table~\ref{tab:agent_atrtributes})\\
+%		\(\forall \ i \in \bm{X_c}\) & Iterate over all agents in cell \(\regnd\). Commonly used in algorithms.
+%		
+%	\end{tabular}
+%	\caption{Caption}
+%	\label{tab:notation}
+%\end{table}
+%
+%\begin{table}[H]
+%	\centering
+%	\begin{tabular}{p{0.2\linewidth} | p{0.7\linewidth}}
+%		Index  & Description (type of variable) \\ 
+%		\hline
+%		\(a_i\) & age (integer) \\
+%		\(l_i\) & length (continuous)\\	
+%		\(lb_i\) & length bin (integer)\\
+%		\(mat_i\) & maturity (boolean)\\		
+%		\(w_i\) & weight (continuous)\\
+%		\(n_i\) & scalar, how many individuals this agent represents  (continuous)\\		
+%	 	\(M_i\) & natural mortality rate (continuous)\\	
+%	 	\(k_i, L_i^{\inf}\) & growth parameters (continuous)\\	
+%	 	\(\regnd^b\) & birthed (natal) cell\\	
+%		\(x_i, y_i\) & Cartesian coordinates such as latitude and longitude (continuous)	 		 						
+%	\end{tabular}
+%	\caption{Notation of agent attributes for agent \(X_\agent\)}
+%	\label{tab:agent_atrtributes}
+%\end{table}
+%
+%
+%\begin{table}[H]
+%	\centering
+%	\begin{tabular}{p{0.25\linewidth} | p{0.5\linewidth} | p{0.2\linewidth}}
+%		Index  & Distribution & support \\ 
+%		\hline
+%		\(\distbern(p)\) & Bernoulli Distribution with probability of success (1) = \(p\)& \(\in (0,1)\)\\
+%		\(\distn(\mu, \sigma^2)\) & Normal Distribution & \(\in \mathbb{R}\)\\	
+%		\(\distln(\mu, \sigma^2)\) & Log Normal Distribution & \\
+%		\(\distmulti(N = 1, \bm{p})\) & Draws from a multinomial with an effective sample size of one with \(\bm{p} = (p_1, \dots, p_k)\). Returns the index of the category i.e. if \(\bm{p} = (0,0,1)\) it would always return a 3, and 2 for \(\bm{p} = (0,1,0\).& \(\in (1,\dots, k)\)
+%		
+%	\end{tabular}
+%	\caption{Notation for distributions used by \IBM}
+%		\label{tab:distributions}
+%	\end{table}
+%%
+%Examples of the distributions in action. Often \IBM\ will iterate over agents in a cell to summarise or apply a dynamic i.e. summing the mature biomass in cell \(\regnd\) denoted as \(SSB_\regnd\)
+%\begin{align*}
+%    	SSB_\regnd & = \sum\limits_{i \in \bm{X_c}} w_i n_i I_i\\
+%    	I_i & \sim \distbern(s(a_i))
+%\end{align*}
+%%,
+%where \(s(a_i)\) denotes a maturity ogive (probability of this agent being mature) based on the agent's age \(a_i\). Another example using the multinomial, if a vector of movement probabilities describing an agent moving from cell \(\regnd_1\) to all other cells as denoted by \(\bm{p_{c_1}} = (p_1, \dots, p_C)\). To move an agent to a potential new cell denoted by \(c_2\) from a multinomial e.g.
+%\begin{equation}
+%	c_2 \sim \distmulti(N = 1, \bm{p_{c_1}})
+%\end{equation}
+%%
 
 \subsection{\I{Spatial structure}\label{sec:spatial-structure}}
 The spatial structure of \IBM\ is represented by a $n_{rows} \times n_{cols}$ grid, with rows $i=1 \dots n_{rows}$ and columns $j=1 \ldots n_{cols}$. Each cell of this grid contain a set of agents denoted by \(\bm{X_c} = \{X_1, \dots, X_{nc}\}\) where \(c\) denotes a cell containing \(nc\) agents. Although these cells are discrete individual locations can move and do store continuous Cartesian points during there existence. 
@@ -162,17 +162,35 @@ An example of syntax, to specify a model with the the above concepts is done usi
 
 
 \subsection{\I{Agents}\label{sec:individuals}}
-An agent is the core object in the model that all other classes interact with. An agent can be thought of as a set of attributes that the user can choose to incorporate in the model or ignore, the set of attributes is listed earlier in Table~\ref{tab:agent_atrtributes}
-%
-The core model contains super individuals (agents) where a single agent represents multiple identical individuals with the same characteristics, defined by the population scalar. This scalar parameter is a function of the recruitment \(R_0\) parameters, the \subcommand{initial\_number\_of\_agents} denoted by \(n_{agents}\) and the natural mortality, as follows.
-\begin{align}
-\widetilde{N} &= \sum\limits_{rec = 1}^{n_{rec}} \sum\limits_{a = 1}^{n_{a+}} R_0^{rec} e^{-M  a}\\
-n_i &=  \frac{n_{agents}}{\widetilde{N} }\\
-\end{align}
-%
-where \(\widetilde{N}\) is the sum of the equilibrium age structure across all \(n_{rec}\) recruitment processes. This means all agents have the same number of individuals. The equilibrium age-structure is approximated up to \(n_{a+}\) which is taken as four times the \subcommand{max\_age}. After the calculation the \IBM\ runs for a number of years applying the annual cycle to set up equilibrium conditions before the model start year. 
+\IBM\ expresses a fish population as a collection of spatially referenced agents within a discrete spatial domain. Agents in spatial cell \(\regnd\) are denoted by \(\bm{X_\regnd} = \{X_{r,1}, \dots, X_{r, n_\regnd}\}\), where \({n_\regnd}\) is the number of agents in cell \(\regnd\). Agent \(X_{r,i}\) is also a set where each element in \(X_{r,i}\) is an agent attribute outlined in Table~\ref{tab:agent_atrtributes}. An agent represents \(n_i\) individual fish with homogeneous attributes. The number of individuals an agent represents is based on the total abundance of the fish stock and number of agents used to represent that fish stock (Section~\ref{eq:abm:init}). In general, the closer agents are to individuals (\(n_i \rightarrow 1\)) the longer model run times are. This leads to a trade off in the number of agents used to represent a fish stock and model run time.
 
-Maturity is an attribute that is activated by the maturity process (see Section~\ref{subsubsec:maturity}), it is tied to some specific derived quantities such as the type \subcommand{mature\_biomass}. You could also calculate the mature biomass on the fly, using the other derived quantities and selectivities, an example of this is shown in the maturity process section.
+
+The ABM applies an annual cycle over a number of specified years. The annual cycle is made up of discrete time blocks hereinafter referred to as time-steps. Each time-step applies a sequence of agent dynamics (Section~\ref{sec:abm:dynamics}), outputs summaries of agent information and simulates synthetic data. Agent dynamics (Section~\ref{sec:abm:dynamics}) use agent specific attributes (Table~\ref{tab:agent_atrtributes}) along with assumed parameter values to define interactions and outcomes from the dynamics over time.
+\begin{table}[H]
+	\centering
+	\caption{Attributes recorded for all agents, where \(X_{\regnd, \agent} = \{a_i,l_i, \dots ,  x_i, y_i\}\).}
+	\label{tab:agent_atrtributes}
+	\begin{tabular}{|p{0.15\linewidth} | p{0.75\linewidth}|}
+		\hline
+		Index  & Description (variable type) \\ 
+		\hline
+		\(a_i\) & age (integer) \\
+		\(l_i\) & length (continuous)\\	
+		\(lb_i\) & length bin (integer)\\
+		\(mat_i\) & maturity (boolean)\\	
+		\(s_i\) & sex (boolean, 0 = male, 1 = female)\\		
+		\(w_i\) & weight (continuous)\\
+		\(n_i\) & scalar = how many individuals this agent represents  (continuous)\\		
+		\(M_i\) & natural mortality rate (continuous)\\	
+		\(L_i^{\inf}\) & growth parameters (continuous)\\	
+		\(\regnd^b_i\) & natal cell (birth cell)\\	
+		\(\regnd_i\) & current cell\\	
+		\(x_i, y_i\) & coordinates over the domain (continuous)	\\
+		\hline 		 						
+	\end{tabular}
+\end{table}
+
+Maturity is an attribute that is activated by having a maturity dynamic (see Section~\ref{subsubsec:maturity}), it is tied to some specific derived quantities such as the type \subcommand{mature\_biomass}. You could also calculate the mature biomass on the fly, using the other derived quantities and selectivities, an example of this is shown in the maturity process section.
 
 Sex is hard coded into the model and at this point the only way that sex effects model outcomes is through selectivities. So sex can have different maturation by age or length, and different vulnerability to mortality processes. The next additions are to have sex specific growth, which is a common occurrence in fish populations.
 
@@ -340,7 +358,25 @@ A mortality block is defined as a consecutive sequence of mortality processes wi
 \subsubsection{\I{Initialisation}}\label{subsec:initialisation}
 Initialisation is the process of determining the world's state just before \subcommand{start\_year}, whether it be equilibrium/steady state or some other initial state for the model (e.g exploited), prior to the start year of the model. This can be computationally expensive if a plus group is present in the partition.
 
-Currently users can only initialise the partition via an iterative method. \IBM\ does a few tricks to help speed up the initialisation. The first thing \IBM\ does is gets the parameter \subcommand{number\_of\_agents} and spits that number of agents uniformly, over the spatial domain, alternatively the user could supply a layer \subcommand{layer\_label} of proportions to seed the initial spatial distribution. This layer should sum to one so that the model initially seeds \subcommand{number\_of\_agents}. When the \IBM\ seeds the initial number of agents it also randomly assigns the agents an age based on an exponential distribution where the parameter $\lambda$ of the exponential distribution is set by the command on the \command{model}, \subcommand{natural\_mortality\_process\_label}. We suggest setting this command to the assumed natural mortality of the model. To see what age structure this would look like you can quickly use \R\ to visualise. by running the following code in an \R\ terminal you could see.
+Starting conditions of the ABM begin by setting the number of agents for the first age (\(a_{min}\)) in each cell denoted by \(R_{\regnd,a_{min}}\) for cell \(\regnd\). This was calculated by
+\[
+R_{\regnd,a_{min}} = \lfloor R_0/n_i P_{\regnd} \rceil  \ ,
+\]
+where \(R_0\) is the average number of individuals expected in the absence of fishing  (see Section~\ref{sec:abm:recruitment}), \(n_i\) is the number of individuals an agent represent (Equation~\ref{eq:abm:init}), \(P_{\regnd}\) is the proportion of recruits allocated to cell \(\regnd\) and \(\lfloor . \rceil\) denotes the rounding operator (the number of agents created needs to be an integer). The ABM then calculates the remaining number of agents for remaining ages cell \(\regnd\) using the exponential decrease based on natural mortality, following
+
+\[
+R_{\regnd,a} =\lfloor R_{\regnd,a - 1} \exp \{-{M^*}\} \rceil  \ ,
+\]
+where \(M^*\) is the initial natural mortality rate, which should be the same as \(\bar{M}\) in the morality process. Once this is complete the ABM then iterates over the annual cycle without fishing \command{years} times. This populates the agents around the spatial domain and assumes an equilibrium or unexploited age and length distribution among all agents before the first year of the model. To initialise the ABM, assumptions are required for number of agents in the system denoted by \(n_{agents}\). This is a trade-off between model run time and number of agents i.e. how many individuals an agent represents. The scalar denoted by \(n_i\) is calculated as
+\begin{align}
+\widetilde{N} &= \sum\limits_{\agend = 1}^{4\times A_{max}} R_0 e^{-M^* \agend} \label{eq:abm:init}\\
+n_i &= \frac{\widetilde{N}}{n_{agents}} \, \nonumber
+\end{align}
+%,
+where, \(a\) is the age, and \(A_{max}\) is the maximum age. All agents represented the same number of individuals and were seeded with identical \(n_i\). 
+
+
+The first thing \IBM\ does is gets the parameter \subcommand{number\_of\_agents} and spits that number of agents uniformly, over the spatial domain, alternatively the user could supply a layer \subcommand{layer\_label} (\(P_{\regnd}\)) of proportions to seed the initial spatial distribution. This layer should sum to one so that the model initially seeds \subcommand{number\_of\_agents}. When the \IBM\ seeds the initial number of agents it also randomly assigns the agents an age based on an exponential distribution where the parameter $\lambda$ of the exponential distribution is set by the command on the \command{model}, \subcommand{natural\_mortality\_process\_label}. We suggest setting this command to the assumed natural mortality of the model. To see what age structure this would look like you can quickly use \R\ to visualise. by running the following code in an \R\ terminal you could see.
 
 \begin{lstlisting}
 Z_param = 0.2;
@@ -378,8 +414,41 @@ recruitment_layer_label recruitment_layer
 For an example of setting an initialisation block with multiple stocks see the 3area example.
 
 
-\subsection{\I{Processes}}\label{sec:process}
-Processes are a set of dynamics that interact with agents. Processes generally take agent specific parameters which dictate the outcome such as natural mortality and growth see specific process for more information. The dynamics are responsible for modifying agents (growth), moving agents (to anther cell), creating agents (recruitment) or removing agents (mortality). Processes are generally stochastic, that is the outcome is the result of random variable. The exception is ageing which is deterministic. The following sections go into detail on how individual processes.
+
+
+\subsection{\I{Agent dynamics}}\label{sec:process}
+Agent dynamics are functions responsible for modifying agents (growth), moving agents, creating agents (recruitment) or deleting agents (mortality). The inputs for these functions use both agent specific attributes (Table~\ref{tab:agent_atrtributes}) and assumed parameter values. \IBM\ assumes a closed spatial domain, meaning, no agents can leave the spatial extent (i.e., no immigration or emigration). Agent dynamics are predominately stochastic, where agent outcomes are based on a randomly generated realisation from a random variable. For example, a dynamic that results in a binary outcome for an agent (an agent getting caught by a fishing interaction or an agent maturing) can be expressed by a Bernoulli random variable \(I\sim\distbern(p)\), where \(p\) is the probability of an event occurring i.e.,
+\begin{align*}\label{eg:bernoulli}
+I \ 
+\begin{cases}
+1,& \text{Event occurs} \\
+0,& \text{Event does not occur} \\	
+\end{cases}  \ .
+\end{align*}
+%
+The notation used to apply an event (i.e., natural mortality) to all agents in cell \(\regnd\) follows
+\begin{align*}
+p_i \ &= f(X_{r,i}, \bm{\theta}) \ , \ \forall \ X_{r,i} \ \in \bm{X_\regnd} \ , \\
+I_i \ &\sim\distbern(p_i)\ ,\\
+I_i \ &
+\begin{cases}
+1,& \text{Event occurs for the }i^{th}{ agent}\\
+0,& \text{Event does not occur for the }i^{th}{ agent}
+\end{cases} \ ,
+\end{align*} 
+%
+where \(p_i\) denotes the \(i^{th}\) agents (\(X_{r,i}\)) specific probability of the event occurring. This is the result of the function \(f(.)\) which uses agent attributes and parameters \(\bm{\theta}\). To make notation more succinct and more explicit on what agent attributes are used in the following descriptions of agent dynamics, the following notation
+\begin{align*}
+p_i \ &= f(X_{r,i}, \bm{\theta}) \ , \ \forall \ X_{r,i} \ \in \bm{X_\regnd} \ , \\
+\end{align*} 
+%
+was replaced with 
+%
+\begin{align*}
+p_i &= f(a_i, \bm{\theta}) \ , \ \forall \ i \ \in \bm{X_\regnd} \ .
+\end{align*} 
+
+In this example \(p_i\) is explicitly a function of the \(i^{th}\) agents age and related parameters \(\bm{\theta}\), but could be a function of any agent attributes outlined in Table~\ref{tab:agent_atrtributes}.
 
 \subsubsection{Ageing}\index{Processes!Ageing}
 

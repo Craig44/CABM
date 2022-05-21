@@ -591,22 +591,22 @@ class Latex:
 
         for i in range(0,3):
           if Globals.operating_system_ == "linux":
-            if os.system('pdflatex --halt-on-error --interaction=nonstopmode IBM') != EX_OK:
+            if os.system('pdflatex --halt-on-error --interaction=nonstopmode CABM') != EX_OK:
               return False
-            if os.system('bibtex IBM') != EX_OK:
+            if os.system('bibtex CABM') != EX_OK:
               return False
-            if os.system('makeindex IBM') != EX_OK:
+            if os.system('makeindex CABM') != EX_OK:
               return False
-            if not os.path.exists('IBM.pdf'):
+            if not os.path.exists('CABM.pdf'):
               return False
           else:
-            if os.system('pdflatex.exe --halt-on-error --enable-installer IBM') != EX_OK:
+            if os.system('pdflatex.exe --halt-on-error --enable-installer CABM') != EX_OK:
               return Globals.PrintError('pdflatex failed')
-            if os.system('bibtex.exe IBM') != EX_OK:
+            if os.system('bibtex.exe CABM') != EX_OK:
               return Globals.PrintError('bibtex failed')
-            if os.system('makeindex.exe IBM') != EX_OK:
+            if os.system('makeindex.exe CABM') != EX_OK:
               return Globals.PrintError('makeindex failed')
-        print '-- Built the IBM usermanual'
+        print '-- Built the CABM usermanual'
 
         #os.chdir('../GettingStartedGuide/')
         #for i in range(0,3):

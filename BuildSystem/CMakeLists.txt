@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
-project(IBM)
+project(CABM)
 
 # Variables
-SET(EXE_NAME "ibm")
+SET(EXE_NAME "cabm")
 
 # Change the output folders for our build to something cleaner and platform dependent
 SET(CMAKE_ROOT   bin/cmake)

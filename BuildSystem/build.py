@@ -7,7 +7,7 @@ import distutils
 
 sys.path.insert(0, "buildtools/classes")
 
-# These are CASAL2 specific python objects
+# These are CABM specific python objects
 from System import *
 from Globals import *
 from Builder import *
@@ -20,7 +20,7 @@ Print the usage for this build system
 def print_usage():  
   os.system( [ 'clear', 'cls' ][ os.name == 'nt' ] )
   print '###########################################################'
-  print '# IBM Build System Usage                               #'
+  print '# CABM Build System Usage                               #'
   print '###########################################################'
   print 'Usage:'
   print 'doBuild <build_target> <build_parameter>'
@@ -34,7 +34,7 @@ def print_usage():
   print '  clean - Remove any previous debug/release build information'
   print '  cleanall - Remove all previous build information'
   print '  check - Do a check of the build system'
-  print '  IBM - Build the syntax section of the manual from source code'
+  print '  CABM - Build the syntax section of the manual from source code'
   print ''
   print 'Valid Build Parameters: (thirdparty only)'
   print '  <libary name> - Target third party library to build or rebuild'
@@ -153,7 +153,7 @@ def start():
   elif build_target == "clean":
     print "*************************************************************************"
     print "*************************************************************************"
-    print "--> Cleaning all IBM built files"
+    print "--> Cleaning all CABM built files"
     cleaner = Cleaner()
     if not cleaner.clean():
       return False
@@ -174,7 +174,7 @@ def start():
   elif build_target == "cleanall":
     print "*************************************************************************"
     print "*************************************************************************"
-    print "--> Cleaning all IBM built files, including third party headers and libs"
+    print "--> Cleaning all CABM built files, including third party headers and libs"
     cleaner = Cleaner()
     if not cleaner.clean_all():
       return False

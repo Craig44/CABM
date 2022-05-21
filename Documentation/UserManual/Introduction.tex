@@ -1,17 +1,17 @@
 \section{Introduction\label{sec:Introduction}} 
 
-\IBM\ ia a project I am currently working on during my PhD and I hope that it will be useful to some one out in the wide world. \IBM\ is a program that simulates a generalised agent based model that allows a great deal of choice in specifying agent dynamics i.e spatial resolution, timing of events and model outputs. \IBM\ is designed for flexibility and is spatially explicit. The term Individual in this document also means agent or super individual. A modelled entity (an agent) can represent many entities with identical characteristics. Unfortunately I have used these terms interchangeably through out this document and the code. I am hoping to tidy this up for consistency in the future, apologies if this adds confusion.
+\IBM\ is a program is a generalised agent based model that allows a great deal of flexibility when specifying agent dynamics, spatial resolution, timing of events and model outputs. It was designed for emulating fish populations, but can be modified to represent other populations. \IBM\ is a program I developed during my PhD and I hope that it will be useful to some one out there. \IBM\ is designed for flexibility and is spatially explicit. A modelled entity (an agent) can represent many individual fish with identical characteristics. Unfortunately I have used these terms interchangeably through out this document and the code. I am hoping to tidy this up for consistency in the future, apologies if this adds confusion.
 
-\IBM\ may not be as fast as specific Individual based models as generality usually comes at a cost of computational speed, but I hope that this program is fast enough to do most tasks the users desire. The bonus in generality is if it gets uptake in the community you can have a little more faith in the underlying dynamics, also because of the syntax and error handling it should be easy to set up models than it would be to code your own (always pros and cons).
+\IBM\ may not be as efficient when compared to bespoke agent based models in the literature. This is because generality comes at a cost of computational speed, but I hope that this program is fast enough to do most tasks users desire. The bonus in generality is if it gets uptake in the community you can have a little more faith in the underlying dynamics, also because of the syntax and error handling making it faster to setup and run models (in Theory).
 
-The time period and annual cycle of \IBM\ is completely defined by the user. It can simulate many different user defined quantities, for example removals-at-length or -age from an anthropogenic or exploitation event (e.g. fishery or other human impact), scientific survey and other biomass indices, and mark-recapture data.
+The \IBM\ applies an annual cycle each year over user defined years. An annual cycle is completely defined by the user. It can simulate many different user defined quantities, for example removals-at-length or -age from an anthropogenic or exploitation event (e.g. fishery or other human impact), scientific survey and other biomass indices, and mark-recapture data.
 
 The real power of \IBM\ I hope will be when it used in management strategy evaluation and population assessment model investigation.
 
 \subsection{\I{Where to get \IBM }}
-\IBM\ source code is hosted on github, and can be found at \url{https://github.com/Craig44/IBM}\index{github}.
+\IBM\ source code is hosted on github, and can be found at \url{https://github.com/Craig44/CABM}\index{github}.
 
-Currently you can either compile the code using the \subcommand{BuildSystem}, or download a pre-compiled version from \url{https://github.com/Craig44/IBM/releases}. This repository is self contained with all the required thirdparty libraries and has been developed for ease of compilation (it is very easy see the github page for information). 
+Currently you can either compile the code using the \subcommand{BuildSystem}, or download a pre-compiled version from \url{https://github.com/Craig44/CABM/releases}. This repository is self contained with all the required thirdparty libraries and has been developed for ease of compilation (it is very easy see the github page for information). 
 
 \subsection{\I{System requirements}}
 \IBM\ is available for most IBM compatible machines running 64-bit \I{Linux} and \I{Microsoft Windows} operating systems, unfortunately \I{Mac} has not been tested.
@@ -22,7 +22,7 @@ The program itself can require anywhere from a few gigs to 10's of gigs of hard-
 
 \subsection{\I{Necessary files}}
 
-For both 64-bit Linux and Microsoft Windows, only the binary executable \texttt{ibm} or \texttt{ibm.exe} is required to run \IBM .
+For both 64-bit Linux and Microsoft Windows, only the binary executable \texttt{cabm} or \texttt{cabm.exe} is required to run \IBM .
 
 
 \IBM\ comes with an \href{http://www.r-project.org}{\R}\ \citep{R} package to assist in the post processing of \IBM\ output. We provide the \texttt{ibm} \R\ package for importing the \IBM\ output into \R\ (see Section \ref{sec:post-processing}).
