@@ -1,9 +1,0 @@
-@layer catch_2002
-type numeric
-table layer
-0 0 0 0 0
-0 26 2 15 3
-0 100 140 96 65
-0 117 43 42 208
-0 0 43 42 53
-end_table

@@ -79,3 +79,12 @@ dev.off()
 ## look at the fisher age distribution
 
 
+## plot preference functions
+png(filename = "pref_plot.png", units = "in", width = 6, height = 4, res = 250)
+par(mfrow = c(1,1), cex.main = 2, cex.lab = 2, mar = c(5,6,1,1))
+plot(names(ibm2$normal$Values), ibm2$normal$Values, type = "l", lwd = 3, xlab = expression(x[r]), ylab = expression(P[r]*x), ylim = c(0,1))
+lines(names(ibm2$double_normal$Values), ibm2$double_normal$Values, lwd = 3, lty = 2, col = "red")
+lines(names(ibm2$logistic$Values), ibm2$logistic$Values, lwd = 3, lty = 2, col = "blue")
+lines(names(ibm2$inverse_logistic$Values), ibm2$inverse_logistic$Values, lwd = 3, lty = 1, col = "purple")
+legend('bottomright', legend = c("Normal", "Double Normal","Logistic","Inverse Logistic"), lty = c(1,2,2,1), col = c("black","red","blue","purple"), lwd = 3)
+dev.off()

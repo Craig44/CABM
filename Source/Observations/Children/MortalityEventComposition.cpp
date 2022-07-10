@@ -146,8 +146,8 @@ void MortalityEventComposition::DoBuild() {
   if (!mortality_process_)
     LOG_FATAL_P(PARAM_PROCESS_LABEL)<< "could not find the process " << process_label_ << ", please make sure it exists and is of type " << PARAM_MORTALITY_EVENT_BIOMASS;
 
-  if ((mortality_process_->type() != PARAM_MORTALITY_EVENT_BIOMASS) & (mortality_process_->type() != PARAM_MORTALITY_BARANOV) & (mortality_process_->type() != PARAM_MORTALITY_EVENT_HYBRID))
-    LOG_FATAL_P(PARAM_PROCESS_LABEL)<< " the process " << process_label_ << ",needs to be either type " << PARAM_MORTALITY_EVENT_BIOMASS << " or " << PARAM_MORTALITY_BARANOV << " or " << PARAM_MORTALITY_EVENT_HYBRID;
+  if ((mortality_process_->type() != PARAM_MORTALITY_EVENT_BIOMASS) & (mortality_process_->type() != PARAM_MORTALITY_BARANOV) & (mortality_process_->type() != PARAM_MORTALITY_EVENT_HYBRID) & (mortality_process_->type() != PARAM_MORTALITY_EXPLOITATION))
+    LOG_FATAL_P(PARAM_PROCESS_LABEL)<< " the process " << process_label_ << ",needs to be either type " << PARAM_MORTALITY_EVENT_BIOMASS << " or " << PARAM_MORTALITY_BARANOV << " or " << PARAM_MORTALITY_EVENT_HYBRID << " or " << PARAM_MORTALITY_EXPLOITATION;
 
     // Build and validate layers
   layer_ = model_->managers().layer()->GetCategoricalLayer(layer_label_);

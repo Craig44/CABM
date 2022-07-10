@@ -13,7 +13,7 @@ To use \IBM, open a console (i.e. the command prompt) window (Microsoft Windows)
 
 \subsection{The \config\label{sec:config-files}}\index{Input configuration files}
 
-It is advised to view \config s, using Text Pad 8 (\url{https://www.textpad.com/download/}). We provide a syntax highlighter for this program which can be found in the Documentation/UserManual called \texttt{ibm.syn}, this makes viewing \config s a lot easier. 
+It is advised to view \config s, using Text Pad 8 (\url{https://www.textpad.com/download/}). We provide a syntax highlighter for this program which can be found in the Documentation/UserManual called \texttt{cabm.syn}, this makes viewing \config s a lot easier. 
 
 
 The \config\ is made up of three broad sections; the description of the population structure and parameters (the population section), the observations and their associated likelihoods (the observation section), and the outputs and reports that \IBM\ will return (the report section). The \config\ is made up of a number of commands (many with subcommands) which specify various options for each of these components.
@@ -32,23 +32,23 @@ The command and subcommand definitions in the \config\ can be extensive (especia
 
 \IBM\ uses the \texttt{standard output}\index{standard output} stream to display run-time information. The \I{standard error} stream is used by \IBM\ to output the program exit status and run-time errors. We suggest redirecting both the standard output and standard error into files\index{Redirecting standard out}\index{Redirecting standard error}. With the bash shell (on Linux systems), you can do this using the command structure,
 
-\begin{verbatim} (ibm [arguments] > out) >& err &\end{verbatim}
+\begin{verbatim} (cabm [arguments] > out) >& err &\end{verbatim}
 
 It may be useful to redirect the standard input, especially if you're using \IBM\ inside a batch job software, i.e. 
 
-\begin{verbatim} (ibm [arguments] > out < /dev/null) >& err &\end{verbatim}
+\begin{verbatim} (cabm [arguments] > out < /dev/null) >& err &\end{verbatim}
 
 On Microsoft Windows systems, you can redirect to standard output using,
 
-\begin{verbatim} ibm [arguments] > out\end{verbatim}
+\begin{verbatim} cabm [arguments] > out\end{verbatim}
 
 e.g.
 
-\begin{verbatim} ibm -r > out\end{verbatim}
+\begin{verbatim} cabm -r > out\end{verbatim}
 
 And, on some Microsoft Windows systems (e.g., Windows10), you can redirect to both standard output and standard error, using the syntax, 
 
-\begin{verbatim} ibm [arguments] > out 2> err\end{verbatim}
+\begin{verbatim} cabm [arguments] > out 2> err\end{verbatim}
 
 Note that \IBM\ outputs a few lines of header information to the output (e.g. Figure~\ref{fig:log_file_1}). The header\index{Output header information} consists of the program name and version, the arguments passed to \IBM\ from the command line, the date and time that the program was called (derived from the system time), the user name, and the machine name (including the operating system and the process identification number). These can be used to track outputs as well as identifying the version of \IBM\ used to run the model.
 
