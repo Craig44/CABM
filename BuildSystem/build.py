@@ -28,6 +28,7 @@ def print_usage():
   print 'Valid Build Types:'
   print '  debug - Build standalone debug executable'
   print '  release - Build standalone release executable'
+  print '  release_mse - Build standalone release executable that can conduct MSE. \nRequires R dependencies and needs to be compiled on the Computer that it is run with'
   print '  thirdparty - Build all required third party libraries'
   print '  thirdpartylean - Build minimal third party libraries'
   print '  modelrunner - Run the test suite of models'
