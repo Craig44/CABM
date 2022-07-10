@@ -23,7 +23,7 @@ allowed_build_targets_ = [ "debug", "release", "thirdparty", "thirdpartylean",
                             "all", "clean", "cleanall", "help", "documentation",
                            "check", "modelrunner"]
 allowed_build_types_ = [ "debug", "release"]
-allowed_build_parameters_ = [ "" ]
+allowed_build_parameters_ = [ "", "mse" ]
 allowed_library_parameters_ = [ "release"]
 
 def PrintError(error_message):

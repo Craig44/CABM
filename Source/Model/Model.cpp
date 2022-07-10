@@ -1,13 +1,13 @@
 /**
  * @file Model.cpp
- * @author  Scott Rasmussen (scott.rasmussen@zaita.com)
+ * @author  Scott Rasmussen & C Marsh
  * @version 1.0
- * @date 6/12/2012
+ * @date 12/7/2018
  * @section LICENSE
  *
  * Copyright NIWA Science �2012 - www.niwa.co.nz
  *
- * @modified 12/7/2018 by C.Marsh for IBM usage
+ * @modified 12/7/2018 by C.Marsh for CABM usage
  */
 
 // Headers
@@ -39,7 +39,10 @@
 #include "TimeVarying/Manager.h"
 #include "Utilities/RandomNumberGenerator.h"
 #include "Utilities/To.h"
-#include <RInside.h>                    // for the embedded R via RInside
+
+#ifdef MSE
+  #include <RInside.h>                    // for the embedded R via RInside only needed in the MSE code base
+#endif
 
 // Namespaces
 namespace niwa {
@@ -200,7 +203,7 @@ bool Model::Start(RunMode::Type run_mode) {
   case RunMode::kSimulation:
     RunBasic();
     break;
-  case RunMode::kMSE:
+  case RunMode::kMSE: // if not the mse exe and users run this mode, then this should error out in main.cpp line:57
     RunMSE();
     break;
   default:
@@ -432,211 +435,214 @@ void Model::Verify() {
  *
  */
 void Model::RunMSE() {
-  LOG_MEDIUM() << "Running MSE";
+  #ifdef MSE
+    LOG_MEDIUM() << "Running MSE";
 
-  // adjust final year now.
+    // adjust final year now.
 
-  // set up R instance and packages
-  int argc = 1;
-  char* argv[0];
-  RInside R(argc, argv);          // create an embedded R instance
-  try {
-     std::string setup_R = "suppressMessages(source(file.path('..','R','SetUpR.R')))";
-     R.parseEvalQ(setup_R);    // load library, no return value
-  } catch(std::exception& ex) {
-    LOG_FATAL() << "Exception caught: " << ex.what();
-  } catch(...) {
-    LOG_FATAL() << "Unknown exception caught";
-  }
-  // Run C++ algorithm up to current time-step
-  // R.parseEvalQ("sim = 1");
-
-  // Model is about to run
-  /*
-   * - iterate over -i file and conduct HCR
-   */
-
-  Addressables& addressables = *managers_->addressables();
-  LOG_MEDIUM() << "Multi line value = " << adressable_values_count_;
-
-  // Get a hold of the mortality process
-  processes::Manager& process_manager = *managers_->process();
-  Mortality* mortality_process_for_mse = process_manager.GetMortalityProcess(mortality_label_);
-  if (!mortality_process_for_mse) {
-    LOG_FATAL_P(PARAM_MORTALITY_PROCESS_LABEL_FOR_MSE) << "Does the mortality process " << mortality_label_ << " exist? please check that it does, and is a mortality process";
-  }
-
-
-  unsigned suffix_width = (unsigned)floor(log10(adressable_values_count_) + 1); ;
-  LOG_MEDIUM() << "suffix width = " << suffix_width << " value = " <<  (adressable_values_count_);
-  unsigned suffix_counter = 0;
-  for (unsigned i = 0; i < adressable_values_count_; ++i) {
-    // Write some reports so the TMB objects can be update i.e. catch
-    current_mse_cycle = 0;
-    suffix_counter++;
-    string report_suffix = ".";
-
-    if (addressable_values_file_) {
-      addressables.LoadValues(i);
-      LOG_MEDIUM() << "about to reset";
-      Reset();
-     }
-    /**
-     * Running the model now
-     */
-    LOG_MEDIUM() << "Model: State change to Initialisation";
-    state_ = State::kInitialise;
-    current_year_ = start_year_ - 1;
-    // Iterate over all partition members and UpDate Mean Weight for the inital weight calculations
-    initialisationphases::Manager& init_phase_manager = *managers_->initialisation_phase();
-    timevarying::Manager& time_varying_manager = *managers_->time_varying();
-    if (i == 0) {
-      LOG_MEDIUM() << "first initialisation phase.";
-      init_phase_manager.Execute();
-      if (not re_run_initialisation_) {
-        LOG_MEDIUM() << "Cache initialsiation";
-        world_view_->CachedWorldForInit();
-      }
-    } else if (re_run_initialisation_) {
-      LOG_MEDIUM() << "Re-run initialisation";
-      init_phase_manager.Execute();
-    } else {
-      LOG_MEDIUM() << "resetting initial world view";
-      world_view_->MergeWorldForInit();
-    }
-
-    managers_->report()->Execute(State::kInitialise);
-
-    LOG_MEDIUM() << "Model: State change to Execute";
-
-    unsigned iteration_width = (unsigned)floor(log10((i + 1)) + 1);
-    unsigned diff = suffix_width - iteration_width;
-    LOG_FINE() << "diff = " << diff;
-    report_suffix.append(diff,'0');
-    report_suffix.append(utilities::ToInline<unsigned, string>(suffix_counter));
-    LOG_MEDIUM() << "i = " << i + 1 <<  " suffix = " << report_suffix << " what i think it should be doing " << (i + 1) << " diff = " << diff << " iteration width = " << iteration_width;
-    managers_->report()->set_report_suffix(report_suffix);
-
-    state_ = State::kExecute;
-    // Reset some R objects such as rebuild objects
+    // set up R instance and packages
+    int argc = 1;
+    char* argv[0];
+    RInside R(argc, argv);          // create an embedded R instance
     try {
-       std::string reset_HCR_R = "suppressMessages(source(file.path('..','R','ResetHCRVals.R')))";
-       R.parseEvalQ(reset_HCR_R);    // load library, no return value
+      std::string setup_R = "suppressMessages(source(file.path('..','R','SetUpR.R')))";
+      R.parseEvalQ(setup_R);    // load library, no return value
     } catch(std::exception& ex) {
       LOG_FATAL() << "Exception caught: " << ex.what();
     } catch(...) {
       LOG_FATAL() << "Unknown exception caught";
     }
+    // Run C++ algorithm up to current time-step
+    // R.parseEvalQ("sim = 1");
 
-    timesteps::Manager& time_step_manager = *managers_->time_step();
-    for (current_year_ = start_year_; current_year_ <= final_year_; ++current_year_) {
-      LOG_MEDIUM() << "Iteration year: " << current_year_;
-      LOG_MEDIUM() << "Update time varying params";
-      time_varying_manager.Update(current_year_);
-      LOG_MEDIUM() << "finishing update time varying now Update Category mean length and weight before beginning annual cycle";
-      world_view_->rebuild_agent_time_varying_params();
-      LOG_MEDIUM() << "rebuild agent values continue to execute the year";
-      time_step_manager.Execute(current_year_);
-      LOG_MEDIUM() << "finished year exectution";
-      // CHeck if we are doing and assessment?
-      if((find(ass_years_.begin(), ass_years_.end(), current_year_) != ass_years_.end())) {
-        LOG_MEDIUM() << "Calculate HCR, print simulated obs and run R-code";
-        managers_->observation()->SimulateData(); // make sure we don't overwrite old observations, these are known
-        //managers_->report()->PrintObservations();
-        LOG_MEDIUM() << "Finished Simulating observations";
+    // Model is about to run
+    /*
+    * - iterate over -i file and conduct HCR
+    */
 
-        managers_->report()->Execute(State::kIterationComplete);
-        managers_->report()->WaitForReportsToFinish();
+    Addressables& addressables = *managers_->addressables();
+    LOG_MEDIUM() << "Multi line value = " << adressable_values_count_;
 
-        // Run HCR rule
-        map<unsigned,map<string,double>> hcr_catches;
-        LOG_MEDIUM() << "Entering RInside section";
-
-        // Run C++ algorithm up to current time-step
-        // R.parseEvalQ("sim = 1");
-        try {
-           // Tell R which suffix to associate simualted data with
-           R["extension"] = report_suffix;
-           R["current_year"] = current_year_;
-           if(current_year_ == final_year_) {
-             R["is_final_year"] = 1; // tell R not to do projections just estiamte and save estimated output
-             R["next_ass_year"] = current_year_;
-           } else {
-             R["next_ass_year"] = ass_years_[current_mse_cycle + 1];
-           }
-           string run_hcr = "suppressMessages(source(file.path('..','R','RunHCR.R')))";
-           //R.parseEvalQ(run_hcr);    // Run the code then get the catch for each fishery.
-           // RunHCR.R needs to return a list called fishing_list
-           SEXP fishing_info;
-           R.parseEval(run_hcr, fishing_info); // fishing_vector
-
-           // Can I get access to this variable
-           int est_model_failure = R["est_model_failure"];
-           LOG_MEDIUM() << "est_model_failure = " << est_model_failure;
-
-           if(est_model_failure == 1) {
-             LOG_MEDIUM() << "Estimation section failed so breaking out of loop current_year_ (hopefully_)";
-             break;
-           }
-           Rcpp::List fishing_ls(fishing_info);
-           LOG_MEDIUM() <<  "bring in catches";
-           SEXP ll = fishing_ls[0];
-           Rcpp::List this_catch(ll);
-           Rcpp::CharacterVector year_labs = this_catch.names();
-           LOG_MEDIUM() << "size = of list n years " << this_catch.size() << " size of year labs = " << year_labs.size();
-           //std::cout << "size = of list n years " << this_catch.names()<< "\n";
-           string year_label;
-           unsigned year_val;
-           double catch_vals;
-           string catch_label;
-           string fishery_label;
-           for(int k = 0; k < this_catch.size(); k++) {
-             LOG_MEDIUM() << "year lab = " << year_labs[k];
-             SEXP this_fishery_catch = this_catch[k];
-             LOG_MEDIUM() << "create SEXP variable";
-             Rcpp::NumericVector this_actual_catch(this_fishery_catch);
-             LOG_MEDIUM() << "Create this_actual_catch";
-             Rcpp::CharacterVector this_lab = this_actual_catch.names();
-             LOG_MEDIUM() << "Create fishery this_lab";
-
-             year_label = year_labs[k];
-             year_val = utilities::ToInline<string, unsigned>(year_label);
-             LOG_MEDIUM() << "diagnosis = " << year_val;
-             LOG_MEDIUM() << "year val = " << year_val;
-             for(int j = 0; j < this_actual_catch.size(); j++) {
-               fishery_label = this_lab[j];
-               catch_vals = this_actual_catch[j];
-               //map<string, double> temp_map;
-               //temp_map[catch_label] = catch_vals;
-               hcr_catches[year_val][fishery_label] = catch_vals;
-               LOG_MEDIUM() <<"k = " << k <<  " j = " << j << " " << catch_vals << " lab = " << year_label << " fishery " << fishery_label;
-             }
-           }
-           // Double check the map
-           for(auto lvl1 : hcr_catches) {
-             LOG_MEDIUM() << "year = " << lvl1.first;
-             for(auto lvl2 : lvl1.second) {
-               LOG_MEDIUM() << "fishery = " << lvl2.first << " value = " << lvl2.second;
-             }
-           }
-
-        } catch(std::exception& ex) {
-          LOG_FATAL() << "Exception caught: " << ex.what() << std::endl;
-        } catch(...) {
-          LOG_FATAL() << "Unknown exception caught" << std::endl;
-        }
-        // Send off to the mortality process
-        if(current_year_ != final_year_)
-          mortality_process_for_mse->set_HCR(hcr_catches);
-        ++current_mse_cycle;
-      }
+    // Get a hold of the mortality process
+    processes::Manager& process_manager = *managers_->process();
+    Mortality* mortality_process_for_mse = process_manager.GetMortalityProcess(mortality_label_);
+    if (!mortality_process_for_mse) {
+      LOG_FATAL_P(PARAM_MORTALITY_PROCESS_LABEL_FOR_MSE) << "Does the mortality process " << mortality_label_ << " exist? please check that it does, and is a mortality process";
     }
-    LOG_MEDIUM() << "Model: State change to Iteration Complete";
-    managers_->report()->Execute(State::kIterationComplete);
-    // Model has finished so we can run finalise.
-    LOG_MEDIUM() << "Model: State change to Iteration Complete";
-    managers_->report()->Execute(State::kInputIterationComplete);
-  }
+
+
+    unsigned suffix_width = (unsigned)floor(log10(adressable_values_count_) + 1); ;
+    LOG_MEDIUM() << "suffix width = " << suffix_width << " value = " <<  (adressable_values_count_);
+    unsigned suffix_counter = 0;
+    for (unsigned i = 0; i < adressable_values_count_; ++i) {
+      // Write some reports so the TMB objects can be update i.e. catch
+      current_mse_cycle = 0;
+      suffix_counter++;
+      string report_suffix = ".";
+
+      if (addressable_values_file_) {
+        addressables.LoadValues(i);
+        LOG_MEDIUM() << "about to reset";
+        Reset();
+      }
+      /**
+      * Running the model now
+      */
+      LOG_MEDIUM() << "Model: State change to Initialisation";
+      state_ = State::kInitialise;
+      current_year_ = start_year_ - 1;
+      // Iterate over all partition members and UpDate Mean Weight for the inital weight calculations
+      initialisationphases::Manager& init_phase_manager = *managers_->initialisation_phase();
+      timevarying::Manager& time_varying_manager = *managers_->time_varying();
+      if (i == 0) {
+        LOG_MEDIUM() << "first initialisation phase.";
+        init_phase_manager.Execute();
+        if (not re_run_initialisation_) {
+          LOG_MEDIUM() << "Cache initialsiation";
+          world_view_->CachedWorldForInit();
+        }
+      } else if (re_run_initialisation_) {
+        LOG_MEDIUM() << "Re-run initialisation";
+        init_phase_manager.Execute();
+      } else {
+        LOG_MEDIUM() << "resetting initial world view";
+        world_view_->MergeWorldForInit();
+      }
+
+      managers_->report()->Execute(State::kInitialise);
+
+      LOG_MEDIUM() << "Model: State change to Execute";
+
+      unsigned iteration_width = (unsigned)floor(log10((i + 1)) + 1);
+      unsigned diff = suffix_width - iteration_width;
+      LOG_FINE() << "diff = " << diff;
+      report_suffix.append(diff,'0');
+      report_suffix.append(utilities::ToInline<unsigned, string>(suffix_counter));
+      LOG_MEDIUM() << "i = " << i + 1 <<  " suffix = " << report_suffix << " what i think it should be doing " << (i + 1) << " diff = " << diff << " iteration width = " << iteration_width;
+      managers_->report()->set_report_suffix(report_suffix);
+
+      state_ = State::kExecute;
+      // Reset some R objects such as rebuild objects
+      try {
+        std::string reset_HCR_R = "suppressMessages(source(file.path('..','R','ResetHCRVals.R')))";
+        R.parseEvalQ(reset_HCR_R);    // load library, no return value
+      } catch(std::exception& ex) {
+        LOG_FATAL() << "Exception caught: " << ex.what();
+      } catch(...) {
+        LOG_FATAL() << "Unknown exception caught";
+      }
+
+      timesteps::Manager& time_step_manager = *managers_->time_step();
+      for (current_year_ = start_year_; current_year_ <= final_year_; ++current_year_) {
+        LOG_MEDIUM() << "Iteration year: " << current_year_;
+        LOG_MEDIUM() << "Update time varying params";
+        time_varying_manager.Update(current_year_);
+        LOG_MEDIUM() << "finishing update time varying now Update Category mean length and weight before beginning annual cycle";
+        world_view_->rebuild_agent_time_varying_params();
+        LOG_MEDIUM() << "rebuild agent values continue to execute the year";
+        time_step_manager.Execute(current_year_);
+        LOG_MEDIUM() << "finished year exectution";
+        // CHeck if we are doing and assessment?
+        if((find(ass_years_.begin(), ass_years_.end(), current_year_) != ass_years_.end())) {
+          LOG_MEDIUM() << "Calculate HCR, print simulated obs and run R-code";
+          managers_->observation()->SimulateData(); // make sure we don't overwrite old observations, these are known
+          //managers_->report()->PrintObservations();
+          LOG_MEDIUM() << "Finished Simulating observations";
+
+          managers_->report()->Execute(State::kIterationComplete);
+          managers_->report()->WaitForReportsToFinish();
+
+          // Run HCR rule
+          map<unsigned,map<string,double>> hcr_catches;
+          LOG_MEDIUM() << "Entering RInside section";
+
+          // Run C++ algorithm up to current time-step
+          // R.parseEvalQ("sim = 1");
+          try {
+            // Tell R which suffix to associate simualted data with
+            R["extension"] = report_suffix;
+            R["current_year"] = current_year_;
+            if(current_year_ == final_year_) {
+              R["is_final_year"] = 1; // tell R not to do projections just estiamte and save estimated output
+              R["next_ass_year"] = current_year_;
+            } else {
+              R["next_ass_year"] = ass_years_[current_mse_cycle + 1];
+            }
+            string run_hcr = "suppressMessages(source(file.path('..','R','RunHCR.R')))";
+            //R.parseEvalQ(run_hcr);    // Run the code then get the catch for each fishery.
+            // RunHCR.R needs to return a list called fishing_list
+            SEXP fishing_info;
+            R.parseEval(run_hcr, fishing_info); // fishing_vector
+
+            // Can I get access to this variable
+            int est_model_failure = R["est_model_failure"];
+            LOG_MEDIUM() << "est_model_failure = " << est_model_failure;
+
+            if(est_model_failure == 1) {
+              LOG_MEDIUM() << "Estimation section failed so breaking out of loop current_year_ (hopefully_)";
+              break;
+            }
+            Rcpp::List fishing_ls(fishing_info);
+            LOG_MEDIUM() <<  "bring in catches";
+            SEXP ll = fishing_ls[0];
+            Rcpp::List this_catch(ll);
+            Rcpp::CharacterVector year_labs = this_catch.names();
+            LOG_MEDIUM() << "size = of list n years " << this_catch.size() << " size of year labs = " << year_labs.size();
+            //std::cout << "size = of list n years " << this_catch.names()<< "\n";
+            string year_label;
+            unsigned year_val;
+            double catch_vals;
+            string catch_label;
+            string fishery_label;
+            for(int k = 0; k < this_catch.size(); k++) {
+              LOG_MEDIUM() << "year lab = " << year_labs[k];
+              SEXP this_fishery_catch = this_catch[k];
+              LOG_MEDIUM() << "create SEXP variable";
+              Rcpp::NumericVector this_actual_catch(this_fishery_catch);
+              LOG_MEDIUM() << "Create this_actual_catch";
+              Rcpp::CharacterVector this_lab = this_actual_catch.names();
+              LOG_MEDIUM() << "Create fishery this_lab";
+
+              year_label = year_labs[k];
+              year_val = utilities::ToInline<string, unsigned>(year_label);
+              LOG_MEDIUM() << "diagnosis = " << year_val;
+              LOG_MEDIUM() << "year val = " << year_val;
+              for(int j = 0; j < this_actual_catch.size(); j++) {
+                fishery_label = this_lab[j];
+                catch_vals = this_actual_catch[j];
+                //map<string, double> temp_map;
+                //temp_map[catch_label] = catch_vals;
+                hcr_catches[year_val][fishery_label] = catch_vals;
+                LOG_MEDIUM() <<"k = " << k <<  " j = " << j << " " << catch_vals << " lab = " << year_label << " fishery " << fishery_label;
+              }
+            }
+            // Double check the map
+            for(auto lvl1 : hcr_catches) {
+              LOG_MEDIUM() << "year = " << lvl1.first;
+              for(auto lvl2 : lvl1.second) {
+                LOG_MEDIUM() << "fishery = " << lvl2.first << " value = " << lvl2.second;
+              }
+            }
+
+          } catch(std::exception& ex) {
+            LOG_FATAL() << "Exception caught: " << ex.what() << std::endl;
+          } catch(...) {
+            LOG_FATAL() << "Unknown exception caught" << std::endl;
+          }
+          // Send off to the mortality process
+          if(current_year_ != final_year_)
+            mortality_process_for_mse->set_HCR(hcr_catches);
+          ++current_mse_cycle;
+        }
+      }
+      LOG_MEDIUM() << "Model: State change to Iteration Complete";
+      managers_->report()->Execute(State::kIterationComplete);
+      // Model has finished so we can run finalise.
+      LOG_MEDIUM() << "Model: State change to Iteration Complete";
+      managers_->report()->Execute(State::kInputIterationComplete);
+    }
+    
+  #endif
 }
 /**
  *

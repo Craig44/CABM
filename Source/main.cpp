@@ -53,6 +53,11 @@ int main(int argc, char * argv[]) {
 
     RunMode::Type run_mode = parameters.run_mode_;
 
+    // Check if the right exe for this run mode
+    #ifndef MSE
+      if(run_mode == RunMode::kMSE)
+        LOG_FATAL() << "Cannot run MSE runmode with this executable. You will need to recompile with the build command doBuild release_mse";
+    #endif
     /**
      * Check the run mode and call the handler.
      */
@@ -122,17 +127,17 @@ int main(int argc, char * argv[]) {
     } // switch(run_mode)
 
   } catch (const string &exception) {
-    cout << "## ERROR - IBM experienced a problem and has stopped execution" << endl;
+    cout << "## ERROR - CABM experienced a problem and has stopped execution" << endl;
     cout << "Error: " << exception << endl;
     return_code = -1;
 
   } catch (std::exception& e) {
-    cout << "## ERROR - IBM experienced a problem and has stopped execution" << endl;
+    cout << "## ERROR - CABM experienced a problem and has stopped execution" << endl;
     cout << e.what() << endl;
     return_code = -1;
 
   } catch(...) {
-    cout << "## ERROR - IBM experienced a problem and has stopped execution" << endl;
+    cout << "## ERROR - CABM experienced a problem and has stopped execution" << endl;
     cout << "The exception was caught with the catch-all. The type was unknown" << endl;
     cout << "Please contact the application developer" << endl;
     return_code = -1;
