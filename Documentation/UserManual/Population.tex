@@ -1,7 +1,7 @@
 \section{\I{The population section}\label{sec:population-section}}
 
 \subsection{Introduction}
-The population section\index{Population section} (Section\ref{sec:population-section}) describes the agent specific dynamics that occur within the spatial domain over time. They are follow the conventional population level dynamic labels such as death, birth, migration and growth but all occur at an agent level. For each process we will define the algorithm and mathematical representation and an example of the syntax for how you would incorporate each dynamic into your own model. This section also discusses how to define the temporal and spatial resolution, which are completely user defined albeit some are computationally limited.
+The population section\index{Population section} (Section~\ref{sec:population-section}) describes the agent dynamics that occur within the spatial domain over time. They are follow the conventional population level dynamic labels such as death, birth, migration and growth but all occur at an agent level. For each process we will define the algorithm and mathematical representation and an example of the syntax for how you would incorporate each dynamic into your own model. This section also discusses how to define the temporal and spatial resolution, which are completely user defined albeit some are computationally limited.
 
 The population section consists of several components, including:
 \begin{itemize}
@@ -87,13 +87,13 @@ The population section consists of several components, including:
 %%
 
 \subsection{\I{Spatial structure}\label{sec:spatial-structure}}
-The spatial structure of \IBM\ is represented by a $n_{rows} \times n_{cols}$ grid, with rows $i=1 \dots n_{rows}$ and columns $j=1 \ldots n_{cols}$. Each cell of this grid contain a set of agents denoted by \(\bm{X_c} = \{X_1, \dots, X_{nc}\}\) where \(c\) denotes a cell containing \(nc\) agents. Although these cells are discrete individual locations can move and do store continuous Cartesian points during there existence. 
+The spatial structure of \IBM\ is represented by a $n_{rows} \times n_{cols}$ grid, with rows $i=1 \dots n_{rows}$ and columns $j=1 \ldots n_{cols}$. Each cell of this grid contains a set of agents denoted by \(\bm{X_\regnd} = \{X_{r,1}, \dots, X_{r, n_\regnd}\}\) where \(\regnd\) denotes a cell containing \({n_\regnd}\) agents. Although these cells are discrete grids, agents can move be moved in a continuous manor where Cartesian points are stored by each agent over their existence. 
 
-\IBM\ implements a single spatial structure, a grid of \emph{square} cells (Figure \ref{fig:SquareSpatialStructure}). The spatial grid can be of an arbitrary size, but must be rectangular. 
+\IBM\ implements a single spatial domain, a grid of \emph{square} cells (Figure \ref{fig:SquareSpatialStructure}). The spatial grid is completely user defined, but must be rectangular. 
 
 The dimensions of the spatial grid are user defined but must be at least a $1 \times 1$ grid (i.e., a single spatial cell), and the largest spatial structure currently allowed by \IBM\ is a grid of $1000 \times 1000$ cells\index{Maximum size of the spatial grid} -- although we note that models of this size are untested and will probably have very long run times. 
 
-Associated with the $n_{rows} \times n_{cols}$ spatial structure is the one compulsory layer (see Section \ref{sec:layers}), the \emph{base layer}\index{Base layer}. This defines the locations where agents can and cannot be present (e.g., in a marine model, the locations associated with the sea and not land). These are defined as the cells where the base layer has a value greater than zero. There must be at least one cell in the spatial grid where the population can be present. In addition, the base layer also defines the relative \emph{area}\index{Cell area} of each spatial cell that is used for density calculations within \IBM.
+Associated with the $n_{rows} \times n_{cols}$ spatial structure is the one compulsory layer (see Section \ref{sec:layers}), the \emph{base layer}\index{Base layer}. This defines active cells in the grid, where an active cell can have agents whereas inactive cells cannot i.e., land. Active cells are defined in the base layer as values greater than zero. There must be at least one cell in the spatial grid where agents can be present. In addition, the base layer also defines the relative \emph{area}\index{Cell area} of each spatial cell that is used for density calculations within \IBM.
 
 \begin{figure}[htp]
 	\centering
@@ -129,6 +129,19 @@ end_table
 \end{verbatim}}}
 
 See Section~\ref{sec:layers} for how to define a layer using \command{layer}. Some processes reports require the user to define latitude and longitude bounds for cells. As they are cell bounds the model expects one more bound than rows or columns. The format of latitude and longitude are 0-180 and 0-360, respectively.
+
+If you wanted to add spatial areas where agents cannot exist i.e., land the base layer can be changed to include zeros such as in
+{\small{\begin{verbatim}
+		@layer base
+		type numeric
+		table layer
+		0 1 1 
+		0 1 1
+		0 0 1
+		1 1 1 
+		end_table		
+		\end{verbatim}}}
+
 
 
 \subsection{\I{Annual Cycle}}\label{sub:sec:annualcylc}
@@ -356,24 +369,27 @@ A mortality block is defined as a consecutive sequence of mortality processes wi
 \end{figure}
 
 \subsubsection{\I{Initialisation}}\label{subsec:initialisation}
-Initialisation is the process of determining the world's state just before \subcommand{start\_year}, whether it be equilibrium/steady state or some other initial state for the model (e.g exploited), prior to the start year of the model. This can be computationally expensive if a plus group is present in the partition.
+Initialisation is the process of determining the world's state just before \subcommand{start\_year}, whether it be equilibrium/steady state or some other initial state for the model (i.e., exploited), prior to the start year of the model. This can be computationally expensive if a plus group is present in the partition.
 
-Starting conditions of the ABM begin by setting the number of agents for the first age (\(a_{min}\)) in each cell denoted by \(R_{\regnd,a_{min}}\) for cell \(\regnd\). This was calculated by
-\[
-R_{\regnd,a_{min}} = \lfloor R_0/n_i P_{\regnd} \rceil  \ ,
-\]
-where \(R_0\) is the average number of individuals expected in the absence of fishing  (see Section~\ref{sec:abm:recruitment}), \(n_i\) is the number of individuals an agent represent (Equation~\ref{eq:abm:init}), \(P_{\regnd}\) is the proportion of recruits allocated to cell \(\regnd\) and \(\lfloor . \rceil\) denotes the rounding operator (the number of agents created needs to be an integer). The ABM then calculates the remaining number of agents for remaining ages cell \(\regnd\) using the exponential decrease based on natural mortality, following
-
-\[
-R_{\regnd,a} =\lfloor R_{\regnd,a - 1} \exp \{-{M^*}\} \rceil  \ ,
-\]
-where \(M^*\) is the initial natural mortality rate, which should be the same as \(\bar{M}\) in the morality process. Once this is complete the ABM then iterates over the annual cycle without fishing \command{years} times. This populates the agents around the spatial domain and assumes an equilibrium or unexploited age and length distribution among all agents before the first year of the model. To initialise the ABM, assumptions are required for number of agents in the system denoted by \(n_{agents}\). This is a trade-off between model run time and number of agents i.e. how many individuals an agent represents. The scalar denoted by \(n_i\) is calculated as
-\begin{align}
-\widetilde{N} &= \sum\limits_{\agend = 1}^{4\times A_{max}} R_0 e^{-M^* \agend} \label{eq:abm:init}\\
-n_i &= \frac{\widetilde{N}}{n_{agents}} \, \nonumber
-\end{align}
+\IBM\ calculates the number of individuals that an agent represents during initialisation. It is derived following,
+\begin{align*}
+\widetilde{N} &= \sum\limits_{\agend = a_{min}}^{4\times a_{max}} R_0 e^{-M^* \agend} \label{eq:abm:init} \ ,\\
+\tilde{n} &= \frac{\widetilde{N}}{n_{agents}} \ , 
+\end{align*}
 %,
-where, \(a\) is the age, and \(A_{max}\) is the maximum age. All agents represented the same number of individuals and were seeded with identical \(n_i\). 
+where, \(a\) is the age, \(a_{min}\) is the minimum age, \(a_{max}\) is the maximum age, \(M^*\) is the initial natural mortality rate (it should be the same as \(\bar{M}\) from the morality process, see Section~\ref{sec:mortality}), \(R_0\) is the average number of individuals expected in the absence of fishing  (see Section~\ref{sec:recruitment}) and \(n_{agents}\) is the number of agents assumed from the users to model the initial stock. The choice of \(n_{agents}\) is a tradeoff between model run time and agent resolution of the stock. As \(n_{agents}\) increases \IBM\ moves towards an IBM (\(\tilde{n} \rightarrow 1\)) but this comes at computational cost and larger model run times.
+
+
+Once  \IBM\ calculates \(\tilde{n}\), it creates the number of agents for the first age (\(a_{min}\)) in each cell denoted by \(R_{\regnd,a_{min}}\). This is calculated as
+\[
+R_{\regnd,a_{min}} = \lfloor R_0/\tilde{n} P_{\regnd} \rceil  \ ,
+\]
+where \(P_{\regnd}\) is the proportion of initial population allocated to cell \(\regnd\) and \(\lfloor . \rceil\) denotes the rounding operator (the number of agents created needs to be an integer). \IBM\ then creates the remaining number of agents for remaining ages in cell \(\regnd\) following
+\[
+R_{\regnd,a} =\lfloor R_{\regnd,a - 1} \exp \{-{M^*}\} \rceil \ , \ a > a_{min} \ .
+\]
+
+When agents are created, they are also assigned agent attributes based on their age and agent specific attributes. The above actions from \IBM\ assume an equilibrium age-structure of agents in each cell, but ignore movement and other dynamics that may effect starting conditions. To account for these dynamics, \IBM\ then iterates over the annual cycle without fishing dynamics for a user defined number of cycles denoted by \(n_{init}\). This populates the agents around the spatial domain according to the annual cycle assumptions.
 
 
 The first thing \IBM\ does is gets the parameter \subcommand{number\_of\_agents} and spits that number of agents uniformly, over the spatial domain, alternatively the user could supply a layer \subcommand{layer\_label} (\(P_{\regnd}\)) of proportions to seed the initial spatial distribution. This layer should sum to one so that the model initially seeds \subcommand{number\_of\_agents}. When the \IBM\ seeds the initial number of agents it also randomly assigns the agents an age based on an exponential distribution where the parameter $\lambda$ of the exponential distribution is set by the command on the \command{model}, \subcommand{natural\_mortality\_process\_label}. We suggest setting this command to the assumed natural mortality of the model. To see what age structure this would look like you can quickly use \R\ to visualise. by running the following code in an \R\ terminal you could see.
@@ -417,38 +433,36 @@ For an example of setting an initialisation block with multiple stocks see the 3
 
 
 \subsection{\I{Agent dynamics}}\label{sec:process}
-Agent dynamics are functions responsible for modifying agents (growth), moving agents, creating agents (recruitment) or deleting agents (mortality). The inputs for these functions use both agent specific attributes (Table~\ref{tab:agent_atrtributes}) and assumed parameter values. \IBM\ assumes a closed spatial domain, meaning, no agents can leave the spatial extent (i.e., no immigration or emigration). Agent dynamics are predominately stochastic, where agent outcomes are based on a randomly generated realisation from a random variable. For example, a dynamic that results in a binary outcome for an agent (an agent getting caught by a fishing interaction or an agent maturing) can be expressed by a Bernoulli random variable \(I\sim\distbern(p)\), where \(p\) is the probability of an event occurring i.e.,
+Agent dynamics are functions responsible for modifying agents (growth), moving agents, creating agents (recruitment) and deleting agents (mortality). The inputs for these functions use both agent specific attributes (Table~\ref{tab:agent_atrtributes}) and assumed parameter values. Agent dynamics are predominately stochastic, where agent actions are based on a randomly generated realisation from a random variable. For example, a dynamic that results in a binary outcome for an agent (i.e. an agent getting caught by a fishing interaction or an agent maturing) can be expressed by the Bernoulli random variable \(I\sim\distbern(p)\), where \(p\) is the probability of an event occurring
 \begin{align*}\label{eg:bernoulli}
 I \ 
 \begin{cases}
-1,& \text{Event occurs} \\
-0,& \text{Event does not occur} \\	
+1,& \text{event occurs} \\
+0,& \text{event does not occur} \\	
 \end{cases}  \ .
 \end{align*}
-%
-The notation used to apply an event (i.e., natural mortality) to all agents in cell \(\regnd\) follows
+
+
+Agent dynamics generally iterate over a collection of agents and for each agent, they apply an outcome based on a realisation from a random variable. The following example demonstrates the notation used when describing how an agent dynamic applies an event to all agents in cell \(\regnd\),
 \begin{align*}
 p_i \ &= f(X_{r,i}, \bm{\theta}) \ , \ \forall \ X_{r,i} \ \in \bm{X_\regnd} \ , \\
-I_i \ &\sim\distbern(p_i)\ ,\\
+I_i \ &\sim\distbern(p_i)\\
 I_i \ &
 \begin{cases}
-1,& \text{Event occurs for the }i^{th}{ agent}\\
-0,& \text{Event does not occur for the }i^{th}{ agent}
+1,& \text{event occurs for the }i^{th}\text{ agent}\\
+0,& \text{event does not occur for the }i^{th}\text{ agent}
 \end{cases} \ ,
 \end{align*} 
 %
-where \(p_i\) denotes the \(i^{th}\) agents (\(X_{r,i}\)) specific probability of the event occurring. This is the result of the function \(f(.)\) which uses agent attributes and parameters \(\bm{\theta}\). To make notation more succinct and more explicit on what agent attributes are used in the following descriptions of agent dynamics, the following notation
+where \(p_i\) denotes the \(i^{th}\) agents (\(X_{r,i}\)) specific probability of the event occurring. This is the result of the function \(f(.)\) which uses agent attributes and parameters \(\bm{\theta}\). 
+
+The agent dynamics described in the following sections define \(p_i\) as a function of specific agent attributes (Table~\ref{tab:agent_atrtributes}). In all descriptions \(X_{r,i}\) in \(f(X_{r,i}, \bm{\theta})\) is replaced with the specific agent attribute. For example, if \(p_i\) was a function of an agent's length (\(l_i\)), it would be defined as,
+
 \begin{align*}
-p_i \ &= f(X_{r,i}, \bm{\theta}) \ , \ \forall \ X_{r,i} \ \in \bm{X_\regnd} \ , \\
-\end{align*} 
-%
-was replaced with 
-%
-\begin{align*}
-p_i &= f(a_i, \bm{\theta}) \ , \ \forall \ i \ \in \bm{X_\regnd} \ .
+p_i \ &= f(l_i, \bm{\theta}) \ , \ \forall \ X_{r,i} \ \in \bm{X_\regnd} \ .\\
 \end{align*} 
 
-In this example \(p_i\) is explicitly a function of the \(i^{th}\) agents age and related parameters \(\bm{\theta}\), but could be a function of any agent attributes outlined in Table~\ref{tab:agent_atrtributes}.
+
 
 \subsubsection{Ageing}\index{Processes!Ageing}
 
@@ -461,14 +475,17 @@ This means every fish automatically ages by one at the end of the year, or you c
 \subsubsection{Maturity}\label{subsubsec:maturity}\index{Processes!Maturity}
 The process of converting an agent from immature to mature, only should be used if you link it to a mature-biomass derived quantity (Section~\ref{para:mature_biomass}). This process only changes the internal state of an agent i.e. no material change happens to the agent. This could be useful down the track if we have dynamics that only occur to mature agents and so this internal flag can be checked against for use in a different algorithm. Maturity is applied using the ogive defined in the subcommand \subcommand{maturity\_ogive\_label} in the \command{model} block, and is applied for a single agent (assuming the agent is not already mature)
 
-\begin{equation}
-	\text{maturity }\begin{cases}
-	 = 1, & \text{if } U() \leq P_a\\
-	 = 0, & \text{if } U() > P_a\\
-	\end{cases}
-\end{equation}
-
-where, $P_a$ is the probability of an immature agent at age $a$ becoming a mature agent. Currently maturity can only be an age based process, although this is not difficult to make a length based probability statement if someone in the future wanted this. A note about creating a logistic based maturity schedule, we recommend users use the selectivity \subcommand{type = logistic\_producing} (Section~\ref{sec:selectivities}) or a similar style of selectivity. The results will not be as expected if you use a normal logistic selectivity. This is because this is only applied to the non-mature agents and so the selectivity needs more thought than other situations where a selectivity is needed\\
+Maturity is applied to agents in cell \(\regnd\) at time-step \(t\) following
+\begin{align*}
+P_i &= S(a_i), \quad \forall \  X_{\regnd,i} \in \bm{X_\regnd} \ ,\\
+I_i &\sim\distbern(1 - P_i) \ ,\\
+I_i \ & \ 
+\begin{cases}
+1,& \text{agent becomes mature}\\
+0,& \text{agent remains immature}
+\end{cases} \ ,
+\end{align*}
+where, $P_a$ is the probability of an immature agent at age $a_i$ becoming a mature agent, defined by the selectivity \(S(.)\). Currently maturity can only be an age based process, although this is not difficult to make a length based probability statement if someone in the future wanted this. A note about creating a logistic based maturity schedule. We recommend users use the selectivity \subcommand{type = logistic\_producing} (Section~\ref{sec:selectivities}) or a similar style of selectivity. The results will not be as expected if you use a normal logistic selectivity. This is because this is only applied to the non-mature agents and so the selectivity needs more thought than other situations.\\
 
 \begin{figure}[htp]\label{fig:mature}
 	\centering
@@ -524,7 +541,7 @@ proportion_through_mortality_block 0.0
 So just to re-iterate the difference, you can have an explicit maturing process that is not associated with a derived quantity, or you could purely associate a derived quantity to the maturing process. This brings up a useful point in that, given the generality of the program there are more than one way to approximate dynamics and some will be more computationally quicker than others. So have a play around but try and keep the number of times we iterate over the state as small as possible, as you will get significant time saving.
 
 
-\subsubsection{Recruitment}\index{Processes!Recruitment}
+\subsubsection{Recruitment}\label{sec:recruitment}\index{Processes!Recruitment}
 Recruitment is the process where new agents are created in the system. It is also the process that defines stock structure in the model. Stocks are not an explicit attribute of \IBM\ so consideration on this process is important. How the stock is defined using the recruitment dynamic surrounds where we calculate Spawning Stock Biomass ($SSB$) and where the resulting recruits are first seeded. This means that for all recruitment types you will need to specify a $B_0$ or \(R_0\) parameter and an associated derived quantity that defines the spatial resolution of the stock ($SSB$) for that event. This is how an $R_0$ value is calculated from the initialisation phase.
 
 \begin{equation}

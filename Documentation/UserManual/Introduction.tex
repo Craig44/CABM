@@ -1,17 +1,22 @@
 \section{Introduction\label{sec:Introduction}} 
 
-\IBM\ is a program is a generalised agent based model that allows a great deal of flexibility when specifying agent dynamics, spatial resolution, timing of events and model outputs. It was designed for emulating fish populations, but can be modified to represent other populations. \IBM\ is a program I developed during my PhD and I hope that it will be useful to some one out there. \IBM\ is designed for flexibility and is spatially explicit. A modelled entity (an agent) can represent many individual fish with identical characteristics. Unfortunately I have used these terms interchangeably through out this document and the code. I am hoping to tidy this up for consistency in the future, apologies if this adds confusion.
+\IBM\ is a command line program that implements a generalised agent-based model (ABM). An ABM is a model that represents a fish stock as a collection of agents. An agent is defined as one or more fish with homogenous characteristics, i.e. length, weight and sex. When an agent represents a single individual, the ABM becomes an individual-based model (IBM) \citep{grimm2013individual}. Given fish stocks consist of millions if not billions of individuals, ABMs are often more practical than IBMs due to computational limitations, i.e. it requires large amounts of memory to record and modify millions of agents. ABMs use functions to grow, move, create and kill agents over time, termed agent dynamics. When summaries are made over all agents, stock level quantities are observed. Simulating stocks with this high level of detail allows heterogeneity in key dynamics such as growth and mortality. This is an advantage of ABMs as this heterogeneity is often approximated in other operating models (OM).
 
-\IBM\ may not be as efficient when compared to bespoke agent based models in the literature. This is because generality comes at a cost of computational speed, but I hope that this program is fast enough to do most tasks users desire. The bonus in generality is if it gets uptake in the community you can have a little more faith in the underlying dynamics, also because of the syntax and error handling making it faster to setup and run models (in Theory).
 
-The \IBM\ applies an annual cycle each year over user defined years. An annual cycle is completely defined by the user. It can simulate many different user defined quantities, for example removals-at-length or -age from an anthropogenic or exploitation event (e.g. fishery or other human impact), scientific survey and other biomass indices, and mark-recapture data.
+\IBM\ was created to emulate a stock over a fine spatial resolution domain, apply realistic movement and replicate complex fishing processes. These were all attributes of an OM that are of interest for exploring stock assessment methods. 
 
-The real power of \IBM\ I hope will be when it used in management strategy evaluation and population assessment model investigation.
+\IBM\ was designed to be flexible with respect to specifying agent dynamics, spatial resolution, timing of agent dynamics, simulated observations and model outputs. It was designed for emulating fish populations, but can be modified to represent other populations. \IBM\ is a program I developed during my PhD and I hope that it will be useful to others. The core modelled entity is an agent. An agent can represent many individual fish with identical characteristics. 
+
+\IBM\ may not be as efficient when compared to bespoke agent-based models in the literature. This is because generality and flexibility comes with a computational cost, but I have found the program to be fast enough for most tasks that I have used it for. The bonus in generality is it has readable input syntax and error handling making it faster to develop and run models (in Theory).
+
+\IBM\ applies an annual cycle each model year for a user defined number of years. The annual cycle consists of user defined number of discrete time-steps. In each time-step users must specify the agent dynamics, simulated observations and model outputs. It can simulate many different user defined quantities, for example removals-at-length or -age from an anthropogenic or exploitation event (e.g. fishery or other human impact), scientific survey and other biomass indices, and mark-recapture data.
+
+The real power of \IBM\ is its use in a closed loop management strategy evaluation (MSE). Recent code changes have allowed \IBM\ to run a model run and then once it reaches assessments years it will run an R script and wait for future catches before continuing to the next assessment year (see Section~\ref{sec:mse-section} for more details).
 
 \subsection{\I{Where to get \IBM }}
-\IBM\ source code is hosted on github, and can be found at \url{https://github.com/Craig44/CABM}\index{github}.
+\IBM\ source code is hosted on GitHub, and can be found at \url{https://github.com/Craig44/CABM}\index{github}.
 
-Currently you can either compile the code using the \subcommand{BuildSystem}, or download a pre-compiled version from \url{https://github.com/Craig44/CABM/releases}. This repository is self contained with all the required thirdparty libraries and has been developed for ease of compilation (it is very easy see the github page for information). 
+Currently you can either compile the code using the \subcommand{BuildSystem}, or download a pre-compiled version from \url{https://github.com/Craig44/CABM/releases}. This repository is self contained with all the required third-party libraries and has been developed for ease of compilation (it is very easy see the GitHub page for information). 
 
 \subsection{\I{System requirements}}
 \IBM\ is available for most IBM compatible machines running 64-bit \I{Linux} and \I{Microsoft Windows} operating systems, unfortunately \I{Mac} has not been tested.
@@ -39,13 +44,13 @@ The random number generator\index{Random number generator} used by \IBM\ uses an
 
 
 \subsection{\I{The future for \IBM}}
-I still have 2.5 years of my PhD to go so I am hoping to maintain and continue development during that period. Things that are not in the Beta version that would be great to add one day (The dream-list)
+
 
 \begin{itemize}
 	\item Make it faster...
 	\item \sout{Add multiple fisheries at the same time, often we have multiple fleets fishing e.g trawler and long-liners, currently we can have multiple fishing events but they do not occur simultaneously. This would have issues on data generation because the order of operations would be important and would get a bit fidgety.}
-	\item test on a high performance computer (HPC) to see the capabilities if a user has access to this. how spatial can we go if we have threads of cores available, it would be cool to have 1000x1000 model. or alternatively use the threads in another space such as run multiple species in parallel and synchronise threads when they interact.	
-	\item see it used in practice other than by my self, I am hoping that this could be used as a management strategy evaluation (MSE) tool. This has the ability to test management actions on a large scale such as test structural uncertainty in our models for MSE. Include the possible effects of climate change in the future etc
+	\item \sout{test on a high performance computer (HPC) to see the capabilities if a user has access to this. how spatial can we go if we have threads of cores available, it would be cool to have 1000x1000 model. or alternatively use the threads in another space such as run multiple species in parallel and synchronise threads when they interact.}. I have explored multi-threading, but found unless the model has 1000's of  cells the overhead and complexity in code has not been worth continuing. 
+	\item see it used in practice other than by my self, I am hoping that this could be used as a management strategy evaluation (MSE) tool. This has the ability to test management actions on a large scale such as test structural uncertainty in our models for MSE. Include the possible effects of climate change in the future etc. Watch this space.
 \end{itemize}
 
 

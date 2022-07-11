@@ -2,15 +2,23 @@
 
 \subsection{Introduction}
 
-\IBM\ is run from the console window in Microsoft Windows or from a terminal window in Linux. \IBM\ gets its information from input configuration files, the default file \IBM\ will look for is \emph{config.ibm}, although you can override this using the \texttt{-c} command line parameter (See Section~\ref{sec:command-line-arguments}). Commands and subcommands in the \config\ are used to define the model structure, provide observations, define parameters, and define the outputs (reports) for \IBM. Command line switches tell \IBM\ the run mode and where to direct its output. See Section~\ref{sec:running} for details.
+\IBM\ is run from the console window in Microsoft Windows or from a terminal window in Linux. \IBM\ gets its information from input text configuration files, the default file \IBM\ will look for is \emph{config.ibm}, although you can override this using the \texttt{-c} command line parameter (See Section~\ref{sec:command-line-arguments}). Commands and subcommands in the \config\ are used to define the model structure, provide observations, define parameters, and define the outputs (reports) for \IBM. Command line switches tell \IBM\ the run mode and where to direct its output. See Section~\ref{sec:running} for details.
 
 We define the model in terms of the \emph{state}\index{Model ! state}\index{State}. The state consists of a few key components the agents that collectively make up the \emph{partition}\index{Model ! partition}\index{Partition}, and any \emph{derived quantities}\index{Model ! derived quantities}\index{Derived quantities} and the spatial resolution. The state will typically change in each \emph{time-step}\index{Model ! time-steps}\index{time-steps} of every year, depending on the \emph{processes}\index{Model ! processes}\index{Processes} defined for those time-steps in the model. 
 
+
+\IBM\ expresses a fish stock as a collection of spatially referenced agents within a discrete spatial domain with \(R\) cells. Agents in spatial cell indexed by \(\regnd\) (\(\regnd = (1,\dots,R)\)) are denoted by \(\bm{X_\regnd} = \{X_{r,1}, \dots, X_{r, n_\regnd}\}\), where \({n_\regnd}\) is the number of agents in cell \(\regnd\). Agent \(X_{r,i}\) is also a set where each element in \(X_{r,i}\) is an agent attribute, as outlined in Table~\ref{tab:agent_atrtributes}.
+
+
+\IBM\ applies an annual cycle each year which is then repeated over a specified number of years. The annual cycle is made up of discrete time blocks hereinafter referred to as time-steps. Each time-step applies a sequence of agent dynamics (Section~\ref{sec:abm:dynamics}), outputs summaries of agent information and simulates synthetic data. Agent dynamics use agent specific attributes (Table~\ref{tab:agent_atrtributes}) along with other assumed parameter values to define interactions and outcomes for agents over time. \IBM\ assumes a closed spatial domain, meaning, no agents can leave the spatial extent (i.e. no immigration or emigration). 
+
+
 \subsection{\I{The population section}}
-This section discusses how to set up the process model, which controls how agents move, die and get created through out the model time frame. It also give details on what each process does and how the syntax looks in a configuration file.
+This section (Section~\ref{sec:population-section}) discusses how to set up the process model, which controls how agents move, die and get created through out the model time frame. It also give details on what each process does and how the syntax looks in a configuration file.
 
 \subsection{\I{The observation section}}
-This section talks about what observations \IBM\ can create and then simulate from. This give likelihood information and syntax examples.
+This section (Section~\ref{sec:observation-section}) talks about what observations \IBM\ can create and then simulate from. This provides examples on simulated observations that can be produced by \IBM. information and syntax examples.
 
 \subsection{\I{The report section}}
-This section discusses how to print output from the model, no reports are printed by default so it is important that you look at this section.
+This section (Section~\ref{sec:report-section}) discusses how to print output from the model, no reports are printed by default so it is important that you look at this section.
+
