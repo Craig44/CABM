@@ -32,6 +32,7 @@
 #include "Children/Mortality/MortalityEffortBasedWithCovar.h"
 
 #include "Children/Movement/MovementBoxTransfer.h"
+#include "Children/Movement/MovementBoxTransferDensity.h"
 #include "Children/Movement/MovementPreference.h"
 #include "Children/Tagging.h"
 #include "Children/TagShedding.h"
@@ -107,6 +108,8 @@ Process* Factory::Create(Model* model, const string& object_type, const string& 
       result = new MortalityEffortBasedWithCovar(model);
     else if (sub == PARAM_MOVEMENT_BOX_TRANSFER)
       result = new MovementBoxTransfer(model);
+    else if (sub == PARAM_MOVEMENT_BOX_TRANSFER_DENSITY_TRIGGER)
+      result = new MovementBoxTransferDensity(model);
     else if (sub == PARAM_PREFERENCE_MOVEMENT)
       result = new MovementPreference(model);
     else if (sub == PARAM_MATURATION)

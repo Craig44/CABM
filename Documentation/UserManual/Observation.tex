@@ -29,21 +29,20 @@ r3-c1 r3-c2 r3-c3
 end_table
 
 @observation fishery_age
-type process_removals_by_age
-cell_layer cells
-cells r1-c1 r1-c2 r1-c3 r2-c1 r2-c2 r2-c3 r3-c1 r3-c2 r3-c3
+type mortality_event_composition
+layer_of_stratum_definitions cells
+strata_to_include r1-c1
 simulation_likelihood multinomial
 process_label fishing
 years 2000
-min_age 0
-max_age 28
 plus_group true
 table error_values
-2000 10000
+year r1-c1
+2000 1000
 end_table
 \end{verbatim}}}
 
-The above syntax asks for an age frequency for each cell in the spatial domain through the link to the categorical layer. You could easily summarise the age frequency over the whole spatial domain by changing the categorical layer as shown below
+The above syntax asks for an age frequency in just the top left cell (\texttt{r1-c1}). You could easily summarise the age frequency over the whole spatial domain by changing the categorical layer as shown below
 
 {\small{\begin{verbatim}
 @layer cells
@@ -55,17 +54,16 @@ single_cell single_cell single_cell
 end_table
 
 @observation fishery_age
-type process_removals_by_age
-cell_layer cells
-cells single_cell
+type mortality_event_composition
+layer_of_stratum_definitions cells
+strata_to_include single_cell
 simulation_likelihood multinomial
 process_label fishing
 years 2000
-min_age 0
-max_age 28
 plus_group true
 table error_values
-2000 10000
+year single_cell
+2000 1000
 end_table
 \end{verbatim}}}
 

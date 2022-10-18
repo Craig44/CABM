@@ -46,7 +46,7 @@ MortalityEventComposition::MortalityEventComposition(Model* model) : Observation
   parameters_.Bind<string>(PARAM_PROCESS_LABEL, &process_label_, "Label of of removal process", "", "");
   parameters_.Bind<string>(PARAM_FISHERY_LABEL, &fishery_label_, "Label of of removal process", "");
   parameters_.Bind<string>(PARAM_STRATUM_WEIGHT_METHOD, &stratum_weight_method_, "Method to weight stratum estimates by", "", PARAM_BIOMASS)->set_allowed_values({PARAM_BIOMASS, PARAM_AREA, PARAM_NONE});
-  parameters_.Bind<bool>(PARAM_SEXED, &sexed_flag_, "You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female", "", false);
+  parameters_.Bind<bool>(PARAM_SEXED, &sexed_flag_, "You can ask to 'ignore' sex (only option for unsexed model), or generate composition for both sexes", "", false);
   parameters_.Bind<string>(PARAM_COMPOSITION_TYPE, &comp_type_, "Is the composition Age or Length", "", PARAM_AGE)->set_allowed_values({PARAM_AGE, PARAM_LENGTH});
   parameters_.Bind<bool>(PARAM_NORMALISE, &are_obs_props_, "Are the compositions normalised to sum to one", "", true);
   parameters_.Bind<string>(PARAM_SIMULATION_LIKELIHOOD, &simulation_likelihood_label_, "Simulation likelihood to use", "");
@@ -196,6 +196,7 @@ void MortalityEventComposition::DoBuild() {
             << " please make sure that you supply cell labels that are consistent with the layer.";
     }
   } else {
+    LOG_FINE() << "did not supply " << PARAM_STRATUMS_TO_INCLUDE << " using all strata areas";
     for (unsigned row = 0; row < model_->get_height(); ++row) {
       for (unsigned col = 0; col < model_->get_width(); ++col) {
         string temp_cell = layer_->get_value(row, col);
