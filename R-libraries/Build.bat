@@ -1,4 +1,4 @@
-R --vanilla < IBM_make_version.R
+R --vanilla < CABM.binary.version
 R --vanilla < run-roxygen.R
 
 R CMD build --force ibm

@@ -90,6 +90,8 @@ public:
 
   virtual unsigned            start_year() const { return start_year_; }
   virtual unsigned            final_year() const { return final_year_; }
+  virtual unsigned            get_year_ndx() const { return current_year_ - start_year_; }
+
   unsigned                    projection_final_year() const { return projection_final_year_;}
   bool                        projection_final_phase() {return projection_final_phase_;}
   void                        set_projection_final_phase(bool phase) {projection_final_phase_ = phase;}

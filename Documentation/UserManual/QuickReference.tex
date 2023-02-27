@@ -156,7 +156,7 @@
 \defSub{process\_label} {Label of of removal process}
 \defSub{fishery\_label} {Label of of removal process}
 \defSub{stratum\_weighting\_method} {Method to weight stratum estimates by}
-\defSub{sexed} {You can ask to 'ignore' sex (only option for unsexed model), or generate composition for a particular sex, either 'male' or 'female}
+\defSub{sexed} {You can ask to 'ignore' sex (only option for unsexed model), or generate composition for both sexes}
 \defSub{composition\_type} {Is the composition Age or Length}
 \defSub{normalise} {Are the compositions normalised to sum to one}
 \defSub{simulation\_likelihood} {Simulation likelihood to use}
@@ -316,6 +316,15 @@
 \defSub{probability\_layers} {Spatial layers (one layer for each origin cell) describing the probability of moving from an origin cell to all other cells in the spatial domain.}
 \defSub{movement\_type} {What type of movement are you applying?}
 \defSub{selectivity\_label} {Label for the selectivity block}
+\par\textbf{\commandlabsubarg{process}{type}{movement\_box\_transfer\_density}}\par
+\defSub{origin\_cell} {The origin cell associated with each spatial layer (should have a one to one relationship with specified layers), format follows row-col (1-2}
+\defSub{probability\_layers} {Spatial layers (one layer for each origin cell) describing the probability of moving from an origin cell to all other cells in the spatial domain.}
+\defSub{selectivity\_label} {Label for the selectivity block}
+\defSub{derived\_quantity} {A label for the derived quantity}
+\defSub{threshold} {The value that triggers movement}
+\defSub{direction} {The direction of threshold trigger}
+\defSub{scale\_by\_initial\_value} {Scale by initial value}
+\defSub{years} {years to apply movement}
 \par\textbf{\commandlabsubarg{process}{type}{movement\_preference}}\par
 \defSub{d\_max} {The maxiumu diffusion value}
 \defSub{time\_intervals} {The time interval that this movement process occurs over (k) in the documentation formula's}

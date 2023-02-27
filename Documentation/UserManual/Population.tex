@@ -1112,7 +1112,7 @@ Where $t$ is the time steps we have applied the preference movement in annual cy
 
 
 \subsubsection{Growth}\label{sec:age-at-age}\index{Processes!Growth}
-Growth is the process where \IBM\ updates both length and weight for an agent, and the same growth process can be applied over multiple time steps.
+Growth is the process where \IBM\ updates both length and weight for an agent, and the same growth process can be applied over multiple time steps. If sex is an agent attribute and you have sexually varying growth, you can specify growth parameters as a vector where the first value is for males and the second value is for females.
 \paragraph{Von Bertalanffy with Basic}\label{subsubsec:vonbert_basic}\index{Processes!Growth!Von Bertalanffy with Basic}
 This process assumes that weight is an allometric function of length (Equation~\ref{mean_weight}) and that length is an incremental function of time that follows the Von Bertalanffy growth formula. Currently it is also the default growth function used to initialise the equilibrium partition structure. The length from going from one year to the next ($t$ represents a year) follows,
 

@@ -1,0 +1,318 @@
+; TextPad syntax definitions for IBM; This is auto generated from the quickreference.py script do not edit
+; ===================================================================================
+;
+;
+C=1
+[Syntax]
+Namespace1 = 6
+IgnoreCase = No
+KeyWordLength = 0
+BracketChars = {[]}
+OperatorChars = -+*/!~%^&|=$:!_<>
+PreprocStart =
+HexPrefix = 0x
+SyntaxStart =
+SyntaxEnd =
+CommentStart = /*
+CommentEnd = */ 
+CommentStartAlt =
+CommentEndAlt =
+SingleComment = #
+SingleCommentCol =
+SingleCommentAlt = @comment
+SingleCommentColAlt =
+SingleCommentEsc =
+StringsSpanLines = No
+StringStart = "
+StringEnd = "
+StringAlt =
+StringEsc = \ 
+CharStart = '
+CharEnd = '
+CharEsc = \ 
+
+[Keywords 1]
+@derivedquantity
+@growth
+@initialisationphase
+@likelihood
+@model
+@mortality
+@movement
+@observation
+@process
+@recruitment
+@report
+@selectivity
+@tag
+@timestep
+@timevarying
+
+[Keywords 2]
+a
+a50
+a_layer_label
+abundance
+age_allocation_method
+age_plus
+age_samples_per_cluster
+ageing_error
+agent_frequency
+alpha
+alpha_layer_label
+arma
+assessment_years
+ato95
+b
+b_layer_label
+base_layer_label
+beta
+beta_layer_label
+bin_labels
+biomass_layer_label
+brownian_motion
+c
+catchability
+catches
+cell_layer
+cells
+closure_layer
+cluster_attribute
+cluster_correlation_lambda
+cluster_cv
+cluster_sigma
+composition_type
+cv
+d_max
+derived_quantity
+direction
+distribution
+do_length_frequency
+e
+effort_layer_label
+effort_values
+error_value
+exogeneous_variable
+file_name
+final_age_protocol
+final_year
+fishery_label
+fishing_mortality_layers
+growth_process_label
+h
+handling_mortality
+include_age_zero
+initial_number_of_agents
+initialisation_mortality_rate
+initialisation_phase_labels
+intercept
+k
+k_layer_label
+l
+label
+latitude_bounds
+layer_label
+layer_of_strata_definitions
+layer_of_stratum_definitions
+length_based
+length_bins
+length_plus
+length_samples_per_cluster
+likelihood
+linf
+linf_layer_label
+longitude_bounds
+lower_bound
+m
+m_multiplier_layer_label
+max_age
+mean
+min_age
+minimiser
+minimum_cluster_weight_to_sample
+minimum_legel_length
+mortality_process_for_mse
+movement_type
+mu
+natural_mortality_process_label
+natural_mortality_selectivity_label
+ncols
+normalise
+nrows
+number_of_agents
+number_of_samples
+observation
+origin_cell
+parameter
+plus_group
+preference_function_label
+preference_functions
+preference_layers
+preference_values
+preference_weights
+print_census_info
+print_extra_info
+print_tag_recapture_info
+probability_layers
+process
+process_label
+processes
+proportion_male
+proportion_through_mortality_block
+r0
+recapture_stratum
+recruitment_layer_label
+release_cell
+release_stratum
+rho
+robust
+save_and_print_a_sample_of_agent_jumps
+scale_by_initial_value
+scaling_years
+scanning_proportion_of_catch
+selectivities
+selectivity
+selectivity_label
+seperate_by_sex
+sex
+sex_lag
+sexed
+shedding_rates
+sigma
+sigma_l
+sigma_r
+simulation_likelihood
+slope
+ssb
+start_year
+starting_value_for_lambda
+steepness
+stop_tracking_tags_in_year
+strata_to_include
+stratum_weighting_method
+t0
+t0_layer_label
+tag_release_layer
+tag_release_region
+tag_release_year
+tau1
+tau2
+threshold
+time_intervals
+time_step
+time_step_ratio
+time_steps
+type
+update_growth_parameters
+update_mortality_parameters
+upper_bound
+v
+values
+write_mode
+x0
+x1
+x2
+y0
+y1
+y2
+ycs_values
+years
+zeta
+
+[Keywords 3]
+F
+False
+T
+True
+f
+false
+t
+true
+
+
+[Keywords 4]
+abundance
+age_frequency_by_cell
+age_length
+age_length_matrix_by_cell
+ageing
+ageing_error_matrix
+all_values
+all_values_bounded
+annual_shift
+binomial
+binomial_approx
+biomass
+biomass_by_cell
+constant
+derived_quantity
+dirichlet
+double_exponential
+double_normal
+exogenous
+growth_schnute_with_basic
+growth_von_bertalanffy_with_basic
+increasing
+initialisation_partition
+inverse_logistic
+iterative
+knife_edge
+likelihood
+linear
+log_normal
+log_normal_with_q
+logistic
+logistic_normal
+logistic_producing
+mature_biomass
+maturity
+model_attributes
+mortality_baranov
+mortality_baranov_simple
+mortality_constant_rate
+mortality_cull
+mortality_effort_based
+mortality_effort_based_with_covar
+mortality_event_biomass
+mortality_event_biomass_age_clusters
+mortality_event_biomass_clusters
+mortality_event_biomass_clusters_original
+mortality_event_biomass_length_clusters
+mortality_event_biomass_scaled_age_frequency
+mortality_event_composition
+mortality_event_hybrid
+mortality_exploitation
+mortality_scaled_age_frequency
+movement_box_transfer
+movement_box_transfer_density
+movement_preference
+multinomial
+nop
+normal
+numeric_layer
+observation
+preference_function
+process
+process_removals_by_age
+process_removals_by_length
+proportions_at_age
+pseudo
+random_draw
+random_walk
+recruitment_beverton_holt
+recruitment_constant
+selectivity
+simulated_observation
+standard_header
+summarise_agents
+tag_recapture_by_age
+tag_recapture_by_length
+tag_shedding
+tagging
+tagging_info
+time_varying
+world_age_frequency
+
+[Keywords 5]
+
+[Preprocessor keywords]

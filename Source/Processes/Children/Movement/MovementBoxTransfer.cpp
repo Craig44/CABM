@@ -44,7 +44,7 @@ MovementBoxTransfer::MovementBoxTransfer(Model* model) : Movement(model) {
 void MovementBoxTransfer::DoValidate() {
   LOG_TRACE();
   if (origin_cell_.size() != probability_layer_labels_.size())
-    LOG_ERROR_P(PARAM_PROBABILITY_LAYERS) << "you must specify a layer label for each origin cell. You have supplied '" << origin_cell_.size() << "' origin cells but '" << probability_layer_labels_.size() << "' probability layer labels, please sort this out.";
+    LOG_ERROR_P(PARAM_PROBABILITY_LAYERS) << "you must specify a layer label for each " << PARAM_PROBABILITY_LAYERS << ". You supplied '" << origin_cell_.size() << "' origin cells but '" << probability_layer_labels_.size() << "' probability layer labels, please sort this out.";
 
   if (movement_type_string_ == PARAM_MARKOVIAN)
     movement_type_ = MovementType::kMarkovian;
@@ -81,10 +81,6 @@ void MovementBoxTransfer::DoBuild() {
       LOG_ERROR_P(PARAM_ORIGIN_CELL) << " value (" << split_cells[1] << ") could not be converted to a unsigned";
     origin_cols_.push_back(value - 1);
   }
-
-  // Check the
-  if (world_->get_enabled_cells() != origin_cell_.size())
-    LOG_ERROR_P(PARAM_ORIGIN_CELL) << "you haven't supplied an origin cell for all enabled cells in the spatial domain. you have supplied '" << origin_cell_.size() << "' origin cells, but there are '" << world_->get_enabled_cells() << "' enabled cells in the domain, please check this out";
 
   for (unsigned row = 0; row < model_->get_height(); ++row) {
     for (unsigned col = 0; col < model_->get_width(); ++col) {
@@ -126,6 +122,10 @@ void MovementBoxTransfer::DoBuild() {
       }
     }
   }
+
+  // assign memory for moved_agents_by_year_
+  MovementData empty_movement_data(model_->get_height(), model_->get_width(), origin_cell_[0], model_->start_year());
+  moved_agents_by_year_.resize(model_->year_spread(), empty_movement_data);
 }
 
 void MovementBoxTransfer::ApplyStochasticMovement(vector<Agent>& agents, MovementData& store_infor, bool tagged_partition, unsigned& origin_element, unsigned& row, unsigned& col) {
@@ -303,24 +303,17 @@ void MovementBoxTransfer::ApplyStochasticMovement(vector<Agent>& agents, Movemen
  */
 void MovementBoxTransfer::DoExecute() {
   LOG_MEDIUM() << "label: " << label_;
-  for (unsigned row = 0; row < model_->get_height(); ++row) {
-    for (unsigned col = 0; col < model_->get_width(); ++col) {
-      // Find the right probability layer for this combo
-      WorldCell* origin_cell = world_->get_base_square(row, col);
-      if (origin_cell->is_enabled()) {
-        unsigned origin_element = 0;
-        for (; origin_element < origin_rows_.size(); ++origin_element) {
-          if ((origin_rows_[origin_element] == row) && (origin_cols_[origin_element] == col))
-            break;
-        }
-        MovementData store_infor(model_->get_height(), model_->get_width(), origin_cell_[origin_element], model_->current_year());
-        ApplyStochasticMovement(origin_cell->agents_, store_infor, false, origin_element, row, col);
-        ApplyStochasticMovement(origin_cell->tagged_agents_, store_infor, true, origin_element, row, col);
+  for(unsigned origin_cell_iter = 0; origin_cell_iter < origin_cell_.size(); ++origin_cell_iter) {
+    // Find the right probability layer for this combo
+    WorldCell* origin_cell = world_->get_base_square(origin_rows_[origin_cell_iter], origin_cols_[origin_cell_iter]);
+    if (origin_cell->is_enabled()) {
+      MovementData store_infor(model_->get_height(), model_->get_width(), origin_cell_[origin_cell_iter], model_->current_year());
+      ApplyStochasticMovement(origin_cell->agents_, store_infor, false, origin_cell_iter, origin_rows_[origin_cell_iter], origin_cols_[origin_cell_iter]);
+      ApplyStochasticMovement(origin_cell->tagged_agents_, store_infor, true, origin_cell_iter, origin_rows_[origin_cell_iter], origin_cols_[origin_cell_iter]);
 
-        // Save info for reporting
-        if (model_->state() != State::kInitialise) {
-            moved_agents_by_year_.push_back(store_infor);
-        }
+      // Save info for reporting
+      if (model_->state() != State::kInitialise) {
+        moved_agents_by_year_[model_->get_year_ndx()] = store_infor;
       }
     }
   }
