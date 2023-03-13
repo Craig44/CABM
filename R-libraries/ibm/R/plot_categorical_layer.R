@@ -5,6 +5,8 @@
 #' @export
 plot_categorical_layer = function(categorical_matrix, fill_color = T) {
   molten_cat_mat = reshape2::melt(categorical_matrix)
+  change_y_for_plotting = rev(sort(unique(molten_cat_mat$Var1)))
+  molten_cat_mat$Var1 = change_y_for_plotting[molten_cat_mat$Var1]
   colnames(molten_cat_mat) = c("Row", "Col", "value")
   gplt = NULL
   if(fill_color) {

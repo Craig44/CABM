@@ -14,7 +14,6 @@ IF (DEBUG)
  SET(COMPILE_OPTIONS " -O0 -g2 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs -fopenmp")
 ELSEIF (RELEASE)
  SET(COMPILE_OPTIONS " -O2 -g0 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs -fopenmp")
- SET(COMPILE_OPTIONS " -O2 -g0 -Wall -Werror -fmessage-length=0 -Wno-unused-local-typedefs -fopenmp")
 ENDIF ()
 ########################################################################################
 IF (MSE) ## if users compile with doBuild release mse
@@ -151,9 +150,9 @@ IF (WIN32)
  ## WINDOWS BUILD VARIABLES AND LIBRARIES
  SET(buildOS windows) 
  IF (MSE)
-  SET(COMPILE_OPTIONS "${COMPILE_OPTIONS} -D__GNUDOS__ -std=c++14 -s ${RCXXFLAGS}")
+  SET(COMPILE_OPTIONS "${COMPILE_OPTIONS} -D__GNUDOS__ -std=c++14 -s ${RCXXFLAGS} -march=i686")
  ELSE()
-  SET(COMPILE_OPTIONS "${COMPILE_OPTIONS} -D__GNUDOS__ -std=c++14")
+  SET(COMPILE_OPTIONS "${COMPILE_OPTIONS} -D__GNUDOS__ -std=c++14 -march=i686")
  ENDIF ()
  SET(thirdPartyLibraries ${thirdPartyLibraries} pthread)
  
