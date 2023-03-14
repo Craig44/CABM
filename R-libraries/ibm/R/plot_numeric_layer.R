@@ -12,7 +12,7 @@
 #' @return a data frame
 #' @export 
 
-get_numeric_layer = function(model, report_label, file_name = "", breaks = NULL, col_labs = NULL, row_labs = NULL) {
+get_numeric_layer = function(model, report_label, breaks = NULL, col_labs = NULL, row_labs = NULL) {
   ## check report label exists
   if (!report_label %in% names(model))
     stop(Paste("In model the report label '", report_label, "' could not be found. The report labels available are ", paste(names(model),collapse = ", ")))
@@ -57,8 +57,7 @@ get_numeric_layer = function(model, report_label, file_name = "", breaks = NULL,
   for (i in 1:(length(breaks) - 1)) {
     legend_lab[i] = round(breaks[i] + ((breaks[i + 1] - breaks[i])/2))
   }  
-  if (file_name == "")
-    file_name = report_label
+
   #dir.create("Figures")
   full_df = NULL
   for (i in 1:length(report)) {
