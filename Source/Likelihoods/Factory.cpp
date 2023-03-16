@@ -5,7 +5,7 @@
  * @date 22/03/2013
  * @section LICENSE
  *
- * Copyright NIWA Science ©2013 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2013 - www.niwa.co.nz
  *
  * $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
  */
@@ -19,6 +19,7 @@
 #include "Likelihoods/Children/Binomial.h"
 #include "Likelihoods/Children/BinomialApprox.h"
 #include "Likelihoods/Children/Dirichlet.h"
+#include "Likelihoods/Children/DirichletMultinomial.h"
 #include "Likelihoods/Children/LogNormal.h"
 #include "Likelihoods/Children/LogisticNormal.h"
 #include "Likelihoods/Children/LogNormalWithQ.h"
@@ -45,6 +46,8 @@ Likelihood* Factory::Create(Model* model, const string& object_type, const strin
     result = new BinomialApprox(model);
   else if (sub_type == PARAM_DIRICHLET)
     result = new Dirichlet(model);
+  else if (sub_type == PARAM_DIRICHLET_MULTINOMIAL)
+    result = new DirichletMultinomial(model);
   else if (sub_type == PARAM_LOGNORMAL)
     result = new LogNormal(model);
   else if (sub_type == PARAM_LOGISTIC_NORMAL)

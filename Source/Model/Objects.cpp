@@ -21,6 +21,7 @@
 #include "Processes/Manager.h"
 #include "Selectivities/Manager.h"
 #include "TimeVarying/Manager.h"
+#include "Likelihoods/Manager.h"
 #include "InitialisationPhases/Manager.h"
 #include "Observations/Manager.h"
 #include "Utilities/String.h"
@@ -237,7 +238,12 @@ base::Object* Objects::FindObjectOrNull(const string& parameter_absolute_name) {
     result = model_->managers().observation()->GetObservation(label);
 
   } else if (type == PARAM_TIME_VARYING) {
+
     result = model_->managers().time_varying()->GetTimeVarying(label);
+
+  } else if (type == PARAM_LIKELIHOOD) {
+
+    result = model_->managers().likelihood()->GetLikelihood(label);
 
   } else {
     LOG_FATAL() << "Currently the type " << type << ", first please check you have spelt it correctly, if you are confident you have it may not be coded to find addressable, please add it the class to FindObject() in Model/Objects.cpp by contacting the development team";

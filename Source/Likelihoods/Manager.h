@@ -5,7 +5,7 @@
  * @date Oct 26, 2016
  * @section LICENSE
  *
- * Copyright NIWA Science ©2016 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2016 - www.niwa.co.nz
  *
  * @section DESCRIPTION
  *
@@ -31,8 +31,9 @@ class Manager : public niwa::base::Manager<niwa::likelihoods::Manager, niwa::Lik
   friend class niwa::Managers;
 public:
   // methods
-  virtual                     ~Manager() noexcept(true) { };
+  virtual                     ~Manager() noexcept(true){};
   Likelihood*                 GetOrCreateLikelihood(Model* model, const string& observation_label, const string& label);
+  Likelihood*                 GetLikelihood(const string& label);
 
 protected:
   // methods
