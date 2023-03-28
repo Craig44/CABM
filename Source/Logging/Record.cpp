@@ -5,7 +5,7 @@
  * @date 14/04/2015
  * @section LICENSE
  *
- * Copyright NIWA Science ©2015 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2015 - www.niwa.co.nz
  *
  */
 
@@ -104,7 +104,7 @@ void Record::BuildMessage() {
 #else
     o << "\n";
     o << "********************************************************************************\n";
-    o << "********                CODE ERROR - IBM is FORCE QUITTING              ********\n";
+    o << "********                CODE ERROR - CABM is FORCE QUITTING              ********\n";
     o << "********************************************************************************\n";
     o << "Source File: " << file_name_ << "(line: " << line_number_ << ")\n";
     o << "Source Method: " << function_ << "\n";

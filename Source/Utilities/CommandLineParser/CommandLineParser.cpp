@@ -5,7 +5,7 @@
  * @date 16/11/2012
  * @section LICENSE
  *
- * Copyright NIWA Science ©2012 - www.niwa.co.nz
+ * Copyright NIWA Science ï¿½2012 - www.niwa.co.nz
  *
  * $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
  */
@@ -48,7 +48,7 @@ void CommandLineParser::Parse(int argc, char* argv[], RunParameters& options) {
   options_description oDesc("Usage");
   oDesc.add_options()
     ("help,h", "Print help")
-    ("license,l", "Display IBM license")
+    ("license,l", "Display CABM license")
     ("version,v", "Display version information")
     ("simulation,s", value<unsigned>(), "Simulation mode (arg = number of candidates)")
     ("config,c", value<string>(), "Configuration file")

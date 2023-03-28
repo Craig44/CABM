@@ -2,7 +2,7 @@
 // Name        : CStandardHeaderReport.cpp
 // Author      : S.Rasmussen
 // Date        : 5/01/2009
-// Copyright   : Copyright NIWA Science ©2008 - www.niwa.co.nz
+// Copyright   : Copyright NIWA Science ï¿½2008 - www.niwa.co.nz
 // Description :
 // $Date: 2008-03-04 16:33:32 +1300 (Tue, 04 Mar 2008) $
 //============================================================================
@@ -58,7 +58,7 @@ StandardHeader::~StandardHeader() {
 void StandardHeader::DoPrepare() {
 
   ostringstream               header;
-  header << "IBM" << endl;
+  header << "CABM" << endl;
 
   /**
    * Build the Command line
